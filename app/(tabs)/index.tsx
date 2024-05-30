@@ -1,10 +1,10 @@
 import { Text, View } from "react-native";
 import styled from "styled-components/native";
 
-export default function Index() {
+export default function Home() {
   return (
     <Container>
-      <Text>Hello, world!</Text>
+      <Text>Home</Text>
     </Container>
   );
 }
