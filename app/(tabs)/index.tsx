@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components/native";
 import { Text, Button, ActivityIndicator } from "react-native";
 import * as Location from "expo-location";
+import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 
 export default function Home() {
   const [location, setLocation] = useState<Location.LocationObject | undefined>(
@@ -27,10 +28,12 @@ export default function Home() {
     setIsLoading(false);
   };
 
+  //Get Location once
   useEffect(() => {
     getLocation();
   }, []);
 
+  //Update Text
   let text = "Waiting..";
   if (errorMsg) {
     text = errorMsg;
@@ -41,7 +44,30 @@ export default function Home() {
   return (
     <Container>
       {isLoading ? (
-        <ActivityIndicator size="large" color="#0000ff" />
+        <>
+          <ActivityIndicator size="large" color="#0000ff" />
+          <Text>{text}</Text>
+        </>
+      ) : location ? (
+        //TODO: Enable Google Maps
+        // <MapView
+        //   provider={PROVIDER_GOOGLE}
+        //   initialRegion={{
+        //     latitude: location.coords.latitude,
+        //     longitude: location.coords.longitude,
+        //     latitudeDelta: 0.0922,
+        //     longitudeDelta: 0.0421,
+        //   }}
+        // >
+        //   <Marker
+        //     coordinate={{
+        //       latitude: location.coords.latitude,
+        //       longitude: location.coords.longitude,
+        //     }}
+        //     title="You are here"
+        //   />
+        // </MapView>
+        <Text>{text}</Text>
       ) : (
         <Text>{text}</Text>
       )}
