@@ -1,17 +1,11 @@
 import { Text, View } from "react-native";
 import styled from "styled-components/native";
+import { Container } from "@/components";
 
 export default function Tips() {
   return (
     <Container>
-      <Text>Tips</Text>
+      <Text>Tip</Text>
     </Container>
   );
 }
-
-const Container = styled.View`
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;

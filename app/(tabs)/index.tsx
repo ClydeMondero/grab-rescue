@@ -3,6 +3,7 @@ import styled from "styled-components/native";
 import { Text, Button, ActivityIndicator } from "react-native";
 import * as Location from "expo-location";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import { Container } from "@/components";
 
 export default function Home() {
   const [location, setLocation] = useState<Location.LocationObject | undefined>(
@@ -74,10 +75,3 @@ export default function Home() {
     </Container>
   );
 }
-
-const Container = styled.View`
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
