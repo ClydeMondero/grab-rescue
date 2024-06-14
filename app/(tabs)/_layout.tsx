@@ -1,7 +1,10 @@
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "styled-components/native";
 
 export default function TabsLayout() {
+  const theme = useTheme();
+
   return (
     <Tabs>
       <Tabs.Screen
@@ -9,8 +12,15 @@ export default function TabsLayout() {
         options={{
           title: "Home",
           tabBarIcon(props) {
-            return <Ionicons name="home" {...props} />;
+            return (
+              <Ionicons
+                name="home"
+                color={props.focused ? theme.PRIMARY_COLOR : props.color}
+                size={props.size}
+              />
+            );
           },
+          tabBarActiveTintColor: theme.PRIMARY_COLOR,
         }}
       />
       <Tabs.Screen
@@ -18,8 +28,15 @@ export default function TabsLayout() {
         options={{
           title: "Tips",
           tabBarIcon(props) {
-            return <Ionicons name="bulb" {...props} />;
+            return (
+              <Ionicons
+                name="bulb"
+                color={props.focused ? theme.PRIMARY_COLOR : props.color}
+                size={props.size}
+              />
+            );
           },
+          tabBarActiveTintColor: theme.PRIMARY_COLOR,
         }}
       />
       <Tabs.Screen
@@ -27,8 +44,15 @@ export default function TabsLayout() {
         options={{
           title: "Hotlines",
           tabBarIcon(props) {
-            return <Ionicons name="call" {...props} />;
+            return (
+              <Ionicons
+                name="call"
+                color={props.focused ? theme.PRIMARY_COLOR : props.color}
+                size={props.size}
+              />
+            );
           },
+          tabBarActiveTintColor: theme.PRIMARY_COLOR,
         }}
       />
     </Tabs>
