@@ -1,6 +1,6 @@
 import { StyleSheet, View, Text, Pressable } from "react-native";
 import { Link } from "expo-router";
-import { Container } from "@/components";
+import { Container, Title, Button, TextInButton } from "@/components";
 import styled from "styled-components/native";
 
 export default function Welcome() {
@@ -25,18 +25,3 @@ export default function Welcome() {
     </Container>
   );
 }
-
-const Title = styled.Text`
-  font-size: 5rem;
-`;
-
-const Button = styled.Pressable`
-  padding: 1rem 2rem;
-  border-radius: 0.8rem;
-  background-color: ${(props) => props.theme.PRIMARY_COLOR};
-`;
-
-const TextInButton = styled.Text`
-  color: ${(props) => props.theme.TEXT_COLOR};
-  font-weight: 600;
-`;

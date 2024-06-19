@@ -1,7 +1,7 @@
 import styled from "styled-components/native";
 import Constants from "expo-constants";
 
-export const Container = styled.View`
+export const Container = styled.SafeAreaView`
   background-color: ${(props) => props.theme.BACKGROUND_COLOR};
   flex: 1;
   display: flex;
