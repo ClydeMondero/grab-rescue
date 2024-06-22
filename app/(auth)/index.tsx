@@ -1,34 +1,26 @@
-import { useState } from "react";
-import { View, Text } from "react-native";
-import { Container, Button, TextInButton, Input } from "@/components";
+import { StyleSheet, View, Text, Pressable } from "react-native";
 import { Link } from "expo-router";
+import { Container, Title, Button, TextInButton } from "@/components";
+import styled from "styled-components/native";
 
-export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
+export default function Welcome() {
   return (
     <Container>
-      <Text>Email</Text>
-      <Input value={email} onChangeText={setEmail}></Input>
-      <Text>Password</Text>
-      <Input
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry={true}
-      ></Input>
-      <Button>
-        <TextInButton>Login</TextInButton>
-      </Button>
+      <Title>Welcome!</Title>
+      <Link replace href="/(tabs)" asChild>
+        <Button>
+          <TextInButton>Continue</TextInButton>
+        </Button>
+      </Link>
       <Link
         replace
-        href="/(auth)/register"
+        href="/(auth)/login"
         style={{
           marginTop: 25,
           color: "#d46969",
         }}
       >
-        Doesn't Have an Account? Sign Up
+        Login as Admin
       </Link>
     </Container>
   );
