@@ -5,9 +5,9 @@ import { Link } from "expo-router";
 export default function Register() {
   return (
     <Container>
-      <Text>Login</Text>
+      <Text>Register</Text>
       <Link href="/(auth)/register" asChild>
-        <Text>Don't Have an Account? Register Now.</Text>
+        <Text>Already Have an Account? Login Now.</Text>
       </Link>
     </Container>
   );
