@@ -1,14 +1,26 @@
-import { Text } from "react-native";
-import { Container } from "@/components";
+import {
+  Container,
+  Heading,
+  InputContainer,
+  Input,
+  LinkText,
+  Button,
+} from "@/components";
 import { Link } from "expo-router";
 
 export default function Index() {
   return (
     <Container>
-      <Text>Login</Text>
+      <Heading>Login as Rescuer</Heading>
+      <InputContainer>
+        <Input placeholder="Email"></Input>
+        <Input placeholder="Full Name"></Input>
+        <Input placeholder="Password"></Input>
+      </InputContainer>
       <Link href="/(auth)/register" asChild>
-        <Text>Don't Have an Account? Register Now.</Text>
+        <LinkText>Don't Have an Account? Register Now.</LinkText>
       </Link>
+      <Button>Login</Button>
     </Container>
   );
 }
