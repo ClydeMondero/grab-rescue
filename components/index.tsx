@@ -44,3 +44,25 @@ export const Button = styled.TouchableOpacity`
   padding: 1rem;
   border-radius: 0.6rem;
 `;
+
+export const PasswordContainer = styled.View`
+  width: 50%;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  background-color: ${(props) => rgba(props.theme.SECONDARY_COLOR, 0.1)};
+  border-radius: 0.6rem;
+  box-sizing: border-box;
+  padding: 1rem;
+  width: 50%;
+  height: 50px;
+`;
+
+export const PasswordInput = styled.TextInput`
+  flex: 1;
+  color: ${(props) => props.theme.TEXT_COLOR};
+  border-radius: 0.6rem;
+  box-sizing: border-box;
+  width: 50%;
+  height: 50px;
+`;
