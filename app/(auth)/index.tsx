@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Text } from "react-native";
 import {
   Container,
   Heading,
@@ -13,27 +14,72 @@ import { Link } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "styled-components/native";
 import { rgba } from "polished";
+import { Controller, useForm } from "react-hook-form";
+import { UserLogin } from "@/constants/types";
 
 export default function Index() {
   const theme = useTheme();
 
   const [showPassword, setShowPassword] = useState(false);
 
+  const { control, handleSubmit } = useForm({
+    defaultValues: {
+      email: "",
+      fullName: "",
+      password: "",
+    },
+  });
+
   const toggleShowPassword = () => {
     setShowPassword(!showPassword);
+  };
+
+  const onSubmit = (data: UserLogin) => {
+    console.log("Success", JSON.stringify(data));
   };
 
   return (
     <Container>
       <Heading>Login as Rescuer</Heading>
       <InputContainer>
-        <Input placeholder="Email"></Input>
-        <Input placeholder="Full Name"></Input>
+        <Controller
+          control={control}
+          name="email"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <Input
+              placeholder="Email"
+              value={value}
+              onChange={onChange}
+              onBlur={onBlur}
+            ></Input>
+          )}
+        />
+        <Controller
+          control={control}
+          name="fullName"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <Input
+              placeholder="Full Name"
+              value={value}
+              onChange={onChange}
+              onBlur={onBlur}
+            ></Input>
+          )}
+        />
         <PasswordContainer>
-          <PasswordInput
-            placeholder="Password"
-            secureTextEntry={true}
-          ></PasswordInput>
+          <Controller
+            control={control}
+            name="password"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <PasswordInput
+                placeholder="Password"
+                secureTextEntry={true}
+                value={value}
+                onChange={onChange}
+                onBlur={onBlur}
+              ></PasswordInput>
+            )}
+          />
           <Ionicons
             name={showPassword ? "eye-off" : "eye"}
             color={rgba(theme.SECONDARY_COLOR, 0.5)}
@@ -45,7 +91,7 @@ export default function Index() {
       <Link href="/(auth)/register" asChild>
         <LinkText>Don't Have an Account? Register Now.</LinkText>
       </Link>
-      <Button>Login</Button>
+      <Button onPress={handleSubmit(onSubmit)}>Login</Button>
     </Container>
   );
 }

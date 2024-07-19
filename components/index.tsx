@@ -35,6 +35,8 @@ export const LinkText = styled.Text`
   color: ${(props) => props.theme.ACCENT_COLOR};
 `;
 
+//TODO: fix Text inside Button
+
 export const Button = styled.TouchableOpacity`
   background-color: ${(props) => props.theme.PRIMARY_COLOR};
   color: ${(props) => props.theme.BACKGROUND_COLOR};
@@ -44,6 +46,8 @@ export const Button = styled.TouchableOpacity`
   padding: 1rem;
   border-radius: 0.6rem;
 `;
+
+//TODO: fix password outline
 
 export const PasswordContainer = styled.View`
   width: 50%;
