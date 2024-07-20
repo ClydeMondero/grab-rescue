@@ -8,6 +8,7 @@ import {
   PasswordInput,
   LinkText,
   Button,
+  ButtonText,
 } from "@/components";
 import { Link } from "expo-router";
 import { useTheme } from "styled-components/native";
@@ -56,7 +57,9 @@ export default function Register() {
       <Link href="/(auth)/" asChild>
         <LinkText>Already Have an Account? Login Now.</LinkText>
       </Link>
-      <Button>Register</Button>
+      <Button>
+        <ButtonText>Register</ButtonText>
+      </Button>
     </Container>
   );
 }

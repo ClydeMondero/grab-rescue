@@ -9,6 +9,7 @@ import {
   PasswordInput,
   LinkText,
   Button,
+  ButtonText,
 } from "@/components";
 import { Link } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -91,7 +92,9 @@ export default function Index() {
       <Link href="/(auth)/register" asChild>
         <LinkText>Don't Have an Account? Register Now.</LinkText>
       </Link>
-      <Button onPress={handleSubmit(onSubmit)}>Login</Button>
+      <Button onPress={handleSubmit(onSubmit)}>
+        <ButtonText>Login</ButtonText>
+      </Button>
     </Container>
   );
 }

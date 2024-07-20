@@ -40,11 +40,17 @@ export const LinkText = styled.Text`
 export const Button = styled.TouchableOpacity`
   background-color: ${(props) => props.theme.PRIMARY_COLOR};
   color: ${(props) => props.theme.BACKGROUND_COLOR};
-  text-transform: uppercase;
   width: 50%;
-  text-align: center;
   padding: 1rem;
   border-radius: 0.6rem;
+`;
+
+export const ButtonText = styled.Text`
+  text-align: center;
+  color: white;
+  font-weight: bold;
+  font-size: 1rem;
+  text-transform: uppercase;
 `;
 
 //TODO: fix password outline
