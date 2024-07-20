@@ -1,39 +1,26 @@
-import { useState } from "react";
-import { Text } from "react-native";
 import {
   Container,
   Heading,
-  InputContainer,
-  Input,
-  PasswordContainer,
-  PasswordInput,
+  FormContainer,
   LinkText,
   Button,
   ButtonText,
 } from "@/components";
+import FormInput from "@/components/FormInput";
 import { Link } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
-import { useTheme } from "styled-components/native";
-import { rgba } from "polished";
-import { Controller, useForm } from "react-hook-form";
-import { UserLogin } from "@/constants/types";
+import { useForm } from "react-hook-form";
+import { UserLogin, userLoginSchema } from "@/constants/types";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 export default function Index() {
-  const theme = useTheme();
-
-  const [showPassword, setShowPassword] = useState(false);
-
   const { control, handleSubmit } = useForm({
     defaultValues: {
       email: "",
       fullName: "",
       password: "",
     },
+    resolver: zodResolver(userLoginSchema),
   });
-
-  const toggleShowPassword = () => {
-    setShowPassword(!showPassword);
-  };
 
   const onSubmit = (data: UserLogin) => {
     console.log("Success", JSON.stringify(data));
@@ -42,59 +29,22 @@ export default function Index() {
   return (
     <Container>
       <Heading>Login as Rescuer</Heading>
-      <InputContainer>
-        <Controller
+      <FormContainer>
+        <FormInput control={control} name="email" placeholder="Email" />
+        <FormInput control={control} name="fullName" placeholder="Full Name" />
+        <FormInput
           control={control}
-          name="email"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <Input
-              placeholder="Email"
-              value={value}
-              onChange={onChange}
-              onBlur={onBlur}
-            ></Input>
-          )}
+          name="password"
+          placeholder="Password"
+          secureTextEntry={true}
         />
-        <Controller
-          control={control}
-          name="fullName"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <Input
-              placeholder="Full Name"
-              value={value}
-              onChange={onChange}
-              onBlur={onBlur}
-            ></Input>
-          )}
-        />
-        <PasswordContainer>
-          <Controller
-            control={control}
-            name="password"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <PasswordInput
-                placeholder="Password"
-                secureTextEntry={true}
-                value={value}
-                onChange={onChange}
-                onBlur={onBlur}
-              ></PasswordInput>
-            )}
-          />
-          <Ionicons
-            name={showPassword ? "eye-off" : "eye"}
-            color={rgba(theme.SECONDARY_COLOR, 0.5)}
-            size={20}
-            onPress={toggleShowPassword}
-          />
-        </PasswordContainer>
-      </InputContainer>
-      <Link href="/(auth)/register" asChild>
-        <LinkText>Don't Have an Account? Register Now.</LinkText>
-      </Link>
+      </FormContainer>
       <Button onPress={handleSubmit(onSubmit)}>
         <ButtonText>Login</ButtonText>
       </Button>
+      <Link href="/(auth)/register" asChild>
+        <LinkText>Don't Have an Account? Register Now.</LinkText>
+      </Link>
     </Container>
   );
 }
