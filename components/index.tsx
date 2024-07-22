@@ -33,7 +33,7 @@ export const FormContainer = styled.View`
 
 export const LinkText = styled.Text`
   color: ${(props) => props.theme.ACCENT_COLOR};
-  font-weight: bold;
+  font-weight: 400;
 `;
 
 export const Button = styled.TouchableOpacity`
