@@ -1,18 +1,8 @@
-import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
-import {Main, Admin, Rescuer, Citizen, Login} from "./pages/";
-
+import Admin from "./pages/Admin";
 const App = () => {
   return (
     <>
-      <Router>
-        <Routes>
-          <Route path="/" element={<Main />} />
-          <Route path='/login' element={<Login />}/>
-          <Route path="/admin" element={<Admin />} />
-          <Route path='/rescuer' element={<Rescuer />}/>
-          <Route path='/citizen' element={<Citizen />}/>
-        </Routes>
-      </Router>
+      <Admin/>
     </>
   );
 }
