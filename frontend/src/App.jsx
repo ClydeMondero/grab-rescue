@@ -1,7 +1,10 @@
-export default function App() {
+import Admin from "./pages/Admin";
+const App = () => {
   return (
     <>
-      <h1 className="text-xl">Hello World!</h1>
+      <Admin/>
     </>
   );
 }
+
+export default App;
