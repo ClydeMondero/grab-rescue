@@ -10,7 +10,7 @@ const Sidebar = () => {
   };
 
   return (
-    <div className='sidebar d-flex flex-column justify-content-between bg-[#557C55] text-white p-4 vh-100'>
+    <div className='sidebar d-flex flex-column justify-content-between bg-[#557C55] text-white p-4 vh-100 fixed top-0 left-0 bottom-0 w-70'>
       <div>
         <div className="dropdown mb-3">
           <a 
@@ -54,42 +54,42 @@ const Sidebar = () => {
 
         <ul className='nav nav-pills flex-column px-0'>
           <li className='nav-item py-1'>
-            <Link to="/" className='nav-link text-white px-2'>
-              <i className='bi bi-alarm fs-5 me-2'></i>
-              <span className='fs-5'>Incoming Requests</span>
+            <Link to="/" className='nav-link text-white d-flex align-items-center px-2'>
+              <i className='bi bi-phone-vibrate-fill fs-5 me-2'></i>
+              <span className='fs-5 mb-0'>Incoming Requests</span>
             </Link>
           </li>
           <li className='nav-item py-1'>
-            <Link to="assign_rescuer" className='nav-link text-white px-2'>
-              <i className='bi bi-person-badge-fill fs-5 me-2'></i>
-              <span className='fs-5'>Assign Rescuer</span>
+            <Link to="/assign_rescuer" className='nav-link text-white d-flex align-items-center px-2'>
+              <i className='bi bi-people-fill fs-5 me-2'></i>
+              <span className='fs-5 mb-0'>Assign Rescuer</span>
             </Link>
           </li>
           <li className='nav-item py-1'>
-            <Link to="ongoing_rescues" className='nav-link text-white px-2'>
-              <i className='bi bi-activity fs-5 me-2'></i>
-              <span className='fs-5'>On Going Rescues</span>
+            <Link to="/ongoing_rescues" className='nav-link text-white d-flex align-items-center px-2'>
+              <i className='bi bi-arrow-repeat fs-5 me-2'></i>
+              <span className='fs-5 mb-0'>On Going Rescues</span>
             </Link>
           </li>
           <li className='nav-item py-1'>
-            <Link to="generate_reports" className='nav-link text-white px-2'>
-              <i className='bi bi-clipboard-check fs-5 me-2'></i>
-              <span className='fs-5'>Generate Reports</span>
+            <Link to="/generate_reports" className='nav-link text-white d-flex align-items-center px-2'>
+              <i className='bi bi-printer-fill fs-5 me-2'></i>
+              <span className='fs-5 mb-0'>Generate Reports</span>
             </Link>
           </li>
           <li className='nav-item py-1'>
-            <Link to="settings" className='nav-link text-white px-2'>
-              <i className='bi bi-gear fs-5 me-2'></i>
-              <span className='fs-5'>Settings</span>
+            <Link to="/settings" className='nav-link text-white d-flex align-items-center px-2'>
+              <i className='bi bi-gear-fill fs-5 me-2'></i>
+              <span className='fs-5 mb-0'>Settings</span>
             </Link>
           </li>
         </ul>
       </div>
       <div>
         <hr className='border-white border-2 mt-2'></hr>
-        <Link to="/logout" className='nav-link text-white px-2'>
+        <Link to="/logout" className='nav-link text-white d-flex align-items-center px-2'>
           <i className='bi bi-box-arrow-right fs-5 me-2'></i>
-          <span className='fs-5'>Logout</span>
+          <span className='fs-5 mb-0'>Logout</span>
         </Link>
       </div>
     </div>

@@ -1,6 +1,13 @@
 import Sidebar from "../components/Sidebar";
 import 'bootstrap/dist/css/bootstrap.css';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import IncomingRequests from '../components/IncomingRequests';
+import AssignRescuers from '../components/AssignRescuers';
+import OngoingRescues from '../components/OngoingRescues';
+import GenerateReports from '../components/GenerateReports';
+import Settings from '../components/Settings';
+import ChangePassword from '../components/ChangePassword';
+import ViewProfile from '../components/ViewProfile';
 
 const Admin = () => {
   return (
@@ -11,12 +18,13 @@ const Admin = () => {
         </div>
         <div className="col vh-100">
           <Routes>
-            <Route path="/" element={<IncomingRequest />} />
-            <Route path="/assign_rescuer" element={<AssignRescuer />} />
-            <Route path="/ongoing_rescues" element={<OnGoingRescues />} />
+            <Route path="/" element={<IncomingRequests />} />
+            <Route path="/assign_rescuer" element={<AssignRescuers />} />
+            <Route path="/ongoing_rescues" element={<OngoingRescues />} />
             <Route path="/generate_reports" element={<GenerateReports />} />
             <Route path="/settings" element={<Settings />} />
-            <Route path="/logout" element={<Logout />} />
+            <Route path="/view_profile" element={<ViewProfile />} />
+            <Route path="/change_password" element={<ChangePassword />} />
           </Routes>
         </div>
       </div>
@@ -25,27 +33,3 @@ const Admin = () => {
 };
 
 export default Admin;
-
-function IncomingRequest() {
-  return <div>Incoming Request</div>;
-}
-
-function AssignRescuer() {
-  return <div>Assign Rescuer</div>;
-}
-
-function OnGoingRescues() {
-  return <div>On-going Rescues</div>;
-}
-
-function GenerateReports() {
-  return <div>Generate Reports</div>;
-}
-
-function Settings() {
-  return <div>Settings</div>;
-}
-
-function Logout() {
-  return <div>Logging out...</div>;
-}
