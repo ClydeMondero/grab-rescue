@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AiOutlineUser } from "react-icons/ai"; 
+import { AiOutlineUser } from "react-icons/ai";
 
 const AssignRescuers = () => {
   const [rescuers] = useState([
@@ -25,20 +25,20 @@ const AssignRescuers = () => {
     : requests.filter(request => request.location.includes(selectedLocation));
 
   return (
-    <div className="flex-1 p-6 lg:p-8 h-full bg-gray-50 flex flex-col">
-      <div className="flex items-center mb-6 border-b border-[#E2E2E2] pb-4">
-        <AiOutlineUser className="text-3xl text-[#557C55] mr-3" />
-        <h4 className="text-2xl font-semibold text-[#557C55]">Assign Rescuers</h4>
-      </div>
+    <div className="flex flex-col h-screen w-full bg-gray-50">
+      <header className="p-2 sm:p-3 lg:p-4 flex items-center border-b border-[#E2E2E2]">
+        <AiOutlineUser className="text-lg sm:text-xl text-[#557C55] mr-1 sm:mr-2" />
+        <h4 className="text-md sm:text-lg font-semibold text-[#557C55]">Assign Rescuers</h4>
+      </header>
 
-      <p className="mb-6 text-md text-gray-600">Filter and assign rescuers to the following requests:</p>
+      <p className="px-2 mb-1 text-xs sm:text-sm text-gray-600">Filter and assign rescuers to the following requests:</p>
 
-      <div className="bg-white rounded-lg p-6 flex flex-col flex-1">
-        <div className="mb-6">
-          <label htmlFor="locationFilter" className="block text-lg font-medium text-gray-700">Filter by Location:</label>
+      <div className="flex-1 bg-white rounded-lg p-2 sm:p-3 flex flex-col">
+        <div className="mb-1 px-2">
+          <label htmlFor="locationFilter" className="block text-xs sm:text-sm font-medium text-gray-700">Filter by Location:</label>
           <select 
             id="locationFilter"
-            className="form-select w-full border border-[#557C55] text-black rounded-lg p-3 mt-2 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#557C55]"
+            className="form-select w-full border border-[#557C55] text-black rounded-lg p-1 mt-1 bg-gray-50 text-xs sm:text-sm"
             value={selectedLocation}
             onChange={(e) => setSelectedLocation(e.target.value)}
           >
@@ -51,17 +51,17 @@ const AssignRescuers = () => {
           </select>
         </div>
 
-        <p className="mb-6 text-lg font-semibold text-gray-700">List of available rescuers:</p>
-        <div className="flex-1 overflow-auto">
-          <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
+        <p className="px-2 mb-1 text-xs sm:text-sm font-semibold text-gray-700">List of available rescuers:</p>
+        <div className="flex-1 overflow-x-auto">
+          <table className="min-w-full bg-white border border-gray-200 rounded-lg text-xs sm:text-sm">
             <thead className="bg-[#557C55] text-white text-left">
               <tr>
-                <th className="px-4 py-3">#</th>
-                <th className="px-4 py-3">Name</th>
-                <th className="px-4 py-3">Location</th>
-                <th className="px-4 py-3">Barangay Name</th>
-                <th className="px-4 py-3">Contact Number</th>
-                <th className="px-4 py-3">Status</th>
+                <th className="px-4 py-2">#</th>
+                <th className="px-4 py-2">Name</th>
+                <th className="px-4 py-2">Location</th>
+                <th className="px-4 py-2">Barangay Name</th>
+                <th className="px-4 py-2">Contact Number</th>
+                <th className="px-4 py-2">Status</th>
               </tr>
             </thead>
             <tbody>
@@ -76,7 +76,7 @@ const AssignRescuers = () => {
                   <td className="px-4 py-2">{rescuer.barangay}</td>
                   <td className="px-4 py-2">{rescuer.contactNumber}</td>
                   <td 
-                    className={`px-4 py-2 ${rescuer.status === 'Available' ? 'text-green-600' : rescuer.status === 'Unavailable' ? 'text-red-600' : 'text-black'}`}
+                    className={`px-2 py-1 ${rescuer.status === 'Available' ? 'text-green-600' : rescuer.status === 'Unavailable' ? 'text-red-600' : 'text-black'}`}
                   >
                     {rescuer.status}
                   </td>

@@ -1,6 +1,9 @@
 import { useState } from 'react';
+import { FaArrowLeft } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 
 const ChangePassword = () => {
+  const navigate = useNavigate();
   const [passwords, setPasswords] = useState({
     currentPassword: '',
     newPassword: '',
@@ -22,8 +25,11 @@ const ChangePassword = () => {
 
   return (
     <div className="p-4 h-full bg-gray-50 flex flex-col">
-      <h4 className="text-xl font-semibold mb-4 text-[#557C55]">Change Password</h4>
-      <div className="p-4 bg-white rounded-lg shadow-md">
+      <div className="flex items-center mb-4">
+        <FaArrowLeft className="text-2xl text-[#557C55] cursor-pointer" onClick={() => navigate(-1)} />
+        <h4 className="text-xl font-semibold ml-4 text-[#557C55]">Change Password</h4>
+      </div>
+      <div className="p-4 bg-white rounded-lg">
         <p className="text-lg mb-4 font-semibold text-[#557C55]">Update your password:</p>
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div>

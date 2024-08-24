@@ -16,7 +16,7 @@ const App = () => {
         <Sidebar />
 
         {/* Main Content */}
-        <div className="flex-1 p-6">
+        <div className="flex-1 p-6 overflow-y-auto">
           <Routes>
             <Route path="/incomingRequests" element={<IncomingRequests />} />
             <Route path="/assignRescuer" element={<AssignRescuers />} />

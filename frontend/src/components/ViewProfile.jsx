@@ -1,6 +1,9 @@
 import { useState } from 'react';
+import { FaArrowLeft } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 
 const ViewProfile = () => {
+  const navigate = useNavigate();
   const [profile, setProfile] = useState({
     name: 'John Doe',
     email: 'john.doe@example.com',
@@ -37,10 +40,13 @@ const ViewProfile = () => {
 
   return (
     <div className="flex-1 p-6 lg:p-8 h-full bg-gray-50 flex flex-col">
-      <h4 className="text-xl font-semibold mb-4 text-[#557C55]">View Profile</h4>
+      <div className="flex items-center mb-4">
+        <FaArrowLeft className="text-2xl text-[#557C55] cursor-pointer" onClick={() => navigate(-1)} />
+        <h4 className="text-xl font-semibold ml-4 text-[#557C55]">View Profile</h4>
+      </div>
       <div className="flex flex-col lg:flex-row lg:space-x-6 space-y-6 lg:space-y-0">
         {/* Profile Picture Section */}
-        <div className="flex-shrink-0 w-full lg:w-1/4 bg-white rounded-lg shadow-md p-4 flex flex-col items-center">
+        <div className="flex-shrink-0 w-full lg:w-1/4 bg-white rounded-lg p-4 flex flex-col items-center">
           <img 
             src={profile.profilePicture} 
             alt="Profile" 
@@ -63,7 +69,7 @@ const ViewProfile = () => {
         </div>
 
         {/* Edit Profile Section */}
-        <div className="flex-1 bg-white rounded-lg shadow-md p-4">
+        <div className="flex-1 bg-white rounded-lg p-4">
           <p className="text-lg mb-4 font-semibold text-[#557C55]">Profile Information:</p>
           <div className="space-y-3 mb-4">
             <div className="flex items-center">
