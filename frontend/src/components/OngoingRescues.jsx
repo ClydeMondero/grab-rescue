@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { AiOutlineUser } from "react-icons/ai"; 
 
 const OngoingRescues = () => {
   const [ongoingRescues] = useState([
@@ -14,9 +15,15 @@ const OngoingRescues = () => {
   };
 
   return (
-    <div className="pl-72 p-6 h-screen">
-      <h4 className="bi bi-arrow-repeat text-4xl font-bold mb-6 text-[#557C55]">Ongoing Rescues</h4>
-      <div className="p-6 rounded-lg bg-white">
+    <div className="flex-1 p-6 lg:p-8 h-full bg-gray-50 flex flex-col" style={{ marginLeft: '16rem' }}>
+      <div className="flex items-center mb-6 border-b border-[#E2E2E2] pb-4">
+        <AiOutlineUser className="text-3xl text-[#557C55] mr-3" />
+        <h4 className="text-2xl font-semibold text-[#557C55]">Ongoing Rescues</h4>
+      </div>
+
+      <p className="mb-6 text-md text-gray-600">Track the status of ongoing rescue operations:</p>
+
+      <div className="bg-white rounded-lg p-6 flex flex-col flex-1">
         {showMap && (
           <div className="mb-6">
             <h5 className="text-2xl font-semibold mb-2">Map for {showMap}</h5>
@@ -32,18 +39,19 @@ const OngoingRescues = () => {
             </button>
           </div>
         )}
+        
         <div className="overflow-x-auto">
-          <table className="table-auto w-full text-sm rounded-lg">
+          <table className="table-auto w-full text-sm rounded-lg border border-gray-200">
             <thead className="bg-[#557C55] text-white">
               <tr>
-                <th className="px-4 py-2">#</th>
-                <th className="px-4 py-2">Location</th>
-                <th className="px-4 py-2">Rescuer</th>
-                <th className="px-4 py-2">Date</th>
-                <th className="px-4 py-2">Arrival</th>
-                <th className="px-4 py-2">Departed</th>
-                <th className="px-4 py-2">Status</th>
-                <th className="px-4 py-2">Map</th>
+                <th className="px-4 py-3">#</th>
+                <th className="px-4 py-3">Location</th>
+                <th className="px-4 py-3">Rescuer</th>
+                <th className="px-4 py-3">Date</th>
+                <th className="px-4 py-3">Arrival</th>
+                <th className="px-4 py-3">Departed</th>
+                <th className="px-4 py-3">Status</th>
+                <th className="px-4 py-3">Map</th>
               </tr>
             </thead>
             <tbody>

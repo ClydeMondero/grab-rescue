@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { AiOutlineUser } from "react-icons/ai";
 
 const IncomingRequests = () => {
   const [requests] = useState([
@@ -7,38 +8,53 @@ const IncomingRequests = () => {
     { id: 3, location: 'San Ildefonso, Bulacan', time: '10:00 AM', status: 'Pending', type: 'Traffic Accident' },
   ]);
 
+  const sidebarRef = useRef(null);
+  const [sidebarWidth, setSidebarWidth] = useState('16rem'); // Default width when sidebar is open
+
+  useEffect(() => {
+    const updateSidebarWidth = () => {
+      if (sidebarRef.current) {
+        setSidebarWidth(sidebarRef.current.offsetWidth + 'px');
+      }
+    };
+
+    updateSidebarWidth();
+
+    // Update the sidebar width on window resize
+    window.addEventListener('resize', updateSidebarWidth);
+
+    return () => {
+      window.removeEventListener('resize', updateSidebarWidth);
+    };
+  }, []);
+
   return (
-    <div className="pl-72 p-6 h-screen">
-      <h4 className="bi bi-phone-vibrate text-4xl font-bold mb-6 text-[#557C55]">Incoming Requests</h4>
-      <div className="p-6 rounded-lg bg-white">
-        <p className="mb-4 text-xl">List of new emergency requests:</p>
-        <table className="table-auto w-full rounded-lg overflow-x-auto">
-          <thead className="bg-[#557C55] text-white">
-            <tr>
-              <th className="px-6 py-3">#</th>
-              <th className="px-6 py-3">Location</th>
-              <th className="px-6 py-3">Time</th>
-              <th className="px-6 py-3">Type</th>
-              <th className="px-6 py-3">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {requests.map((request, index) => (
-              <tr 
-                key={request.id} 
-                className={`border-b ${index % 2 === 0 ? 'bg-white' : 'bg-[#F0F0F0]'}`}
-              >
-                <td className="px-6 py-3">{request.id}</td>
-                <td className="px-6 py-3">{request.location}</td>
-                <td className="px-6 py-3">{request.time}</td>
-                <td className="px-6 py-3">{request.type}</td>
-                <td className={`px-6 py-3 ${request.status === 'Pending' ? 'text-[#FABC3F]' : request.status === 'In Progress' ? 'text-[#FFA500]' : request.status === 'Completed' ? 'text-[#00FF00]' : 'text-black'}`}>
-                  {request.status}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+    <div
+      className="flex flex-col p-4 lg:p-6 h-full bg-gray-50"
+      style={{ marginLeft: `calc(${sidebarWidth} + 0.5rem)` }} 
+    >
+      <div className="flex items-center mb-4">
+        <AiOutlineUser className="text-2xl lg:text-3xl text-[#557C55] mr-2" />
+        <h4 className="text-xl lg:text-2xl font-semibold text-[#557C55]">Incoming Requests</h4>
+      </div>
+
+      <p className="mb-4 text-sm lg:text-md text-gray-700">Here are the latest emergency requests:</p>
+
+      <div className="flex flex-col gap-4 overflow-hidden">
+        {requests.map((request) => (
+          <div key={request.id} className="bg-white rounded-lg shadow-md p-4 flex flex-col lg:flex-row items-start lg:items-center justify-between border border-gray-200">
+            <div className="flex flex-col lg:flex-row lg:items-center">
+              <div className="text-md lg:text-lg font-semibold text-[#557C55]">{request.type}</div>
+              <div className="text-xs lg:text-sm text-gray-600 lg:ml-4">{request.location}</div>
+            </div>
+            <div className="mt-2 lg:mt-0 lg:text-right">
+              <div className="text-xs lg:text-sm text-gray-500">{request.time}</div>
+              <div className={`mt-1 text-xs lg:text-sm font-semibold ${request.status === 'Pending' ? 'text-yellow-500' : request.status === 'In Progress' ? 'text-orange-500' : 'text-green-500'}`}>
+                {request.status}
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { AiOutlineUser } from "react-icons/ai"; 
 
 const AssignRescuers = () => {
   const [rescuers] = useState([
@@ -24,14 +25,20 @@ const AssignRescuers = () => {
     : requests.filter(request => request.location.includes(selectedLocation));
 
   return (
-    <div className="pl-72 p-6 h-screen">
-      <h4 className="bi bi-people-fill text-4xl font-bold mb-6 text-[#557C55]">Assign Rescuers</h4>
-      <div className="p-6 rounded-lg bg-white">
-        <div className="mb-4">
-          <label htmlFor="locationFilter" className="form-label text-xl">Filter by Location:</label>
+    <div className="flex-1 p-6 lg:p-8 h-full bg-gray-50 flex flex-col" style={{ marginLeft: '16rem' }}>
+      <div className="flex items-center mb-6 border-b border-[#E2E2E2] pb-4">
+        <AiOutlineUser className="text-3xl text-[#557C55] mr-3" />
+        <h4 className="text-2xl font-semibold text-[#557C55]">Assign Rescuers</h4>
+      </div>
+
+      <p className="mb-6 text-md text-gray-600">Filter and assign rescuers to the following requests:</p>
+
+      <div className="bg-white rounded-lg p-6 flex flex-col flex-1">
+        <div className="mb-6">
+          <label htmlFor="locationFilter" className="block text-lg font-medium text-gray-700">Filter by Location:</label>
           <select 
             id="locationFilter"
-            className="form-select w-full border-2 border-[#557C55] text-black rounded-lg p-3 mt-1"
+            className="form-select w-full border border-[#557C55] text-black rounded-lg p-3 mt-2 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#557C55]"
             value={selectedLocation}
             onChange={(e) => setSelectedLocation(e.target.value)}
           >
@@ -43,38 +50,41 @@ const AssignRescuers = () => {
             <option value="San Ildefonso, Bulacan">San Ildefonso, Bulacan</option>
           </select>
         </div>
-        <p className="mb-4 text-xl">List of available rescuers:</p>
-        <table className="table-auto w-full rounded-lg overflow-x-auto">
-          <thead className="bg-[#557C55] text-white">
-            <tr>
-              <th className="px-6 py-3">#</th>
-              <th className="px-6 py-3">Name</th>
-              <th className="px-6 py-3">Location</th>
-              <th className="px-6 py-3">Barangay Name</th>
-              <th className="px-6 py-3">Contact Number</th>
-              <th className="px-6 py-3">Status</th>             
-            </tr>
-          </thead>
-          <tbody>
-            {rescuers.map((rescuer, index) => (
-              <tr 
-                key={rescuer.id} 
-                className={`border-b ${index % 2 === 0 ? 'bg-white' : 'bg-[#F0F0F0]'}`}
-              >
-                <td className="px-6 py-3">{rescuer.id}</td>
-                <td className="px-6 py-3">{rescuer.name}</td>
-                <td className="px-6 py-3">{rescuer.location}</td>
-                <td className="px-6 py-3">{rescuer.barangay}</td>
-                <td className="px-6 py-3">{rescuer.contactNumber}</td>
-                <td 
-                  className={`px-6 py-3 ${rescuer.status === 'Available' ? 'text-[#00712D]' : rescuer.status === 'Unavailable' ? 'text-[#FF1700]' : 'text-black'}`}
-                >
-                  {rescuer.status}
-                </td>
+
+        <p className="mb-6 text-lg font-semibold text-gray-700">List of available rescuers:</p>
+        <div className="flex-1 overflow-auto">
+          <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
+            <thead className="bg-[#557C55] text-white text-left">
+              <tr>
+                <th className="px-4 py-3">#</th>
+                <th className="px-4 py-3">Name</th>
+                <th className="px-4 py-3">Location</th>
+                <th className="px-4 py-3">Barangay Name</th>
+                <th className="px-4 py-3">Contact Number</th>
+                <th className="px-4 py-3">Status</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {rescuers.map((rescuer, index) => (
+                <tr 
+                  key={rescuer.id} 
+                  className={`border-t ${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}
+                >
+                  <td className="px-4 py-2">{rescuer.id}</td>
+                  <td className="px-4 py-2">{rescuer.name}</td>
+                  <td className="px-4 py-2">{rescuer.location}</td>
+                  <td className="px-4 py-2">{rescuer.barangay}</td>
+                  <td className="px-4 py-2">{rescuer.contactNumber}</td>
+                  <td 
+                    className={`px-4 py-2 ${rescuer.status === 'Available' ? 'text-green-600' : rescuer.status === 'Unavailable' ? 'text-red-600' : 'text-black'}`}
+                  >
+                    {rescuer.status}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
