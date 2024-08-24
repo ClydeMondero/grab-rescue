@@ -21,7 +21,7 @@ const Settings = () => {
   };
 
   return (
-    <div className={`flex-1 p-6 lg:p-8 h-full ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-800'} flex flex-col`} style={{ marginLeft: '16rem' }}>
+    <div className={`flex-1 p-6 lg:p-8 h-full ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-800'} flex flex-col`}>
       <div className="flex items-center mb-6 border-[#E2E2E2] pb-4p-4 rounded-md">
         <h4 className={`text-2xl font-semibold ${isDarkMode ? 'text-[#A0D9A4]' : 'text-[#557C55]'}`}>
           Settings

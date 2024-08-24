@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { AiOutlineUser } from "react-icons/ai";
 
 const IncomingRequests = () => {
@@ -8,31 +8,8 @@ const IncomingRequests = () => {
     { id: 3, location: 'San Ildefonso, Bulacan', time: '10:00 AM', status: 'Pending', type: 'Traffic Accident' },
   ]);
 
-  const sidebarRef = useRef(null);
-  const [sidebarWidth, setSidebarWidth] = useState('16rem'); // Default width when sidebar is open
-
-  useEffect(() => {
-    const updateSidebarWidth = () => {
-      if (sidebarRef.current) {
-        setSidebarWidth(sidebarRef.current.offsetWidth + 'px');
-      }
-    };
-
-    updateSidebarWidth();
-
-    // Update the sidebar width on window resize
-    window.addEventListener('resize', updateSidebarWidth);
-
-    return () => {
-      window.removeEventListener('resize', updateSidebarWidth);
-    };
-  }, []);
-
   return (
-    <div
-      className="flex flex-col p-4 lg:p-6 h-full bg-gray-50"
-      style={{ marginLeft: `calc(${sidebarWidth} + 0.5rem)` }} 
-    >
+    <div className="flex flex-col p-4 lg:p-6 h-full bg-gray-50">
       <div className="flex items-center mb-4">
         <AiOutlineUser className="text-2xl lg:text-3xl text-[#557C55] mr-2" />
         <h4 className="text-xl lg:text-2xl font-semibold text-[#557C55]">Incoming Requests</h4>

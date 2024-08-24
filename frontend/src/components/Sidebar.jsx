@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { FaBars, FaHome, FaRegEnvelope, FaUserPlus, FaAmbulance, FaFileAlt } from "react-icons/fa";
 import { AiFillSetting, AiOutlineLogout, AiOutlineUser } from "react-icons/ai";
@@ -15,11 +15,30 @@ const Sidebar = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
 
+  const initializeSidebar = () => {
+    const pageWidth = window.innerWidth;
+    
+    if(pageWidth <= 675 && isOpen){
+      setIsOpen(false);
+    }else {
+      if(!isOpen) return;
+      setIsOpen(true);
+    }
+
+  }
+
+  window.addEventListener('resize', initializeSidebar);
+
+  useEffect(() => {
+    initializeSidebar();
+  }, []);
+
   console.log("Sidebar rendered");
 
   return (
     <div
-      className={`fixed top-0 left-0 h-full ${isOpen ? "w-64" : "w-20"} bg-[#557C55] text-white flex flex-col transition-all duration-300`}
+      style={{height: "100vh"}}
+      className={`top-0 left-0 h-full ${isOpen ? "w-64" : "w-20"} bg-[#557C55] text-white flex flex-col transition-all duration-300`}
       id="sidebar"
     >
       {/* Logo and Toggle Button */}

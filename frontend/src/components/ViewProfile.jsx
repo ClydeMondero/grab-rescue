@@ -36,7 +36,7 @@ const ViewProfile = () => {
   };
 
   return (
-    <div className="flex-1 p-6 lg:p-8 h-full bg-gray-50 flex flex-col" style={{ marginLeft: '16rem' }}>
+    <div className="flex-1 p-6 lg:p-8 h-full bg-gray-50 flex flex-col">
       <h4 className="text-xl font-semibold mb-4 text-[#557C55]">View Profile</h4>
       <div className="flex flex-col lg:flex-row lg:space-x-6 space-y-6 lg:space-y-0">
         {/* Profile Picture Section */}

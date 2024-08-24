@@ -15,7 +15,7 @@ const OngoingRescues = () => {
   };
 
   return (
-    <div className="flex-1 p-6 lg:p-8 h-full bg-gray-50 flex flex-col" style={{ marginLeft: '16rem' }}>
+    <div className="flex-1 p-6 lg:p-8 h-full bg-gray-50 flex flex-col">
       <div className="flex items-center mb-6 border-b border-[#E2E2E2] pb-4">
         <AiOutlineUser className="text-3xl text-[#557C55] mr-3" />
         <h4 className="text-2xl font-semibold text-[#557C55]">Ongoing Rescues</h4>
