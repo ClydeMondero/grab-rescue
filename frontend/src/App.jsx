@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import AddRescuer from './components/AddRescuer';
 import IncomingRequests from './components/IncomingRequests';
-import AssignRescuers from './components/AssignRescuers'; 
+import Rescuers from './components/Rescuers'; 
 import OngoingRescues from './components/OngoingRescues';  
 import GenerateReports from './components/GenerateReports'; 
 import Settings from './components/Settings';  
@@ -18,8 +19,9 @@ const App = () => {
         {/* Main Content */}
         <div className="flex-1 p-6 overflow-y-auto">
           <Routes>
+          <Route path="/addRescuer" element={<AddRescuer/>} />
             <Route path="/incomingRequests" element={<IncomingRequests />} />
-            <Route path="/assignRescuer" element={<AssignRescuers />} />
+            <Route path="/rescuers" element={<Rescuers />} />
             <Route path="/ongoingRescues" element={<OngoingRescues />} />
             <Route path="/generateReports" element={<GenerateReports />} />
             <Route path="/settings" element={<Settings />} />
