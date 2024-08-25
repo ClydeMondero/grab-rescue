@@ -24,7 +24,7 @@ app.listen(port,()=>{
 console.log(`Server listening in http://localhost:${port}`);
 })
 
-//get all users
+//Get all users
 app.get("/users", (req, res) => {
   const q = "SELECT * FROM users";
   db.query(q, (err, data) => {
@@ -34,7 +34,7 @@ app.get("/users", (req, res) => {
   })
 })
 
-//create new user
+//Create new user
 app.post("/users", (req, res) => {
   // Get the user details from the request body
   const { firstName, middleInitial, lastName, birthday, municipality, barangay, email, username, password, accountType } = req.body;
@@ -134,7 +134,7 @@ app.post("/users", (req, res) => {
 
 
 
-//verify a user
+//Verify a user
 app.get("/verify/:id", (req, res) => {
   const id = req.params.id;
   const q = "UPDATE users SET verified = 1 WHERE id = ?";
@@ -145,7 +145,7 @@ app.get("/verify/:id", (req, res) => {
   })
 });
 
-//get a specific user by id
+//Get a specific user by id
 app.get("/users/:id", (req, res) => {
   const id = req.params.id
   const q = "SELECT * FROM users WHERE id = ?";
@@ -156,7 +156,7 @@ app.get("/users/:id", (req, res) => {
   })
 })
 
-//update a user
+//Update a user
 app.put("/users/:id", (req, res) => {
   const id = req.params.id;
   const { 
@@ -172,7 +172,7 @@ app.put("/users/:id", (req, res) => {
     account_type: accountType 
   } = req.body;
 
-  // Validation
+  //Validation
   if (!firstName || !middleInitial || !lastName || !birthday || !municipality || !barangay || !accountType || !email) {
     return res.status(400).json({ error: "Please fill in all fields" });
   }
@@ -256,7 +256,7 @@ app.put("/users/:id", (req, res) => {
 
 
 
-//delete a user
+//Delete a user
 app.delete("/users/:id", (req, res) => {
   const id = req.params.id;
   console.log("Deleted:" + req.body);
@@ -270,7 +270,7 @@ app.delete("/users/:id", (req, res) => {
   })
 })
 
-//login user
+//Login user
 app.post("/login", (req, res) => {
   // Get the username and password from the request body
   const { username, password } = req.body;
