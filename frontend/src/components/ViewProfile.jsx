@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FaArrowLeft, FaSave } from 'react-icons/fa'; // Import the FaSave icon
+import { FaArrowLeft, FaSave } from 'react-icons/fa'; 
 import { useNavigate } from 'react-router-dom';
 
 const ViewProfile = () => {
@@ -116,7 +116,7 @@ const ViewProfile = () => {
               type="submit"
               className="bg-[#557C55] text-white px-2 py-1 rounded text-xs sm:text-sm hover:bg-[#6EA46E] transition flex items-center justify-center"
             >
-              <FaSave className="mr-1" /> {/* FaSave icon */}
+              <FaSave className="mr-1" /> 
               Save
             </button>
           </form>
