@@ -3,11 +3,16 @@ import { useSearchParams } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { userLoginSchema } from "../models/Users";
+import { useState } from "react";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const Login = () => {
   //get query params
   const [searchParams] = useSearchParams();
   const role = searchParams.get("role");
+
+  //show password
+  const [showPassword, setShowPassword] = useState(false);
 
   //form validation
   const {
@@ -51,18 +56,24 @@ const Login = () => {
           {errors.email && (
             <p className="text-red-500 text-sm">{errors.email.message}</p>
           )}
-          <div>
+          <div className="relative">
             <label htmlFor="password" className="block mb-1 font-semibold">
               Password
             </label>
             <input
               {...register("password")}
-              type="password"
+              type={showPassword ? "text" : "password"}
               id="password"
               name="password"
               placeholder="Enter your password"
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600"
             />
+            <span
+              className="absolute top-12 right-3 -translate-y-1/2 cursor-pointer text-gray-600"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? <FaEye /> : <FaEyeSlash />}
+            </span>
           </div>
           {errors.password && (
             <p className="text-red-500 text-sm">{errors.password.message}</p>
