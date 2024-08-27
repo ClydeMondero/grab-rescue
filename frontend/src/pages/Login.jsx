@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { userLoginSchema } from "../models/Users";
 import { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { Loader } from "../components";
 
 const Login = () => {
   //get query params
@@ -14,12 +15,15 @@ const Login = () => {
   //show password
   const [showPassword, setShowPassword] = useState(false);
 
+  //loading
+  const [loading, setLoading] = useState(false);
+
   //form validation
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors, isSubmitting, isValid },
+    formState: { errors },
   } = useForm({
     resolver: zodResolver(userLoginSchema),
   });
@@ -27,6 +31,13 @@ const Login = () => {
   //handle form submission
   const onSubmit = (data) => {
     console.log(data);
+    setLoading(true);
+
+    // Simulate a delay of 5 seconds
+    setTimeout(() => {
+      setLoading(false);
+    }, 5000);
+
     reset();
   };
 
@@ -82,7 +93,7 @@ const Login = () => {
             type="submit"
             className="w-full bg-red-400 text-white font-bold py-2 rounded-md hover:bg-red-700"
           >
-            Login
+            {loading ? <Loader {...{ isLoading: loading }} /> : "Login"}
           </button>
         </form>
       </div>

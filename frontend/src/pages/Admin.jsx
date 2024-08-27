@@ -1,13 +1,15 @@
-import { Routes, Route } from 'react-router-dom';
-import Sidebar from '../components/Sidebar';
-import AddRescuer from '../components/AddRescuer';
-import IncomingRequests from '../components/IncomingRequests';
-import Rescuers from '../components/Rescuers';  
-import OngoingRescues from '../components/OngoingRescues';  
-import GenerateReports from '../components/GenerateReports';  
-import Settings from '../components/Settings';  
-import ViewProfile from '../components/ViewProfile';  
-import ChangePassword from '../components/ChangePassword';  
+import { Routes, Route } from "react-router-dom";
+import {
+  Sidebar,
+  AddRescuer,
+  IncomingRequests,
+  Rescuers,
+  OngoingRescues,
+  GenerateReports,
+  Settings,
+  ViewProfile,
+  ChangePassword,
+} from "../components";
 
 const Admin = () => {
   return (
@@ -18,7 +20,7 @@ const Admin = () => {
       {/* Main Content */}
       <div className="flex-1 p-6">
         <Routes>
-        <Route path="/addRescuer" element={<AddRescuer />} />
+          <Route path="/addRescuer" element={<AddRescuer />} />
           <Route path="/incomingRequests" element={<IncomingRequests />} />
           <Route path="/rescuers" element={<Rescuers />} />
           <Route path="/ongoingRescues" element={<OngoingRescues />} />
