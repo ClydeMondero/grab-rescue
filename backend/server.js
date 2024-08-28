@@ -4,6 +4,7 @@ const app = express();
 const cors = require('cors');
 const mysql = require('mysql');
 const nodemailer = require('nodemailer');
+const crypto = require('crypto');
 
 const port = 4000;
 
@@ -24,7 +25,7 @@ app.listen(port,()=>{
 console.log(`Server listening in http://localhost:${port}`);
 })
 
-//get all users
+//Get all users
 app.get("/users", (req, res) => {
   const q = "SELECT * FROM users";
   db.query(q, (err, data) => {
@@ -34,19 +35,24 @@ app.get("/users", (req, res) => {
   })
 })
 
-//create new user
+//Create new user
 app.post("/users", (req, res) => {
   // Get the user details from the request body
-  const { firstName, middleInitial, lastName, birthday, municipality, barangay, email, username, password, accountType } = req.body;
+  const { firstName, middleInitial, lastName, birthday, municipality, barangay, email, username, password, confirmPassword, accountType } = req.body;
 
   // Check if the user has filled in all the required fields
-  if (!firstName || !middleInitial || !lastName || !birthday || !municipality || !barangay || !email || !username || !password || !accountType) {
+  if (!firstName || !middleInitial || !lastName || !birthday || !municipality || !barangay || !email || !username || !password || !confirmPassword || !accountType) {
     return res.status(400).json({ error: "Please fill in all fields" });
   }
 
   // Check if the password is at least 8 characters long
   if (password.length < 8) {
     return res.status(400).json({ error: "Password must be at least 8 characters" });
+  }
+
+  // Check if the password and confirm password match
+  if (password !== confirmPassword) {
+    return res.status(400).json({ error: "Password and confirm password do not match" });
   }
 
   // Calculate the user's age based on the provided birthday
@@ -132,9 +138,7 @@ app.post("/users", (req, res) => {
   });
 });
 
-
-
-//verify a user
+//Verify a user
 app.get("/verify/:id", (req, res) => {
   const id = req.params.id;
   const q = "UPDATE users SET verified = 1 WHERE id = ?";
@@ -145,7 +149,7 @@ app.get("/verify/:id", (req, res) => {
   })
 });
 
-//get a specific user by id
+//Get a specific user by id
 app.get("/users/:id", (req, res) => {
   const id = req.params.id
   const q = "SELECT * FROM users WHERE id = ?";
@@ -156,7 +160,7 @@ app.get("/users/:id", (req, res) => {
   })
 })
 
-//update a user
+//Update a user
 app.put("/users/:id", (req, res) => {
   const id = req.params.id;
   const { 
@@ -166,18 +170,13 @@ app.put("/users/:id", (req, res) => {
     birthday, 
     municipality, 
     barangay, 
-    email, 
     username: newUsername, 
-    password, 
     account_type: accountType 
   } = req.body;
 
-  // Validation
-  if (!firstName || !middleInitial || !lastName || !birthday || !municipality || !barangay || !accountType || !email) {
+  //Validation
+  if (!firstName || !middleInitial || !lastName || !birthday || !municipality || !barangay || !accountType || !newUsername) {
     return res.status(400).json({ error: "Please fill in all fields" });
-  }
-  if (password && password.length < 8) {
-    return res.status(400).json({ error: "Password must be at least 8 characters" });
   }
 
   const q = "SELECT * FROM users WHERE id = ?";
@@ -186,65 +185,42 @@ app.put("/users/:id", (req, res) => {
     if (err) return res.status(500).json({ error: err.sqlMessage });
     else if (data.length === 0) return res.status(400).json({ error: "User does not exist" });
     else {
-      const { username: oldUsername, email: oldEmail } = data[0];
+      const { username: oldUsername } = data[0];
 
-      if ((newUsername && newUsername !== oldUsername) || (email && email !== oldEmail)) {
-        // Check if new username or email is already taken
-        const q = "SELECT * FROM users WHERE (username = ? AND username != ?) OR (email = ? AND email != ?)";
-        db.query(q, [newUsername, oldUsername, email, oldEmail], (err, data) => {
+      if (newUsername && newUsername !== oldUsername) {
+        // Check if new username is already taken
+        const q = "SELECT * FROM users WHERE username = ? AND username != ?";
+        db.query(q, [newUsername, oldUsername], (err, data) => {
           if (err) return res.status(500).json({ error: err.sqlMessage });
           else if (data.length > 0) {
             const existingUser = data[0];
             if (existingUser.username === newUsername) {
               return res.status(400).json({ error: "Username is already taken" });
             }
-            if (existingUser.email === email) {
-              return res.status(400).json({ error: "Email is already taken" });
-            }
           }
 
-          // If password is provided, hash it
-          let updatedData = { ...req.body };
-          if (password) {
-            const bcrypt = require('bcrypt');
-            const salt = bcrypt.genSaltSync(10);
-            updatedData.password = bcrypt.hashSync(password, salt);
-          }
-
-          // Update the user's age based on the provided birthday
-          updatedData.age = Math.floor((new Date() - new Date(birthday).getTime()) / 3.15576e+10);
-
-          // Construct the query and update the user
+          // Update the user
           const q = `
             UPDATE users 
-            SET ${Object.keys(updatedData).map((key) => `${key} = ?`).join(", ")} 
+            SET first_name = ?, middle_initial = ?, last_name = ?, birthday = ?, municipality = ?, barangay = ?, username = ?, account_type = ?, age = ?
             WHERE id = ?
           `;
-          db.query(q, [...Object.values(updatedData), id], (err, out) => {
+          const values = [firstName, middleInitial, lastName, birthday, municipality, barangay, newUsername, accountType, Math.floor((new Date() - new Date(birthday).getTime()) / 3.15576e+10), id];
+          db.query(q, values, (err, out) => {
             console.log(err, out);
             if (err) return res.json({ error: err.sqlMessage });
             else return res.json({ data: out });
           });
         });
       } else {
-        // If password is provided, hash it
-        let updatedData = { ...req.body };
-        if (password) {
-          const bcrypt = require('bcrypt');
-          const salt = bcrypt.genSaltSync(10);
-          updatedData.password = bcrypt.hashSync(password, salt);
-        }
-
-        // Update the user's age based on the provided birthday
-        updatedData.age = Math.floor((new Date() - new Date(birthday).getTime()) / 3.15576e+10);
-
-        // Construct the query and update the user
+        // Update the user
         const q = `
           UPDATE users 
-          SET ${Object.keys(updatedData).map((key) => `${key} = ?`).join(", ")} 
+          SET first_name = ?, middle_initial = ?, last_name = ?, birthday = ?, municipality = ?, barangay = ?, account_type = ?, age = ?
           WHERE id = ?
         `;
-        db.query(q, [...Object.values(updatedData), id], (err, out) => {
+        const values = [firstName, middleInitial, lastName, birthday, municipality, barangay, accountType, Math.floor((new Date() - new Date(birthday).getTime()) / 3.15576e+10), id];
+        db.query(q, values, (err, out) => {
           console.log(err, out);
           if (err) return res.json({ error: err.sqlMessage });
           else return res.json({ data: out });
@@ -254,9 +230,217 @@ app.put("/users/:id", (req, res) => {
   });
 });
 
+//Update a user's email
+app.put("/users/:id/email", (req, res) => {
+  const id = req.params.id;
+  const { email } = req.body;
+
+  // Validation
+  if (!email) {
+    return res.status(400).json({ error: "Please enter a new email" });
+  }
+
+  const q = "SELECT * FROM users WHERE id = ?";
+  db.query(q, [id], (err, data) => {
+    // Check if user exists
+    if (err) return res.status(500).json({ error: err.sqlMessage });
+    else if (data.length === 0) return res.status(400).json({ error: "User does not exist" });
+    else {
+      const { email: oldEmail } = data[0];
+
+      if (email && email !== oldEmail) {
+        // Check if new email is already taken
+        const q = "SELECT * FROM users WHERE email = ? AND email != ?";
+        db.query(q, [email, oldEmail], (err, data) => {
+          if (err) return res.status(500).json({ error: err.sqlMessage });
+          else if (data.length > 0) {
+            return res.status(400).json({ error: "Email is already taken" });
+          }
+
+          // Update the user
+          const q = "UPDATE users SET email = ?, verified = 0 WHERE id = ?";
+          const values = [email, id];
+          db.query(q, values, (err, out) => {
+            if (err) return res.status(500).json({ error: err.sqlMessage });
+
+            // Send a verification email to the user
+            const transporter = nodemailer.createTransport({
+              service: 'yahoo',
+              auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS
+              }
+            });
+
+            const mailOptions = {
+              from: process.env.EMAIL_USER,
+              to: email,
+              subject: 'Email Verification',
+              text: `Please click the following link to verify your new email: http://localhost:4000/verify/${id}`
+            };
+
+            transporter.sendMail(mailOptions, (err, info) => {
+              if (err) {
+                console.error('Error while sending email:', err);
+                return res.status(500).json({ error: 'Failed to send verification email' });
+              } else {
+                console.log('Verification email sent:', info.response);
+                return res.status(200).json({ message: 'Email updated. Verification email sent.' });
+              }
+            });
+          });
+        });
+      } else {
+        // Return success if no changes were made
+        return res.json({ data: { message: "No changes were made" } });
+      }
+    }
+  });
+});
+
+// Forgot password email sending
+app.post("/forgot-password", (req, res) => {
+  const { email } = req.body;
+
+  // Validate the email
+  if (!email) {
+    return res.status(400).json({ error: "Please enter your email" });
+  }
+
+  // Check if the user exists
+  const q = "SELECT * FROM users WHERE email = ?";
+  db.query(q, [email], (err, data) => {
+    if (err) return res.status(500).json({ error: err.sqlMessage });
+
+    if (data.length === 0) {
+      return res.status(400).json({ error: "No account associated with this email" });
+    }
+
+    const user = data[0];
+
+    // Generate a reset token and expiration time (1 hour)
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    const resetTokenExpire = Date.now() + 3600000; // 1 hour
+
+    // Update the user with the reset token and expiration
+    const updateQuery = `
+      UPDATE users SET reset_token = ?, reset_token_expire = ? WHERE id = ?
+    `;
+    db.query(updateQuery, [resetToken, resetTokenExpire, user.id], (err) => {
+      if (err) return res.status(500).json({ error: err.sqlMessage });
+
+      // Send the reset email
+      const transporter = nodemailer.createTransport({
+        service: 'yahoo',
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS
+        }
+      });
+
+      const resetUrl = `http://localhost:4000/reset-password/${resetToken}`;
+
+      const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: 'Password Reset Request',
+        text: `You requested a password reset. Click the link to reset your password: ${resetUrl}\n\nIf you didn't request this, you can ignore this email.`
+      };
+
+      transporter.sendMail(mailOptions, (err, info) => {
+        if (err) {
+          console.error('Error while sending email:', err);
+          return res.status(500).json({ error: 'Failed to send reset email' });
+        } else {
+          console.log('Reset email sent:', info.response);
+          return res.status(200).json({ message: 'Password reset email sent' });
+        }
+      });
+    });
+  });
+});
+
+// Reset password
+app.post("/reset-password/:token", (req, res) => {
+  const { token } = req.params;
+  const { password, confirmPassword } = req.body;
+
+  // Validate the passwords
+  if (!password || !confirmPassword) {
+    return res.status(400).json({ error: "Please enter a new password and confirm it" });
+  } else if (password.length < 8) {
+    return res.status(400).json({ error: "Password must be at least 8 characters" });
+  } else if (password !== confirmPassword) {
+    return res.status(400).json({ error: "Password and confirm password do not match" });
+  }
+
+  // Find the user by the reset token
+  const q = `
+    SELECT * FROM users WHERE reset_token = ? AND reset_token_expire > ?
+  `;
+  db.query(q, [token, Date.now()], (err, data) => {
+    if (err) return res.status(500).json({ error: err.sqlMessage });
+
+    if (data.length === 0) {
+      return res.status(400).json({ error: "Invalid or expired reset token" });
+    }
+
+    const user = data[0];
+
+    // Hash the new password
+    const bcrypt = require('bcrypt');
+    const salt = bcrypt.genSaltSync(10);
+    const hash = bcrypt.hashSync(password, salt);
+
+    // Update the user's password and clear the reset token fields
+    const updateQuery = `
+      UPDATE users SET password = ?, reset_token = NULL, reset_token_expire = NULL WHERE id = ?
+    `;
+    db.query(updateQuery, [hash, user.id], (err) => {
+      if (err) return res.status(500).json({ error: err.sqlMessage });
+
+      return res.status(200).json({ message: "Password has been reset successfully" });
+    });
+  });
+});
 
 
-//delete a user
+//Update a user's password
+app.put("/users/:id/password", (req, res) => {
+  const id = req.params.id;
+  const { password, confirmPassword } = req.body;
+
+  if (!password || !confirmPassword) {
+    return res.status(400).json({ error: "Please enter a new password and confirm it" });
+  } else if (password.length < 8) {
+    return res.status(400).json({ error: "Password must be at least 8 characters" });
+  } else if (password !== confirmPassword) {
+    return res.status(400).json({ error: "Password and confirm password do not match" });
+  }
+
+  const q = "SELECT * FROM users WHERE id = ?";
+  db.query(q, [id], (err, data) => {
+    // Check if user exists
+    if (err) return res.status(500).json({ error: err.sqlMessage });
+    else if (data.length === 0) return res.status(400).json({ error: "User does not exist" });
+    else {
+      // Hash the password using bcrypt
+      const bcrypt = require('bcrypt');
+      const salt = bcrypt.genSaltSync(10);
+      const hash = bcrypt.hashSync(password, salt);
+
+      // Update the user's password
+      const q = "UPDATE users SET password = ? WHERE id = ?";
+      db.query(q, [hash, id], (err, out) => {
+        console.log(err, out);
+        if (err) return res.json({ error: err.sqlMessage });
+        else return res.json({ data: out });
+      });
+    }
+  });
+});
+
+//Delete a user
 app.delete("/users/:id", (req, res) => {
   const id = req.params.id;
   console.log("Deleted:" + req.body);
@@ -270,7 +454,7 @@ app.delete("/users/:id", (req, res) => {
   })
 })
 
-//login user
+//Login user
 app.post("/login", (req, res) => {
   // Get the username and password from the request body
   const { username, password } = req.body;

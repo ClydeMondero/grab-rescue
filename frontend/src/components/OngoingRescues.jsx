@@ -57,7 +57,7 @@ const OngoingRescues = () => {
         <h4 className="text-md sm:text-2xl font-semibold text-[#557C55]">Ongoing Rescues</h4>
       </div>
 
-      <p className="mb-4 text-xs sm:text-md text-gray-600">Track the status of ongoing rescue operations:</p>
+      <p className="mb-4 text-sm sm:text-md text-gray-600">Track the status of ongoing rescue operations:</p>
 
       <div className="bg-white rounded-lg p-2 sm:p-4 flex flex-col flex-1">
         {showMap && (

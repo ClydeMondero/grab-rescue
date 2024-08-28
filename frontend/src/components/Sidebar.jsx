@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { FaBars, FaUserPlus, FaAmbulance, FaFileAlt } from "react-icons/fa";
+import { FaUserPlus, FaAmbulance, FaFileAlt } from "react-icons/fa";
 import { AiFillSetting, AiOutlineLogout, AiOutlineUser, AiFillCaretDown } from "react-icons/ai";
 import { MdMail, MdAssignmentInd, MdDashboard } from "react-icons/md"; 
 
@@ -46,10 +46,9 @@ const Sidebar = () => {
       {/* Logo and Toggle Button */}
       <div className="flex items-center justify-between p-4">
         <div className="flex items-center cursor-pointer" onClick={toggleSidebar}>
-          <MdDashboard className={`text-3xl ${isOpen ? "text-2xl" : "text-xl"} cursor-pointer`} />
+          <MdDashboard className={`text-3xl ${isOpen ? "text-2xl" : "text-3xl"} cursor-pointer`} />
           {isOpen && <span className="ml-2 text-lg font-bold">Dashboard</span>}
         </div>
-        {!isOpen && <FaBars className="text-2xl cursor-pointer" onClick={toggleSidebar} />}
       </div>
 
       {/* Profile Section */}

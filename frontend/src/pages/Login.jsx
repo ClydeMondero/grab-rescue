@@ -52,7 +52,10 @@ const Login = () => {
         </h2>
         <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
           <div>
-            <label htmlFor="email" className="block mb-1 font-semibold">
+            <label
+              htmlFor="email"
+              className="block mb-2 font-semibold text-sm text-[#557C55]"
+            >
               Email
             </label>
             <input
@@ -61,7 +64,7 @@ const Login = () => {
               id="email"
               name="email"
               placeholder="Enter your email"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#557C55]"
             />
           </div>
           {errors.email && (
