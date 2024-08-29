@@ -3,10 +3,10 @@
 @tailwind utilities;
 
 /*Side bar Hover Effect*/
-.sidebar .nav{
-    padding: 0 !important;
+.sidebar .nav {
+  padding: 0 !important;
 }
 
-.sidebar ul li a:hover{
-    background-color: #6EA46E;
+.sidebar ul li a:hover {
+  background-color: #6ea46e;
 }

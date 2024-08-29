@@ -6,6 +6,7 @@ import { userLoginSchema } from "../models/Users";
 import { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { Loader } from "../components";
+import axios from "axios";
 
 const Login = () => {
   //get query params
@@ -30,15 +31,26 @@ const Login = () => {
 
   //handle form submission
   const onSubmit = (data) => {
-    console.log(data);
-    setLoading(true);
+    login(data);
 
-    // Simulate a delay of 5 seconds
-    setTimeout(() => {
+    // reset();
+  };
+
+  //handle login
+  const login = async (data) => {
+    try {
+      setLoading(true);
+
+      const response = await axios.post("/login", {
+        email: data.email,
+        password: data.password,
+      });
+
+      console.log(response.data);
       setLoading(false);
-    }, 5000);
-
-    reset();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -71,7 +83,10 @@ const Login = () => {
             <p className="text-red-500 text-sm">{errors.email.message}</p>
           )}
           <div className="relative">
-            <label htmlFor="password" className="block mb-1 font-semibold">
+            <label
+              htmlFor="password"
+              className="block mb-2 font-semibold text-sm text-[#557C55]"
+            >
               Password
             </label>
             <input
@@ -80,7 +95,7 @@ const Login = () => {
               id="password"
               name="password"
               placeholder="Enter your password"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#557C55]"
             />
             <span
               className="absolute top-12 right-3 -translate-y-1/2 cursor-pointer text-gray-600"
@@ -94,7 +109,7 @@ const Login = () => {
           )}
           <button
             type="submit"
-            className="w-full bg-red-400 text-white font-bold py-2 rounded-md hover:bg-red-700"
+            className="w-full bg-red-400 text-white font-bold py-2 rounded-md hover:opacity-80 focus:outline-none"
           >
             {loading ? <Loader {...{ isLoading: loading }} /> : "Login"}
           </button>
