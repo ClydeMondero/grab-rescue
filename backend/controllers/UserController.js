@@ -73,10 +73,6 @@ module.exports.CreateUser = async (req, res) => {
 
         const userId = data.insertId;
 
-        //TODO: Add cookies
-
-        //TODO: Email verification
-
         // Send a verification email to the user
         const transporter = nodemailer.createTransport({
           service: "yahoo",

@@ -11,6 +11,7 @@ require("dotenv").config({ path: "config/.env" });
 const { PORT } = process.env;
 
 const userRoute = require("./routes/UserRoute");
+const authRoute = require("./routes/AuthRoute");
 
 const port = PORT;
 app.listen(port, () => {
@@ -33,4 +34,5 @@ app.use(cookieParser());
 app.use(express.json());
 
 //routes
+app.use("/auth", authRoute);
 app.use("/users", userRoute);
