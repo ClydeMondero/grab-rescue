@@ -1,10 +1,6 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
-
-const nodemailer = require("nodemailer");
-const crypto = require("crypto");
-const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
 
 require("dotenv").config({ path: "config/.env" });

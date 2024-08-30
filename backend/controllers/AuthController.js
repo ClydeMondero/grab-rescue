@@ -1,4 +1,7 @@
 const db = require("../config/db");
+const bcrypt = require("bcrypt");
+
+const { createSecretToken } = require("../utils/SecretToken");
 
 module.exports.Login = async (req, res) => {
   // Get the username and password from the request body
@@ -8,9 +11,11 @@ module.exports.Login = async (req, res) => {
   const q = "SELECT * FROM users WHERE email = ? AND verified = true";
   db.query(q, [email], (err, data) => {
     if (err)
-      return res
-        .status(200)
-        .json({ success: false, message: "Database error" });
+      return res.status(200).json({
+        success: false,
+        message: "Database error",
+        error: err.message,
+      });
 
     // If the user does not exist or is not verified, return an error
     if (data.length === 0) {
@@ -49,6 +54,10 @@ module.exports.Login = async (req, res) => {
           .json({ success: false, message: "Failed to update online status" });
 
       //TODO: add jwt
+
+      const token = createSecretToken(userData.id);
+
+      res.cookie("token", token, { withCredentials: true, httpOnly: false });
 
       // Remove the password from the user data and return it
       delete userData.password;
