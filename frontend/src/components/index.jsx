@@ -9,8 +9,10 @@ import Settings from "./Settings";
 import ViewProfile from "./ViewProfile";
 import Sidebar from "./Sidebar";
 import Logout from "./Logout";
+import PrivateRoute from "./PrivateRoute";
 
 export {
+  PrivateRoute,
   Loader,
   AddRescuer,
   ChangePassword,

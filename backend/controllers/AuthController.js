@@ -53,8 +53,6 @@ module.exports.Login = async (req, res) => {
           .status(200)
           .json({ success: false, message: "Failed to update online status" });
 
-      //TODO: add jwt
-
       const token = createSecretToken(userData.id);
 
       res.cookie("token", token, { withCredentials: true, httpOnly: false });
