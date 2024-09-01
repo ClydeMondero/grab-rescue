@@ -7,6 +7,7 @@ import { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { Loader } from "../components";
 import axios from "axios";
+import { Navigate } from "react-router-dom";
 
 const Login = () => {
   //get query params
@@ -32,22 +33,35 @@ const Login = () => {
   //handle form submission
   const onSubmit = (data) => {
     login(data);
-
-    // reset();
   };
 
   //handle login
-  const login = async (data) => {
+  const login = async ({ email, password }) => {
     try {
       setLoading(true);
 
-      const response = await axios.post("/auth/login", {
-        email: data.email,
-        password: data.password,
-      });
+      const { data } = await axios.post(
+        "/auth/login",
+        {
+          email: email,
+          password: password,
+        },
+        { withCredentials: true }
+      );
 
-      console.log(response.data);
+      console.log(data);
+
+      if (data.success) {
+        setLoading(false);
+
+        reset();
+
+        return <Navigate to={"/" + role.toLowerCase()} replace />;
+      }
+
       setLoading(false);
+
+      reset();
     } catch (error) {
       console.log(error);
     }

@@ -4,6 +4,7 @@ import axios from "axios";
 
 const useAuthentication = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [role, setRole] = useState(null);
   const [cookies, removeCookie] = useCookies([""]);
 
   useEffect(() => {
@@ -12,10 +13,8 @@ const useAuthentication = () => {
         setIsAuthenticated(false);
       }
 
-      console.log(cookies.token);
-
       const { data } = await axios.post(
-        "http://localhost:4000/",
+        "http://localhost:4000/auth",
         {},
         { withCredentials: true }
       );
@@ -23,9 +22,10 @@ const useAuthentication = () => {
       const { success, user } = data;
 
       //TODO: return user
+      const role = user.account_type;
 
       return success
-        ? setIsAuthenticated(true)
+        ? (setRole(role), setIsAuthenticated(true))
         : (removeCookie("token"), setIsAuthenticated(false));
     };
 

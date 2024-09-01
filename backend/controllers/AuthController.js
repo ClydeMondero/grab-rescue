@@ -55,7 +55,12 @@ module.exports.Login = async (req, res) => {
 
       const token = createSecretToken(userData.id);
 
-      res.cookie("token", token, { withCredentials: true, httpOnly: false });
+      res.cookie("token", token, {
+        withCredentials: true,
+        secure: true,
+        sameSite: "none",
+        httpOnly: false,
+      });
 
       // Remove the password from the user data and return it
       delete userData.password;
