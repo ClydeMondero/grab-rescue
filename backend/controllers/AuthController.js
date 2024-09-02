@@ -64,9 +64,11 @@ module.exports.Login = async (req, res) => {
 
       // Remove the password from the user data and return it
       delete userData.password;
-      return res
-        .status(200)
-        .json({ success: true, message: "Logged In Success!" });
+      return res.status(200).json({
+        success: true,
+        message: "Logged In Success!",
+        role: userData.account_type,
+      });
     });
   });
 };

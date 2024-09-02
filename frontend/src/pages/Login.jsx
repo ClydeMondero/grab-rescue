@@ -51,12 +51,21 @@ const Login = () => {
         { withCredentials: true }
       );
 
-      console.log(data.success);
-
       if (data.success) {
         setLoading(false);
 
-        navigate("/" + role.toLowerCase());
+        if (role == data.role) {
+          //TODO: show toast for successful login
+          navigate("/" + role.toLowerCase(), { replace: true });
+        } else {
+          //TODO: show toast for role mismatch
+
+          console.log("Role mismatch");
+
+          navigate("/");
+        }
+
+        //TODO: show toast for failed login
       }
 
       setLoading(false);
