@@ -11,8 +11,8 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/admin" element={<PrivateRoute Component={Admin} />} />
-        <Route path="/rescuer" element={<PrivateRoute Component={Rescuer} />} />
+        <Route path="/admin/*" element={<Admin />} />
+        <Route path="/rescuer/*" element={<Rescuer />} />
       </Routes>
     </Router>
   );

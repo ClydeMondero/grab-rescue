@@ -1,5 +1,5 @@
 import logo from "../assets/logo.png";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { userLoginSchema } from "../models/Users";
@@ -7,7 +7,6 @@ import { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { Loader } from "../components";
 import axios from "axios";
-import { Navigate } from "react-router-dom";
 
 const Login = () => {
   //get query params
@@ -19,6 +18,9 @@ const Login = () => {
 
   //loading
   const [loading, setLoading] = useState(false);
+
+  //navigate
+  const navigate = useNavigate();
 
   //form validation
   const {
@@ -49,14 +51,12 @@ const Login = () => {
         { withCredentials: true }
       );
 
-      console.log(data);
+      console.log(data.success);
 
       if (data.success) {
         setLoading(false);
 
-        reset();
-
-        return <Navigate to={"/" + role.toLowerCase()} replace />;
+        navigate("/" + role.toLowerCase());
       }
 
       setLoading(false);
