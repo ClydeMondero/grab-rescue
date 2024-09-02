@@ -8,14 +8,12 @@ import {
   AiFillCaretDown,
 } from "react-icons/ai";
 import { MdMail, MdAssignmentInd, MdDashboard } from "react-icons/md";
-import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [cookies, setCookies, removeCookie] = useCookies(["token"]);
   const navigate = useNavigate();
 
   const toggleSidebar = () => {
