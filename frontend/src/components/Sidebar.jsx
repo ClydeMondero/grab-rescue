@@ -8,10 +8,15 @@ import {
   AiFillCaretDown,
 } from "react-icons/ai";
 import { MdMail, MdAssignmentInd, MdDashboard } from "react-icons/md";
+import { useCookies } from "react-cookie";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [cookies, setCookies, removeCookie] = useCookies(["token"]);
+  const navigate = useNavigate();
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
@@ -41,6 +46,35 @@ const Sidebar = () => {
   useEffect(() => {
     initializeSidebar();
   }, []);
+
+  const verifyToken = async () => {
+    const { data } = await axios.post("/auth/", {}, { withCredentials: true });
+
+    const userId = data.user.id;
+
+    return userId;
+  };
+
+  const handleLogout = async () => {
+    const userId = await verifyToken();
+
+    const { data } = await axios.post(
+      "/auth/logout",
+      {
+        id: userId,
+      },
+      { withCredentials: true }
+    );
+
+    if (data.success) {
+      //TODO: show toast for successful logout
+      console.log("Logout successful");
+      navigate("/");
+      return;
+    }
+    //TODO: show toast for failed logout
+    console.log("Logout failed");
+  };
 
   return (
     <div
@@ -166,9 +200,9 @@ const Sidebar = () => {
             Settings
           </span>
         </Link>
-        <Link
-          to="/logout"
-          className="flex items-center px-4 py-2 hover:bg-[#6EA46E]"
+        <div
+          onClick={handleLogout}
+          className="flex items-center px-4 py-2 hover:bg-[#6EA46E] cursor-pointer"
         >
           <AiOutlineLogout
             className={`text-lg ${!isOpen ? "text-xl" : "text-lg"}`}
@@ -176,7 +210,7 @@ const Sidebar = () => {
           <span className={`${!isOpen && "hidden"} ml-4 duration-300`}>
             Logout
           </span>
-        </Link>
+        </div>
       </div>
     </div>
   );

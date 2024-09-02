@@ -47,25 +47,21 @@ const Login = () => {
         {
           email: email,
           password: password,
+          role: role,
         },
         { withCredentials: true }
       );
 
+      console.log(data);
+
+      setLoading(false);
+
       if (data.success) {
-        setLoading(false);
-
-        if (role == data.role) {
-          //TODO: show toast for successful login
-          navigate("/" + role.toLowerCase(), { replace: true });
-        } else {
-          //TODO: show toast for role mismatch
-
-          console.log("Role mismatch");
-
-          navigate("/");
-        }
-
+        //TODO: show toast for successful login
+        navigate("/" + role.toLowerCase(), { replace: true });
+      } else {
         //TODO: show toast for failed login
+        console.log("Login failed");
       }
 
       setLoading(false);

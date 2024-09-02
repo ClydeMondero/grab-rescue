@@ -1,5 +1,4 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import { PrivateRoute } from "./components";
 import { Home, Login, Admin, Rescuer } from "./pages";
 import axios from "axios";
 

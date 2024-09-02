@@ -5,7 +5,7 @@ const { createSecretToken } = require("../utils/SecretToken");
 
 module.exports.Login = async (req, res) => {
   // Get the username and password from the request body
-  const { email, password } = req.body;
+  const { email, password, role } = req.body;
 
   // Get the user from the database
   const q = "SELECT * FROM users WHERE email = ? AND verified = true";
@@ -33,6 +33,13 @@ module.exports.Login = async (req, res) => {
       return res
         .status(200)
         .json({ success: false, message: "User is already online" });
+    }
+
+    // Check if role is valid
+    if (userData.account_type !== role) {
+      return res
+        .status(200)
+        .json({ success: false, message: "Role is not valid" });
     }
 
     // Check if the password is valid
@@ -70,5 +77,24 @@ module.exports.Login = async (req, res) => {
         role: userData.account_type,
       });
     });
+  });
+};
+
+module.exports.Logout = (req, res) => {
+  const { id } = req.body;
+
+  // Update the user to be offline
+  const updateQuery = "UPDATE users SET is_online = false WHERE id = ?";
+  db.query(updateQuery, [id], (err) => {
+    if (err) {
+      return res
+        .status(200)
+        .json({ success: false, message: "Failed to update online status" });
+    }
+
+    res.clearCookie("token");
+    return res
+      .status(200)
+      .json({ success: true, message: "Logged Out Success!" });
   });
 };
