@@ -66,12 +66,10 @@ const Sidebar = () => {
 
     if (data.success) {
       //TODO: show toast for successful logout
-      console.log("Logout successful");
       navigate("/");
       return;
     }
     //TODO: show toast for failed logout
-    console.log("Logout failed");
   };
 
   return (

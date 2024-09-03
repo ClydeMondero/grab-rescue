@@ -52,8 +52,6 @@ const Login = () => {
         { withCredentials: true }
       );
 
-      console.log(data);
-
       setLoading(false);
 
       if (data.success) {

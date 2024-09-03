@@ -1,8 +1,25 @@
+import { useEffect } from "react";
 import logo from "../assets/logo.png";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Home = () => {
   const navigate = useNavigate();
+
+  //go to user page if already logged in
+  const verifyToken = async () => {
+    const { data } = await axios.post("/auth/", {}, { withCredentials: true });
+
+    if (data.success) {
+      const role = data.user.account_type;
+
+      navigate("/" + role.toLowerCase(), { replace: true });
+    }
+  };
+
+  useEffect(() => {
+    verifyToken();
+  }, []);
 
   return (
     <div className="h-screen flex flex-col">
