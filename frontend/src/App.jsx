@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import { Home, Login, Admin, Rescuer } from "./pages";
+import { Home, Login, Admin, Rescuer, NotFound } from "./pages";
 import axios from "axios";
 import { PrivateRoute } from "./components";
 
@@ -16,6 +16,7 @@ const App = () => {
           path="/rescuer/*"
           element={<PrivateRoute Component={Rescuer} />}
         />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   );
