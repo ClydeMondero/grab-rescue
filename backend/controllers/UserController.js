@@ -74,20 +74,20 @@ module.exports.CreateUser = async (req, res) => {
         const userId = data.insertId;
 
         // Send a verification email to the user
-        const transporter = nodemailer.createTransport({
-          service: "yahoo",
-          auth: {
-            user: EMAIL_USER,
-            pass: EMAIL_PASS,
-          },
-        });
+        // const transporter = nodemailer.createTransport({
+        //   service: "yahoo",
+        //   auth: {
+        //     user: EMAIL_USER,
+        //     pass: EMAIL_PASS,
+        //   },
+        // });
 
-        const mailOptions = {
-          from: EMAIL_USER,
-          to: email,
-          subject: "Email Verification",
-          text: `Please click the following link to verify your email: http://localhost:4000/verify/${userId}`,
-        };
+        // const mailOptions = {
+        //   from: EMAIL_USER,
+        //   to: email,
+        //   subject: "Email Verification",
+        //   text: `Please click the following link to verify your email: http://localhost:4000/verify/${userId}`,
+        // };
 
         // transporter.sendMail(mailOptions, (err, info) => {
         //   if (err) {

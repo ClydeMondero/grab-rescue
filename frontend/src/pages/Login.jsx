@@ -7,6 +7,8 @@ import { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { Loader } from "../components";
 import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Login = () => {
   //get query params
@@ -53,12 +55,16 @@ const Login = () => {
       );
 
       setLoading(false);
-
+      console.log(data);
       if (data.success) {
         //TODO: show toast for successful login
-        navigate("/" + role.toLowerCase(), { replace: true });
+        toast(data.message);
+        setTimeout(() => {
+          navigate("/" + role.toLowerCase(), { replace: true });
+        }, 1000);
       } else {
         //TODO: show toast for failed login
+        toast(data.message);
         console.log("Login failed");
       }
 
@@ -131,6 +137,7 @@ const Login = () => {
             {loading ? <Loader {...{ isLoading: loading }} /> : "Login"}
           </button>
         </form>
+        <ToastContainer />
       </div>
     </div>
   );
