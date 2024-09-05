@@ -13,7 +13,7 @@ module.exports.Login = async (req, res) => {
     if (err)
       return res.status(200).json({
         success: false,
-        message: "Database error",
+        message: "Database error.",
         error: err.message,
       });
 
@@ -21,7 +21,7 @@ module.exports.Login = async (req, res) => {
     if (data.length === 0) {
       return res.status(200).json({
         success: false,
-        message: "Email does not exist or is not verified",
+        message: "Email does not exist or is not verified.",
       });
     }
 
@@ -32,14 +32,14 @@ module.exports.Login = async (req, res) => {
     if (userData.is_online) {
       return res
         .status(200)
-        .json({ success: false, message: "User is already online" });
+        .json({ success: false, message: "User is already online." });
     }
 
     // Check if role is valid
     if (userData.account_type !== role) {
       return res
         .status(200)
-        .json({ success: false, message: "Role is not valid" });
+        .json({ success: false, message: "Role is not valid." });
     }
 
     // Check if the password is valid
@@ -49,7 +49,7 @@ module.exports.Login = async (req, res) => {
     if (!isPasswordValid) {
       return res
         .status(200)
-        .json({ success: false, message: "Invalid password" });
+        .json({ success: false, message: "Invalid password." });
     }
 
     // Update the user to be online
@@ -58,7 +58,7 @@ module.exports.Login = async (req, res) => {
       if (err)
         return res
           .status(200)
-          .json({ success: false, message: "Failed to update online status" });
+          .json({ success: false, message: "Failed to update online status." });
 
       const token = createSecretToken(userData.id);
 
@@ -89,7 +89,7 @@ module.exports.Logout = (req, res) => {
     if (err) {
       return res
         .status(200)
-        .json({ success: false, message: "Failed to update online status" });
+        .json({ success: false, message: "Logout failed." });
     }
 
     res.clearCookie("token");

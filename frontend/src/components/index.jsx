@@ -10,8 +10,10 @@ import ViewProfile from "./ViewProfile";
 import Sidebar from "./Sidebar";
 import Logout from "./Logout";
 import PrivateRoute from "./PrivateRoute";
+import Toast from "./Toast";
 
 export {
+  Toast,
   PrivateRoute,
   Loader,
   AddRescuer,
