@@ -8,6 +8,8 @@ const { PORT } = process.env;
 
 const userRoute = require("./routes/UserRoute");
 const authRoute = require("./routes/AuthRoute");
+const rescuerRoute = require("./routes/RescuerRoute");
+const adminRoute = require("./routes/AdminRoute");
 
 const port = PORT;
 app.listen(port, () => {
@@ -32,3 +34,5 @@ app.use(express.json());
 //routes
 app.use("/auth", authRoute);
 app.use("/users", userRoute);
+app.use("/rescuers", rescuerRoute);
+app.use("/admins", adminRoute);
