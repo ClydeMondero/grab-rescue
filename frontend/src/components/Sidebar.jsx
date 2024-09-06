@@ -10,6 +10,8 @@ import {
 import { MdMail, MdAssignmentInd, MdDashboard } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { Toast } from "../components";
+import { toast } from "react-toastify";
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
@@ -65,11 +67,10 @@ const Sidebar = () => {
     );
 
     if (data.success) {
-      //TODO: show toast for successful logout
       navigate("/");
       return;
     }
-    //TODO: show toast for failed logout
+    toast.error(data.message);
   };
 
   return (
