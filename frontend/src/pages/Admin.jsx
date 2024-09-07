@@ -9,6 +9,7 @@ import {
   Settings,
   ViewProfile,
   ChangePassword,
+  Toast,
 } from "../components";
 
 const Admin = () => {
@@ -30,6 +31,7 @@ const Admin = () => {
           <Route path="/changePassword" element={<ChangePassword />} />
         </Routes>
       </div>
+      <Toast />
     </div>
   );
 };

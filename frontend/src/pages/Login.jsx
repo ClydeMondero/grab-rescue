@@ -5,9 +5,9 @@ import { useForm } from "react-hook-form";
 import { userLoginSchema } from "../models/Users";
 import { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { Loader } from "../components";
+import { Loader, Toast } from "../components";
 import axios from "axios";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const Login = () => {
@@ -55,17 +55,14 @@ const Login = () => {
       );
 
       setLoading(false);
-      console.log(data);
+
       if (data.success) {
-        //TODO: show toast for successful login
-        toast(data.message);
+        toast.success(data.message);
         setTimeout(() => {
           navigate("/" + role.toLowerCase(), { replace: true });
-        }, 1000);
+        }, 1500);
       } else {
-        //TODO: show toast for failed login
-        toast(data.message);
-        console.log("Login failed");
+        toast.warning(data.message);
       }
 
       setLoading(false);
@@ -137,7 +134,7 @@ const Login = () => {
             {loading ? <Loader {...{ isLoading: loading }} /> : "Login"}
           </button>
         </form>
-        <ToastContainer />
+        <Toast />
       </div>
     </div>
   );
