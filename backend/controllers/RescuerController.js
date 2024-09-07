@@ -3,6 +3,7 @@ const db = require("../config/db");
 require("dotenv").config({ path: "config/.env" });
 const { EMAIL_USER, EMAIL_PASS } = process.env;
 
+const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 
 // Get Rescuers with Filtering and Name Search
@@ -160,7 +161,7 @@ module.exports.CreateRescuer = async (req, res) => {
 // Update Rescuer
 module.exports.UpdateRescuer = async (req, res) => {
   // Get the user details from the request body
-  const{
+  const {
     first_name: firstName,
     middle_initial: middleInitial,
     last_name: lastName,
@@ -169,16 +170,185 @@ module.exports.UpdateRescuer = async (req, res) => {
     barangay,
     profile_image,
     contact_number: contactNumber,
-    email,
-    username,
-    password
+    username: newUsername
   } = req.body;
 
   // Validation
-  if (!firstName || !lastName || !birthday || !municipality || !barangay || !contactNumber || !email || !username || !password) {
+  if (!firstName || !lastName || !birthday || !municipality || !barangay || !contactNumber || !newUsername) {
     return res.status(200).json({ error: "Please fill in all fields" });
   }
+
+  let oldUsername; // Declare oldUsername in the outer scope
+
+  const q = `SELECT * FROM users WHERE id = ?`;
+  db.query(q, [req.params.id], (err, data) => {
+    if (err) return res.status(200).json({ error: err.sqlMessage });
+    else if (data.length === 0) return res.status(200).json({ error: "User does not exist" });
+    else {
+      oldUsername = data[0].username; // Assign oldUsername
+    }
+
+    if (newUsername && newUsername !== oldUsername) {
+      // Check if new username is already taken
+      const q = "SELECT * FROM users WHERE username = ? AND username != ?";
+      db.query(q, [newUsername, oldUsername], (err, data) => {
+        if (err) return res.status(200).json({ error: err.sqlMessage });
+        else if (data.length > 0) {
+          const existingUser = data[0];
+          if (existingUser.username === newUsername) {
+            return res.status(200).json({ error: "Username is already taken" });
+          }
+        }
+
+        // Update the user in the database without email and password
+        const q = `UPDATE users SET first_name = ?, middle_initial = ?, last_name = ?, birthday = ?, municipality = ?, barangay = ?, contact_number = ?, username = ? WHERE id = ?`;
+        const values = [
+          firstName,
+          middleInitial,
+          lastName,
+          birthday,
+          municipality,
+          barangay,
+          contactNumber,
+          newUsername,
+          req.params.id
+        ];
+        db.query(q, values, (err, data) => {
+          if (err) return res.status(200).json({ error: err.sqlMessage });
+          return res.status(200).json({ data });
+        });
+      });
+    } else {
+      // Update the user in the database without email and password
+      const q = `UPDATE users SET first_name = ?, middle_initial = ?, last_name = ?, birthday = ?, municipality = ?, barangay = ?, contact_number = ?, username = ? WHERE id = ?`;
+      const values = [
+        firstName,
+        middleInitial,
+        lastName,
+        birthday,
+        municipality,
+        barangay,
+        contactNumber,
+        newUsername,
+        req.params.id
+      ];
+      db.query(q, values, (err, data) => {
+        if (err) return res.status(200).json({ error: err.sqlMessage });
+        return res.status(200).json({ data });
+      });
+    }
+  });
+};
+
+// Update Rescuer's email
+module.exports.UpdateRescuerEmail = async (req, res) => {
+  const id = req.params.id;
+  const { email } = req.body;
+
+  // Validation
+  if (!email) {
+    return res.status(200).json({ error: "Please enter an email" });
+  }
+
+  // Email format validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return res.status(200).json({ error: "Invalid email format" });
+  }
+
+  const q = "SELECT * FROM users WHERE id = ?";
+  db.query(q, [id], (err, data) => {
+    if (err) return res.status(200).json({ error: err.sqlMessage });
+    else if (data.length === 0) return res.status(200).json({ error: "User does not exist" });
+    else {
+      const {email: oldEmail} = data[0];
+
+      if (email && email !== oldEmail) {
+        // Check if new email is already taken
+        const q = `SELECT * FROM users WHERE email = ? AND email != ?`;
+        db.query(q, [email, oldEmail], (err, data) => {
+          if (err) return res.status(200).json({ error: err.sqlMessage });
+          else if (data.length > 0) {
+            const existingUser = data[0];
+            if (existingUser.email === email) {
+              return res.status(200).json({ error: "Email is already taken" });
+            }
+          }
+
+          // Update the user in the database
+          const q = `UPDATE users SET email = ? WHERE id = ?`;
+          db.query(q, [email, id], (err, data) => {
+            if (err) return res.status(200).json({ error: err.sqlMessage });
+
+            // Send email verification
+            //const transporter = nodemailer.createTransport({
+            //  service: "yahoo",
+            //  auth: {
+            //    user: process.env.EMAIL_USER,
+            //    pass: process.env.EMAIL_PASS,
+            //  },
+            //});
+            //const mailOptions = {
+            //  from: process.env.EMAIL_USER,
+            //  to: email,
+            //  subject: "Email Verification",
+            //  text: `Please click the following link to verify your new email: http://localhost:4000/verify/${id}`,
+            //};
+            //transporter.sendMail(mailOptions, (err, info) => {
+            //  if (err) {
+            //    console.error("Error while sending email:", err);
+            //    return res
+            //      .status(500)
+            //      .json({ error: "Failed to send verification email" });
+            //  } else {
+            //    console.log("Verification email sent:", info.response);
+            //    return res
+            //      .status(200)
+            //      .json({ message: "Email updated. Verification email sent." });
+            //  }
+            //});
+          });
+        });
+      }else{
+        //Return success when email is not updated
+        return res.status(200).json({ data: "Email not updated" });
+      }
+    }
+  })
 }
+
+module.exports.UpdateRescuerPassword = async (req, res) => {
+  const id = req.params.id;
+  const { password } = req.body;
+
+  // Validation
+  if (!password) {
+    return res.status(200).json({ error: "Please enter a password" });
+  }
+
+  // Password format validation
+  //const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  //if (!passwordRegex.test(password)) {
+  //  return res.status(200).json({ error: "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character" });
+  //}
+
+  // Check if user exists
+  const q = "SELECT * FROM users WHERE id = ?";
+  db.query(q, [id], (err, data) => {
+    if (err) return res.status(200).json({ error: err.sqlMessage });
+    else if (data.length === 0) return res.status(200).json({ error: "User does not exist" });
+    else {
+      // Update the user in the database
+      const q = "UPDATE users SET password = ? WHERE id = ?";
+      db.query(q, [password, id], (err, data) => {
+        if (err) return res.status(200).json({ error: err.sqlMessage });
+        return res.status(200).json({ data: "Password updated" });
+      });
+    }
+  })
+}
+
+
 
 
 
