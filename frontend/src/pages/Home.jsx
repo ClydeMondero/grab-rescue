@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import logo from "../assets/logo.png";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { Map } from "../components";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -49,7 +50,9 @@ const Home = () => {
             Need help? We got you covered!
           </p>
         </div>
-        <div className="w-full h-4/6 mt-10 bg-gray-200"></div>
+        <div className="w-full h-4/6 mt-10 bg-gray-200">
+          <Map />
+        </div>
         <button
           className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-10"
           onClick={() => (window.location.href = "/request-help")}
