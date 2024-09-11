@@ -9,9 +9,7 @@ import {
 } from "react-icons/ai";
 import { MdMail, MdAssignmentInd, MdDashboard } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import { Toast } from "../components";
-import { toast } from "react-toastify";
+import { handleLogout } from "../services/authServices";
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
@@ -46,32 +44,6 @@ const Sidebar = () => {
   useEffect(() => {
     initializeSidebar();
   }, []);
-
-  const verifyToken = async () => {
-    const { data } = await axios.post("/auth/", {}, { withCredentials: true });
-
-    const userId = data.user.id;
-
-    return userId;
-  };
-
-  const handleLogout = async () => {
-    const userId = await verifyToken();
-
-    const { data } = await axios.post(
-      "/auth/logout",
-      {
-        id: userId,
-      },
-      { withCredentials: true }
-    );
-
-    if (data.success) {
-      navigate("/");
-      return;
-    }
-    toast.error(data.message);
-  };
 
   return (
     <div
@@ -198,7 +170,7 @@ const Sidebar = () => {
           </span>
         </Link>
         <div
-          onClick={handleLogout}
+          onClick={() => handleLogout(navigate)}
           className="flex items-center px-4 py-2 hover:bg-[#6EA46E] cursor-pointer"
         >
           <AiOutlineLogout

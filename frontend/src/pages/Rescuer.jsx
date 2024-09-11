@@ -8,10 +8,13 @@ import {
   FaUserCircle,
   FaChevronDown,
 } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import { handleLogout } from "../services/authServices";
 
 const Rescuer = () => {
   const [activeTab, setActiveTab] = useState("requests");
   const [showDropdown, setShowDropdown] = useState(false);
+  const navigate = useNavigate();
 
   const renderContent = () => {
     switch (activeTab) {
@@ -76,7 +79,10 @@ const Rescuer = () => {
               <a href="#" className="block px-4 py-2 hover:bg-gray-200">
                 Change Password
               </a>
-              <a href="#" className="block px-4 py-2 hover:bg-gray-200">
+              <a
+                onClick={() => handleLogout(navigate)}
+                className="block px-4 py-2 hover:bg-gray-200"
+              >
                 Logout
               </a>
             </div>
