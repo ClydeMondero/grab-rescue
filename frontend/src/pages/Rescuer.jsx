@@ -10,6 +10,7 @@ import {
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { handleLogout } from "../services/authServices";
+import { Map } from "../components";
 
 const Rescuer = () => {
   const [activeTab, setActiveTab] = useState("requests");
@@ -92,7 +93,7 @@ const Rescuer = () => {
 
       {/* Map Section */}
       <div className="w-full h-96 bg-gray-300 flex items-center justify-center">
-        <p className="text-center text-gray-700">Map Placeholder</p>
+        <Map />
       </div>
 
       {/* Dashboard Content */}
