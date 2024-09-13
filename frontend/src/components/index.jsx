@@ -8,7 +8,6 @@ import Rescuers from "./Rescuers";
 import Settings from "./Settings";
 import ViewProfile from "./ViewProfile";
 import Sidebar from "./Sidebar";
-import Logout from "./Logout";
 import PrivateRoute from "./PrivateRoute";
 import Toast from "./Toast";
 import Map from "./Map";
@@ -27,5 +26,4 @@ export {
   Settings,
   ViewProfile,
   Sidebar,
-  Logout,
 };
