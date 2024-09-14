@@ -1,5 +1,6 @@
 import axios from "axios";
 import { toast } from "react-toastify";
+import { getCookie } from "./CookieHandler";
 
 export const verifyToken = async () => {
   const { data } = await axios.post("/auth/", {}, { withCredentials: true });
@@ -25,4 +26,13 @@ export const handleLogout = async (navigate) => {
     return;
   }
   toast.error(data.message);
+};
+
+//to access every private routes
+export const createAuthHeader = () => {
+  return {
+    headers: {
+      Authorization: "Bearer " + getCookie("token"),
+    },
+  };
 };
