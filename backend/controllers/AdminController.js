@@ -130,7 +130,7 @@ module.exports.CreateAdmin = async (req, res) => {
         if (err) {
           return res.status(200).json({ error: err.sqlMessage });
         }
-
+        return res.status(200).json({ data });
         const userId = data.insertId;
 
         // Send a verification email to the user
@@ -299,7 +299,7 @@ module.exports.UpdateAdminEmail = async (req, res) => {
           const q = `UPDATE users SET email = ? WHERE id = ?`;
           db.query(q, [email, id], (err, data) => {
             if (err) return res.status(200).json({ error: err.sqlMessage });
-            
+            return res.status(200).json({ data });
             // Send email verification
             //const transporter = nodemailer.createTransport({
             //  service: "yahoo",

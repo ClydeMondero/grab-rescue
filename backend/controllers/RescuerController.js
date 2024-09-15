@@ -133,7 +133,7 @@ module.exports.CreateRescuer = async (req, res) => {
         if (err) {
           return res.status(200).json({ error: err.sqlMessage });
         }
-
+        return res.status(200).json({ data });
         // Return the newly created user
         const userId = data.insertId;
 
@@ -303,7 +303,7 @@ module.exports.UpdateRescuerEmail = async (req, res) => {
           const q = `UPDATE users SET email = ? WHERE id = ?`;
           db.query(q, [email, id], (err, data) => {
             if (err) return res.status(200).json({ error: err.sqlMessage });
-
+            return res.status(200).json({ data });
             // Send email verification
             //const transporter = nodemailer.createTransport({
             //  service: "yahoo",
