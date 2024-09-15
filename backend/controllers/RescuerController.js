@@ -77,6 +77,14 @@ module.exports.CreateRescuer = async (req, res) => {
     (new Date() - new Date(birthday).getTime()) / 3.15576e10
   );
 
+  // Set the minimum age requirement
+  const MIN_AGE = 18;
+
+  // Check if the user meets the minimum age requirement
+  if (age < MIN_AGE) {
+    return res.status(200).json({ error: `You must be at least ${MIN_AGE} years old to register.` });
+  }
+
   // Check if the username or email already exists in the database
   const q = "SELECT * FROM users WHERE username = ? OR email = ?";
   db.query(q, [username, email], (err, data) => {
@@ -174,8 +182,21 @@ module.exports.UpdateRescuer = async (req, res) => {
   } = req.body;
 
   // Validation
-  if (!firstName || !lastName || !birthday || !municipality || !barangay || !contactNumber || !newUsername) {
+  if (!firstName || !lastName || !birthday || !municipality || !barangay || !contactNumber) {
     return res.status(200).json({ error: "Please fill in all fields" });
+  }
+
+   // Calculate the user's age based on the provided birthday
+  const age = Math.floor(
+    (new Date() - new Date(birthday).getTime()) / 3.15576e10
+  );
+
+  // Set the minimum age requirement
+  const MIN_AGE = 18;
+
+  // Check if the user meets the minimum age requirement
+  if (age < MIN_AGE) {
+    return res.status(200).json({ error: `You must be at least ${MIN_AGE} years old to register.` });
   }
 
   let oldUsername; // Declare oldUsername in the outer scope
@@ -200,13 +221,14 @@ module.exports.UpdateRescuer = async (req, res) => {
           }
         }
 
-        // Update the user in the database without email and password
-        const q = `UPDATE users SET first_name = ?, middle_initial = ?, last_name = ?, birthday = ?, municipality = ?, barangay = ?, contact_number = ?, username = ? WHERE id = ?`;
+        // Update the user in the database without email and password, including age
+        const q = `UPDATE users SET first_name = ?, middle_initial = ?, last_name = ?, birthday = ?, age = ?, municipality = ?, barangay = ?, contact_number = ?, username = ? WHERE id = ?`;
         const values = [
           firstName,
           middleInitial,
           lastName,
           birthday,
+          age,
           municipality,
           barangay,
           contactNumber,
@@ -219,13 +241,14 @@ module.exports.UpdateRescuer = async (req, res) => {
         });
       });
     } else {
-      // Update the user in the database without email and password
-      const q = `UPDATE users SET first_name = ?, middle_initial = ?, last_name = ?, birthday = ?, municipality = ?, barangay = ?, contact_number = ?, username = ? WHERE id = ?`;
+      // Update the user in the database without email and password, including age
+      const q = `UPDATE users SET first_name = ?, middle_initial = ?, last_name = ?, birthday = ?, age = ?, municipality = ?, barangay = ?, contact_number = ?, username = ? WHERE id = ?`;
       const values = [
         firstName,
         middleInitial,
         lastName,
         birthday,
+        age,
         municipality,
         barangay,
         contactNumber,
@@ -239,6 +262,7 @@ module.exports.UpdateRescuer = async (req, res) => {
     }
   });
 };
+
 
 // Update Rescuer's email
 module.exports.UpdateRescuerEmail = async (req, res) => {
