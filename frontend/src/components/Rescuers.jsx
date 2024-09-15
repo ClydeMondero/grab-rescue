@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
 import { MdAssignmentInd } from "react-icons/md";
 import { FaCircle } from "react-icons/fa";
+import { FaPencilAlt } from "react-icons/fa";
+import { FaTrash } from "react-icons/fa";
+import { FaCheckCircle } from "react-icons/fa";
+import { FaTimesCircle } from "react-icons/fa";
 import { createAuthHeader } from "../services/authServices";
 import axios from "axios";
 
@@ -15,7 +19,7 @@ const AssignRescuers = () => {
   const [selectedBarangay, setSelectedBarangay] = useState("All");
   const [selectedStatus, setSelectedStatus] = useState("All");
 
-  const rowsPerPage = 2;
+  const rowsPerPage = 10;
 
   const barangaysData = {
     "San Rafael": [
@@ -117,8 +121,8 @@ const AssignRescuers = () => {
       try {
         const result = await axios.get("/rescuers/get", createAuthHeader());
         setRescuers(result.data);
-        setFilteredRescuers(result.data); // Initialize filteredRescuers
-        console.log(result); // Assuming you might filter rescuers here
+        setFilteredRescuers(result.data);
+        console.log(result);
       } catch (error) {
         console.error("Error fetching rescuers:", error);
       }
@@ -175,7 +179,7 @@ const AssignRescuers = () => {
       <header className="p-2 sm:p-3 lg:p-4 flex items-center">
         <MdAssignmentInd className="text-xl sm:text-2xl lg:text-3xl text-[#557C55] mr-2" />
         <h4 className="text-md sm:text-lg font-semibold text-[#557C55]">
-          Assign Rescuers
+          Rescuers
         </h4>
       </header>
 
@@ -270,6 +274,8 @@ const AssignRescuers = () => {
             <th className="px-1 py-0.5 sm:px-4 sm:py-2">Barangay Name</th>
             <th className="px-1 py-0.5 sm:px-4 sm:py-2">Contact Number</th>
             <th className="px-1 py-0.5 sm:px-4 sm:py-2">Status</th>
+            <th className="px-1 py-0.5 sm:px-4 sm:py-2">Verified Email</th>
+            <th className="px-1 py-0.5 sm:px-4 sm:py-2">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -313,6 +319,35 @@ const AssignRescuers = () => {
                     <span>Offline</span>
                   </div>
                 )}
+              </td>
+              <td>
+                {rescue.is_verified ? (
+                  <div className="flex items-center space-x-1">
+                    <FaCheckCircle className="text-[#557C55]" />
+                    <span>Verified</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center space-x-1">
+                    <FaTimesCircle className="text-[#FA7070]" />
+                    <span>Not Verified</span>
+                  </div>
+                )}
+              </td>
+              <td className="px-1 py-0.5 sm:px-4 sm:py-2">
+                <div className="flex items-center space-x-2">
+                  <button
+                    className="text-[#557C55] hover:text-[#6EA46E]"
+                    onClick={() => console.log("update", rescue.id)}
+                  >
+                    <FaPencilAlt className="text-lg" />
+                  </button>
+                  <button
+                    className="text-[#FA7070] hover:text-[#EA4C4C]"
+                    onClick={() => console.log("delete", rescue.id)}
+                  >
+                    <FaTrash className="text-lg" />
+                  </button>
+                </div>
               </td>
             </tr>
           ))}

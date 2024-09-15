@@ -28,11 +28,21 @@ export const handleLogout = async (navigate) => {
   toast.error(data.message);
 };
 
-//to access every private routes
+/**
+ * Creates an authorization header with a Bearer token
+ *
+ * This function is used to authenticate requests to the server.
+ * It retrieves the token from the cookie and adds it to the
+ * Authorization header of the request.
+ *
+ * @return {Object} An object with the Authorization header
+ */
 export const createAuthHeader = () => {
+  const token = getCookie("token");
+
   return {
     headers: {
-      Authorization: "Bearer " + getCookie("token"),
+      Authorization: `Bearer ${token}`,
     },
   };
 };
