@@ -1,58 +1,58 @@
 const db = require("../config/db");
 
-require("dotenv").config({ path: "config/.env" });
-const { EMAIL_USER, EMAIL_PASS } = process.env;
+const env = require("../config/env");
 
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 
 // Get Rescuers with Filtering and Name Search
 module.exports.GetRescuers = async (req, res) => {
-    let q = "SELECT id, first_name, middle_initial, last_name, municipality, barangay, contact_number, is_online FROM users WHERE account_type = 'Rescuer'";
-    
-    const queryParams = [];
+  let q =
+    "SELECT id, first_name, middle_initial, last_name, municipality, barangay, contact_number, is_online FROM users WHERE account_type = 'Rescuer'";
 
-    // Add filters based on query parameters
-    if (req.query.municipality) {
-        q += " AND municipality = ?";
-        queryParams.push(req.query.municipality);
+  const queryParams = [];
+
+  // Add filters based on query parameters
+  if (req.query.municipality) {
+    q += " AND municipality = ?";
+    queryParams.push(req.query.municipality);
+  }
+
+  if (req.query.barangay) {
+    q += " AND barangay = ?";
+    queryParams.push(req.query.barangay);
+  }
+
+  if (req.query.is_online) {
+    q += " AND is_online = ?";
+    queryParams.push(req.query.is_online);
+  }
+
+  // Add keyword search for first_name or last_name
+  if (req.query.keyword) {
+    q += " AND (first_name LIKE ? OR last_name LIKE ?)";
+    const keyword = `%${req.query.keyword}%`;
+    queryParams.push(keyword, keyword);
+  }
+
+  db.query(q, queryParams, (err, data) => {
+    if (err) {
+      return res.status(200).json({ error: err.sqlMessage });
     }
-
-    if (req.query.barangay) {
-        q += " AND barangay = ?";
-        queryParams.push(req.query.barangay);
-    }
-
-    if (req.query.is_online) {
-        q += " AND is_online = ?";
-        queryParams.push(req.query.is_online);
-    }
-
-    // Add keyword search for first_name or last_name
-    if (req.query.keyword) {
-        q += " AND (first_name LIKE ? OR last_name LIKE ?)";
-        const keyword = `%${req.query.keyword}%`;
-        queryParams.push(keyword, keyword);
-    }
-
-    db.query(q, queryParams, (err, data) => {
-        if (err) {
-            return res.status(200).json({ error: err.sqlMessage });
-        }
-        return res.status(200).json(data);
-    });
+    return res.status(200).json(data);
+  });
 };
-
 
 // Get Specific Rescuer
 module.exports.GetRescuer = async (req, res) => {
-    const q = "SELECT id, first_name, middle_initial, last_name, municipality, barangay, contact_number, is_online FROM users WHERE id = ?";
-    db.query(q, [req.params.id], (err, data) => {
-        if (err) {
-            return res.status(200).json({ error: err.sqlMessage });
-        }
-        return res.status(200).json(data);
-    });
+  const q =
+    "SELECT id, first_name, middle_initial, last_name, municipality, barangay, contact_number, is_online FROM users WHERE id = ?";
+  db.query(q, [req.params.id], (err, data) => {
+    if (err) {
+      return res.status(200).json({ error: err.sqlMessage });
+    }
+    return res.status(200).json(data);
+  });
 };
 
 // Create Rescuer
@@ -69,7 +69,7 @@ module.exports.CreateRescuer = async (req, res) => {
     contactNumber,
     email,
     username,
-    password
+    password,
   } = req.body;
 
   // Calculate the user's age based on the provided birthday
@@ -120,7 +120,6 @@ module.exports.CreateRescuer = async (req, res) => {
         false,
       ];
 
-    
       db.query(q, [values], (err, data) => {
         if (err) {
           return res.status(200).json({ error: err.sqlMessage });
@@ -133,13 +132,13 @@ module.exports.CreateRescuer = async (req, res) => {
         // const transporter = nodemailer.createTransport({
         //   service: "yahoo",
         //   auth: {
-        //     user: EMAIL_USER,
-        //     pass: EMAIL_PASS,
+        //     user: env.EMAIL_USER,
+        //     pass: env.EMAIL_PASS,
         //   },
         // });
 
         // const mailOptions = {
-        //   from: EMAIL_USER,
+        //   from: env.EMAIL_USER,
         //   to: email,
         //   subject: "Email Verification",
         //   text: `Please click the following link to verify your email: http://localhost:4000/verify/${userId}`,
@@ -157,7 +156,6 @@ module.exports.CreateRescuer = async (req, res) => {
   });
 };
 
-
 // Update Rescuer
 module.exports.UpdateRescuer = async (req, res) => {
   // Get the user details from the request body
@@ -170,11 +168,19 @@ module.exports.UpdateRescuer = async (req, res) => {
     barangay,
     profile_image,
     contact_number: contactNumber,
-    username: newUsername
+    username: newUsername,
   } = req.body;
 
   // Validation
-  if (!firstName || !lastName || !birthday || !municipality || !barangay || !contactNumber || !newUsername) {
+  if (
+    !firstName ||
+    !lastName ||
+    !birthday ||
+    !municipality ||
+    !barangay ||
+    !contactNumber ||
+    !newUsername
+  ) {
     return res.status(200).json({ error: "Please fill in all fields" });
   }
 
@@ -183,7 +189,8 @@ module.exports.UpdateRescuer = async (req, res) => {
   const q = `SELECT * FROM users WHERE id = ?`;
   db.query(q, [req.params.id], (err, data) => {
     if (err) return res.status(200).json({ error: err.sqlMessage });
-    else if (data.length === 0) return res.status(200).json({ error: "User does not exist" });
+    else if (data.length === 0)
+      return res.status(200).json({ error: "User does not exist" });
     else {
       oldUsername = data[0].username; // Assign oldUsername
     }
@@ -211,7 +218,7 @@ module.exports.UpdateRescuer = async (req, res) => {
           barangay,
           contactNumber,
           newUsername,
-          req.params.id
+          req.params.id,
         ];
         db.query(q, values, (err, data) => {
           if (err) return res.status(200).json({ error: err.sqlMessage });
@@ -230,7 +237,7 @@ module.exports.UpdateRescuer = async (req, res) => {
         barangay,
         contactNumber,
         newUsername,
-        req.params.id
+        req.params.id,
       ];
       db.query(q, values, (err, data) => {
         if (err) return res.status(200).json({ error: err.sqlMessage });
@@ -259,9 +266,10 @@ module.exports.UpdateRescuerEmail = async (req, res) => {
   const q = "SELECT * FROM users WHERE id = ?";
   db.query(q, [id], (err, data) => {
     if (err) return res.status(200).json({ error: err.sqlMessage });
-    else if (data.length === 0) return res.status(200).json({ error: "User does not exist" });
+    else if (data.length === 0)
+      return res.status(200).json({ error: "User does not exist" });
     else {
-      const {email: oldEmail} = data[0];
+      const { email: oldEmail } = data[0];
 
       if (email && email !== oldEmail) {
         // Check if new email is already taken
@@ -284,12 +292,12 @@ module.exports.UpdateRescuerEmail = async (req, res) => {
             //const transporter = nodemailer.createTransport({
             //  service: "yahoo",
             //  auth: {
-            //    user: process.env.EMAIL_USER,
-            //    pass: process.env.EMAIL_PASS,
+            //    user: env.EMAIL_USER,
+            //    pass: env.EMAIL_PASS,
             //  },
             //});
             //const mailOptions = {
-            //  from: process.env.EMAIL_USER,
+            //  from: env.EMAIL_USER,
             //  to: email,
             //  subject: "Email Verification",
             //  text: `Please click the following link to verify your new email: http://localhost:4000/verify/${id}`,
@@ -309,13 +317,13 @@ module.exports.UpdateRescuerEmail = async (req, res) => {
             //});
           });
         });
-      }else{
+      } else {
         //Return success when email is not updated
         return res.status(200).json({ data: "Email not updated" });
       }
     }
-  })
-}
+  });
+};
 
 module.exports.UpdateRescuerPassword = async (req, res) => {
   const id = req.params.id;
@@ -336,7 +344,8 @@ module.exports.UpdateRescuerPassword = async (req, res) => {
   const q = "SELECT * FROM users WHERE id = ?";
   db.query(q, [id], (err, data) => {
     if (err) return res.status(200).json({ error: err.sqlMessage });
-    else if (data.length === 0) return res.status(200).json({ error: "User does not exist" });
+    else if (data.length === 0)
+      return res.status(200).json({ error: "User does not exist" });
     else {
       // Update the user in the database
       const q = "UPDATE users SET password = ? WHERE id = ?";
@@ -345,12 +354,5 @@ module.exports.UpdateRescuerPassword = async (req, res) => {
         return res.status(200).json({ data: "Password updated" });
       });
     }
-  })
-}
-
-
-
-
-
-
-
+  });
+};
