@@ -76,6 +76,18 @@ module.exports.CreateAdmin = async (req, res) => {
     (new Date() - new Date(birthday).getTime()) / 3.15576e10
   );
 
+  // Set the minimum age requirement
+  const MIN_AGE = 18;
+
+  // Check if the user meets the minimum age requirement
+  if (age < MIN_AGE) {
+    return res
+      .status(200)
+      .json({
+        error: `You must be at least ${MIN_AGE} years old to register.`,
+      });
+  }
+
   // Check if the username or email already exists in the database
   const q = "SELECT * FROM users WHERE username = ? OR email = ?";
   db.query(q, [username, email], (err, data) => {
@@ -122,7 +134,7 @@ module.exports.CreateAdmin = async (req, res) => {
         if (err) {
           return res.status(200).json({ error: err.sqlMessage });
         }
-
+        return res.status(200).json({ data });
         const userId = data.insertId;
 
         // Send a verification email to the user
@@ -181,6 +193,23 @@ module.exports.UpdateAdmin = async (req, res) => {
     return res.status(200).json({ error: "Please fill in all fields" });
   }
 
+  // Calculate the user's age based on the provided birthday
+  const age = Math.floor(
+    (new Date() - new Date(birthday).getTime()) / 3.15576e10
+  );
+
+  // Set the minimum age requirement
+  const MIN_AGE = 18;
+
+  // Check if the user meets the minimum age requirement
+  if (age < MIN_AGE) {
+    return res
+      .status(200)
+      .json({
+        error: `You must be at least ${MIN_AGE} years old to register.`,
+      });
+  }
+
   let oldUsername;
 
   const q = `SELECT * FROM users WHERE id = ?`;
@@ -204,13 +233,14 @@ module.exports.UpdateAdmin = async (req, res) => {
           }
         }
 
-        // Update the user in the database without email and password
-        const q = `UPDATE users SET first_name = ?, middle_initial = ?, last_name = ?, birthday = ?, municipality = ?, barangay = ?, contact_number = ?, username = ? WHERE id = ?`;
+        // Update the user in the database without email and password, including age
+        const q = `UPDATE users SET first_name = ?, middle_initial = ?, last_name = ?, birthday = ?, age = ?, municipality = ?, barangay = ?, contact_number = ?, username = ? WHERE id = ?`;
         const values = [
           firstName,
           middleInitial,
           lastName,
           birthday,
+          age,
           municipality,
           barangay,
           contactNumber,
@@ -223,13 +253,14 @@ module.exports.UpdateAdmin = async (req, res) => {
         });
       });
     } else {
-      // Update the user in the database without email and password
-      const q = `UPDATE users SET first_name = ?, middle_initial = ?, last_name = ?, birthday = ?, municipality = ?, barangay = ?, contact_number = ?, username = ? WHERE id = ?`;
+      // Update the user in the database without email and password, including age
+      const q = `UPDATE users SET first_name = ?, middle_initial = ?, last_name = ?, birthday = ?, age = ?, municipality = ?, barangay = ?, contact_number = ?, username = ? WHERE id = ?`;
       const values = [
         firstName,
         middleInitial,
         lastName,
         birthday,
+        age,
         municipality,
         barangay,
         contactNumber,
@@ -284,7 +315,7 @@ module.exports.UpdateAdminEmail = async (req, res) => {
           const q = `UPDATE users SET email = ? WHERE id = ?`;
           db.query(q, [email, id], (err, data) => {
             if (err) return res.status(200).json({ error: err.sqlMessage });
-
+            return res.status(200).json({ data });
             // Send email verification
             //const transporter = nodemailer.createTransport({
             //  service: "yahoo",

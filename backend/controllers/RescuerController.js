@@ -11,7 +11,16 @@ module.exports.GetRescuers = async (req, res) => {
     "SELECT id, first_name, middle_initial, last_name, municipality, barangay, contact_number, is_online FROM users WHERE account_type = 'Rescuer'";
 
   const queryParams = [];
+  let q =
+    "SELECT id, first_name, middle_initial, last_name, municipality, barangay, contact_number, is_online FROM users WHERE account_type = 'Rescuer'";
 
+  const queryParams = [];
+
+  // Add filters based on query parameters
+  if (req.query.municipality) {
+    q += " AND municipality = ?";
+    queryParams.push(req.query.municipality);
+  }
   // Add filters based on query parameters
   if (req.query.municipality) {
     q += " AND municipality = ?";
@@ -22,12 +31,26 @@ module.exports.GetRescuers = async (req, res) => {
     q += " AND barangay = ?";
     queryParams.push(req.query.barangay);
   }
+  if (req.query.barangay) {
+    q += " AND barangay = ?";
+    queryParams.push(req.query.barangay);
+  }
 
   if (req.query.is_online) {
     q += " AND is_online = ?";
     queryParams.push(req.query.is_online);
   }
+  if (req.query.is_online) {
+    q += " AND is_online = ?";
+    queryParams.push(req.query.is_online);
+  }
 
+  // Add keyword search for first_name or last_name
+  if (req.query.keyword) {
+    q += " AND (first_name LIKE ? OR last_name LIKE ?)";
+    const keyword = `%${req.query.keyword}%`;
+    queryParams.push(keyword, keyword);
+  }
   // Add keyword search for first_name or last_name
   if (req.query.keyword) {
     q += " AND (first_name LIKE ? OR last_name LIKE ?)";
@@ -41,10 +64,24 @@ module.exports.GetRescuers = async (req, res) => {
     }
     return res.status(200).json(data);
   });
+  db.query(q, queryParams, (err, data) => {
+    if (err) {
+      return res.status(200).json({ error: err.sqlMessage });
+    }
+    return res.status(200).json(data);
+  });
 };
 
 // Get Specific Rescuer
 module.exports.GetRescuer = async (req, res) => {
+  const q =
+    "SELECT id, first_name, middle_initial, last_name, municipality, barangay, contact_number, is_online FROM users WHERE id = ?";
+  db.query(q, [req.params.id], (err, data) => {
+    if (err) {
+      return res.status(200).json({ error: err.sqlMessage });
+    }
+    return res.status(200).json(data);
+  });
   const q =
     "SELECT id, first_name, middle_initial, last_name, municipality, barangay, contact_number, is_online FROM users WHERE id = ?";
   db.query(q, [req.params.id], (err, data) => {
@@ -70,12 +107,25 @@ module.exports.CreateRescuer = async (req, res) => {
     email,
     username,
     password,
+    password,
   } = req.body;
 
   // Calculate the user's age based on the provided birthday
   const age = Math.floor(
     (new Date() - new Date(birthday).getTime()) / 3.15576e10
   );
+
+  // Set the minimum age requirement
+  const MIN_AGE = 18;
+
+  // Check if the user meets the minimum age requirement
+  if (age < MIN_AGE) {
+    return res
+      .status(200)
+      .json({
+        error: `You must be at least ${MIN_AGE} years old to register.`,
+      });
+  }
 
   // Check if the username or email already exists in the database
   const q = "SELECT * FROM users WHERE username = ? OR email = ?";
@@ -120,11 +170,12 @@ module.exports.CreateRescuer = async (req, res) => {
         false,
       ];
 
+
       db.query(q, [values], (err, data) => {
         if (err) {
           return res.status(200).json({ error: err.sqlMessage });
         }
-
+        return res.status(200).json({ data });
         // Return the newly created user
         const userId = data.insertId;
 
@@ -169,6 +220,7 @@ module.exports.UpdateRescuer = async (req, res) => {
     profile_image,
     contact_number: contactNumber,
     username: newUsername,
+    username: newUsername,
   } = req.body;
 
   // Validation
@@ -184,11 +236,30 @@ module.exports.UpdateRescuer = async (req, res) => {
     return res.status(200).json({ error: "Please fill in all fields" });
   }
 
+  // Calculate the user's age based on the provided birthday
+  const age = Math.floor(
+    (new Date() - new Date(birthday).getTime()) / 3.15576e10
+  );
+
+  // Set the minimum age requirement
+  const MIN_AGE = 18;
+
+  // Check if the user meets the minimum age requirement
+  if (age < MIN_AGE) {
+    return res
+      .status(200)
+      .json({
+        error: `You must be at least ${MIN_AGE} years old to register.`,
+      });
+  }
+
   let oldUsername; // Declare oldUsername in the outer scope
 
   const q = `SELECT * FROM users WHERE id = ?`;
   db.query(q, [req.params.id], (err, data) => {
     if (err) return res.status(200).json({ error: err.sqlMessage });
+    else if (data.length === 0)
+      return res.status(200).json({ error: "User does not exist" });
     else if (data.length === 0)
       return res.status(200).json({ error: "User does not exist" });
     else {
@@ -207,17 +278,19 @@ module.exports.UpdateRescuer = async (req, res) => {
           }
         }
 
-        // Update the user in the database without email and password
-        const q = `UPDATE users SET first_name = ?, middle_initial = ?, last_name = ?, birthday = ?, municipality = ?, barangay = ?, contact_number = ?, username = ? WHERE id = ?`;
+        // Update the user in the database without email and password, including age
+        const q = `UPDATE users SET first_name = ?, middle_initial = ?, last_name = ?, birthday = ?, age = ?, municipality = ?, barangay = ?, contact_number = ?, username = ? WHERE id = ?`;
         const values = [
           firstName,
           middleInitial,
           lastName,
           birthday,
+          age,
           municipality,
           barangay,
           contactNumber,
           newUsername,
+          req.params.id,
           req.params.id,
         ];
         db.query(q, values, (err, data) => {
@@ -226,17 +299,19 @@ module.exports.UpdateRescuer = async (req, res) => {
         });
       });
     } else {
-      // Update the user in the database without email and password
-      const q = `UPDATE users SET first_name = ?, middle_initial = ?, last_name = ?, birthday = ?, municipality = ?, barangay = ?, contact_number = ?, username = ? WHERE id = ?`;
+      // Update the user in the database without email and password, including age
+      const q = `UPDATE users SET first_name = ?, middle_initial = ?, last_name = ?, birthday = ?, age = ?, municipality = ?, barangay = ?, contact_number = ?, username = ? WHERE id = ?`;
       const values = [
         firstName,
         middleInitial,
         lastName,
         birthday,
+        age,
         municipality,
         barangay,
         contactNumber,
         newUsername,
+        req.params.id,
         req.params.id,
       ];
       db.query(q, values, (err, data) => {
@@ -268,7 +343,10 @@ module.exports.UpdateRescuerEmail = async (req, res) => {
     if (err) return res.status(200).json({ error: err.sqlMessage });
     else if (data.length === 0)
       return res.status(200).json({ error: "User does not exist" });
+    else if (data.length === 0)
+      return res.status(200).json({ error: "User does not exist" });
     else {
+      const { email: oldEmail } = data[0];
       const { email: oldEmail } = data[0];
 
       if (email && email !== oldEmail) {
@@ -287,7 +365,7 @@ module.exports.UpdateRescuerEmail = async (req, res) => {
           const q = `UPDATE users SET email = ? WHERE id = ?`;
           db.query(q, [email, id], (err, data) => {
             if (err) return res.status(200).json({ error: err.sqlMessage });
-
+            return res.status(200).json({ data });
             // Send email verification
             //const transporter = nodemailer.createTransport({
             //  service: "yahoo",
@@ -318,10 +396,13 @@ module.exports.UpdateRescuerEmail = async (req, res) => {
           });
         });
       } else {
+      } else {
         //Return success when email is not updated
         return res.status(200).json({ data: "Email not updated" });
       }
     }
+  });
+};
   });
 };
 
@@ -346,6 +427,8 @@ module.exports.UpdateRescuerPassword = async (req, res) => {
     if (err) return res.status(200).json({ error: err.sqlMessage });
     else if (data.length === 0)
       return res.status(200).json({ error: "User does not exist" });
+    else if (data.length === 0)
+      return res.status(200).json({ error: "User does not exist" });
     else {
       // Update the user in the database
       const q = "UPDATE users SET password = ? WHERE id = ?";
@@ -354,5 +437,7 @@ module.exports.UpdateRescuerPassword = async (req, res) => {
         return res.status(200).json({ data: "Password updated" });
       });
     }
+  });
+};
   });
 };
