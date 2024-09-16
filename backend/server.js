@@ -2,16 +2,15 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-
-require("dotenv").config({ path: "config/.env" });
-const { PORT } = process.env;
+const env = require("./config/env");
 
 const userRoute = require("./routes/UserRoute");
 const authRoute = require("./routes/AuthRoute");
 const rescuerRoute = require("./routes/RescuerRoute");
 const adminRoute = require("./routes/AdminRoute");
 
-const port = PORT;
+const port = env.PORT;
+
 app.listen(port, () => {
   console.log(`Server listening in http://localhost:${port}`);
 });
@@ -19,7 +18,7 @@ app.listen(port, () => {
 //enable cors
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", "https://grab-rescue.onrender.com/"],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })

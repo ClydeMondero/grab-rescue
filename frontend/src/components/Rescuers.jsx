@@ -1,185 +1,171 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MdAssignmentInd } from "react-icons/md";
+import { FaCircle } from "react-icons/fa";
+import { FaPencilAlt } from "react-icons/fa";
+import { FaTrash } from "react-icons/fa";
+import { FaCheckCircle } from "react-icons/fa";
+import { FaTimesCircle } from "react-icons/fa";
+import { createAuthHeader } from "../services/authServices";
+import axios from "axios";
 
 const AssignRescuers = () => {
-  const [rescuer] = useState([
-    {
-      id: 1,
-      name: "John Doe",
-      location: "San Rafael, Bulacan",
-      status: "Available",
-      barangay: "Barangay San Isidro",
-      contactNumber: "123-456-7890",
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      location: "Bustos, Bulacan",
-      status: "Available",
-      barangay: "Barangay Bignay",
-      contactNumber: "234-567-8901",
-    },
-    {
-      id: 4,
-      name: "Sarah Connor",
-      location: "Angat, Bulacan",
-      status: "Available",
-      barangay: "Barangay Cawayan",
-      contactNumber: "345-678-9012",
-    },
-    {
-      id: 5,
-      name: "Tom Harris",
-      location: "San Ildefonso, Bulacan",
-      status: "Unavailable",
-      barangay: "Barangay Poblacion",
-      contactNumber: "456-789-0123",
-    },
-    {
-      id: 6,
-      name: "Linda Johnson",
-      location: "Baliuag, Bulacan",
-      status: "Available",
-      barangay: "Barangay Tarangnan",
-      contactNumber: "567-890-1234",
-    },
-    {
-      id: 7,
-      name: "Peter Brown",
-      location: "Plaridel, Bulacan",
-      status: "Available",
-      barangay: "Barangay Banga 1st",
-      contactNumber: "678-901-2345",
-    },
-    {
-      id: 8,
-      name: "Karen Davis",
-      location: "Pulilan, Bulacan",
-      status: "Available",
-      barangay: "Barangay Dampol 2nd",
-      contactNumber: "789-012-3456",
-    },
-    {
-      id: 9,
-      name: "David Lee",
-      location: "Calumpit, Bulacan",
-      status: "Available",
-      barangay: "Barangay Meysulao",
-      contactNumber: "890-123-4567",
-    },
-    {
-      id: 10,
-      name: "Emily Chen",
-      location: "Hagonoy, Bulacan",
-      status: "Available",
-      barangay: "Barangay San Agustin",
-      contactNumber: "901-234-5678",
-    },
-  ]);
-
-  const [requests] = useState([
-    {
-      id: 1,
-      location: "San Rafael, Bulacan",
-      time: "08:30 AM",
-      status: "Pending",
-      type: "Medical Emergency",
-    },
-    {
-      id: 2,
-      location: "Bustos, Bulacan",
-      time: "09:00 AM",
-      status: "Pending",
-      type: "Flooding",
-    },
-    {
-      id: 3,
-      location: "Baliuag, Bulacan",
-      time: "09:30 AM",
-      status: "In Progress",
-      type: "Fire",
-    },
-    {
-      id: 4,
-      location: "San Ildefonso, Bulacan",
-      time: "10:00 AM",
-      status: "Pending",
-      type: "Traffic Accident",
-    },
-    {
-      id: 5,
-      location: "Angat, Bulacan",
-      time: "10:15 AM",
-      status: "Completed",
-      type: "Earthquake",
-    },
-    {
-      id: 6,
-      location: "Pandi, Bulacan",
-      time: "10:30 AM",
-      status: "Pending",
-      type: "Fire",
-    },
-    {
-      id: 7,
-      location: "Bulakan, Bulacan",
-      time: "10:45 AM",
-      status: "In Progress",
-      type: "Medical Emergency",
-    },
-    {
-      id: 8,
-      location: "Obando, Bulacan",
-      time: "11:00 AM",
-      status: "Pending",
-      type: "Traffic Accident",
-    },
-    {
-      id: 9,
-      location: "Marilao, Bulacan",
-      time: "11:15 AM",
-      status: "Completed",
-      type: "Flooding",
-    },
-    {
-      id: 10,
-      location: "Meycauayan, Bulacan",
-      time: "11:30 AM",
-      status: "In Progress",
-      type: "Earthquake",
-    },
-  ]);
-
-  const [selectedLocation, setSelectedLocation] = useState("All");
+  const [rescuers, setRescuers] = useState([]);
+  const [filteredRescuers, setFilteredRescuers] = useState([]);
+  const [paginatedRescuers, setPaginatedRescuers] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const rowsPerPage = 20;
+  const [searchName, setSearchName] = useState("");
+  const [selectedMunicipality, setSelectedMunicipality] = useState("All");
+  const [barangays, setBarangays] = useState([]);
+  const [selectedBarangay, setSelectedBarangay] = useState("All");
+  const [selectedStatus, setSelectedStatus] = useState("All");
 
-  // Filter rescuers based on the selected location
-  const filteredRescuers =
-    selectedLocation === "All"
-      ? rescuer
-      : rescuer.filter((r) => r.location.includes(selectedLocation));
+  const rowsPerPage = 10;
 
-  // Paginate data
-  const totalRows = filteredRescuers.length;
-  const totalPages = Math.ceil(totalRows / rowsPerPage);
-  const startIndex = (currentPage - 1) * rowsPerPage;
-  const endIndex = startIndex + rowsPerPage;
-  const paginatedRescuers = filteredRescuers.slice(startIndex, endIndex);
+  const barangaysData = {
+    "San Rafael": [
+      "Banca-Banca",
+      "BMA – Balagtas",
+      "Caingin",
+      "Capihan",
+      "Coral na Bato",
+      "Cruz na Daan",
+      "Dagat-Dagatan",
+      "Diliman I",
+      "Diliman II",
+      "Lico",
+      "Libis",
+      "Maasim",
+      "Mabalas-Balas",
+      "Maguinao",
+      "Maronquillo",
+      "Paco",
+      "Pansumaloc",
+      "Pantubig",
+      "Pasong Bangkal",
+      "Pasong Callos",
+      "Pasong Intsik",
+      "Pinacpinacan",
+      "Poblacion",
+      "Pulo",
+      "Pulong Bayabas",
+      "Salapungan",
+      "Sampaloc",
+      "San Agustin",
+      "San Roque",
+      "Sapang Pahalang",
+      "Talacsan",
+      "Tambubong",
+      "Tukod",
+      "Ulingao",
+    ],
+    Bustos: [
+      "Bonga Mayor",
+      "Bonga Menor",
+      "Buisan",
+      "Camachilihan",
+      "Cambaog",
+      "Catacte",
+      "Liciada",
+      "Malamig",
+      "Malawak",
+      "Poblacion",
+      "San Pedro",
+      "Talampas",
+      "Tanawan",
+      "Tibagan",
+    ],
+  };
+
+  useEffect(() => {
+    // Filter rescuers based on search query and selected filters
+    const filtered = rescuers.filter((rescue) => {
+      const fullName =
+        `${rescue.first_name} ${rescue.middle_initial} ${rescue.last_name}`.toLowerCase();
+      const matchesName = fullName.includes(searchName.toLowerCase());
+      const matchesMunicipality =
+        selectedMunicipality === "All" ||
+        rescue.municipality === selectedMunicipality;
+      const matchesBarangay =
+        selectedBarangay === "All" || rescue.barangay === selectedBarangay;
+      const matchesStatus =
+        selectedStatus === "All" ||
+        (selectedStatus === "Online" && rescue.is_online) ||
+        (selectedStatus === "Offline" && !rescue.is_online);
+
+      return (
+        matchesName && matchesMunicipality && matchesBarangay && matchesStatus
+      );
+    });
+    setFilteredRescuers(filtered);
+    setCurrentPage(1); // Reset to first page when filtering
+  }, [
+    searchName,
+    selectedMunicipality,
+    selectedBarangay,
+    selectedStatus,
+    rescuers,
+  ]);
+
+  useEffect(() => {
+    // Update barangays based on selected municipality
+    if (selectedMunicipality === "All") {
+      setBarangays([]); // Clear barangays if "All" is selected
+      setSelectedBarangay("All"); // Reset selected barangay
+    } else {
+      setBarangays(barangaysData[selectedMunicipality] || []);
+    }
+  }, [selectedMunicipality]);
+
+  useEffect(() => {
+    const initializePage = async () => {
+      try {
+        const result = await axios.get("/rescuers/get", createAuthHeader());
+        setRescuers(result.data);
+        setFilteredRescuers(result.data);
+        console.log(result);
+      } catch (error) {
+        console.error("Error fetching rescuers:", error);
+      }
+    };
+
+    initializePage();
+  }, []);
+
+  useEffect(() => {
+    // Filter rescuers based on search query
+    const filtered = rescuers.filter((rescue) =>
+      `${rescue.first_name} ${rescue.middle_initial} ${rescue.last_name}`
+        .toLowerCase()
+        .includes(searchName.toLowerCase())
+    );
+    setFilteredRescuers(filtered);
+    setCurrentPage(1);
+  }, [searchName, rescuers]);
+
+  useEffect(() => {
+    const totalRows = filteredRescuers.length;
+    const totalPages = Math.ceil(totalRows / rowsPerPage);
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
+    setPaginatedRescuers(filteredRescuers.slice(startIndex, endIndex));
+  }, [filteredRescuers, currentPage]);
 
   const handlePageChange = (newPage) => {
+    const totalRows = filteredRescuers.length;
+    const totalPages = Math.ceil(totalRows / rowsPerPage);
     if (newPage > 0 && newPage <= totalPages) {
       setCurrentPage(newPage);
     }
   };
 
-  // Generate page numbers
+  const totalRows = filteredRescuers.length;
+  const totalPages = Math.ceil(totalRows / rowsPerPage);
+
   const pageNumbers = [];
   for (let i = 1; i <= totalPages; i++) {
     pageNumbers.push(i);
   }
 
-  // Determine which page numbers to show
   const visiblePages =
     pageNumbers.length <= 5
       ? pageNumbers
@@ -193,134 +179,209 @@ const AssignRescuers = () => {
       <header className="p-2 sm:p-3 lg:p-4 flex items-center">
         <MdAssignmentInd className="text-xl sm:text-2xl lg:text-3xl text-[#557C55] mr-2" />
         <h4 className="text-md sm:text-lg font-semibold text-[#557C55]">
-          Assign Rescuers
+          Rescuers
         </h4>
       </header>
 
       <p className="px-2 mb-1 text-xs sm:text-sm text-gray-600">
-        Filter and assign rescuers to the following requests:
+        Search and assign rescuers to the following requests:
       </p>
+      {/* Search bar for rescuer names */}
+      <div className="mb-2 px-2">
+        <label
+          htmlFor="searchName"
+          className="block text-xs sm:text-sm font-medium text-gray-700"
+        >
+          Search Rescuer by Name:
+        </label>
+        <input
+          id="searchName"
+          type="text"
+          className="form-input w-full border border-[#557C55] text-black rounded-lg p-1 mt-1 bg-gray-50 text-xs sm:text-sm"
+          placeholder="Enter rescuer's name"
+          value={searchName}
+          onChange={(e) => setSearchName(e.target.value)}
+        />
+      </div>
+      {/* Dropdown for Municipality */}
+      <div className="mb-2 px-2">
+        <label
+          htmlFor="municipalityFilter"
+          className="block text-xs sm:text-sm font-medium text-gray-700"
+        >
+          Filter by Municipality:
+        </label>
+        <select
+          id="municipalityFilter"
+          className="form-select w-full border border-[#557C55] text-black rounded-lg p-1 mt-1 bg-gray-50 text-xs sm:text-sm"
+          value={selectedMunicipality}
+          onChange={(e) => setSelectedMunicipality(e.target.value)}
+        >
+          <option value="All">All</option>
+          <option value="San Rafael">San Rafael</option>
+          <option value="Bustos">Bustos</option>
+        </select>
+      </div>
 
-      <div className="flex-1 bg-white p-2 sm:p-3 flex flex-col">
-        <div className="mb-1 px-2">
-          <label
-            htmlFor="locationFilter"
-            className="block text-xs sm:text-sm font-medium text-gray-700"
-          >
-            Filter by Location:
-          </label>
-          <select
-            id="locationFilter"
-            className="form-select w-full border border-[#557C55] text-black rounded-lg p-1 mt-1 bg-gray-50 text-xs sm:text-sm"
-            value={selectedLocation}
-            onChange={(e) => setSelectedLocation(e.target.value)}
-          >
-            <option value="All">All</option>
-            <option value="San Rafael, Bulacan">San Rafael, Bulacan</option>
-            <option value="Bustos, Bulacan">Bustos, Bulacan</option>
-            <option value="Baliuag, Bulacan">Baliuag, Bulacan</option>
-            <option value="Angat, Bulacan">Angat, Bulacan</option>
-            <option value="San Ildefonso, Bulacan">
-              San Ildefonso, Bulacan
+      {/* Dropdown for Barangay */}
+      <div className="mb-2 px-2">
+        <label
+          htmlFor="barangayFilter"
+          className="block text-xs sm:text-sm font-medium text-gray-700"
+        >
+          Filter by Barangay:
+        </label>
+        <select
+          id="barangayFilter"
+          className="form-select w-full border border-[#557C55] text-black rounded-lg p-1 mt-1 bg-gray-50 text-xs sm:text-sm"
+          value={selectedBarangay}
+          onChange={(e) => setSelectedBarangay(e.target.value)}
+        >
+          <option value="All">All</option>
+          {barangays.map((barangay) => (
+            <option key={barangay} value={barangay}>
+              {barangay}
             </option>
-          </select>
-        </div>
+          ))}
+        </select>
+      </div>
+      {/* Dropdown for Status */}
+      <div className="mb-2 px-2">
+        <label
+          htmlFor="statusFilter"
+          className="block text-xs sm:text-sm font-medium text-gray-700"
+        >
+          Filter by Status:
+        </label>
+        <select
+          id="statusFilter"
+          className="form-select w-full border border-[#557C55] text-black rounded-lg p-1 mt-1 bg-gray-50 text-xs sm:text-sm"
+          value={selectedStatus}
+          onChange={(e) => setSelectedStatus(e.target.value)}
+        >
+          <option value="All">All</option>
+          <option value="Online">Online</option>
+          <option value="Offline">Offline</option>
+        </select>
+      </div>
 
-        <p className="px-2 mb-1 text-xs sm:text-sm font-semibold text-gray-700">
-          List of available rescuers:
-        </p>
-
-        <div className="flex-1">
-          <div className="overflow-x-auto">
-            <table className="w-full bg-white border border-gray-200 rounded-lg text-xs sm:text-sm">
-              <thead className="bg-[#557C55] text-white text-left">
-                <tr>
-                  <th className="px-1 py-0.5 sm:px-4 sm:py-2">#</th>
-                  <th className="px-1 py-0.5 sm:px-4 sm:py-2">Name</th>
-                  <th className="px-1 py-0.5 sm:px-4 sm:py-2">Location</th>
-                  <th className="px-1 py-0.5 sm:px-4 sm:py-2">Barangay Name</th>
-                  <th className="px-1 py-0.5 sm:px-4 sm:py-2">
-                    Contact Number
-                  </th>
-                  <th className="px-1 py-0.5 sm:px-4 sm:py-2">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {paginatedRescuers.map((rescue, index) => (
-                  <tr
-                    key={rescue.id}
-                    className={`border-t ${
-                      index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                    }`}
+      <table className="w-full bg-white border border-gray-200 rounded-lg text-xs sm:text-sm">
+        <thead className="bg-[#557C55] text-white text-left">
+          <tr>
+            <th className="px-1 py-0.5 sm:px-4 sm:py-2">#</th>
+            <th className="px-1 py-0.5 sm:px-4 sm:py-2">Name</th>
+            <th className="px-1 py-0.5 sm:px-4 sm:py-2">Municipality</th>
+            <th className="px-1 py-0.5 sm:px-4 sm:py-2">Barangay Name</th>
+            <th className="px-1 py-0.5 sm:px-4 sm:py-2">Contact Number</th>
+            <th className="px-1 py-0.5 sm:px-4 sm:py-2">Status</th>
+            <th className="px-1 py-0.5 sm:px-4 sm:py-2">Verified Email</th>
+            <th className="px-1 py-0.5 sm:px-4 sm:py-2">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {paginatedRescuers.map((rescue, index) => (
+            <tr
+              key={rescue.id}
+              className={`border-t ${
+                index % 2 === 0 ? "bg-gray-50" : "bg-white"
+              }`}
+            >
+              <td className="px-1 py-0.5 sm:px-4 sm:py-2">{rescue.id}</td>
+              <td className="px-1 py-0.5 sm:px-4 sm:py-2">
+                {rescue.first_name +
+                  " " +
+                  rescue.middle_initial +
+                  " " +
+                  rescue.last_name}
+              </td>
+              <td className="px-1 py-0.5 sm:px-4 sm:py-2">
+                {rescue.municipality}
+              </td>
+              <td className="px-1 py-0.5 sm:px-4 sm:py-2">{rescue.barangay}</td>
+              <td className="px-1 py-0.5 sm:px-4 sm:py-2">
+                {rescue.contact_number}
+              </td>
+              <td
+                className={`px-1 py-0.5 sm:px-4 sm:py-2 ${
+                  rescue.is_online ? "text-[#557C55]" : "text-[#FA7070]"
+                }`}
+              >
+                {rescue.is_online ? (
+                  <div className="flex items-center">
+                    <FaCircle className="text-[#557C55] mr-2" />{" "}
+                    {/* Green circle for online */}
+                    <span>Online</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center">
+                    <FaCircle className="text-[#FA7070] mr-2" />{" "}
+                    {/* Red circle for offline */}
+                    <span>Offline</span>
+                  </div>
+                )}
+              </td>
+              <td>
+                {rescue.is_verified ? (
+                  <div className="flex items-center space-x-1">
+                    <FaCheckCircle className="text-[#557C55]" />
+                    <span>Verified</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center space-x-1">
+                    <FaTimesCircle className="text-[#FA7070]" />
+                    <span>Not Verified</span>
+                  </div>
+                )}
+              </td>
+              <td className="px-1 py-0.5 sm:px-4 sm:py-2">
+                <div className="flex items-center space-x-2">
+                  <button
+                    className="text-[#557C55] hover:text-[#6EA46E]"
+                    onClick={() => console.log("update", rescue.id)}
                   >
-                    <td className="px-1 py-0.5 sm:px-4 sm:py-2">{rescue.id}</td>
-                    <td className="px-1 py-0.5 sm:px-4 sm:py-2">
-                      {rescue.name}
-                    </td>
-                    <td className="px-1 py-0.5 sm:px-4 sm:py-2">
-                      {rescue.location}
-                    </td>
-                    <td className="px-1 py-0.5 sm:px-4 sm:py-2">
-                      {rescue.barangay}
-                    </td>
-                    <td className="px-1 py-0.5 sm:px-4 sm:py-2">
-                      {rescue.contactNumber}
-                    </td>
-                    <td
-                      className={`px-1 py-0.5 sm:px-4 sm:py-2 font-semibold ${
-                        rescue.status === "Available"
-                          ? "text-green-600"
-                          : "text-red-500"
-                      }`}
-                    >
-                      {rescue.status}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+                    <FaPencilAlt className="text-lg" />
+                  </button>
+                  <button
+                    className="text-[#FA7070] hover:text-[#EA4C4C]"
+                    onClick={() => console.log("delete", rescue.id)}
+                  >
+                    <FaTrash className="text-lg" />
+                  </button>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
 
-        <div className="flex justify-between mt-3">
-          <button
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-            className={`mx-1 px-2 py-1 rounded-lg ${
-              currentPage === 1
-                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                : "bg-gray-200 text-gray-800 hover:bg-gray-300"
-            } text-xs sm:text-sm`}
-          >
-            Previous
-          </button>
-
+      <div className="mt-4 flex justify-between items-center">
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="px-4 py-2 bg-gray-300 rounded disabled:bg-gray-200"
+        >
+          Previous
+        </button>
+        <div className="flex space-x-2">
           {visiblePages.map((page) => (
             <button
               key={page}
               onClick={() => handlePageChange(page)}
-              className={`mx-1 px-2 py-1 rounded-lg ${
-                currentPage === page
-                  ? "bg-[#557C55] text-white"
-                  : "bg-gray-200 text-gray-800"
-              } text-xs sm:text-sm`}
+              className={`px-4 py-2 rounded ${
+                page === currentPage ? "bg-[#557C55] text-white" : "bg-gray-200"
+              }`}
             >
               {page}
             </button>
           ))}
-
-          <button
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-            className={`mx-1 px-2 py-1 rounded-lg ${
-              currentPage === totalPages
-                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                : "bg-gray-200 text-gray-800 hover:bg-gray-300"
-            } text-xs sm:text-sm`}
-          >
-            Next
-          </button>
         </div>
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className="px-4 py-2 bg-gray-300 rounded disabled:bg-gray-200"
+        >
+          Next
+        </button>
       </div>
     </div>
   );
