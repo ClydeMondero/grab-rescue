@@ -9,16 +9,17 @@ const authRoute = require("./routes/AuthRoute");
 const rescuerRoute = require("./routes/RescuerRoute");
 const adminRoute = require("./routes/AdminRoute");
 
+const url = env.SITE_URL;
 const port = env.PORT;
 
 app.listen(port, () => {
-  console.log(`Server listening in http://localhost:${port}`);
+  console.log(`Server listening in ${url}:${port}`);
 });
 
 //enable cors
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://grab-rescue.onrender.com/"],
+    origin: ["http://localhost:5173", "https://grab-rescue.onrender.com"],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })

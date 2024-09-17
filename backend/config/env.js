@@ -6,7 +6,7 @@ dotenv.config({
 });
 
 module.exports = {
-  PATH: path.resolve(__dirname, `${process.env.NODE_ENV}.env`),
+  SITE_URL: process.env.SITE_URL,
   NODE_ENV: process.env.NODE_ENV,
   DATABASE_NAME: process.env.DATABASE_NAME,
   DATABASE_HOST: process.env.DATABASE_HOST,
