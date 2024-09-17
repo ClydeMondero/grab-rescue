@@ -3,7 +3,10 @@ import { Home, Login, Admin, Rescuer, NotFound } from "./pages";
 import axios from "axios";
 import { PrivateRoute } from "./components";
 
-axios.defaults.baseURL = "http://localhost:4000";
+axios.defaults.baseURL =
+  process.env.NODE_ENV === "production"
+    ? import.meta.env.VITE_DEV_API_URL
+    : import.meta.env.VITE_PROD_API_URL;
 
 const App = () => {
   return (
