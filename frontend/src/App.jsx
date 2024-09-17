@@ -5,8 +5,8 @@ import { PrivateRoute } from "./components";
 
 axios.defaults.baseURL =
   process.env.NODE_ENV === "production"
-    ? import.meta.env.VITE_DEV_API_URL
-    : import.meta.env.VITE_PROD_API_URL;
+    ? import.meta.env.VITE_PROD_API_URL
+    : import.meta.env.VITE_DEV_API_URL;
 
 const App = () => {
   return (
