@@ -81,11 +81,9 @@ module.exports.CreateAdmin = async (req, res) => {
 
   // Check if the user meets the minimum age requirement
   if (age < MIN_AGE) {
-    return res
-      .status(200)
-      .json({
-        error: `You must be at least ${MIN_AGE} years old to register.`,
-      });
+    return res.status(200).json({
+      error: `You must be at least ${MIN_AGE} years old to register.`,
+    });
   }
 
   // Check if the username or email already exists in the database
@@ -203,11 +201,9 @@ module.exports.UpdateAdmin = async (req, res) => {
 
   // Check if the user meets the minimum age requirement
   if (age < MIN_AGE) {
-    return res
-      .status(200)
-      .json({
-        error: `You must be at least ${MIN_AGE} years old to register.`,
-      });
+    return res.status(200).json({
+      error: `You must be at least ${MIN_AGE} years old to register.`,
+    });
   }
 
   let oldUsername;
