@@ -18,14 +18,15 @@ module.exports.UserVerification = async (req, res) => {
     if (err) {
       return res.json({ success: false });
     } else {
-      const q = "SELECT * FROM users WHERE id = ?";
+      const q = "SELECT * FROM users WHERE id = $1";
+
       db.query(q, [data.id], (err, data) => {
         if (err) {
           return res.json({ success: false });
         } else {
           return res.json({
             success: true,
-            user: data[0],
+            user: data.rows[0],
           });
         }
       });
