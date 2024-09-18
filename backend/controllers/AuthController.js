@@ -8,7 +8,7 @@ module.exports.Login = async (req, res) => {
   const { email, password, role } = req.body;
 
   // Get the user from the database
-  const q = "SELECT * FROM users WHERE email = ? AND verified = true";
+  const q = "SELECT * FROM users WHERE email = $1 AND verified = true";
   db.query(q, [email], (err, data) => {
     if (err)
       return res.status(200).json({
@@ -18,7 +18,7 @@ module.exports.Login = async (req, res) => {
       });
 
     // If the user does not exist or is not verified, return an error
-    if (data.length === 0) {
+    if (data.rows.length === 0) {
       return res.status(200).json({
         success: false,
         message: "Email does not exist or is not verified.",
@@ -26,7 +26,7 @@ module.exports.Login = async (req, res) => {
     }
 
     // Get the user data from the database
-    const [userData] = data;
+    const [userData] = data.rows;
 
     // Check if the user is already online
     if (userData.is_online) {
@@ -53,7 +53,7 @@ module.exports.Login = async (req, res) => {
     }
 
     // Update the user to be online
-    const updateQuery = "UPDATE users SET is_online = true WHERE id = ?";
+    const updateQuery = "UPDATE users SET is_online = true WHERE id = $1";
     db.query(updateQuery, [userData.id], (err) => {
       if (err)
         return res
@@ -69,19 +69,17 @@ module.exports.Login = async (req, res) => {
         httpOnly: false,
       });
 
-      
-    // Create a log of the login
-    const logQuery = "INSERT INTO logs (`date_time`, `action`, `user_id`) VALUES (NOW(), ?, ?)";
-    const values = [
-      "Login",
-      userData.id,
-    ];
-    db.query(logQuery, values, (err) => {
-      if (err)
-        return res
-          .status(200)
-          .json({ success: false, message: "Failed to create log" });
-    });
+      //TODO: create logs table
+      // // Create a log of the login
+      // const logQuery =
+      //   "INSERT INTO logs (`date_time`, `action`, `user_id`) VALUES (NOW(), $1, $2)";
+      // const values = ["Login", userData.id];
+      // db.query(logQuery, values, (err) => {
+      //   if (err)
+      //     return res
+      //       .status(200)
+      //       .json({ success: false, message: "Failed to create log" });
+      // });
 
       // Remove the password from the user data and return it
       delete userData.password;
@@ -97,22 +95,21 @@ module.exports.Login = async (req, res) => {
 module.exports.Logout = (req, res) => {
   const { id } = req.body;
 
-  // Create a log of logout
-  const logQuery = "INSERT INTO logs (`date_time`, `action`, `user_id`) VALUES (NOW(), ?, ?)";
-  const values = [
-    "Logout",
-    id,
-  ];
-  db.query(logQuery, values, (err) => {
-    if (err) {
-      return res
-        .status(200)
-        .json({ success: false, message: "Failed to create log" });
-    }
-  });
+  //TODO: create logs table
+  // // Create a log of logout
+  // const logQuery =
+  //   "INSERT INTO logs (`date_time`, `action`, `user_id`) VALUES (NOW(), ?, ?)";
+  // const values = ["Logout", id];
+  // db.query(logQuery, values, (err) => {
+  //   if (err) {
+  //     return res
+  //       .status(200)
+  //       .json({ success: false, message: "Failed to create log" });
+  //   }
+  // });
 
   // Update the user to be offline
-  const updateQuery = "UPDATE users SET is_online = false WHERE id = ?";
+  const updateQuery = "UPDATE users SET is_online = false WHERE id = $1";
   db.query(updateQuery, [id], (err) => {
     if (err) {
       return res
