@@ -1,21 +1,27 @@
-const mysql = require("mysql");
+const pg = require("pg");
 const env = require("./env");
+const { connectionString, ssl } = require("pg/lib/defaults");
+
+const { Pool } = pg;
 
 //create database connection
-const db = mysql.createConnection({
-  host: env.DATABASE_HOST,
-  user: env.DATABASE_USER,
-  password: env.DATABASE_PASSWORD,
-  database: env.DATABASE_NAME,
-  port: env.DATABASE_PORT,
+const pool = new Pool({
+  connectionString: env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false,
+  },
 });
 
-db.connect(function (err) {
-  if (err) {
-    console.log("Error connecting to Database", err.code);
-  } else {
-    console.log("Database connection established on port " + env.DATABASE_PORT);
+async function checkConnection() {
+  try {
+    const client = await pool.connect(); // Try to acquire a client
+    console.log("Database connected successfully");
+    client.release(); // Release the client back to the pool
+  } catch (err) {
+    console.error("Error connecting to the pool:", err.stack);
   }
-});
+}
 
-module.exports = db;
+checkConnection();
+
+module.exports = pool;
