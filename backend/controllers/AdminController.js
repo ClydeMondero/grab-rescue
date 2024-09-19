@@ -132,32 +132,31 @@ module.exports.CreateAdmin = async (req, res) => {
         if (err) {
           return res.status(200).json({ error: err.sqlMessage });
         }
-        return res.status(200).json({ data });
         const userId = data.insertId;
 
         // Send a verification email to the user
-        // const transporter = nodemailer.createTransport({
-        //   service: "yahoo",
-        //   auth: {
-        //     user: env.EMAIL_USER,
-        //     pass: env.EMAIL_PASS,
-        //   },
-        // });
+        const transporter = nodemailer.createTransport({
+          service: "yahoo",
+          auth: {
+            user: EMAIL_USER,
+            pass: EMAIL_PASS,
+          },
+        });
 
-        // const mailOptions = {
-        //   from: env.EMAIL_USER,
-        //   to: env.email,
-        //   subject: "Email Verification",
-        //   text: `Please click the following link to verify your email: http://localhost:4000/verify/${userId}`,
-        // };
+        const mailOptions = {
+          from: EMAIL_USER,
+          to: email,
+          subject: "Email Verification",
+          text: `Please click the following link to verify your email: http://localhost:4000/verify/${userId}`,
+        };
 
-        // transporter.sendMail(mailOptions, (err, info) => {
-        //   if (err) {
-        //     return res.status(200).json({ error: err.message });
-        //   } else {
-        //     return res.status(200).json({ data });
-        //   }
-        // });
+        transporter.sendMail(mailOptions, (err, info) => {
+          if (err) {
+            return res.status(200).json({ error: err.message });
+          } else {
+            return res.status(200).json({ data });
+          }
+        });
       });
     }
   });
@@ -271,80 +270,74 @@ module.exports.UpdateAdmin = async (req, res) => {
   });
 };
 
-// Update Admin Email
+
 module.exports.UpdateAdminEmail = async (req, res) => {
   const id = req.params.id;
   const { email } = req.body;
 
   // Validation
   if (!email) {
-    return res.status(200).json({ error: "Please enter an email" });
+    return res.status(400).json({ error: "Please enter an email" });
   }
 
   // Email format validation
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
-    return res.status(200).json({ error: "Invalid email format" });
+    return res.status(400).json({ error: "Invalid email format" });
   }
 
+  // Fetch the user's current email from the database
   const q = "SELECT * FROM users WHERE id = ?";
   db.query(q, [id], (err, data) => {
-    if (err) return res.status(200).json({ error: err.sqlMessage });
-    else if (data.length === 0)
-      return res.status(200).json({ error: "User does not exist" });
-    else {
-      const { email: oldEmail } = data[0];
+    if (err) return res.status(500).json({ error: err.sqlMessage });
+    if (data.length === 0) return res.status(404).json({ error: "User does not exist" });
 
-      if (email && email !== oldEmail) {
-        // Check if new email is already taken
-        const q = `SELECT * FROM users WHERE email = ? AND email != ?`;
-        db.query(q, [email, oldEmail], (err, data) => {
-          if (err) return res.status(200).json({ error: err.sqlMessage });
-          else if (data.length > 0) {
-            const existingUser = data[0];
-            if (existingUser.email === email) {
-              return res.status(200).json({ error: "Email is already taken" });
-            }
-          }
+    const { email: oldEmail } = data[0];
 
-          // Update the user in the database
-          const q = `UPDATE users SET email = ? WHERE id = ?`;
-          db.query(q, [email, id], (err, data) => {
-            if (err) return res.status(200).json({ error: err.sqlMessage });
-            return res.status(200).json({ data });
-            // Send email verification
-            //const transporter = nodemailer.createTransport({
-            //  service: "yahoo",
-            //  auth: {
-            //    user: env.EMAIL_USER,
-            //    pass: env.EMAIL_PASS,
-            //  },
-            //});
-            //const mailOptions = {
-            //  from: env.EMAIL_USER,
-            //  to: email,
-            //  subject: "Email Verification",
-            //  text: `Please click the following link to verify your new email: http://localhost:4000/verify/${id}`,
-            //};
-            //transporter.sendMail(mailOptions, (err, info) => {
-            //  if (err) {
-            //    console.error("Error while sending email:", err);
-            //    return res
-            //      .status(500)
-            //      .json({ error: "Failed to send verification email" });
-            //  } else {
-            //    console.log("Verification email sent:", info.response);
-            //    return res
-            //      .status(200)
-            //      .json({ message: "Email updated. Verification email sent." });
-            //  }
-            //});
-          });
-        });
-      } else {
-        //Return success when email is not updated
-        return res.status(200).json({ data: "Email not updated" });
-      }
+    // Check if the new email is the same as the old email
+    if (email === oldEmail) {
+      return res.status(200).json({ message: "The email is the same. No changes made." });
     }
+
+    // Check if the new email is already taken
+    const q = `SELECT * FROM users WHERE email = ?`;
+    db.query(q, [email], (err, data) => {
+      if (err) return res.status(500).json({ error: err.sqlMessage });
+      if (data.length > 0) return res.status(400).json({ error: "Email is already taken" });
+
+      // Proceed to update the email in the database
+      const q = `UPDATE users SET email = ? WHERE id = ?`;
+      db.query(q, [email, id], (err, data) => {
+        if (err) return res.status(500).json({ error: err.sqlMessage });
+
+        //Send a verification email to the user
+        const transporter = nodemailer.createTransport({
+          service: "gmail",
+          auth: {
+            user: "bhenzmharlbartolome012603@gmail.com",
+            pass: "owvb wzni fhxu cvbz",
+          },
+        });
+
+        const mailOptions = {
+          from: process.env.EMAIL_USER,
+          to: email,
+          subject: "Email Verification",
+          text: `Please click the following link to verify your new email: http://localhost:4000/verify/${id}`,
+        };
+
+        transporter.sendMail(mailOptions, (err, info) => {
+          if (err) {
+            console.error("Error while sending email:", err);
+            return res.status(500).json({ error: "Failed to send verification email" });
+          } else {
+            console.log("Verification email sent:", info.response);
+            return res.status(200).json({ message: "Email updated. Verification email sent." });
+          }
+        });
+      });
+    });
   });
 };
+
+
