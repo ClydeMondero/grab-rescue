@@ -1,11 +1,16 @@
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import logo from "../assets/logo.png";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Map } from "../components";
+import { addLocation } from "../services/firestoreServices";
 
 const Home = () => {
   const navigate = useNavigate();
+  const [location, setLocation] = useState({
+    longitude: 120.9107,
+    latitude: 14.9536,
+  });
 
   //go to user page if already logged in
   const verifyToken = async () => {
@@ -22,6 +27,31 @@ const Home = () => {
     verifyToken();
   }, []);
 
+  //handle request click
+  const handleRequestClick = () => {
+    //get user location
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+
+        if (latitude && longitude) {
+          setLocation({
+            longitude,
+            latitude,
+          });
+
+          //add location to firestore
+          addLocation(location.longitude, location.latitude);
+        } else {
+          console.log("No location data available");
+        }
+      },
+      (error) => {
+        console.log("Error getting location:", error.message);
+      },
+      { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
+    );
+  };
   return (
     <div className="h-screen flex flex-col">
       <header className="bg-white shadow w-full flex justify-between">
@@ -55,7 +85,7 @@ const Home = () => {
         </div>
         <button
           className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-10"
-          onClick={() => (window.location.href = "/request-help")}
+          onClick={handleRequestClick}
         >
           Request for Help
         </button>
