@@ -1,4 +1,4 @@
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, getDocs } from "firebase/firestore";
 import { store } from "../../firebaseConfig";
 
 //add location to firestore
@@ -8,7 +8,7 @@ export const addLocation = async (
   longitude,
   latitude,
   role = "rescuer",
-  timestamp = Date.now()
+  timestamp = new Date().toISOString()
 ) => {
   const location = {
     longitude,
@@ -26,3 +26,13 @@ export const addLocation = async (
 };
 
 //TODO: get locations from firestore based on role
+export const getLocations = async (role) => {
+  const querySnapshot = await getDocs(collection(store, "locations"));
+
+  const locations = [];
+
+  querySnapshot.forEach((doc) => {
+    locations.push(doc.data());
+  });
+  return locations;
+};
