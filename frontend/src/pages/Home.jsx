@@ -3,7 +3,8 @@ import logo from "../assets/logo.png";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Map } from "../components";
-import { addLocation } from "../services/firestoreServices";
+import { addLocation, getLocations } from "../services/firestoreServices";
+import { set } from "react-hook-form";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -11,6 +12,7 @@ const Home = () => {
     longitude: 120.9107,
     latitude: 14.9536,
   });
+  const [locations, setLocations] = useState([]);
 
   //go to user page if already logged in
   const verifyToken = async () => {
@@ -23,12 +25,17 @@ const Home = () => {
     }
   };
 
-  useEffect(() => {
-    verifyToken();
-  }, []);
+  //get locations from firestore
+  const getRescuerLocations = async () => {
+    const locations = await getLocations("rescuer");
 
-  //handle request click
-  const handleRequestClick = () => {
+    setLocations(locations);
+
+    console.log(locations);
+  };
+
+  // set user location to firestore
+  const setUserLocation = () => {
     //get user location
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -52,6 +59,13 @@ const Home = () => {
       { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
     );
   };
+
+  useEffect(() => {
+    verifyToken();
+    getRescuerLocations();
+    setUserLocation();
+  }, []);
+
   return (
     <div className="h-screen flex flex-col">
       <header className="bg-white shadow w-full flex justify-between">
@@ -83,10 +97,7 @@ const Home = () => {
         <div className="w-full h-4/6 mt-10 bg-gray-200">
           <Map />
         </div>
-        <button
-          className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-10"
-          onClick={handleRequestClick}
-        >
+        <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-10">
           Request for Help
         </button>
       </div>
