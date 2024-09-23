@@ -8,13 +8,15 @@ export const addLocation = async (
   longitude,
   latitude,
   role = "rescuer",
-  timestamp = new Date().toISOString()
+  timestamp = new Date().toISOString(),
+  status = "available" //available, assigned, in-transit, unavailable
 ) => {
   const location = {
     longitude,
     latitude,
     role,
     timestamp,
+    status,
   };
 
   try {
@@ -25,6 +27,7 @@ export const addLocation = async (
   }
 };
 
+//get locations from firestore based on role that are active
 export const getLocations = async (role) => {
   const querySnapshot = await getDocs(collection(store, "locations"));
 

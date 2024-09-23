@@ -63,7 +63,9 @@ const Home = () => {
   useEffect(() => {
     verifyToken();
     getRescuerLocations();
-    setUserLocation();
+
+    //TODO: set user location only if it changes
+    //setUserLocation();
   }, []);
 
   return (
@@ -95,7 +97,7 @@ const Home = () => {
           </p>
         </div>
         <div className="w-full h-4/6 mt-10 bg-gray-200">
-          <Map />
+          <Map locations={locations} />
         </div>
         <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-10">
           Request for Help
