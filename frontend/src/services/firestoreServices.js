@@ -25,14 +25,13 @@ export const addLocation = async (
   }
 };
 
-//TODO: get locations from firestore based on role
 export const getLocations = async (role) => {
   const querySnapshot = await getDocs(collection(store, "locations"));
 
   const locations = [];
 
   querySnapshot.forEach((doc) => {
-    locations.push(doc.data());
+    locations.push({ id: doc.id, ...doc.data() });
   });
   return locations;
 };
