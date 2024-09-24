@@ -1,6 +1,6 @@
 import axios from "axios";
 import { toast } from "react-toastify";
-import { getCookie } from "./CookieHandler";
+import { getCookie } from "./cookieService";
 
 export const verifyToken = async () => {
   const { data } = await axios.post("/auth/", {}, { withCredentials: true });
