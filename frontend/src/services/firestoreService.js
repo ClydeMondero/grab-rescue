@@ -5,6 +5,7 @@ import { store } from "../../firebaseConfig";
 //TODO: add location id base on the user id
 //TODO: use setDoc instead of addDoc
 export const addLocation = async (
+  userId,
   longitude,
   latitude,
   role = "rescuer",
@@ -20,7 +21,11 @@ export const addLocation = async (
   };
 
   try {
-    const docRef = await addDoc(collection(store, "locations"), location);
+    const docRef = await addDoc(
+      collection(store, "locations"),
+      location,
+      userId
+    );
     console.log("Document written with ID: ", docRef.id);
   } catch (error) {
     console.error("Error adding document: ", error);
@@ -37,4 +42,14 @@ export const getLocations = async (role) => {
     locations.push({ id: doc.id, ...doc.data() });
   });
   return locations;
+};
+
+//check if user exists
+export const checkUser = async (id) => {
+  const querySnapshot = await getDocs(collection(store, "users"));
+  const users = [];
+  querySnapshot.forEach((doc) => {
+    users.push({ id: doc.id, ...doc.data() });
+  });
+  return users.find((user) => user.id === id);
 };

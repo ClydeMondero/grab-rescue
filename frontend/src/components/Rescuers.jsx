@@ -5,7 +5,7 @@ import { FaPencilAlt } from "react-icons/fa";
 import { FaTrash } from "react-icons/fa";
 import { FaCheckCircle } from "react-icons/fa";
 import { FaTimesCircle } from "react-icons/fa";
-import { createAuthHeader } from "../services/authServices";
+import { createAuthHeader } from "../services/authService";
 import axios from "axios";
 
 const AssignRescuers = () => {

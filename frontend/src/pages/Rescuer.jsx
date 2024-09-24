@@ -9,7 +9,7 @@ import {
   FaChevronDown,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { handleLogout } from "../services/authServices";
+import { handleLogout } from "../services/authService";
 
 const Rescuer = () => {
   const [activeTab, setActiveTab] = useState("requests");
