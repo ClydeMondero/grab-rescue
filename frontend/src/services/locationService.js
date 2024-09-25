@@ -11,7 +11,7 @@ export const updateLocationIfMoved = (
   const distance = getDistance(currentLat, currentLon, lastLat, lastLon);
 
   if (distance >= MIN_DISTANCE_THRESHOLD) {
-    alert("Location updated:");
+    console.log("Location updated", currentLat, currentLon + " " + Date.now());
 
     //TODO: update location in database and update marker
 

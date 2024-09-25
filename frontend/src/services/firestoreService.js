@@ -2,13 +2,10 @@ import { collection, addDoc, getDocs } from "firebase/firestore";
 import { store } from "../../firebaseConfig";
 
 //add location to firestore
-//TODO: add location id base on the user id
-//TODO: use setDoc instead of addDoc
-export const addLocation = async (
-  userId,
+export const addLocationToFirestore = async (
   longitude,
   latitude,
-  role = "rescuer",
+  role,
   timestamp = new Date().toISOString(),
   status = "available" //available, assigned, in-transit, unavailable
 ) => {
@@ -21,12 +18,10 @@ export const addLocation = async (
   };
 
   try {
-    const docRef = await addDoc(
-      collection(store, "locations"),
-      location,
-      userId
-    );
+    const docRef = await addDoc(collection(store, "locations"), location);
+
     console.log("Document written with ID: ", docRef.id);
+    return { id: docRef.id };
   } catch (error) {
     console.error("Error adding document: ", error);
   }

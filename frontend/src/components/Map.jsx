@@ -3,6 +3,7 @@ import { Map as MapGL, GeolocateControl, Marker, Popup } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import citizenMarker from "../assets/citizen-marker.png";
 import rescuerMarker from "../assets/rescuer-marker.png";
+import { updateLocationIfMoved } from "../services/locationService";
 
 const Map = ({ locations }) => {
   //set initial viewport to BSU-BUSTOS
@@ -14,6 +15,35 @@ const Map = ({ locations }) => {
   const geoControlRef = useRef();
   const [markers, setMarkers] = useState([]);
 
+  //update user location if moved
+  useEffect(() => {
+    navigator.geolocation.watchPosition(
+      (position) => {
+        const { longitude, latitude } = position.coords;
+
+        if (viewport.latitude && viewport.longitude) {
+          updateLocationIfMoved(
+            viewport.longitude,
+            viewport.latitude,
+            longitude,
+            latitude
+          );
+        }
+
+        setViewport({
+          longitude,
+          latitude,
+          zoom: 15,
+        });
+      },
+      (error) => {
+        console.log("Error getting location:", error.message);
+      },
+      { enableHighAccuracy: true, timeout: 60000, maximumAge: 3000 }
+    );
+  }, [viewport.latitude, viewport.longitude]);
+
+  //updates location
   useEffect(() => {
     setMarkers(locations);
   }, [locations]);
