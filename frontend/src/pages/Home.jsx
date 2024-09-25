@@ -3,8 +3,11 @@ import logo from "../assets/logo.png";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Map } from "../components";
-import { addLocation, getLocations } from "../services/firestoreServices";
-import { set } from "react-hook-form";
+import {
+  addLocationToFirestore,
+  getLocations,
+} from "../services/firestoreService";
+import { setCitizenCookie } from "../services/cookieService";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -25,20 +28,15 @@ const Home = () => {
     }
   };
 
-  //get locations from firestore
-  const getRescuerLocations = async () => {
-    const locations = await getLocations("rescuer");
-
-    setLocations(locations);
-
-    console.log(locations);
-  };
+  //TODO: move location functions to Map component
+  //TODO:check if user location is already set in firebase, if not add location else update location
+  //TODO: use state instead of using the navigator
 
   // set user location to firestore
   const setUserLocation = () => {
     //get user location
     navigator.geolocation.getCurrentPosition(
-      (position) => {
+      async (position) => {
         const { latitude, longitude } = position.coords;
 
         if (latitude && longitude) {
@@ -48,7 +46,16 @@ const Home = () => {
           });
 
           //add location to firestore
-          addLocation(location.longitude, location.latitude);
+          const { id } = await addLocationToFirestore(
+            location.longitude,
+            location.latitude,
+            "citizen"
+          );
+
+          //adds citizen id to cookies
+          setCitizenCookie(id);
+
+          console.log("Location added");
         } else {
           console.log("No location data available");
         }
@@ -60,12 +67,16 @@ const Home = () => {
     );
   };
 
+  //get locations from firestore
+  const getRescuerLocations = async () => {
+    const locations = await getLocations("rescuer");
+
+    setLocations(locations);
+  };
+
   useEffect(() => {
     verifyToken();
     getRescuerLocations();
-
-    //TODO: set user location only if it changes
-    //setUserLocation();
   }, []);
 
   return (
@@ -99,7 +110,10 @@ const Home = () => {
         <div className="w-full h-4/6 mt-10 bg-gray-200">
           <Map locations={locations} />
         </div>
-        <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-10">
+        <button
+          onClick={setUserLocation}
+          className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-10"
+        >
           Request for Help
         </button>
       </div>
