@@ -3,9 +3,13 @@ import { Map as MapGL, GeolocateControl, Marker, Popup } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import citizenMarker from "../assets/citizen-marker.png";
 import rescuerMarker from "../assets/rescuer-marker.png";
-import { updateLocationIfMoved } from "../services/locationService";
+import {
+  addCitizenLocation,
+  getRescuerLocations,
+  updateCitizenLocation,
+} from "../services/locationService";
 
-const Map = ({ locations }) => {
+const Map = () => {
   //set initial viewport to BSU-BUSTOS
   const [viewport, setViewport] = useState({
     longitude: 120.9107,
@@ -15,38 +19,10 @@ const Map = ({ locations }) => {
   const geoControlRef = useRef();
   const [markers, setMarkers] = useState([]);
 
-  //update user location if moved
   useEffect(() => {
-    navigator.geolocation.watchPosition(
-      (position) => {
-        const { longitude, latitude } = position.coords;
-
-        if (viewport.latitude && viewport.longitude) {
-          updateLocationIfMoved(
-            viewport.longitude,
-            viewport.latitude,
-            longitude,
-            latitude
-          );
-        }
-
-        setViewport({
-          longitude,
-          latitude,
-          zoom: 15,
-        });
-      },
-      (error) => {
-        console.log("Error getting location:", error.message);
-      },
-      { enableHighAccuracy: true, timeout: 60000, maximumAge: 3000 }
-    );
-  }, [viewport.latitude, viewport.longitude]);
-
-  //updates location
-  useEffect(() => {
-    setMarkers(locations);
-  }, [locations]);
+    //get rescuer locations on load
+    getRescuerLocations(setMarkers);
+  }, []);
 
   return (
     <MapGL
@@ -57,6 +33,8 @@ const Map = ({ locations }) => {
         geoControlRef.current?.trigger();
       }}
     >
+      {/*TODO onGeoLcotate check if citizen has already have a cookie, 
+      if not add location else update location */}
       <GeolocateControl
         ref={geoControlRef}
         position="top-right"
@@ -88,7 +66,8 @@ const Map = ({ locations }) => {
       {/* Rescuers marker */}
       {markers.map(
         (marker) =>
-          marker.status === "available" && (
+          marker.status === "available" &&
+          marker.role === "rescuer" && (
             <Marker
               key={marker.id}
               longitude={marker.longitude}
