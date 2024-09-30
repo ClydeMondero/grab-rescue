@@ -10,3 +10,17 @@
 .sidebar ul li a:hover {
   background-color: #6ea46e;
 }
+
+/* Active Geolacate Icon */
+.mapboxgl-ctrl
+  button.mapboxgl-ctrl-geolocate.mapboxgl-ctrl-geolocate-active
+  .mapboxgl-ctrl-icon {
+  background-image: url("./assets/accident-active.svg");
+  background-size: 20px 20px;
+}
+
+/* Inactive Geolacate Icon *.mapboxgl-ctrl */
+.mapboxgl-ctrl button.mapboxgl-ctrl-geolocate .mapboxgl-ctrl-icon {
+  background-image: url("./assets/accident-inactive.svg");
+  background-size: 20px 20px;
+}
