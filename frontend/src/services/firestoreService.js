@@ -1,4 +1,10 @@
-import { collection, addDoc, getDocs } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  doc,
+  updateDoc,
+} from "firebase/firestore";
 import { store } from "../../firebaseConfig";
 
 //add location to firestore
@@ -27,6 +33,29 @@ export const addLocationToFirestore = async (
   }
 };
 
+// update location in firestore
+export const updateLocationInFirestore = async (
+  id,
+  longitude,
+  latitude,
+  timestamp = new Date().toISOString(),
+  status = "available" //available, assigned, in-transit, unavailable
+) => {
+  const location = {
+    longitude,
+    latitude,
+    timestamp,
+    status,
+  };
+
+  try {
+    await updateDoc(doc(store, "locations", id), location);
+    console.log("Document updated with ID: ", id);
+  } catch (error) {
+    console.error("Error updating document: ", error);
+  }
+};
+
 //get locations from firestore based on role that are active
 export const getLocationsFromFirestore = async (role) => {
   const querySnapshot = await getDocs(collection(store, "locations"));
@@ -34,7 +63,9 @@ export const getLocationsFromFirestore = async (role) => {
   const locations = [];
 
   querySnapshot.forEach((doc) => {
-    locations.push({ id: doc.id, ...doc.data() });
+    if (doc.data().role === role) {
+      locations.push({ id: doc.id, ...doc.data() });
+    }
   });
   return locations;
 };

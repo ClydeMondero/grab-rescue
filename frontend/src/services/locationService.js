@@ -2,6 +2,7 @@ import { getDistance } from "../utils/distanceCalculator";
 import {
   addLocationToFirestore,
   getLocationsFromFirestore,
+  updateLocationInFirestore,
 } from "../services/firestoreService";
 import { setCitizenCookie } from "../services/cookieService";
 
@@ -30,37 +31,44 @@ export const addCitizenLocation = async (longitude, latitude) => {
   console.log("Location added");
 };
 
-//TODO update location if moved
-export const updateCitizenLocation = () => {
-  navigator.geolocation.watchPosition(
-    (position) => {
-      const { longitude, latitude } = position.coords;
+//get nearest rescuer
+export const getNearestRescuer = (citizen, rescuers) => {
+  const distances = rescuers.map((rescuer) => {
+    return getDistance(
+      citizen.latitude,
+      citizen.longitude,
+      rescuer.latitude,
+      rescuer.longitude
+    );
+  });
 
-      if (viewport.latitude && viewport.longitude) {
-        hasUserMoved(
-          viewport.longitude,
-          viewport.latitude,
-          longitude,
-          latitude
-        );
-      }
+  const minDistance = Math.min(...distances);
+  const nearestRescuer = rescuers[distances.indexOf(minDistance)];
 
-      setViewport({
-        longitude,
-        latitude,
-        zoom: 15,
-      });
-    },
-    (error) => {
-      console.log("Error getting location:", error.message);
-    },
-    { enableHighAccuracy: true, timeout: 60000, maximumAge: 3000 }
-  );
+  return nearestRescuer;
+};
+
+// update location if moved
+export const updateCitizenLocation = (
+  prevLon,
+  prevLat,
+  longitude,
+  latitude
+) => {
+  const moved = hasUserMoved(prevLon, prevLat, longitude, latitude);
+
+  //TODO:test if update location if moved in firestore
+  if (moved) {
+    //console.log("Location updated", moved);
+    //updateLocationInFirestore(id, longitude, latitude);
+  } else {
+    console.log("Location not updated", moved);
+  }
 };
 
 //get locations from firestore
-export const getRescuerLocations = async (setMarkers) => {
+export const getRescuerLocations = async (setRescuers) => {
   const locations = await getLocationsFromFirestore("rescuer");
 
-  setMarkers(locations);
+  setRescuers(locations);
 };

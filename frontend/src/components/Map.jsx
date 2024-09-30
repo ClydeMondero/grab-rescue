@@ -7,34 +7,39 @@ import {
   addCitizenLocation,
   getRescuerLocations,
   updateCitizenLocation,
+  getNearestRescuer,
 } from "../services/locationService";
+import { getCitizenCookie } from "../services/cookieService";
 
 const Map = () => {
   //set initial viewport to BSU-BUSTOS
-  const [viewport, setViewport] = useState({
+  const [citizen, setCitizen] = useState({
     longitude: 120.9107,
     latitude: 14.9536,
     zoom: 15,
   });
   const geoControlRef = useRef();
-  const [markers, setMarkers] = useState([]);
+  const [rescuers, setRescuers] = useState([]);
+  const [nearestRescuer, setNearestRescuer] = useState({});
 
   useEffect(() => {
     //get rescuer locations on load
-    getRescuerLocations(setMarkers);
+    getRescuerLocations(setRescuers);
   }, []);
+
+  useEffect(() => {
+    //TODO: show the nearest rescuer on the map
+  }, [nearestRescuer]);
 
   return (
     <MapGL
-      initialViewState={viewport}
+      initialViewState={citizen}
       mapStyle={"mapbox://styles/mapbox/streets-v12"}
       mapboxAccessToken={import.meta.env.VITE_MAPBOX_TOKEN}
       onLoad={() => {
         geoControlRef.current?.trigger();
       }}
     >
-      {/*TODO onGeoLcotate check if citizen has already have a cookie, 
-      if not add location else update location */}
       <GeolocateControl
         ref={geoControlRef}
         position="top-right"
@@ -42,7 +47,28 @@ const Map = () => {
         trackUserLocation={true}
         showUserLocation={false}
         onGeolocate={({ coords }) => {
-          setViewport({
+          const cookie = getCitizenCookie();
+
+          {
+            /* check if citizen has already have a cookie, if not add location else update location */
+          }
+          if (cookie) {
+            updateCitizenLocation(
+              citizen.longitude,
+              citizen.latitude,
+              coords.longitude,
+              coords.latitude
+            );
+          } else {
+            addCitizenLocation(coords.longitude, coords.latitude);
+          }
+
+          {
+            /* get nearest rescuer */
+          }
+          setNearestRescuer(getNearestRescuer(citizen, rescuers));
+
+          setCitizen({
             longitude: coords.longitude,
             latitude: coords.latitude,
             zoom: 15,
@@ -50,8 +76,8 @@ const Map = () => {
         }}
       />
       <Popup
-        longitude={viewport.longitude}
-        latitude={viewport.latitude}
+        longitude={citizen.longitude}
+        latitude={citizen.latitude}
         offset={10}
         closeButton={false}
       >
@@ -59,19 +85,18 @@ const Map = () => {
       </Popup>
 
       {/* Citizen marker */}
-      <Marker longitude={viewport.longitude} latitude={viewport.latitude}>
+      <Marker longitude={citizen.longitude} latitude={citizen.latitude}>
         <img src={citizenMarker} width={25} height={25} />
       </Marker>
 
       {/* Rescuers marker */}
-      {markers.map(
-        (marker) =>
-          marker.status === "available" &&
-          marker.role === "rescuer" && (
+      {rescuers.map(
+        (rescuer) =>
+          rescuer.status === "available" && (
             <Marker
-              key={marker.id}
-              longitude={marker.longitude}
-              latitude={marker.latitude}
+              key={rescuer.id}
+              longitude={rescuer.longitude}
+              latitude={rescuer.latitude}
             >
               <img src={rescuerMarker} width={30} height={30} />
             </Marker>
