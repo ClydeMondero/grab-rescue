@@ -29,6 +29,7 @@ const Map = () => {
 
   useEffect(() => {
     //TODO: show the nearest rescuer on the map
+    //TODO: add class to the marker of the nearest rescuer
   }, [nearestRescuer]);
 
   return (
@@ -86,7 +87,9 @@ const Map = () => {
 
       {/* Citizen marker */}
       <Marker longitude={citizen.longitude} latitude={citizen.latitude}>
-        <img src={citizenMarker} width={25} height={25} />
+        <div className="citizen-marker">
+          <img src={citizenMarker} width={25} height={25} />
+        </div>
       </Marker>
 
       {/* Rescuers marker */}
@@ -98,7 +101,15 @@ const Map = () => {
               longitude={rescuer.longitude}
               latitude={rescuer.latitude}
             >
-              <img src={rescuerMarker} width={30} height={30} />
+              <div
+                className={
+                  rescuer.id === nearestRescuer.id
+                    ? "nearest-rescuer-marker"
+                    : ""
+                }
+              >
+                <img src={rescuerMarker} width={30} height={30} />
+              </div>
             </Marker>
           )
       )}
