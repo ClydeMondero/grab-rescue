@@ -19,6 +19,14 @@
   background-size: 20px 20px;
 }
 
+/* Unfocused Geolacate Icon */
+.mapboxgl-ctrl
+  button.mapboxgl-ctrl-geolocate.mapboxgl-ctrl-geolocate-background
+  .mapboxgl-ctrl-icon {
+  background-image: url("./assets/accident-idle.svg");
+  background-size: 20px 20px;
+}
+
 /* Inactive Geolacate Icon *.mapboxgl-ctrl */
 .mapboxgl-ctrl button.mapboxgl-ctrl-geolocate .mapboxgl-ctrl-icon {
   background-image: url("./assets/accident-inactive.svg");

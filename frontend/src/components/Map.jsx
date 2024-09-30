@@ -27,10 +27,7 @@ const Map = () => {
     getRescuerLocations(setRescuers);
   }, []);
 
-  useEffect(() => {
-    //TODO: show the nearest rescuer on the map
-    //TODO: add class to the marker of the nearest rescuer
-  }, [nearestRescuer]);
+  //TODO: add lines and distance between rescuer and citizen
 
   return (
     <MapGL
