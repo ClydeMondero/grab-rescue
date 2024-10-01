@@ -11,6 +11,8 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import citizenMarker from "../assets/citizen-marker.png";
 import rescuerMarker from "../assets/rescuer-marker.png";
 import rescuerActive from "../assets/rescuer-active.svg";
+import routeIcon from "../assets/route.svg";
+import hideRoute from "../assets/hide-route.svg";
 import {
   addCitizenLocation,
   getRescuerLocations,
@@ -19,6 +21,7 @@ import {
   getRouteData,
 } from "../services/locationService";
 import { getCitizenCookie } from "../services/cookieService";
+import { set } from "react-hook-form";
 
 const Map = () => {
   //set initial viewport to BSU-BUSTOS
@@ -34,6 +37,12 @@ const Map = () => {
   const mapRef = useRef();
   const [mapLoaded, setMapLoaded] = useState(false);
   const [dashArray, setDashArray] = useState([0, 4, 3]);
+  const [routeToggle, setRouteToggle] = useState(true);
+  const [routeToggleIcon, setRouteToggleIcon] = useState(routeIcon);
+  const [routeOpacity, setRouteOpacity] = useState({
+    background: 0.2,
+    line: 1,
+  });
 
   const getRoute = async () => {
     const route = await getRouteData(nearestRescuer, citizen);
@@ -83,6 +92,21 @@ const Map = () => {
         center: [nearestRescuer.longitude, nearestRescuer.latitude],
         zoom: 15,
       });
+    }
+  };
+
+  //hide route layer
+  const hideRouteToRescuer = () => {
+    if (mapRef) {
+      routeToggle ? setRouteToggle(false) : setRouteToggle(true);
+
+      routeToggle
+        ? setRouteOpacity({ background: 0.2, line: 1 })
+        : setRouteOpacity({ background: 0, line: 0 });
+
+      routeToggle
+        ? setRouteToggleIcon(hideRoute)
+        : setRouteToggleIcon(routeIcon);
     }
   };
 
@@ -166,9 +190,19 @@ const Map = () => {
         <button className="ctrl-icon">
           {/*TODO: add route icon*/}
           <img
-            src={rescuerActive}
-            width={20}
-            height={20}
+            src={routeIcon}
+            width={18}
+            height={18}
+            style={{ display: "block", margin: "auto" }}
+          />
+        </button>
+        {/*hide route*/}
+        <button className="ctrl-icon" onClick={hideRouteToRescuer}>
+          {/*add route icon*/}
+          <img
+            src={routeToggleIcon}
+            width={18}
+            height={18}
             style={{ display: "block", margin: "auto" }}
           />
         </button>
@@ -236,9 +270,9 @@ const Map = () => {
                 "line-cap": "round",
               }}
               paint={{
-                "line-color": "violet", // Customize the color of the ant line
+                "line-color": "#3B82F6", // Customize the color of the ant line
                 "line-width": 6, // Adjust the width of the line
-                "line-opacity": 0.2,
+                "line-opacity": routeOpacity.background,
               }}
             />
 
@@ -246,9 +280,10 @@ const Map = () => {
               id="route-line"
               type="line"
               paint={{
-                "line-color": "violet", // Customize the color of the ant line
+                "line-color": "#3B82F6", // Customize the color of the ant line
                 "line-width": 6, // Adjust the width of the line
                 "line-dasharray": dashArray,
+                "line-opacity": routeOpacity.line,
               }}
             />
           </Source>
