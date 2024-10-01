@@ -16,3 +16,11 @@ export const getDistance = (lat1, lon1, lat2, lon2) => {
 
   return R * c; //return distance in km
 };
+
+export const formatDistance = (distance) =>
+  (distance / 1000).toFixed(2) + " km"; // Convert meters to kilometers
+
+export const formatDuration = (duration) => {
+  const minutes = Math.floor(duration / 60);
+  return `${minutes} min`;
+};
