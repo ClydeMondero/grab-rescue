@@ -3,8 +3,7 @@ const pool = require("../config/db");
 const env = require("../config/env");
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
-const crypto = require('crypto');
-
+const crypto = require("crypto");
 
 // Create a new user
 // module.exports.CreateUser = async (req, res) => {
@@ -107,7 +106,7 @@ const crypto = require('crypto');
 module.exports.GetUsers = async (req, res) => {
   let q = `
     SELECT id, first_name, middle_initial, last_name, municipality, barangay, contact_number, 
-    is_online, account_type FROM users WHERE 1=1
+    is_online, verified account_type FROM users WHERE 1=1
   `;
 
   const queryParams = [];
@@ -153,11 +152,11 @@ module.exports.VerifyEmail = async (req, res) => {
   const { token } = req.params;
 
   try {
-    const q = 'SELECT * FROM users WHERE verification_token = $1';
+    const q = "SELECT * FROM users WHERE verification_token = $1";
     const { rows } = await pool.query(q, [token]);
 
     if (rows.length === 0) {
-      return res.status(400).json({ error: 'Invalid or expired token' });
+      return res.status(400).json({ error: "Invalid or expired token" });
     }
 
     const updateQuery = `
@@ -167,7 +166,7 @@ module.exports.VerifyEmail = async (req, res) => {
     `;
     await pool.query(updateQuery, [token]);
 
-    return res.status(200).json({ message: 'Email verified successfully' });
+    return res.status(200).json({ message: "Email verified successfully" });
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
@@ -179,50 +178,53 @@ module.exports.RequestPasswordReset = async (req, res) => {
 
   try {
     // Check if the email exists and if it is verified
-    const q = 'SELECT * FROM users WHERE email = $1';
+    const q = "SELECT * FROM users WHERE email = $1";
     const { rows } = await pool.query(q, [email]);
 
     if (rows.length === 0) {
-      return res.status(404).json({ error: 'No user found with that email' });
+      return res.status(404).json({ error: "No user found with that email" });
     }
 
     const user = rows[0];
 
     if (!user.verified) {
-      return res.status(400).json({ error: 'Email address not verified' });
+      return res.status(400).json({ error: "Email address not verified" });
     }
 
     // Generate a reset password token
-    const resetPasswordToken = crypto.randomBytes(20).toString('hex');
+    const resetPasswordToken = crypto.randomBytes(20).toString("hex");
 
     // Update the user's reset password token and expiration time
-    const updateQuery = 'UPDATE users SET reset_password_token = $1, reset_password_expires = $2 WHERE email = $3';
+    const updateQuery =
+      "UPDATE users SET reset_password_token = $1, reset_password_expires = $2 WHERE email = $3";
     const expires = new Date(Date.now() + 3600000);
     await pool.query(updateQuery, [resetPasswordToken, expires, email]);
 
     // Configure the email transporter
     const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-          user: 'bhenzmharlbartolome012603@gmail.com',
-          pass: 'owvb wzni fhxu cvbz',
-        },
-      });
+      service: "gmail",
+      auth: {
+        user: "bhenzmharlbartolome012603@gmail.com",
+        pass: "owvb wzni fhxu cvbz",
+      },
+    });
 
     // Email options
     const mailOptions = {
       from: "bhenzmharlbartolome012603@gmail.com",
       to: email,
-      subject: 'Password Reset Request',
+      subject: "Password Reset Request",
       text: `Please click the following link to reset your password: http://localhost:4000/users/reset-password/${resetPasswordToken}`,
     };
 
     // Send the email
     transporter.sendMail(mailOptions, (err, info) => {
       if (err) {
-        return res.status(500).json({ error: 'Failed to send reset password email' });
+        return res
+          .status(500)
+          .json({ error: "Failed to send reset password email" });
       }
-      return res.status(200).json({ message: 'Password reset email sent' });
+      return res.status(200).json({ message: "Password reset email sent" });
     });
   } catch (err) {
     return res.status(500).json({ error: err.message });
@@ -235,24 +237,26 @@ module.exports.ResetPassword = async (req, res) => {
   const { newPassword } = req.body;
 
   try {
-    const q = 'SELECT * FROM users WHERE reset_password_token = $1 AND reset_password_expires > $2';
+    const q =
+      "SELECT * FROM users WHERE reset_password_token = $1 AND reset_password_expires > $2";
     const { rows } = await pool.query(q, [token, new Date()]);
 
     if (rows.length === 0) {
-      return res.status(400).json({ error: 'Invalid or expired token' });
+      return res.status(400).json({ error: "Invalid or expired token" });
     }
 
     const user = rows[0];
     const salt = bcrypt.genSaltSync(10);
     const hash = bcrypt.hashSync(newPassword, salt);
 
-    const updateQuery = 'UPDATE users SET password = $1, reset_password_token = NULL, reset_password_expires = NULL WHERE id = $2';
+    const updateQuery =
+      "UPDATE users SET password = $1, reset_password_token = NULL, reset_password_expires = NULL WHERE id = $2";
     await pool.query(updateQuery, [hash, user.id]);
 
-    return res.status(200).json({ message: 'Password has been reset successfully' });
+    return res
+      .status(200)
+      .json({ message: "Password has been reset successfully" });
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
 };
-
-
