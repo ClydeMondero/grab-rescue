@@ -1,12 +1,15 @@
 import { useState, useEffect } from "react";
 import { MdAssignmentInd } from "react-icons/md";
-import { FaCircle } from "react-icons/fa";
-import { FaPencilAlt } from "react-icons/fa";
-import { FaTrash } from "react-icons/fa";
-import { FaCheckCircle } from "react-icons/fa";
-import { FaTimesCircle } from "react-icons/fa";
-import { createAuthHeader } from "../services/authServices";
+import {
+  FaCircle,
+  FaPencilAlt,
+  FaTrash,
+  FaCheckCircle,
+  FaTimesCircle,
+} from "react-icons/fa";
+import { createAuthHeader } from "../services/authService";
 import axios from "axios";
+import { barangaysData } from "../constants/Barangays";
 
 const AssignRescuers = () => {
   const [rescuers, setRescuers] = useState([]);
@@ -18,63 +21,33 @@ const AssignRescuers = () => {
   const [barangays, setBarangays] = useState([]);
   const [selectedBarangay, setSelectedBarangay] = useState("All");
   const [selectedStatus, setSelectedStatus] = useState("All");
+  const [selectedVerified, setSelectedVerified] = useState("All");
 
   const rowsPerPage = 10;
 
-  const barangaysData = {
-    "San Rafael": [
-      "Banca-Banca",
-      "BMA – Balagtas",
-      "Caingin",
-      "Capihan",
-      "Coral na Bato",
-      "Cruz na Daan",
-      "Dagat-Dagatan",
-      "Diliman I",
-      "Diliman II",
-      "Lico",
-      "Libis",
-      "Maasim",
-      "Mabalas-Balas",
-      "Maguinao",
-      "Maronquillo",
-      "Paco",
-      "Pansumaloc",
-      "Pantubig",
-      "Pasong Bangkal",
-      "Pasong Callos",
-      "Pasong Intsik",
-      "Pinacpinacan",
-      "Poblacion",
-      "Pulo",
-      "Pulong Bayabas",
-      "Salapungan",
-      "Sampaloc",
-      "San Agustin",
-      "San Roque",
-      "Sapang Pahalang",
-      "Talacsan",
-      "Tambubong",
-      "Tukod",
-      "Ulingao",
-    ],
-    Bustos: [
-      "Bonga Mayor",
-      "Bonga Menor",
-      "Buisan",
-      "Camachilihan",
-      "Cambaog",
-      "Catacte",
-      "Liciada",
-      "Malamig",
-      "Malawak",
-      "Poblacion",
-      "San Pedro",
-      "Talampas",
-      "Tanawan",
-      "Tibagan",
-    ],
-  };
+  useEffect(() => {
+    const initializePage = async () => {
+      try {
+        const result = await axios.get("/rescuers/get", createAuthHeader());
+        setRescuers(result.data);
+        setFilteredRescuers(result.data);
+      } catch (error) {
+        console.error("Error fetching rescuers:", error);
+      }
+    };
+
+    initializePage();
+  }, []);
+
+  useEffect(() => {
+    // Update barangays based on selected municipality
+    if (selectedMunicipality === "All") {
+      setBarangays([]);
+      setSelectedBarangay("All");
+    } else {
+      setBarangays(barangaysData[selectedMunicipality] || []);
+    }
+  }, [selectedMunicipality]);
 
   useEffect(() => {
     // Filter rescuers based on search query and selected filters
@@ -91,56 +64,28 @@ const AssignRescuers = () => {
         selectedStatus === "All" ||
         (selectedStatus === "Online" && rescue.is_online) ||
         (selectedStatus === "Offline" && !rescue.is_online);
-
+      const matchesVerified =
+        selectedVerified === "All" ||
+        (selectedVerified === "True" && rescue.verified) ||
+        (selectedVerified === "False" && !rescue.verified);
       return (
-        matchesName && matchesMunicipality && matchesBarangay && matchesStatus
+        matchesName &&
+        matchesMunicipality &&
+        matchesBarangay &&
+        matchesStatus &&
+        matchesVerified
       );
     });
     setFilteredRescuers(filtered);
-    setCurrentPage(1); // Reset to first page when filtering
+    setCurrentPage(1);
   }, [
     searchName,
     selectedMunicipality,
     selectedBarangay,
     selectedStatus,
+    selectedVerified,
     rescuers,
   ]);
-
-  useEffect(() => {
-    // Update barangays based on selected municipality
-    if (selectedMunicipality === "All") {
-      setBarangays([]); // Clear barangays if "All" is selected
-      setSelectedBarangay("All"); // Reset selected barangay
-    } else {
-      setBarangays(barangaysData[selectedMunicipality] || []);
-    }
-  }, [selectedMunicipality]);
-
-  useEffect(() => {
-    const initializePage = async () => {
-      try {
-        const result = await axios.get("/rescuers/get", createAuthHeader());
-        setRescuers(result.data);
-        setFilteredRescuers(result.data);
-        console.log(result);
-      } catch (error) {
-        console.error("Error fetching rescuers:", error);
-      }
-    };
-
-    initializePage();
-  }, []);
-
-  useEffect(() => {
-    // Filter rescuers based on search query
-    const filtered = rescuers.filter((rescue) =>
-      `${rescue.first_name} ${rescue.middle_initial} ${rescue.last_name}`
-        .toLowerCase()
-        .includes(searchName.toLowerCase())
-    );
-    setFilteredRescuers(filtered);
-    setCurrentPage(1);
-  }, [searchName, rescuers]);
 
   useEffect(() => {
     const totalRows = filteredRescuers.length;
@@ -151,8 +96,7 @@ const AssignRescuers = () => {
   }, [filteredRescuers, currentPage]);
 
   const handlePageChange = (newPage) => {
-    const totalRows = filteredRescuers.length;
-    const totalPages = Math.ceil(totalRows / rowsPerPage);
+    const totalPages = Math.ceil(filteredRescuers.length / rowsPerPage);
     if (newPage > 0 && newPage <= totalPages) {
       setCurrentPage(newPage);
     }
@@ -175,7 +119,7 @@ const AssignRescuers = () => {
         );
 
   return (
-    <div className="flex flex-col h-100 w-full bg-gray-50">
+    <div className="flex flex-col h-full w-full bg-gray-50">
       <header className="p-2 sm:p-3 lg:p-4 flex items-center">
         <MdAssignmentInd className="text-xl sm:text-2xl lg:text-3xl text-[#557C55] mr-2" />
         <h4 className="text-md sm:text-lg font-semibold text-[#557C55]">
@@ -186,13 +130,14 @@ const AssignRescuers = () => {
       <p className="px-2 mb-1 text-xs sm:text-sm text-gray-600">
         Search and assign rescuers to the following requests:
       </p>
-      {/* Search bar for rescuer names */}
+
+      {/* Search bar and filters */}
       <div className="mb-2 px-2">
         <label
           htmlFor="searchName"
           className="block text-xs sm:text-sm font-medium text-gray-700"
         >
-          Search Rescuer by Name:
+          <span style={{ color: "#557C55" }}>Search Rescuer by Name:</span>
         </label>
         <input
           id="searchName"
@@ -203,68 +148,46 @@ const AssignRescuers = () => {
           onChange={(e) => setSearchName(e.target.value)}
         />
       </div>
-      {/* Dropdown for Municipality */}
-      <div className="mb-2 px-2">
-        <label
-          htmlFor="municipalityFilter"
-          className="block text-xs sm:text-sm font-medium text-gray-700"
-        >
-          Filter by Municipality:
-        </label>
-        <select
-          id="municipalityFilter"
-          className="form-select w-full border border-[#557C55] text-black rounded-lg p-1 mt-1 bg-gray-50 text-xs sm:text-sm"
-          value={selectedMunicipality}
-          onChange={(e) => setSelectedMunicipality(e.target.value)}
-        >
-          <option value="All">All</option>
-          <option value="San Rafael">San Rafael</option>
-          <option value="Bustos">Bustos</option>
-        </select>
+
+      {/* Dropdowns for filters */}
+      <div className="grid grid-cols-2 gap-2 mb-2">
+        <FilterDropdown
+          label={
+            <span style={{ color: "#557C55" }}>Filter by Municipality:</span>
+          }
+          options={["All", "San Rafael", "Bustos"]}
+          selected={selectedMunicipality}
+          setSelected={setSelectedMunicipality}
+          labelStyle="text-[#557C55]"
+          borderStyle="border-[#557C55]"
+        />
+        <FilterDropdown
+          label={<span style={{ color: "#557C55" }}>Filter by Barangay:</span>}
+          options={["All", ...barangays]}
+          selected={selectedBarangay}
+          setSelected={setSelectedBarangay}
+          labelStyle="text-[#557C55]"
+          borderStyle="border-[#557C55]"
+        />
+        <FilterDropdown
+          label={<span style={{ color: "#557C55" }}>Filter by Status:</span>}
+          options={["All", "Online", "Offline"]}
+          selected={selectedStatus}
+          setSelected={setSelectedStatus}
+          labelStyle="text-[#557C55]"
+          borderStyle="border-[#557C55]"
+        />
+        <FilterDropdown
+          label={<span style={{ color: "#557C55" }}>Filter by Verified:</span>}
+          options={["All", "True", "False"]}
+          selected={selectedVerified}
+          setSelected={setSelectedVerified}
+          labelStyle="text-[#557C55]"
+          borderStyle="border-[#557C55]"
+        />
       </div>
 
-      {/* Dropdown for Barangay */}
-      <div className="mb-2 px-2">
-        <label
-          htmlFor="barangayFilter"
-          className="block text-xs sm:text-sm font-medium text-gray-700"
-        >
-          Filter by Barangay:
-        </label>
-        <select
-          id="barangayFilter"
-          className="form-select w-full border border-[#557C55] text-black rounded-lg p-1 mt-1 bg-gray-50 text-xs sm:text-sm"
-          value={selectedBarangay}
-          onChange={(e) => setSelectedBarangay(e.target.value)}
-        >
-          <option value="All">All</option>
-          {barangays.map((barangay) => (
-            <option key={barangay} value={barangay}>
-              {barangay}
-            </option>
-          ))}
-        </select>
-      </div>
-      {/* Dropdown for Status */}
-      <div className="mb-2 px-2">
-        <label
-          htmlFor="statusFilter"
-          className="block text-xs sm:text-sm font-medium text-gray-700"
-        >
-          Filter by Status:
-        </label>
-        <select
-          id="statusFilter"
-          className="form-select w-full border border-[#557C55] text-black rounded-lg p-1 mt-1 bg-gray-50 text-xs sm:text-sm"
-          value={selectedStatus}
-          onChange={(e) => setSelectedStatus(e.target.value)}
-        >
-          <option value="All">All</option>
-          <option value="Online">Online</option>
-          <option value="Offline">Offline</option>
-        </select>
-      </div>
-
+      {/* Rescuers Table */}
       <table className="w-full bg-white border border-gray-200 rounded-lg text-xs sm:text-sm">
         <thead className="bg-[#557C55] text-white text-left">
           <tr>
@@ -282,17 +205,15 @@ const AssignRescuers = () => {
           {paginatedRescuers.map((rescue, index) => (
             <tr
               key={rescue.id}
-              className={`border-t ${
-                index % 2 === 0 ? "bg-gray-50" : "bg-white"
+              className={`border-b text-black ${
+                index % 2 === 0 ? "bg-gray-50" : ""
               }`}
             >
-              <td className="px-1 py-0.5 sm:px-4 sm:py-2">{rescue.id}</td>
               <td className="px-1 py-0.5 sm:px-4 sm:py-2">
-                {rescue.first_name +
-                  " " +
-                  rescue.middle_initial +
-                  " " +
-                  rescue.last_name}
+                {(currentPage - 1) * rowsPerPage + index + 1}
+              </td>
+              <td className="px-1 py-0.5 sm:px-4 sm:py-2">
+                {`${rescue.first_name} ${rescue.middle_initial} ${rescue.last_name}`}
               </td>
               <td className="px-1 py-0.5 sm:px-4 sm:py-2">
                 {rescue.municipality}
@@ -301,90 +222,112 @@ const AssignRescuers = () => {
               <td className="px-1 py-0.5 sm:px-4 sm:py-2">
                 {rescue.contact_number}
               </td>
-              <td
-                className={`px-1 py-0.5 sm:px-4 sm:py-2 ${
-                  rescue.is_online ? "text-[#557C55]" : "text-[#FA7070]"
-                }`}
-              >
+              <td className="px-1 py-0.5 sm:px-4 sm:py-2">
                 {rescue.is_online ? (
                   <div className="flex items-center">
                     <FaCircle className="text-[#557C55] mr-2" />{" "}
                     {/* Green circle for online */}
-                    <span>Online</span>
+                    <span className="text-[#557C55]">Online</span>
                   </div>
                 ) : (
                   <div className="flex items-center">
                     <FaCircle className="text-[#FA7070] mr-2" />{" "}
                     {/* Red circle for offline */}
-                    <span>Offline</span>
-                  </div>
-                )}
-              </td>
-              <td>
-                {rescue.is_verified ? (
-                  <div className="flex items-center space-x-1">
-                    <FaCheckCircle className="text-[#557C55]" />
-                    <span>Verified</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center space-x-1">
-                    <FaTimesCircle className="text-[#FA7070]" />
-                    <span>Not Verified</span>
+                    <span className="text-[#FA7070]">Offline</span>
                   </div>
                 )}
               </td>
               <td className="px-1 py-0.5 sm:px-4 sm:py-2">
-                <div className="flex items-center space-x-2">
-                  <button
-                    className="text-[#557C55] hover:text-[#6EA46E]"
-                    onClick={() => console.log("update", rescue.id)}
-                  >
-                    <FaPencilAlt className="text-lg" />
-                  </button>
-                  <button
-                    className="text-[#FA7070] hover:text-[#EA4C4C]"
-                    onClick={() => console.log("delete", rescue.id)}
-                  >
-                    <FaTrash className="text-lg" />
-                  </button>
-                </div>
+                {rescue.verified ? (
+                  <div className="flex items-center space-x-1">
+                    <FaCheckCircle className="text-[#557C55] " />
+                    <span className="text-[#557C55]">Verified</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center space-x-1">
+                    <FaTimesCircle className="text-[#FA7070]" />
+                    <span className="text-[#FA7070]">Not Verified</span>
+                  </div>
+                )}
+              </td>
+              <td className="px-1 py-0.5 sm:px-4 sm:py-2 flex space-x-2">
+                <button
+                  onClick={() => handleEdit(rescue.id)}
+                  className="text-blue-500 hover:text-blue-700"
+                >
+                  <FaPencilAlt className="text-yellow-500" />
+                </button>
+                <button
+                  onClick={() => handleDelete(rescue.id)}
+                  className="text-red-500 hover:text-red-700"
+                >
+                  <FaTrash className="text-[#FA7070]" />
+                </button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
 
-      <div className="mt-4 flex justify-between items-center">
-        <button
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-          className="px-4 py-2 bg-gray-300 rounded disabled:bg-gray-200"
-        >
-          Previous
-        </button>
+      {/* Pagination */}
+      <div className="flex justify-between items-center mt-4 px-2">
+        <div>
+          <span className="text-xs sm:text-sm">
+            Showing {(currentPage - 1) * rowsPerPage + 1} to{" "}
+            {Math.min(currentPage * rowsPerPage, totalRows)} of {totalRows}{" "}
+            entries
+          </span>
+        </div>
         <div className="flex space-x-2">
+          <button
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="px-2 py-1 bg-gray-200 rounded-md text-xs sm:text-sm"
+          >
+            Previous
+          </button>
           {visiblePages.map((page) => (
             <button
               key={page}
               onClick={() => handlePageChange(page)}
-              className={`px-4 py-2 rounded ${
-                page === currentPage ? "bg-[#557C55] text-white" : "bg-gray-200"
+              className={`px-2 py-1 rounded-md text-xs sm:text-sm ${
+                currentPage === page ? "bg-[#557C55] text-white" : "bg-gray-200"
               }`}
             >
               {page}
             </button>
           ))}
+          <button
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="px-2 py-1 bg-gray-200 rounded-md text-xs sm:text-sm"
+          >
+            Next
+          </button>
         </div>
-        <button
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-          className="px-4 py-2 bg-gray-300 rounded disabled:bg-gray-200"
-        >
-          Next
-        </button>
       </div>
     </div>
   );
 };
+
+// FilterDropdown Component
+const FilterDropdown = ({ label, options, selected, setSelected }) => (
+  <div className="mb-2 px-2">
+    <label className="block text-xs sm:text-sm font-medium text-gray-700">
+      {label}
+    </label>
+    <select
+      className="form-select w-full border border-[#557C55] text-black rounded-lg p-1 mt-1 bg-gray-50 text-xs sm:text-sm"
+      value={selected}
+      onChange={(e) => setSelected(e.target.value)}
+    >
+      {options.map((option, index) => (
+        <option key={index} value={option}>
+          {option}
+        </option>
+      ))}
+    </select>
+  </div>
+);
 
 export default AssignRescuers;
