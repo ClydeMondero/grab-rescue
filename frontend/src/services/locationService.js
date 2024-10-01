@@ -66,6 +66,7 @@ export const getNearestRescuer = (citizen, rescuers) => {
 
 // update location if moved
 export const updateCitizenLocation = (
+  id,
   prevLon,
   prevLat,
   longitude,
@@ -76,7 +77,7 @@ export const updateCitizenLocation = (
   //TODO: use id from cookie
   if (moved) {
     console.log("Location updated", moved);
-    // updateLocationInFirestore(id, longitude, latitude);
+    updateLocationInFirestore(id, longitude, latitude);
   } else {
     console.log("Location not updated", moved);
   }
