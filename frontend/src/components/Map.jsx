@@ -173,6 +173,7 @@ const Map = () => {
           }
           if (cookie) {
             updateCitizenLocation(
+              cookie,
               citizen.longitude,
               citizen.latitude,
               coords.longitude,
