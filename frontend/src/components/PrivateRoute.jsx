@@ -5,6 +5,7 @@ import axios from "axios";
 const PrivateRoute = ({ Component }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState({});
 
   const verifyToken = async () => {
     setLoading(true);
@@ -13,6 +14,7 @@ const PrivateRoute = ({ Component }) => {
 
     if (data.success) {
       setIsAuthenticated(true);
+      setUser(data.user);
       setLoading(false);
     } else {
       setLoading(false);
@@ -31,7 +33,7 @@ const PrivateRoute = ({ Component }) => {
   }
 
   if (isAuthenticated) {
-    return <Component />;
+    return <Component user={user} />;
   } else {
     return <Navigate to="/" />;
   }

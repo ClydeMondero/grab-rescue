@@ -1,15 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FaArrowLeft, FaSave } from 'react-icons/fa'; 
 import { useNavigate } from 'react-router-dom';
 
-const ViewProfile = () => {
+const ViewProfile = (props) => {
   const navigate = useNavigate();
-  const [profile, setProfile] = useState({
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    address: '123 Main St, San Rafael, Bulacan',
-    profilePicture: 'https://via.placeholder.com/150',
-  });
+  const {user} = props;
+  const [profile, setProfile] = useState(user);
+
 
   const handleProfileChange = (e) => {
     const { name, value } = e.target;
@@ -75,43 +72,139 @@ const ViewProfile = () => {
           <div className="space-y-2 mb-3">
             <div className="flex items-center space-x-2">
               <h5 className="text-xs sm:text-sm font-semibold text-[#557C55] w-16 truncate">Name:</h5>
-              <p className="text-gray-700 text-xs sm:text-sm truncate">{profile.name}</p>
+              <p className="text-gray-700 text-xs sm:text-sm truncate">{profile.first_name} {profile.middle_initial} {profile.last_name}</p>
             </div>
             <div className="flex items-center space-x-2">
               <h5 className="text-xs sm:text-sm font-semibold text-[#557C55] w-16 truncate">Email:</h5>
               <p className="text-gray-700 text-xs sm:text-sm truncate">{profile.email}</p>
             </div>
             <div className="flex items-center space-x-2">
+              <h5 className="text-xs sm:text-sm font-semibold text-[#557C55] w-16 truncate">Username:</h5>
+              <p className="text-gray-700 text-xs sm:text-sm truncate">{profile.username}</p>
+            </div>
+            <div className="flex items-center space-x-2">
               <h5 className="text-xs sm:text-sm font-semibold text-[#557C55] w-16 truncate">Address:</h5>
-              <p className="text-gray-700 text-xs sm:text-sm truncate">{profile.address}</p>
+              <p className="text-gray-700 text-xs sm:text-sm truncate">{profile.barangay}, {profile.municipality}</p>
+            </div>
+            <div className="flex items-center space-x-2">
+              <h5 className="text-xs sm:text-sm font-semibold text-[#557C55] w-16 truncate">Contact Number:</h5>
+              <p className="text-gray-700 text-xs sm:text-sm truncate">{profile.contact_number}</p>
+            </div>
+            <div className="flex items-center space-x-2">
+              <h5 className="text-xs sm:text-sm font-semibold text-[#557C55] w-16 truncate">Birthday:</h5>
+              <p className="text-gray-700 text-xs sm:text-sm truncate">{new Date(profile.birthday).toLocaleString('default', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
             </div>
           </div>
           <form className="space-y-2" onSubmit={handleSubmit}>
             <h4 className="text-sm sm:text-lg font-bold mb-2 text-[#557C55]">Edit Profile</h4>
             <div>
-              <label htmlFor="name" className="block text-xs sm:text-sm font-semibold text-[#557C55]">Name:</label>
+              <label htmlFor="first_name" className="block text-xs sm:text-sm font-semibold text-[#557C55]">First Name:</label>
               <input
                 type="text"
-                id="name"
-                name="name"
-                value={profile.name}
+                id="first_name"
+                name="first_name"
+                value={profile.first_name}
                 onChange={handleProfileChange}
                 className="w-full p-1 border rounded bg-[#F9F9F9] border-gray-300 text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-[#557C55] transition"
-                placeholder="Enter your name"
+                placeholder="Enter your first name"
               />
             </div>
             <div>
-              <label htmlFor="address" className="block text-xs sm:text-sm font-semibold text-[#557C55]">Address:</label>
+              <label htmlFor="middle_initial" className="block text-xs sm:text-sm font-semibold text-[#557C55]">Middle Name:</label>
               <input
                 type="text"
-                id="address"
-                name="address"
-                value={profile.address}
+                id="middle_initial"
+                name="middle_initial"
+                value={profile.middle_initial}
+                onChange={handleProfileChange}
+                className="w-full p-1 border rounded bg-[#F9F9F9] border-gray-300 text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-[#557C55] transition"
+                placeholder="Enter your middle name"
+              />
+            </div>
+            <div>
+              <label htmlFor="last_name" className="block text-xs sm:text-sm font-semibold text-[#557C55]">Last Name:</label>
+              <input
+                type="text"
+                id="last_name"
+                name="last_name"
+                value={profile.last_name}
+                onChange={handleProfileChange}
+                className="w-full p-1 border rounded bg-[#F9F9F9] border-gray-300 text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-[#557C55] transition"
+                placeholder="Enter your middle name"
+              />
+            </div>
+            <div>
+              <label htmlFor="email" className="block text-xs sm:text-sm font-semibold text-[#557C55]">Email:</label>
+              <input
+                type="text"
+                id="email"
+                name="email"
+                value={profile.email}
+                onChange={handleProfileChange}
+                className="w-full p-1 border rounded bg-[#F9F9F9] border-gray-300 text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-[#557C55] transition"
+                placeholder="Enter your email"
+              />
+            </div>
+            <div>
+              <label htmlFor="username" className="block text-xs sm:text-sm font-semibold text-[#557C55]">Username:</label>
+              <input
+                type="text"
+                id="username"
+                name="username"
+                value={profile.username}
+                onChange={handleProfileChange}
+                className="w-full p-1 border rounded bg-[#F9F9F9] border-gray-300 text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-[#557C55] transition"
+                placeholder="Enter your username"
+              />
+            </div>
+            <div>
+              <label htmlFor="barangay" className="block text-xs sm:text-sm font-semibold text-[#557C55]">Barangay:</label>
+              <input
+                type="text"
+                id="barangay"
+                name="barangay"
+                value={profile.barangay}
                 onChange={handleProfileChange}
                 className="w-full p-1 border rounded bg-[#F9F9F9] border-gray-300 text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-[#557C55] transition"
                 placeholder="Enter your address"
               />
             </div>
+            <div>
+              <label htmlFor="municipality" className="block text-xs sm:text-sm font-semibold text-[#557C55]">Municipality:</label>
+              <input
+                type="text"
+                id="municipality"
+                name="municipality"
+                value={profile.municipality}
+                onChange={handleProfileChange}
+                className="w-full p-1 border rounded bg-[#F9F9F9] border-gray-300 text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-[#557C55] transition"
+                placeholder="Enter your address"
+              />
+            </div>
+            <div>
+              <label htmlFor="contact_number" className="block text-xs sm:text-sm font-semibold text-[#557C55]">Contact Number:</label>
+              <input
+                type="text"
+                id="contact_number"
+                name="contact_number"
+                value={profile.contact_number}
+                onChange={handleProfileChange}
+                className="w-full p-1 border rounded bg-[#F9F9F9] border-gray-300 text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-[#557C55] transition"
+                placeholder="Enter your Contact Number"
+              />
+            </div>
+            <div>
+              <label htmlFor="birthday" className="block text-xs sm:text-sm font-semibold text-[#557C55]">Birthday:</label>
+              <input
+                type="text"
+                id="birthday"
+                name="birthday"
+                value={new Date(profile.birthday).toLocaleString('default', { month: 'long', day: 'numeric', year: 'numeric' })}
+                onChange={handleProfileChange}
+                className="w-full p-1 border rounded bg-[#F9F9F9] border-gray-300 text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-[#557C55] transition"
+                placeholder="Enter your Contact Number"
+              />
+            </div>            
             <button
               type="submit"
               className="bg-[#557C55] text-white px-2 py-1 rounded text-xs sm:text-sm hover:bg-[#6EA46E] transition flex items-center justify-center"
