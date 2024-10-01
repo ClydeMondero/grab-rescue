@@ -1,4 +1,4 @@
-import { getDistance } from "../utils/distanceCalculator";
+import { getDistance } from "../utils/DistanceUtility";
 import {
   addLocationToFirestore,
   getLocationsFromFirestore,
@@ -9,8 +9,11 @@ import axios from "axios";
 
 const MIN_DISTANCE_THRESHOLD = 50; //in meters
 
+//TODO: check if user moved by 50 meters
 export const hasUserMoved = (currentLat, currentLon, lastLat, lastLon) => {
   const distance = getDistance(currentLat, currentLon, lastLat, lastLon);
+
+  console.log(distance);
 
   if (distance >= MIN_DISTANCE_THRESHOLD) {
     return true;
@@ -28,7 +31,7 @@ export const getRouteData = async (rescuer, citizen) => {
 
   try {
     const response = await axios.get(directionsUrl);
-    const route = response.data.routes[0].geometry;
+    const route = response.data.routes[0];
 
     return route;
   } catch (error) {

@@ -22,8 +22,7 @@ import {
   getRouteData,
 } from "../services/locationService";
 import { getCitizenCookie } from "../services/cookieService";
-import { set } from "react-hook-form";
-import { WebMercatorViewport } from "deck.gl";
+import { formatDistance, formatDuration } from "../utils/DistanceUtility";
 
 const Map = () => {
   //set initial viewport to BSU-BUSTOS
@@ -45,11 +44,15 @@ const Map = () => {
     background: 0.2,
     line: 1,
   });
+  const [distance, setDistance] = useState(0);
+  const [eta, setEta] = useState(0);
 
   const getRoute = async () => {
     const route = await getRouteData(nearestRescuer, citizen);
 
     setRouteData(route);
+    setDistance(route.distance);
+    setEta(route.duration);
   };
 
   //ant line animate route
@@ -115,7 +118,7 @@ const Map = () => {
   //fit map bounds
   const fitBounds = () => {
     if (mapRef.current && routeData) {
-      const routeCoordinates = routeData.coordinates;
+      const routeCoordinates = routeData.geometry.coordinates;
 
       const longitudes = routeCoordinates.map((coord) => coord[0]);
       const latitudes = routeCoordinates.map((coord) => coord[1]);
@@ -267,8 +270,8 @@ const Map = () => {
 
       {/* show line Layer for the route */}
       {routeData &&
-        routeData.coordinates &&
-        routeData.coordinates.length > 0 && (
+        routeData.geometry.coordinates &&
+        routeData.geometry.coordinates.length > 0 && (
           <Source
             id="route"
             type="geojson"
@@ -276,7 +279,7 @@ const Map = () => {
               type: "Feature",
               geometry: {
                 type: "LineString",
-                coordinates: routeData.coordinates,
+                coordinates: routeData.geometry.coordinates,
               },
               properties: {},
             }}
@@ -307,6 +310,10 @@ const Map = () => {
             />
           </Source>
         )}
+      <div className="distance-details">
+        {distance && <p>{formatDistance(distance)}</p>}
+        {eta && <p>{formatDuration(eta)}</p>}
+      </div>
     </MapGL>
   );
 };
