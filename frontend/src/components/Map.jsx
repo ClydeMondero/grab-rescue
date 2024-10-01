@@ -139,8 +139,7 @@ const Map = () => {
 
   useEffect(() => {
     if (mapLoaded) {
-      //TODO: enable animate route
-      // animateRoute();
+      animateRoute();
     }
   }, [mapLoaded]);
 
@@ -209,7 +208,7 @@ const Map = () => {
             style={{ display: "block", margin: "auto" }}
           />
         </button>
-        {/*TODO: zoom out route */}
+        {/*zoom out route */}
         <button className="ctrl-icon" onClick={fitBounds}>
           <img
             src={zoomOutIcon}
