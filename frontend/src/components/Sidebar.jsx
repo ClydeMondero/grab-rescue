@@ -9,7 +9,7 @@ import {
 } from "react-icons/ai";
 import { MdMail, MdAssignmentInd, MdDashboard } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
-import { handleLogout } from "../services/authServices";
+import { handleLogout } from "../services/authService";
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(true);

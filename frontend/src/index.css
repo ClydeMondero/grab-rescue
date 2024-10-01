@@ -10,3 +10,65 @@
 .sidebar ul li a:hover {
   background-color: #6ea46e;
 }
+
+/* Active Geolacate Icon */
+.mapboxgl-ctrl
+  button.mapboxgl-ctrl-geolocate.mapboxgl-ctrl-geolocate-active
+  .mapboxgl-ctrl-icon {
+  background-image: url("./assets/accident-active.svg");
+  background-size: 20px 20px;
+}
+
+/* Unfocused Geolacate Icon */
+.mapboxgl-ctrl
+  button.mapboxgl-ctrl-geolocate.mapboxgl-ctrl-geolocate-background
+  .mapboxgl-ctrl-icon {
+  background-image: url("./assets/accident-idle.svg");
+  background-size: 20px 20px;
+}
+
+/* Inactive Geolacate Icon *.mapboxgl-ctrl */
+.mapboxgl-ctrl button.mapboxgl-ctrl-geolocate .mapboxgl-ctrl-icon {
+  background-image: url("./assets/accident-inactive.svg");
+  background-size: 20px 20px;
+}
+
+.nearest-rescuer-marker {
+  position: relative;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  animation: green-pulse 2s infinite;
+}
+
+.citizen-marker {
+  position: relative;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  animation: red-pulse 2s infinite;
+}
+
+@keyframes red-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 20px rgba(255, 0, 0, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 0, 0, 0);
+  }
+}
+
+@keyframes green-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 20px rgba(255, 0, 0, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 0, 0, 0);
+  }
+}
