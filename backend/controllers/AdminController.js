@@ -10,27 +10,42 @@ module.exports.GetAdmins = async (req, res) => {
   let q =
     "SELECT id, first_name, middle_initial, last_name, municipality, barangay, contact_number, is_online, verified FROM users WHERE account_type = 'Admin'";
 
+  let paramCounter = 1; // To dynamically number the query parameters
+
   // Add filters based on query parameters
   if (req.query.municipality) {
-    q += " AND municipality = $1";
+    q += ` AND municipality = $${paramCounter}`;
     queryParams.push(req.query.municipality);
+    paramCounter++;
   }
 
   if (req.query.barangay) {
-    q += " AND barangay = $2";
+    q += ` AND barangay = $${paramCounter}`;
     queryParams.push(req.query.barangay);
+    paramCounter++;
   }
 
   if (req.query.is_online) {
-    q += " AND is_online = $3";
+    q += ` AND is_online = $${paramCounter}`;
     queryParams.push(req.query.is_online);
+    paramCounter++;
   }
 
   // Add keyword search for first_name or last_name
   if (req.query.keyword) {
-    q += " AND (first_name ILIKE $4 OR last_name ILIKE $5)";
+    q += ` AND (first_name ILIKE $${paramCounter} OR last_name ILIKE $${
+      paramCounter + 1
+    })`;
     const keyword = `%${req.query.keyword}%`;
     queryParams.push(keyword, keyword);
+    paramCounter += 2;
+  }
+
+  // Add filter for verified
+  if (req.query.verified) {
+    q += ` AND verified = $${paramCounter}`;
+    queryParams.push(req.query.verified);
+    paramCounter++;
   }
 
   try {
