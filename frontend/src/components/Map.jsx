@@ -44,8 +44,8 @@ const Map = () => {
     background: 0.2,
     line: 1,
   });
-  const [distance, setDistance] = useState(0);
-  const [eta, setEta] = useState(0);
+  const [distance, setDistance] = useState();
+  const [eta, setEta] = useState();
 
   const getRoute = async () => {
     const route = await getRouteData(nearestRescuer, citizen);
@@ -310,10 +310,12 @@ const Map = () => {
             />
           </Source>
         )}
-      <div className="distance-details">
-        {distance && <p>{formatDistance(distance)}</p>}
-        {eta && <p>{formatDuration(eta)}</p>}
-      </div>
+      {distance && eta && (
+        <div className="distance-details">
+          {distance && <p>{formatDistance(distance)}</p>}
+          {eta && <p>{formatDuration(eta)}</p>}
+        </div>
+      )}
     </MapGL>
   );
 };
