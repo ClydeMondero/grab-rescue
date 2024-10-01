@@ -10,6 +10,7 @@ import {
 import "mapbox-gl/dist/mapbox-gl.css";
 import citizenMarker from "../assets/citizen-marker.png";
 import rescuerMarker from "../assets/rescuer-marker.png";
+import rescuerActive from "../assets/rescuer-active.svg";
 import {
   addCitizenLocation,
   getRescuerLocations,
@@ -62,7 +63,7 @@ const Map = () => {
     let step = 0;
 
     function animateDashArray(timestamp) {
-      const newStep = parseInt((timestamp / 50) % dashArraySequence.length);
+      const newStep = parseInt((timestamp / 100) % dashArraySequence.length);
 
       if (newStep !== step) {
         setDashArray(dashArraySequence[step]);
@@ -76,6 +77,15 @@ const Map = () => {
     animateDashArray(0);
   };
 
+  const goToNearestRescuer = () => {
+    if (nearestRescuer) {
+      mapRef.current.flyTo({
+        center: [nearestRescuer.longitude, nearestRescuer.latitude],
+        zoom: 15,
+      });
+    }
+  };
+
   useEffect(() => {
     //get rescuer locations on load
     getRescuerLocations(setRescuers);
@@ -83,8 +93,8 @@ const Map = () => {
 
   useEffect(() => {
     if (mapLoaded) {
-      console.log("Map loaded animating route");
-      animateRoute();
+      //TODO: enable animate route
+      // animateRoute();
     }
   }, [mapLoaded]);
 
@@ -93,7 +103,7 @@ const Map = () => {
     if (nearestRescuer != null) {
       getRoute();
     }
-  }, [nearestRescuer]);
+  }, [nearestRescuer, citizen]);
 
   return (
     <MapGL
@@ -141,6 +151,29 @@ const Map = () => {
           });
         }}
       />
+
+      {/* go to nearest rescuer */}
+      <div className="ctrl-group">
+        <button onClick={goToNearestRescuer} className="ctrl-icon">
+          <img
+            src={rescuerActive}
+            width={20}
+            height={20}
+            style={{ display: "block", margin: "auto" }}
+          />
+        </button>
+        {/*TODO: zoom out route */}
+        <button className="ctrl-icon">
+          {/*TODO: add route icon*/}
+          <img
+            src={rescuerActive}
+            width={20}
+            height={20}
+            style={{ display: "block", margin: "auto" }}
+          />
+        </button>
+      </div>
+
       <Popup
         longitude={citizen.longitude}
         latitude={citizen.latitude}
