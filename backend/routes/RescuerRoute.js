@@ -6,6 +6,7 @@ const { UpdateRescuer } = require("../controllers/RescuerController");
 const { UpdateRescuerEmail } = require("../controllers/RescuerController");
 const { UpdateRescuerPassword } = require("../controllers/RescuerController");
 
+
 router.post("/create", CreateRescuer);
 router.get("/get", GetRescuers);
 router.get("/get/:id", GetRescuer);

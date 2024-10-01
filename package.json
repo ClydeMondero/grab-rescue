@@ -4,7 +4,8 @@
   "description": "This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.",
   "main": "index.js",
   "scripts": {
-    "dev": "npm install && concurrently \"cd backend && npm install && npm run dev\" \"cd frontend && npm install && npm run dev\" "
+    "dev": "npm install && concurrently \"cd backend && npm install && npm run dev\" \"cd frontend && npm install && npm run dev\" ",
+    "host": "npm install && concurrently \"cd backend && npm install && npm run dev\" \"cd frontend && npm install && npm run host\" "
   },
   "author": "",
   "license": "ISC",
