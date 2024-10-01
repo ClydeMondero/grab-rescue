@@ -1,8 +1,15 @@
 import { useState, useEffect } from "react";
 import { MdAssignmentInd } from "react-icons/md";
-import { FaCircle, FaPencilAlt, FaTrash, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
+import {
+  FaCircle,
+  FaPencilAlt,
+  FaTrash,
+  FaCheckCircle,
+  FaTimesCircle,
+} from "react-icons/fa";
 import { createAuthHeader } from "../services/authService";
 import axios from "axios";
+import { barangaysData } from "../constants/Barangays";
 
 const AssignRescuers = () => {
   const [rescuers, setRescuers] = useState([]);
@@ -17,25 +24,6 @@ const AssignRescuers = () => {
   const [selectedVerified, setSelectedVerified] = useState("All");
 
   const rowsPerPage = 10;
-
-  const barangaysData = {
-    "San Rafael": [
-      "Banca-Banca", "BMA – Balagtas", "Caingin", "Capihan", 
-      "Coral na Bato", "Cruz na Daan", "Dagat-Dagatan", "Diliman I",
-      "Diliman II", "Lico", "Libis", "Maasim", "Mabalas-Balas",
-      "Maguinao", "Maronquillo", "Paco", "Pansumaloc", "Pantubig",
-      "Pasong Bangkal", "Pasong Callos", "Pasong Intsik", "Pinacpinacan",
-      "Poblacion", "Pulo", "Pulong Bayabas", "Salapungan", 
-      "Sampaloc", "San Agustin", "San Roque", "Sapang Pahalang",
-      "Talacsan", "Tambubong", "Tukod", "Ulingao",
-    ],
-    Bustos: [
-      "Bonga Mayor", "Bonga Menor", "Buisan", "Camachilihan",
-      "Cambaog", "Catacte", "Liciada", "Malamig", 
-      "Malawak", "Poblacion", "San Pedro", "Talampas",
-      "Tanawan", "Tibagan",
-    ],
-  };
 
   useEffect(() => {
     const initializePage = async () => {
@@ -64,10 +52,12 @@ const AssignRescuers = () => {
   useEffect(() => {
     // Filter rescuers based on search query and selected filters
     const filtered = rescuers.filter((rescue) => {
-      const fullName = `${rescue.first_name} ${rescue.middle_initial} ${rescue.last_name}`.toLowerCase();
+      const fullName =
+        `${rescue.first_name} ${rescue.middle_initial} ${rescue.last_name}`.toLowerCase();
       const matchesName = fullName.includes(searchName.toLowerCase());
       const matchesMunicipality =
-        selectedMunicipality === "All" || rescue.municipality === selectedMunicipality;
+        selectedMunicipality === "All" ||
+        rescue.municipality === selectedMunicipality;
       const matchesBarangay =
         selectedBarangay === "All" || rescue.barangay === selectedBarangay;
       const matchesStatus =
@@ -78,11 +68,24 @@ const AssignRescuers = () => {
         selectedVerified === "All" ||
         (selectedVerified === "True" && rescue.verified) ||
         (selectedVerified === "False" && !rescue.verified);
-      return matchesName && matchesMunicipality && matchesBarangay && matchesStatus && matchesVerified;
+      return (
+        matchesName &&
+        matchesMunicipality &&
+        matchesBarangay &&
+        matchesStatus &&
+        matchesVerified
+      );
     });
     setFilteredRescuers(filtered);
     setCurrentPage(1);
-  }, [searchName, selectedMunicipality, selectedBarangay, selectedStatus, selectedVerified, rescuers]);
+  }, [
+    searchName,
+    selectedMunicipality,
+    selectedBarangay,
+    selectedStatus,
+    selectedVerified,
+    rescuers,
+  ]);
 
   useEffect(() => {
     const totalRows = filteredRescuers.length;
@@ -130,8 +133,11 @@ const AssignRescuers = () => {
 
       {/* Search bar and filters */}
       <div className="mb-2 px-2">
-        <label htmlFor="searchName" className="block text-xs sm:text-sm font-medium text-gray-700">
-          Search Rescuer by Name:
+        <label
+          htmlFor="searchName"
+          className="block text-xs sm:text-sm font-medium text-gray-700"
+        >
+          <span style={{ color: "#557C55" }}>Search Rescuer by Name:</span>
         </label>
         <input
           id="searchName"
@@ -144,10 +150,42 @@ const AssignRescuers = () => {
       </div>
 
       {/* Dropdowns for filters */}
-      <FilterDropdown label="Filter by Municipality:" options={["All", "San Rafael", "Bustos"]} selected={selectedMunicipality} setSelected={setSelectedMunicipality} />
-      <FilterDropdown label="Filter by Barangay:" options={["All", ...barangays]} selected={selectedBarangay} setSelected={setSelectedBarangay} />
-      <FilterDropdown label="Filter by Status:" options={["All", "Online", "Offline"]} selected={selectedStatus} setSelected={setSelectedStatus} />
-      <FilterDropdown label="Filter by Verified:" options={["All", "True", "False"]} selected={selectedVerified} setSelected={setSelectedVerified} />
+      <div className="grid grid-cols-2 gap-2 mb-2">
+        <FilterDropdown
+          label={
+            <span style={{ color: "#557C55" }}>Filter by Municipality:</span>
+          }
+          options={["All", "San Rafael", "Bustos"]}
+          selected={selectedMunicipality}
+          setSelected={setSelectedMunicipality}
+          labelStyle="text-[#557C55]"
+          borderStyle="border-[#557C55]"
+        />
+        <FilterDropdown
+          label={<span style={{ color: "#557C55" }}>Filter by Barangay:</span>}
+          options={["All", ...barangays]}
+          selected={selectedBarangay}
+          setSelected={setSelectedBarangay}
+          labelStyle="text-[#557C55]"
+          borderStyle="border-[#557C55]"
+        />
+        <FilterDropdown
+          label={<span style={{ color: "#557C55" }}>Filter by Status:</span>}
+          options={["All", "Online", "Offline"]}
+          selected={selectedStatus}
+          setSelected={setSelectedStatus}
+          labelStyle="text-[#557C55]"
+          borderStyle="border-[#557C55]"
+        />
+        <FilterDropdown
+          label={<span style={{ color: "#557C55" }}>Filter by Verified:</span>}
+          options={["All", "True", "False"]}
+          selected={selectedVerified}
+          setSelected={setSelectedVerified}
+          labelStyle="text-[#557C55]"
+          borderStyle="border-[#557C55]"
+        />
+      </div>
 
       {/* Rescuers Table */}
       <table className="w-full bg-white border border-gray-200 rounded-lg text-xs sm:text-sm">
@@ -167,53 +205,63 @@ const AssignRescuers = () => {
           {paginatedRescuers.map((rescue, index) => (
             <tr
               key={rescue.id}
-              className={`border-b text-black ${index % 2 === 0 ? 'bg-gray-50' : ''}`}>
-              <td className="px-1 py-0.5 sm:px-4 sm:py-2">{(currentPage - 1) * rowsPerPage + index + 1}</td>
+              className={`border-b text-black ${
+                index % 2 === 0 ? "bg-gray-50" : ""
+              }`}
+            >
+              <td className="px-1 py-0.5 sm:px-4 sm:py-2">
+                {(currentPage - 1) * rowsPerPage + index + 1}
+              </td>
               <td className="px-1 py-0.5 sm:px-4 sm:py-2">
                 {`${rescue.first_name} ${rescue.middle_initial} ${rescue.last_name}`}
               </td>
-              <td className="px-1 py-0.5 sm:px-4 sm:py-2">{rescue.municipality}</td>
+              <td className="px-1 py-0.5 sm:px-4 sm:py-2">
+                {rescue.municipality}
+              </td>
               <td className="px-1 py-0.5 sm:px-4 sm:py-2">{rescue.barangay}</td>
-              <td className="px-1 py-0.5 sm:px-4 sm:py-2">{rescue.contact_number}</td>
+              <td className="px-1 py-0.5 sm:px-4 sm:py-2">
+                {rescue.contact_number}
+              </td>
               <td className="px-1 py-0.5 sm:px-4 sm:py-2">
                 {rescue.is_online ? (
                   <div className="flex items-center">
                     <FaCircle className="text-[#557C55] mr-2" />{" "}
                     {/* Green circle for online */}
-                    <span>Online</span>
+                    <span className="text-[#557C55]">Online</span>
                   </div>
                 ) : (
                   <div className="flex items-center">
                     <FaCircle className="text-[#FA7070] mr-2" />{" "}
                     {/* Red circle for offline */}
-                    <span>Offline</span>
+                    <span className="text-[#FA7070]">Offline</span>
                   </div>
-
                 )}
               </td>
               <td className="px-1 py-0.5 sm:px-4 sm:py-2">
                 {rescue.verified ? (
                   <div className="flex items-center space-x-1">
-                  <FaCheckCircle className="text-green-500" />
-                  <span>Verified</span>
+                    <FaCheckCircle className="text-[#557C55] " />
+                    <span className="text-[#557C55]">Verified</span>
                   </div>
                 ) : (
                   <div className="flex items-center space-x-1">
-                  <FaTimesCircle className="text-red-500" />
-                  <span>Not Verified</span>
+                    <FaTimesCircle className="text-[#FA7070]" />
+                    <span className="text-[#FA7070]">Not Verified</span>
                   </div>
                 )}
               </td>
               <td className="px-1 py-0.5 sm:px-4 sm:py-2 flex space-x-2">
                 <button
                   onClick={() => handleEdit(rescue.id)}
-                  className="text-blue-500 hover:text-blue-700">
-                  <FaPencilAlt />
+                  className="text-blue-500 hover:text-blue-700"
+                >
+                  <FaPencilAlt className="text-yellow-500" />
                 </button>
                 <button
                   onClick={() => handleDelete(rescue.id)}
-                  className="text-red-500 hover:text-red-700">
-                  <FaTrash />
+                  className="text-red-500 hover:text-red-700"
+                >
+                  <FaTrash className="text-[#FA7070]" />
                 </button>
               </td>
             </tr>
@@ -225,20 +273,37 @@ const AssignRescuers = () => {
       <div className="flex justify-between items-center mt-4 px-2">
         <div>
           <span className="text-xs sm:text-sm">
-            Showing {((currentPage - 1) * rowsPerPage) + 1} to {Math.min(currentPage * rowsPerPage, totalRows)} of {totalRows} entries
+            Showing {(currentPage - 1) * rowsPerPage + 1} to{" "}
+            {Math.min(currentPage * rowsPerPage, totalRows)} of {totalRows}{" "}
+            entries
           </span>
         </div>
         <div className="flex space-x-2">
-          <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} className="px-2 py-1 bg-gray-200 rounded-md text-xs sm:text-sm">Previous</button>
+          <button
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="px-2 py-1 bg-gray-200 rounded-md text-xs sm:text-sm"
+          >
+            Previous
+          </button>
           {visiblePages.map((page) => (
             <button
               key={page}
               onClick={() => handlePageChange(page)}
-              className={`px-2 py-1 rounded-md text-xs sm:text-sm ${currentPage === page ? 'bg-[#557C55] text-white' : 'bg-gray-200'}`}>
+              className={`px-2 py-1 rounded-md text-xs sm:text-sm ${
+                currentPage === page ? "bg-[#557C55] text-white" : "bg-gray-200"
+              }`}
+            >
               {page}
             </button>
           ))}
-          <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} className="px-2 py-1 bg-gray-200 rounded-md text-xs sm:text-sm">Next</button>
+          <button
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="px-2 py-1 bg-gray-200 rounded-md text-xs sm:text-sm"
+          >
+            Next
+          </button>
         </div>
       </div>
     </div>
@@ -248,7 +313,9 @@ const AssignRescuers = () => {
 // FilterDropdown Component
 const FilterDropdown = ({ label, options, selected, setSelected }) => (
   <div className="mb-2 px-2">
-    <label className="block text-xs sm:text-sm font-medium text-gray-700">{label}</label>
+    <label className="block text-xs sm:text-sm font-medium text-gray-700">
+      {label}
+    </label>
     <select
       className="form-select w-full border border-[#557C55] text-black rounded-lg p-1 mt-1 bg-gray-50 text-xs sm:text-sm"
       value={selected}

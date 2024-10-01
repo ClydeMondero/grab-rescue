@@ -1,11 +1,23 @@
 import { useState } from "react";
 import { FaSave } from "react-icons/fa";
-import { MdAdd } from "react-icons/md";
 import { MdPersonAdd } from "react-icons/md"; // New icon for AddRescuer
 import axios from "axios";
 import { toast } from "react-toastify";
+import { barangaysData } from "../constants/Barangays";
+import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 
 const AddRescuer = () => {
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+  };
+
   const [formData, setFormData] = useState({
     firstName: "",
     middleInitial: "",
@@ -112,41 +124,13 @@ const AddRescuer = () => {
 
       {/* Add Rescuer Form */}
       <div className="flex-1 bg-white rounded-md p-4 sm:p-6 lg:p-8">
-        <form className="space-y-2 sm:space-y-4" onSubmit={handleSubmit}>
-          {/* Profile Picture Section (commented out) */}
-          {/* <div className="flex flex-col items-center mb-4 sm:mb-6">
-            <div className="relative w-24 h-24 sm:w-32 sm:h-32">
-              <img
-                src={
-                  rescuer.profilePicture || "https://via.placeholder.com/150"
-                }
-                alt="Profile"
-                className="w-full h-full rounded-full object-cover border-4 border-[#557C55]"
-              />
-              <label
-                htmlFor="profile-picture"
-                className="absolute bottom-0 right-0 p-1 sm:p-2 bg-[#557C55] text-white rounded-full cursor-pointer"
-              >
-                <span className="sr-only">Change Profile Picture</span>
-                <input
-                  type="file"
-                  id="profile-picture"
-                  name="profilePicture"
-                  accept="image/*"
-                  onChange={handleProfilePictureChange}
-                  className="absolute inset-0 opacity-0 cursor-pointer"
-                />
-                <MdAdd className="w-4 h-4 sm:w-6 sm:h-6" />
-              </label>
-            </div>
-          </div> */}
-
-          <div className="grid grid-cols-1 gap-2 sm:gap-4">
+        <form className="space-y-4 sm:space-y-6" onSubmit={handleSubmit}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             {/* Form Fields */}
             <div>
               <label
                 htmlFor="firstName"
-                className="block text-xs sm:text-sm font-semibold text-[#557C55]"
+                className="block text-sm font-medium text-[#557C55]"
               >
                 First Name:
               </label>
@@ -156,14 +140,14 @@ const AddRescuer = () => {
                 name="firstName"
                 value={formData.firstName}
                 onChange={handleChange}
-                className="w-full p-1 sm:p-2 border rounded bg-[#F9F9F9] border-gray-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
+                className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
                 placeholder="Enter first name"
               />
             </div>
             <div>
               <label
                 htmlFor="middleInitial"
-                className="block text-xs sm:text-sm font-semibold text-[#557C55]"
+                className="block text-sm font-medium text-[#557C55]"
               >
                 Middle Name:
               </label>
@@ -173,14 +157,14 @@ const AddRescuer = () => {
                 name="middleInitial"
                 value={formData.middleInitial}
                 onChange={handleChange}
-                className="w-full p-1 sm:p-2 border rounded bg-[#F9F9F9] border-gray-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
+                className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
                 placeholder="Enter middle name"
               />
             </div>
             <div>
               <label
                 htmlFor="lastName"
-                className="block text-xs sm:text-sm font-semibold text-[#557C55]"
+                className="block text-sm font-medium text-[#557C55]"
               >
                 Last Name:
               </label>
@@ -190,14 +174,14 @@ const AddRescuer = () => {
                 name="lastName"
                 value={formData.lastName}
                 onChange={handleChange}
-                className="w-full p-1 sm:p-2 border rounded bg-[#F9F9F9] border-gray-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
+                className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
                 placeholder="Enter last name"
               />
             </div>
             <div>
               <label
                 htmlFor="birthday"
-                className="block text-xs sm:text-sm font-semibold text-[#557C55]"
+                className="block text-sm font-medium text-[#557C55]"
               >
                 Birthday:
               </label>
@@ -207,13 +191,13 @@ const AddRescuer = () => {
                 name="birthday"
                 value={formData.birthday}
                 onChange={handleChange}
-                className="w-full p-1 sm:p-2 border rounded bg-[#F9F9F9] border-gray-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
+                className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
               />
             </div>
             <div>
               <label
                 htmlFor="age"
-                className="block text-xs sm:text-sm font-semibold text-[#557C55]"
+                className="block text-sm font-medium text-[#557C55]"
               >
                 Age:
               </label>
@@ -223,48 +207,59 @@ const AddRescuer = () => {
                 name="age"
                 value={formData.age}
                 readOnly
-                className="w-full p-1 sm:p-2 border rounded bg-[#F9F9F9] border-gray-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
+                className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
                 placeholder="Age"
               />
             </div>
             <div>
               <label
                 htmlFor="municipality"
-                className="block text-xs sm:text-sm font-semibold text-[#557C55]"
+                className="block text-sm font-semibold text-[#557C55]"
               >
                 Municipality:
               </label>
-              <input
-                type="text"
+              <select
                 id="municipality"
                 name="municipality"
                 value={formData.municipality}
                 onChange={handleChange}
-                className="w-full p-1 sm:p-2 border rounded bg-[#F9F9F9] border-gray-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
-                placeholder="Enter municipality"
-              />
+                className="w-full p-3 border rounded-lg bg-gray-100 border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
+              >
+                <option value="">Select Municipality</option>
+                {Object.keys(barangaysData).map((municipality) => (
+                  <option key={municipality} value={municipality}>
+                    {municipality}
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <label
                 htmlFor="barangay"
-                className="block text-xs sm:text-sm font-semibold text-[#557C55]"
+                className="block text-sm font-semibold text-[#557C55]"
               >
                 Barangay:
               </label>
-              <input
-                type="text"
+              <select
                 id="barangay"
                 name="barangay"
                 value={formData.barangay}
                 onChange={handleChange}
-                className="w-full p-1 sm:p-2 border rounded bg-[#F9F9F9] border-gray-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
-                placeholder="Enter barangay"
-              />
+                className="w-full p-3 border rounded-lg bg-gray-100 border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
+              >
+                <option value="">Select Barangay</option>
+                {formData.municipality &&
+                  barangaysData[formData.municipality].map((barangay) => (
+                    <option key={barangay} value={barangay}>
+                      {barangay}
+                    </option>
+                  ))}
+              </select>
             </div>
             <div>
               <label
                 htmlFor="contactNumber"
-                className="block text-xs sm:text-sm font-semibold text-[#557C55]"
+                className="block text-sm font-medium text-[#557C55]"
               >
                 Contact Number:
               </label>
@@ -274,14 +269,14 @@ const AddRescuer = () => {
                 name="contactNumber"
                 value={formData.contactNumber}
                 onChange={handleChange}
-                className="w-full p-1 sm:p-2 border rounded bg-[#F9F9F9] border-gray-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
+                className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
                 placeholder="Enter contact number"
               />
             </div>
             <div>
               <label
                 htmlFor="email"
-                className="block text-xs sm:text-sm font-semibold text-[#557C55]"
+                className="block text-sm font-medium text-[#557C55]"
               >
                 Email:
               </label>
@@ -291,14 +286,14 @@ const AddRescuer = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full p-1 sm:p-2 border rounded bg-[#F9F9F9] border-gray-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
+                className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
                 placeholder="Enter email"
               />
             </div>
             <div>
               <label
                 htmlFor="username"
-                className="block text-xs sm:text-sm font-semibold text-[#557C55]"
+                className="block text-sm font-medium text-[#557C55]"
               >
                 Username:
               </label>
@@ -308,48 +303,73 @@ const AddRescuer = () => {
                 name="username"
                 value={formData.username}
                 onChange={handleChange}
-                className="w-full p-1 sm:p-2 border rounded bg-[#F9F9F9] border-gray-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
-                placeholder="Enter Username"
+                className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
+                placeholder="Enter username"
               />
             </div>
             <div>
               <label
                 htmlFor="password"
-                className="block text-xs sm:text-sm font-semibold text-[#557C55]"
+                className="block text-sm font-medium text-[#557C55]"
               >
                 Password:
               </label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                className="w-full p-1 sm:p-2 border rounded bg-[#F9F9F9] border-gray-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
-                placeholder="Enter password"
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
+                  placeholder="Enter password"
+                />
+                <div
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                  onClick={togglePasswordVisibility}
+                >
+                  {showPassword ? (
+                    <AiFillEyeInvisible size={24} color="#557C55" />
+                  ) : (
+                    <AiFillEye size={24} color="#557C55" />
+                  )}
+                </div>
+              </div>
             </div>
+
             <div>
               <label
                 htmlFor="confirmPassword"
-                className="block text-xs sm:text-sm font-semibold text-[#557C55]"
+                className="block text-sm font-medium text-[#557C55]"
               >
                 Confirm Password:
               </label>
-              <input
-                type="password"
-                id="confirmPassword"
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                className="w-full p-1 sm:p-2 border rounded bg-[#F9F9F9] border-gray-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
-                placeholder="Confirm password"
-              />
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
+                  placeholder="Confirm password"
+                />
+                <div
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                  onClick={toggleConfirmPasswordVisibility}
+                >
+                  {showConfirmPassword ? (
+                    <AiFillEyeInvisible size={24} color="#557C55" />
+                  ) : (
+                    <AiFillEye size={24} color="#557C55" />
+                  )}
+                </div>
+              </div>
             </div>
           </div>
 
           {/* Submit Button */}
-          <div className="flex justify-end mt-4">
+          <div className="flex justify-end mt-6">
             <button
               type="submit"
               className="flex items-center px-4 py-2 bg-[#557C55] text-white rounded-md hover:bg-[#3c5e3c] focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
