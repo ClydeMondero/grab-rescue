@@ -1,5 +1,12 @@
 import { useState, useRef, useEffect } from "react";
-import { Map as MapGL, GeolocateControl, Marker, Popup } from "react-map-gl";
+import {
+  Map as MapGL,
+  GeolocateControl,
+  Marker,
+  Popup,
+  Source,
+  Layer,
+} from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import citizenMarker from "../assets/citizen-marker.png";
 import rescuerMarker from "../assets/rescuer-marker.png";
@@ -8,6 +15,7 @@ import {
   getRescuerLocations,
   updateCitizenLocation,
   getNearestRescuer,
+  getRouteData,
 } from "../services/locationService";
 import { getCitizenCookie } from "../services/cookieService";
 
@@ -20,22 +28,82 @@ const Map = () => {
   });
   const geoControlRef = useRef();
   const [rescuers, setRescuers] = useState([]);
-  const [nearestRescuer, setNearestRescuer] = useState({});
+  const [nearestRescuer, setNearestRescuer] = useState(null);
+  const [routeData, setRouteData] = useState(null);
+  const mapRef = useRef();
+  const [mapLoaded, setMapLoaded] = useState(false);
+  const [dashArray, setDashArray] = useState([0, 4, 3]);
+
+  const getRoute = async () => {
+    const route = await getRouteData(nearestRescuer, citizen);
+
+    setRouteData(route);
+  };
+
+  //ant line animate route
+  const animateRoute = () => {
+    const dashArraySequence = [
+      [0, 4, 3],
+      [0.5, 4, 2.5],
+      [1, 4, 2],
+      [1.5, 4, 1.5],
+      [2, 4, 1],
+      [2.5, 4, 0.5],
+      [3, 4, 0],
+      [0, 0.5, 3, 3.5],
+      [0, 1, 3, 3],
+      [0, 1.5, 3, 2.5],
+      [0, 2, 3, 2],
+      [0, 2.5, 3, 1.5],
+      [0, 3, 3, 1],
+      [0, 3.5, 3, 0.5],
+    ];
+
+    let step = 0;
+
+    function animateDashArray(timestamp) {
+      const newStep = parseInt((timestamp / 50) % dashArraySequence.length);
+
+      if (newStep !== step) {
+        setDashArray(dashArraySequence[step]);
+
+        step = newStep;
+      }
+
+      requestAnimationFrame(animateDashArray);
+    }
+
+    animateDashArray(0);
+  };
 
   useEffect(() => {
     //get rescuer locations on load
     getRescuerLocations(setRescuers);
   }, []);
 
-  //TODO: add lines and distance between rescuer and citizen
+  useEffect(() => {
+    if (mapLoaded) {
+      console.log("Map loaded animating route");
+      animateRoute();
+    }
+  }, [mapLoaded]);
+
+  //show route to the nearest rescuer
+  useEffect(() => {
+    if (nearestRescuer != null) {
+      getRoute();
+    }
+  }, [nearestRescuer]);
 
   return (
     <MapGL
+      ref={mapRef}
       initialViewState={citizen}
       mapStyle={"mapbox://styles/mapbox/streets-v12"}
       mapboxAccessToken={import.meta.env.VITE_MAPBOX_TOKEN}
       onLoad={() => {
         geoControlRef.current?.trigger();
+        setMapLoaded(true);
       }}
     >
       <GeolocateControl
@@ -100,7 +168,7 @@ const Map = () => {
             >
               <div
                 className={
-                  rescuer.id === nearestRescuer.id
+                  nearestRescuer && rescuer.id === nearestRescuer.id
                     ? "nearest-rescuer-marker"
                     : ""
                 }
@@ -110,6 +178,48 @@ const Map = () => {
             </Marker>
           )
       )}
+
+      {/* show line Layer for the route */}
+      {routeData &&
+        routeData.coordinates &&
+        routeData.coordinates.length > 0 && (
+          <Source
+            id="route"
+            type="geojson"
+            data={{
+              type: "Feature",
+              geometry: {
+                type: "LineString",
+                coordinates: routeData.coordinates,
+              },
+              properties: {},
+            }}
+          >
+            <Layer
+              id="route-background"
+              type="line"
+              layout={{
+                "line-join": "round",
+                "line-cap": "round",
+              }}
+              paint={{
+                "line-color": "violet", // Customize the color of the ant line
+                "line-width": 6, // Adjust the width of the line
+                "line-opacity": 0.2,
+              }}
+            />
+
+            <Layer
+              id="route-line"
+              type="line"
+              paint={{
+                "line-color": "violet", // Customize the color of the ant line
+                "line-width": 6, // Adjust the width of the line
+                "line-dasharray": dashArray,
+              }}
+            />
+          </Source>
+        )}
     </MapGL>
   );
 };

@@ -5,6 +5,7 @@ import {
   updateLocationInFirestore,
 } from "../services/firestoreService";
 import { setCitizenCookie } from "../services/cookieService";
+import axios from "axios";
 
 const MIN_DISTANCE_THRESHOLD = 50; //in meters
 
@@ -18,6 +19,23 @@ export const hasUserMoved = (currentLat, currentLon, lastLat, lastLon) => {
   }
 
   return false;
+};
+
+export const getRouteData = async (rescuer, citizen) => {
+  const directionsUrl = `https://api.mapbox.com/directions/v5/mapbox/driving/${
+    rescuer.longitude
+  },${rescuer.latitude};${citizen.longitude},${
+    citizen.latitude
+  }?geometries=geojson&access_token=${import.meta.env.VITE_MAPBOX_TOKEN}`;
+
+  try {
+    const response = await axios.get(directionsUrl);
+    const route = response.data.routes[0].geometry;
+
+    return route;
+  } catch (error) {
+    console.log("Error fetching the route:", error);
+  }
 };
 
 //add user location to firestore and set cookie
@@ -59,7 +77,7 @@ export const updateCitizenLocation = (
 
   //TODO:test if update location if moved in firestore
   if (moved) {
-    //console.log("Location updated", moved);
+    console.log("Location updated", moved);
     //updateLocationInFirestore(id, longitude, latitude);
   } else {
     console.log("Location not updated", moved);
