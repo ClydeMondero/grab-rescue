@@ -294,9 +294,10 @@ module.exports.UpdateAdminEmail = async (req, res) => {
     // Proceed to update the email and verification token in the database
     const updateQuery = `
       UPDATE users
-      SET email = $1, verification_token = $2
+      SET email = $1, verification_token = $2, verified = false
       WHERE id = $3
     `;
+
     await pool.query(updateQuery, [email, verificationToken, id]);
 
     // Send a verification email to the user
