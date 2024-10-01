@@ -78,7 +78,7 @@ export const updateCitizenLocation = (
   //TODO:test if update location if moved in firestore
   if (moved) {
     console.log("Location updated", moved);
-    //updateLocationInFirestore(id, longitude, latitude);
+    updateLocationInFirestore(id, longitude, latitude);
   } else {
     console.log("Location not updated", moved);
   }

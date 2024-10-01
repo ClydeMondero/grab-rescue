@@ -49,6 +49,33 @@
   animation: red-pulse 2s infinite;
 }
 
+.ctrl-group {
+  position: absolute;
+  right: 10px;
+  top: 50px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.ctrl-icon {
+  background-color: white;
+  border: 0;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 29px;
+  outline: none;
+  overflow: hidden;
+  padding: 0;
+  width: 29px;
+  z-index: 1;
+  border-radius: 4px;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+}
+
 @keyframes red-pulse {
   0% {
     box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7);
