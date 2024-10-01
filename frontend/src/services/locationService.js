@@ -13,8 +13,6 @@ export const hasUserMoved = (currentLat, currentLon, lastLat, lastLon) => {
   const distance = getDistance(currentLat, currentLon, lastLat, lastLon);
 
   if (distance >= MIN_DISTANCE_THRESHOLD) {
-    console.log("Location updated", currentLat, currentLon + " " + Date.now());
-
     return true;
   }
 
@@ -75,10 +73,10 @@ export const updateCitizenLocation = (
 ) => {
   const moved = hasUserMoved(prevLon, prevLat, longitude, latitude);
 
-  //TODO:test if update location if moved in firestore
+  //TODO: use id from cookie
   if (moved) {
     console.log("Location updated", moved);
-    updateLocationInFirestore(id, longitude, latitude);
+    // updateLocationInFirestore(id, longitude, latitude);
   } else {
     console.log("Location not updated", moved);
   }

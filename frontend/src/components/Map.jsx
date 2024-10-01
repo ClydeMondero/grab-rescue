@@ -13,6 +13,7 @@ import rescuerMarker from "../assets/rescuer-marker.png";
 import rescuerActive from "../assets/rescuer-active.svg";
 import routeIcon from "../assets/route.svg";
 import hideRoute from "../assets/hide-route.svg";
+import zoomOutIcon from "../assets/zoom-out.svg";
 import {
   addCitizenLocation,
   getRescuerLocations,
@@ -22,6 +23,7 @@ import {
 } from "../services/locationService";
 import { getCitizenCookie } from "../services/cookieService";
 import { set } from "react-hook-form";
+import { WebMercatorViewport } from "deck.gl";
 
 const Map = () => {
   //set initial viewport to BSU-BUSTOS
@@ -110,6 +112,23 @@ const Map = () => {
     }
   };
 
+  //fit map bounds
+  const fitBounds = () => {
+    if (mapRef.current && routeData) {
+      const routeCoordinates = routeData.coordinates;
+
+      const longitudes = routeCoordinates.map((coord) => coord[0]);
+      const latitudes = routeCoordinates.map((coord) => coord[1]);
+
+      const bounds = [
+        [Math.min(...longitudes), Math.min(...latitudes)],
+        [Math.max(...longitudes), Math.max(...latitudes)],
+      ];
+
+      mapRef.current.fitBounds(bounds, { padding: 50 });
+    }
+  };
+
   useEffect(() => {
     //get rescuer locations on load
     getRescuerLocations(setRescuers);
@@ -187,10 +206,9 @@ const Map = () => {
           />
         </button>
         {/*TODO: zoom out route */}
-        <button className="ctrl-icon">
-          {/*TODO: add route icon*/}
+        <button className="ctrl-icon" onClick={fitBounds}>
           <img
-            src={routeIcon}
+            src={zoomOutIcon}
             width={18}
             height={18}
             style={{ display: "block", margin: "auto" }}
