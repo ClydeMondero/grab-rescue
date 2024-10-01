@@ -3,6 +3,8 @@ import { MdAssignmentInd } from "react-icons/md";
 import { FaCircle, FaPencilAlt, FaTrash, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 import { createAuthHeader } from "../services/authService";
 import axios from "axios";
+import { barangaysData } from "../constants/Barangays";
+
 
 const AssignRescuers = () => {
   const [rescuers, setRescuers] = useState([]);
@@ -15,27 +17,11 @@ const AssignRescuers = () => {
   const [selectedBarangay, setSelectedBarangay] = useState("All");
   const [selectedStatus, setSelectedStatus] = useState("All");
   const [selectedVerified, setSelectedVerified] = useState("All");
+  
 
   const rowsPerPage = 10;
 
-  const barangaysData = {
-    "San Rafael": [
-      "Banca-Banca", "BMA – Balagtas", "Caingin", "Capihan", 
-      "Coral na Bato", "Cruz na Daan", "Dagat-Dagatan", "Diliman I",
-      "Diliman II", "Lico", "Libis", "Maasim", "Mabalas-Balas",
-      "Maguinao", "Maronquillo", "Paco", "Pansumaloc", "Pantubig",
-      "Pasong Bangkal", "Pasong Callos", "Pasong Intsik", "Pinacpinacan",
-      "Poblacion", "Pulo", "Pulong Bayabas", "Salapungan", 
-      "Sampaloc", "San Agustin", "San Roque", "Sapang Pahalang",
-      "Talacsan", "Tambubong", "Tukod", "Ulingao",
-    ],
-    Bustos: [
-      "Bonga Mayor", "Bonga Menor", "Buisan", "Camachilihan",
-      "Cambaog", "Catacte", "Liciada", "Malamig", 
-      "Malawak", "Poblacion", "San Pedro", "Talampas",
-      "Tanawan", "Tibagan",
-    ],
-  };
+ 
 
   useEffect(() => {
     const initializePage = async () => {
