@@ -77,7 +77,6 @@ export const updateCitizenLocation = (
 ) => {
   const moved = hasUserMoved(prevLon, prevLat, longitude, latitude);
 
-  //TODO: use id from cookie
   if (moved) {
     console.log("Location updated", moved);
     updateLocationInFirestore(id, longitude, latitude);
