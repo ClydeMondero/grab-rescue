@@ -62,24 +62,11 @@ module.exports.Login = async (req, res) => {
         httpOnly: false,
       });
 
-      // Create a log of the login
-      const logQuery =
-        "INSERT INTO logs (date_time, action, user_id) VALUES (NOW(), $1, $2)";
-      const values = ["Login", userData.id];
-      db.query(logQuery, values, (err) => {
-        if (err) {
-          return res
-            .status(200)
-            .json({ success: false, message: "Failed to create log" });
-        }
-
-        // After logging, return the response
-        delete userData.password;
-        return res.status(200).json({
-          success: true,
-          message: "Logged In Success!",
-          role: userData.account_type,
-        });
+      delete userData.password;
+      return res.status(200).json({
+        success: true,
+        message: "Logged In Success!",
+        role: userData.account_type,
       });
     });
   });
@@ -100,21 +87,8 @@ module.exports.Logout = (req, res) => {
     // Clear the cookie after updating the user's online status
     res.clearCookie("token");
 
-    // Create a log of the logout
-    const logQuery =
-      "INSERT INTO logs (date_time, action, user_id) VALUES (NOW(), $1, $2)";
-    const values = ["Logout", id];
-    db.query(logQuery, values, (err) => {
-      if (err) {
-        return res
-          .status(200)
-          .json({ success: false, message: "Failed to create log." });
-      }
-
-      // Successfully logged out and log created
-      return res
-        .status(200)
-        .json({ success: true, message: "Logged Out Success!" });
-    });
+    return res
+      .status(200)
+      .json({ success: true, message: "Logged Out Success!" });
   });
 };

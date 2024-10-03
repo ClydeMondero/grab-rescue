@@ -6,9 +6,6 @@ const {
   ResetPassword,
 } = require("../controllers/UserController");
 
-// User creation route
-//router.post("/create", CreateUser);
-
 // Get users route
 router.get("/get", GetUsers);
 
