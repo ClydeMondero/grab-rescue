@@ -141,7 +141,7 @@ const Login = () => {
           <p className="text-center text-sm mt-2 text-[#557C55]">
             Forgot your password?{" "}
             <a
-              href="/forgot-password"
+              href={`/forgot-password?role=${role}`}
               className="text-[#FA7070] hover:text-red-600 transition-colors duration-200 ease-in-out"
             >
               Reset it here
