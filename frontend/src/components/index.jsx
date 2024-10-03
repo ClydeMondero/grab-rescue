@@ -10,10 +10,20 @@ import ViewProfile from "./ViewProfile";
 import Sidebar from "./Sidebar";
 import PrivateRoute from "./PrivateRoute";
 import Toast from "./Toast";
-import Map from "./Map";
+import CitizenMap from "./CitizenMap";
+import RescuerMap from "./RescuerMap";
+import Markers from "./Markers";
+import Route from "./Route";
+import Controls from "./Controls";
+import DistanceEta from "./DistanceEta";
 
 export {
-  Map,
+  DistanceEta,
+  Markers,
+  Route,
+  Controls,
+  CitizenMap,
+  RescuerMap,
   Toast,
   PrivateRoute,
   Loader,
