@@ -152,6 +152,7 @@ module.exports.VerifyEmail = async (req, res) => {
   const { token } = req.params;
 
   try {
+    // Query to get the user based on the verification token
     const q = "SELECT * FROM users WHERE verification_token = $1";
     const { rows } = await pool.query(q, [token]);
 
@@ -159,23 +160,41 @@ module.exports.VerifyEmail = async (req, res) => {
       return res.status(400).json({ error: "Invalid or expired token" });
     }
 
-    const { pending_email: newEmail, id } = rows[0];
+    const { pending_email: newEmail, id, verified } = rows[0];
 
-    if (!newEmail) {
-      return res.status(400).json({ error: "No email change pending." });
+    // If the user is not verified yet, this is a new user email verification
+    if (!verified) {
+      // Verify the email by setting `verified = true`, clear the token
+      const updateQuery = `
+        UPDATE users
+        SET verified = true, verification_token = NULL
+        WHERE id = $1
+      `;
+      await pool.query(updateQuery, [id]);
+
+      return res
+        .status(200)
+        .json({ message: "New user email verified successfully." });
     }
 
-    // Update the email and clear the pending email and token
-    const updateQuery = `
-      UPDATE users
-      SET email = $1, pending_email = NULL, verification_token = NULL, verified = true
-      WHERE id = $2
-    `;
-    await pool.query(updateQuery, [newEmail, id]);
+    // If the user is already verified but there's a pending email, it's an email change verification
+    if (newEmail) {
+      const updateQuery = `
+        UPDATE users
+        SET email = $1, pending_email = NULL, verification_token = NULL
+        WHERE id = $2
+      `;
+      await pool.query(updateQuery, [newEmail, id]);
 
-    return res
-      .status(200)
-      .json({ message: "Email verified and updated successfully." });
+      return res
+        .status(200)
+        .json({ message: "Email change verified and updated successfully." });
+    }
+
+    // Fallback case: no pending email or verification case
+    return res.status(400).json({
+      error: "No email change pending or invalid verification request.",
+    });
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
@@ -209,6 +228,12 @@ module.exports.RequestPasswordReset = async (req, res) => {
     const expires = new Date(Date.now() + 3600000);
     await pool.query(updateQuery, [resetPasswordToken, expires, email]);
 
+    // Log the password reset request
+    const logQuery =
+      "INSERT INTO logs (date_time, action, user_id) VALUES (NOW(), $1, $2)";
+    const logValues = ["Request Password Reset", user.id];
+    await pool.query(logQuery, logValues);
+
     // Configure the email transporter
     const transporter = nodemailer.createTransport({
       service: "gmail",
@@ -227,7 +252,7 @@ module.exports.RequestPasswordReset = async (req, res) => {
     };
 
     // Send the email
-    transporter.sendMail(mailOptions, (err, info) => {
+    transporter.sendMail(mailOptions, (err) => {
       if (err) {
         return res
           .status(500)
@@ -243,7 +268,13 @@ module.exports.RequestPasswordReset = async (req, res) => {
 // Reset Password
 module.exports.ResetPassword = async (req, res) => {
   const { token } = req.params;
-  const { newPassword } = req.body;
+  const { newPassword, confirmPassword } = req.body;
+
+  if (newPassword !== confirmPassword) {
+    return res
+      .status(400)
+      .json({ error: "New password and confirm password do not match" });
+  }
 
   try {
     const q =
@@ -261,6 +292,12 @@ module.exports.ResetPassword = async (req, res) => {
     const updateQuery =
       "UPDATE users SET password = $1, reset_password_token = NULL, reset_password_expires = NULL WHERE id = $2";
     await pool.query(updateQuery, [hash, user.id]);
+
+    // Create a log entry for password reset
+    const logQuery =
+      "INSERT INTO logs (date_time, action, user_id) VALUES (NOW(), $1, $2)";
+    const logValues = ["Reset Password", user.id];
+    await pool.query(logQuery, logValues);
 
     return res
       .status(200)

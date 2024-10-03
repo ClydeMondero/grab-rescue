@@ -4,20 +4,19 @@ const bcrypt = require("bcrypt");
 const { createSecretToken } = require("../utils/SecretToken");
 
 module.exports.Login = async (req, res) => {
-  // Get the username and password from the request body
   const { email, password, role } = req.body;
 
   // Get the user from the database
   const q = "SELECT * FROM users WHERE email = $1 AND verified = true";
   db.query(q, [email], (err, data) => {
-    if (err)
+    if (err) {
       return res.status(200).json({
         success: false,
         message: "Database error.",
         error: err.message,
       });
+    }
 
-    // If the user does not exist or is not verified, return an error
     if (data.rows.length === 0) {
       return res.status(200).json({
         success: false,
@@ -25,43 +24,37 @@ module.exports.Login = async (req, res) => {
       });
     }
 
-    // Get the user data from the database
     const [userData] = data.rows;
 
-    // Check if the user is already online
     if (userData.is_online) {
       return res
         .status(200)
         .json({ success: false, message: "User is already online." });
     }
 
-    // Check if role is valid
     if (userData.account_type !== role) {
       return res
         .status(200)
         .json({ success: false, message: "Role is not valid." });
     }
 
-    // Check if the password is valid
     const isPasswordValid = bcrypt.compareSync(password, userData.password);
 
-    // If the password is invalid, return an error
     if (!isPasswordValid) {
       return res
         .status(200)
         .json({ success: false, message: "Invalid password." });
     }
 
-    // Update the user to be online
     const updateQuery = "UPDATE users SET is_online = true WHERE id = $1";
     db.query(updateQuery, [userData.id], (err) => {
-      if (err)
+      if (err) {
         return res
           .status(200)
           .json({ success: false, message: "Failed to update online status." });
+      }
 
       const token = createSecretToken(userData.id);
-
       res.cookie("token", token, {
         withCredentials: true,
         secure: true,
@@ -69,24 +62,24 @@ module.exports.Login = async (req, res) => {
         httpOnly: false,
       });
 
-      //TODO: create logs table
-      // // Create a log of the login
-      // const logQuery =
-      //   "INSERT INTO logs (`date_time`, `action`, `user_id`) VALUES (NOW(), $1, $2)";
-      // const values = ["Login", userData.id];
-      // db.query(logQuery, values, (err) => {
-      //   if (err)
-      //     return res
-      //       .status(200)
-      //       .json({ success: false, message: "Failed to create log" });
-      // });
+      // Create a log of the login
+      const logQuery =
+        "INSERT INTO logs (date_time, action, user_id) VALUES (NOW(), $1, $2)";
+      const values = ["Login", userData.id];
+      db.query(logQuery, values, (err) => {
+        if (err) {
+          return res
+            .status(200)
+            .json({ success: false, message: "Failed to create log" });
+        }
 
-      // Remove the password from the user data and return it
-      delete userData.password;
-      return res.status(200).json({
-        success: true,
-        message: "Logged In Success!",
-        role: userData.account_type,
+        // After logging, return the response
+        delete userData.password;
+        return res.status(200).json({
+          success: true,
+          message: "Logged In Success!",
+          role: userData.account_type,
+        });
       });
     });
   });
@@ -94,19 +87,6 @@ module.exports.Login = async (req, res) => {
 
 module.exports.Logout = (req, res) => {
   const { id } = req.body;
-
-  //TODO: create logs table
-  // // Create a log of logout
-  // const logQuery =
-  //   "INSERT INTO logs (`date_time`, `action`, `user_id`) VALUES (NOW(), ?, ?)";
-  // const values = ["Logout", id];
-  // db.query(logQuery, values, (err) => {
-  //   if (err) {
-  //     return res
-  //       .status(200)
-  //       .json({ success: false, message: "Failed to create log" });
-  //   }
-  // });
 
   // Update the user to be offline
   const updateQuery = "UPDATE users SET is_online = false WHERE id = $1";
@@ -117,9 +97,24 @@ module.exports.Logout = (req, res) => {
         .json({ success: false, message: "Logout failed." });
     }
 
+    // Clear the cookie after updating the user's online status
     res.clearCookie("token");
-    return res
-      .status(200)
-      .json({ success: true, message: "Logged Out Success!" });
+
+    // Create a log of the logout
+    const logQuery =
+      "INSERT INTO logs (date_time, action, user_id) VALUES (NOW(), $1, $2)";
+    const values = ["Logout", id];
+    db.query(logQuery, values, (err) => {
+      if (err) {
+        return res
+          .status(200)
+          .json({ success: false, message: "Failed to create log." });
+      }
+
+      // Successfully logged out and log created
+      return res
+        .status(200)
+        .json({ success: true, message: "Logged Out Success!" });
+    });
   });
 };
