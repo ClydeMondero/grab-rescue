@@ -159,14 +159,23 @@ module.exports.VerifyEmail = async (req, res) => {
       return res.status(400).json({ error: "Invalid or expired token" });
     }
 
+    const { pending_email: newEmail, id } = rows[0];
+
+    if (!newEmail) {
+      return res.status(400).json({ error: "No email change pending." });
+    }
+
+    // Update the email and clear the pending email and token
     const updateQuery = `
       UPDATE users
-      SET verified = true, verification_token = NULL
-      WHERE verification_token = $1
+      SET email = $1, pending_email = NULL, verification_token = NULL, verified = true
+      WHERE id = $2
     `;
-    await pool.query(updateQuery, [token]);
+    await pool.query(updateQuery, [newEmail, id]);
 
-    return res.status(200).json({ message: "Email verified successfully" });
+    return res
+      .status(200)
+      .json({ message: "Email verified and updated successfully." });
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
