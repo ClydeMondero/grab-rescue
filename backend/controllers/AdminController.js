@@ -143,7 +143,10 @@ module.exports.CreateAdmin = async (req, res) => {
       const insertResult = await pool.query(insertQuery, values);
       const userId = insertResult.rows[0].id;
 
-      // Send a verification email to the user
+      // Use frontend base URL for the verification link
+      const verificationLink = `${process.env.SITE_URL}/verify/${verificationToken}`;
+
+      // Send a verification email to the new email
       const transporter = nodemailer.createTransport({
         service: "gmail",
         auth: {
@@ -153,10 +156,10 @@ module.exports.CreateAdmin = async (req, res) => {
       });
 
       const mailOptions = {
-        from: "your_email_here",
+        from: "bhenzmharlbartolome012603@gmail.com",
         to: email,
         subject: "Email Verification",
-        text: `Please click the following link to verify your email: http://localhost:4000/users/verify/${verificationToken}`,
+        text: `Please click the following link to verify your new email: ${verificationLink}`,
       };
 
       transporter.sendMail(mailOptions, (err, info) => {
@@ -316,6 +319,9 @@ module.exports.UpdateAdminEmail = async (req, res) => {
     `;
     await pool.query(updateQuery, [email, verificationToken, id]);
 
+    // Use frontend base URL for the verification link
+    const verificationLink = `${process.env.SITE_URL}/verify/${verificationToken}`;
+
     // Send a verification email to the new email
     const transporter = nodemailer.createTransport({
       service: "gmail",
@@ -329,7 +335,7 @@ module.exports.UpdateAdminEmail = async (req, res) => {
       from: "bhenzmharlbartolome012603@gmail.com",
       to: email,
       subject: "Email Verification",
-      text: `Please click the following link to verify your new email: http://localhost:4000/users/verify/${verificationToken}`,
+      text: `Please click the following link to verify your new email: ${verificationLink}`,
     };
 
     transporter.sendMail(mailOptions, (err, info) => {
