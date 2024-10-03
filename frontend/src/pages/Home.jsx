@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import logo from "../assets/logo.png";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Map } from "../components";
+import { CitizenMap as Map } from "../components";
 
 const Home = () => {
   const navigate = useNavigate();

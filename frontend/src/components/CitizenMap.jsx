@@ -9,11 +9,9 @@ import {
   getRescuerLocations,
   getRouteData,
 } from "../services/locationService";
-import Markers from "./Markers";
-import Route from "./Route";
-import Controls from "./Controls";
+import { Markers, Route, Controls, DistanceEta } from "../components";
 
-const Map = () => {
+const CitizenMap = () => {
   const [citizen, setCitizen] = useState({
     longitude: 120.9107,
     latitude: 14.9536,
@@ -114,8 +112,9 @@ const Map = () => {
         routeData={routeData}
         setRouteOpacity={setRouteOpacity}
       />
+      <DistanceEta distance={distance} eta={eta} />
     </MapGL>
   );
 };
 
-export default Map;
+export default CitizenMap;
