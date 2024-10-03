@@ -8,7 +8,7 @@ const crypto = require("crypto");
 module.exports.GetUsers = async (req, res) => {
   let q = `
     SELECT id, first_name, middle_initial, last_name, municipality, barangay, contact_number, 
-    is_online, verified account_type FROM users WHERE 1=1
+    is_online, verified, account_type FROM users WHERE 1=1
   `;
 
   const queryParams = [];
@@ -130,6 +130,17 @@ module.exports.RequestPasswordReset = async (req, res) => {
     const expires = new Date(Date.now() + 3600000);
     await pool.query(updateQuery, [resetPasswordToken, expires, email]);
 
+    // Get the dynamic base URL
+    const baseUrl = `${req.protocol}://${req.get("host")}`;
+
+    // Email options
+    const mailOptions = {
+      from: "bhenzmharlbartolome012603@gmail.com",
+      to: email,
+      subject: "Password Reset Request",
+      text: `Please click the following link to reset your password: ${baseUrl}/users/reset-password/${resetPasswordToken}`,
+    };
+
     // Configure the email transporter
     const transporter = nodemailer.createTransport({
       service: "gmail",
@@ -138,14 +149,6 @@ module.exports.RequestPasswordReset = async (req, res) => {
         pass: "owvb wzni fhxu cvbz",
       },
     });
-
-    // Email options
-    const mailOptions = {
-      from: "bhenzmharlbartolome012603@gmail.com",
-      to: email,
-      subject: "Password Reset Request",
-      text: `Please click the following link to reset your password: http://localhost:4000/users/reset-password/${resetPasswordToken}`,
-    };
 
     // Send the email
     transporter.sendMail(mailOptions, (err) => {
@@ -195,4 +198,22 @@ module.exports.ResetPassword = async (req, res) => {
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
+};
+
+// Show Reset Password Form
+module.exports.ShowResetPasswordForm = async (req, res) => {
+  const { token } = req.params;
+
+  // You can validate the token if needed, but for now, just render the form
+  res.send(`
+    <form action="/users/reset-password/${token}" method="POST">
+      <label for="newPassword">New Password:</label>
+      <input type="password" id="newPassword" name="newPassword" required>
+      <br>
+      <label for="confirmPassword">Confirm Password:</label>
+      <input type="password" id="confirmPassword" name="confirmPassword" required>
+      <br>
+      <button type="submit">Reset Password</button>
+    </form>
+  `);
 };
