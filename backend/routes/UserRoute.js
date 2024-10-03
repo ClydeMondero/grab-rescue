@@ -1,5 +1,10 @@
 const router = require("express").Router();
-const { GetUsers, VerifyEmail, RequestPasswordReset, ResetPassword } = require("../controllers/UserController");
+const {
+  GetUsers,
+  VerifyEmail,
+  RequestPasswordReset,
+  ResetPassword,
+} = require("../controllers/UserController");
 
 // User creation route
 //router.post("/create", CreateUser);
