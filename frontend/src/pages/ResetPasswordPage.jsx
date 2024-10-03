@@ -1,3 +1,4 @@
+// ResetPasswordPage.jsx
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -18,13 +19,16 @@ const ResetPassword = () => {
     }
 
     try {
-      const response = await axios.post(`/api/reset-password/${token}`, {
+      const response = await axios.post(`/users/reset-password/${token}`, {
         newPassword,
+        confirmPassword, // Include confirmPassword
       });
       setMessage(response.data.message);
+      setError(null);
       setTimeout(() => navigate("/login"), 2000);
     } catch (err) {
       setError(err.response?.data?.error || "Failed to reset password.");
+      setMessage(null);
     }
   };
 
@@ -55,6 +59,7 @@ const ResetPassword = () => {
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#557C55]"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
+              required
             />
           </div>
           <div>
@@ -72,6 +77,7 @@ const ResetPassword = () => {
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#557C55]"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
+              required
             />
           </div>
           <button

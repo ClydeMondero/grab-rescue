@@ -127,18 +127,19 @@ module.exports.RequestPasswordReset = async (req, res) => {
     // Update the user's reset password token and expiration time
     const updateQuery =
       "UPDATE users SET reset_password_token = $1, reset_password_expires = $2 WHERE email = $3";
-    const expires = new Date(Date.now() + 3600000);
+    const expires = new Date(Date.now() + 3600000); // 1 hour from now
     await pool.query(updateQuery, [resetPasswordToken, expires, email]);
 
-    // Get the dynamic base URL
-    const baseUrl = `${req.protocol}://${req.get("host")}`;
+    // Use frontend base URL for the reset link
+    const resetLink = `${process.env.SITE_URL}/reset-password/${resetPasswordToken}`;
 
     // Email options
     const mailOptions = {
       from: "bhenzmharlbartolome012603@gmail.com",
       to: email,
       subject: "Password Reset Request",
-      text: `Please click the following link to reset your password: ${baseUrl}/users/reset-password/${resetPasswordToken}`,
+      text: `Please click the following link to reset your password: ${resetLink}`,
+      html: `<p>Please click the following link to reset your password:</p><a href="${resetLink}">${resetLink}</a>`,
     };
 
     // Configure the email transporter
@@ -146,7 +147,7 @@ module.exports.RequestPasswordReset = async (req, res) => {
       service: "gmail",
       auth: {
         user: "bhenzmharlbartolome012603@gmail.com",
-        pass: "owvb wzni fhxu cvbz",
+        pass: "owvb wzni fhxu cvbz", // Consider using environment variables for sensitive data
       },
     });
 
