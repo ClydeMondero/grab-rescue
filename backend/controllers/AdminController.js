@@ -263,6 +263,7 @@ module.exports.UpdateAdmin = async (req, res) => {
   }
 };
 
+// Update Admin Email
 module.exports.UpdateAdminEmail = async (req, res) => {
   const id = req.params.id;
   const { email } = req.body;
@@ -279,23 +280,24 @@ module.exports.UpdateAdminEmail = async (req, res) => {
   }
 
   try {
-    // Fetch the user's current email from the database
+    // Fetch the user's current data from the database
     const q = "SELECT * FROM users WHERE id = $1";
     const { rows } = await pool.query(q, [id]);
 
-    if (rows.length === 0)
+    if (rows.length === 0) {
       return res.status(404).json({ error: "User does not exist" });
+    }
 
-    const { email: oldEmail } = rows[0];
+    const { email: oldEmail, pending_email: pendingEmail } = rows[0];
 
-    // Check if the new email is the same as the old email
-    if (email === oldEmail) {
+    // Check if the new email is the same as the current or pending email
+    if (email === oldEmail || email === pendingEmail) {
       return res
         .status(200)
         .json({ message: "The email is the same. No changes made." });
     }
 
-    // Check if the new email is already taken
+    // Check if the new email is already taken by another user
     const emailCheckQuery = "SELECT * FROM users WHERE email = $1";
     const emailCheckResult = await pool.query(emailCheckQuery, [email]);
 
@@ -306,16 +308,15 @@ module.exports.UpdateAdminEmail = async (req, res) => {
     // Generate a unique verification token
     const verificationToken = crypto.randomBytes(20).toString("hex");
 
-    // Proceed to update the email and verification token in the database
+    // Update the pending email and verification token in the database
     const updateQuery = `
       UPDATE users
-      SET email = $1, verification_token = $2, verified = false
+      SET pending_email = $1, verification_token = $2
       WHERE id = $3
     `;
-
     await pool.query(updateQuery, [email, verificationToken, id]);
 
-    // Send a verification email to the user
+    // Send a verification email to the new email
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -325,7 +326,7 @@ module.exports.UpdateAdminEmail = async (req, res) => {
     });
 
     const mailOptions = {
-      from: process.env.EMAIL_USER,
+      from: "bhenzmharlbartolome012603@gmail.com",
       to: email,
       subject: "Email Verification",
       text: `Please click the following link to verify your new email: http://localhost:4000/users/verify/${verificationToken}`,
@@ -338,10 +339,9 @@ module.exports.UpdateAdminEmail = async (req, res) => {
           .status(500)
           .json({ error: "Failed to send verification email" });
       } else {
-        console.log("Verification email sent:", info.response);
-        return res
-          .status(200)
-          .json({ message: "Email updated. Verification email sent." });
+        return res.status(200).json({
+          message: "Verification email sent. Please check your new email.",
+        });
       }
     });
   } catch (err) {
