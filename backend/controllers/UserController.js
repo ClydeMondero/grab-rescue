@@ -199,21 +199,3 @@ module.exports.ResetPassword = async (req, res) => {
     return res.status(500).json({ error: err.message });
   }
 };
-
-// Show Reset Password Form
-module.exports.ShowResetPasswordForm = async (req, res) => {
-  const { token } = req.params;
-
-  // You can validate the token if needed, but for now, just render the form
-  res.send(`
-    <form action="/users/reset-password/${token}" method="POST">
-      <label for="newPassword">New Password:</label>
-      <input type="password" id="newPassword" name="newPassword" required>
-      <br>
-      <label for="confirmPassword">Confirm Password:</label>
-      <input type="password" id="confirmPassword" name="confirmPassword" required>
-      <br>
-      <button type="submit">Reset Password</button>
-    </form>
-  `);
-};
