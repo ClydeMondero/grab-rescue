@@ -5,8 +5,7 @@ const DistanceEta = ({ distance, eta }) => {
     distance &&
     eta && (
       <div className="distance-eta">
-        {distance && <p>Distance: {formatDistance(distance)}</p>}
-        {eta && <p>ETA: {formatDuration(eta)}</p>}
+        {<p>{formatDuration(eta) + " • " + formatDistance(distance)}</p>}
       </div>
     )
   );
