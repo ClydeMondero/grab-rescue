@@ -56,6 +56,15 @@
   animation: red-pulse 2s infinite;
 }
 
+.ctrl-group {
+  position: absolute;
+  right: 10px;
+  top: 50px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
 .ctrl-icon {
   background-color: white;
   border: 0;
@@ -120,5 +129,14 @@
   }
   .mapboxgl-ctrl-top-right {
     display: none;
+  }
+}
+
+@media (min-width: 768px) {
+  .ctrl-group {
+    display: flex;
+  }
+  .mapboxgl-ctrl-top-right {
+    display: block;
   }
 }

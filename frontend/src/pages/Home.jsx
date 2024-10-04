@@ -33,11 +33,38 @@ const Home = () => {
     verifyToken();
   }, []);
 
-  //TODO: add header and footor for big screens
+  //TODO: add footer for big screens
   return (
     <div className="h-screen flex flex-col">
-      <div className="w-full h-[80%] relative">
-        <div className="absolute top-4 right-4 m-2 p-2 z-10 rounded-full bg-white shadow-lg">
+      <div className="hidden  lg:h-[10%] bg-[#557C55] text-white shadow-lg px-4 py-2 lg:flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <img src={logo} alt="logo" className="h-12" />
+        </div>
+        <ul className="space-x-4 flex items-center justify-center">
+          <li className="hover:underline">
+            <a href="/about" className="text-md font-semibold">
+              About
+            </a>
+          </li>
+          <li className="border-[2px] border-white px-4 py-2 rounded-md">
+            <a href="/login?role=Rescuer" className="text-md font-semibold">
+              Login as Rescuer
+            </a>
+          </li>
+          <li className="border-[2px] border-white px-4 py-2 rounded-md">
+            <a href="/login?role=Admin" className="text-md font-semibold">
+              Login as Admin
+            </a>
+          </li>
+          <li className="bg-white text-[#557C55] px-4 py-2 hover:underline rounded-md">
+            <a href="/register" className="text-md font-semibold">
+              Be a Rescuer
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div className="w-full h-[80%] relative lg:h-[90%] lg:bg-slate-200">
+        <div className="absolute top-4 right-4 m-2 p-2 z-10 rounded-full bg-white shadow-lg lg:hidden">
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="text-md cursor-pointer text-gray-700 rounded-full p-2 hover:bg-gra"
@@ -71,7 +98,7 @@ const Home = () => {
                     className="flex items-center justify-center w-full text-lg font-semibold hover:underline"
                   >
                     <FaUserPlus className="mr-2" />
-                    Register
+                    Be a Rescuer
                   </a>
                 </li>
                 <li className="py-2">
@@ -91,11 +118,11 @@ const Home = () => {
         <Map />
       </div>
       {/*TODO: call control functions*/}
-      <div className="h-[20%] bg-slate-200 px-2 pb-2 flex flex-col justify-between gap-2">
+      <div className="h-[20%] bg-slate-200 px-2 pb-2 flex flex-col justify-between gap-2 lg:h-[10%]">
         <button className="flex-1 bg-[#FF5757] hover:bg-red-700 text-white font-bold p-2 rounded">
           Request for Help
         </button>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 lg:hidden">
           <div className="bg-white flex items-center justify-around gap-4 rounded-lg px-2 py-4 font-medium text-sm text-center flex-1">
             <div className="flex flex-col items-center">
               <button className="bg-gray-200 hover:bg-gray-300 rounded-full p-3 flex items-center justify-center">
