@@ -3,58 +3,60 @@ import { FaArrowLeft, FaEnvelope } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { createAuthHeader } from "../services/authService";
 
-
-const ChangeEmail = () => {
-  const [email, setEmail] = useState("");
-  const [currentEmail, setCurrentEmail] = useState("");
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
+const ChangeEmail = (props) => {
   const navigate = useNavigate();
+  const { user } = props;
+  const userId = user.id;
+  const [newEmail, setNewEmail] = useState("");
+  const [error, setError] = useState("");
 
-  useEffect(() => {
-    const fetchCurrentEmail = async () => {
-      try {
-        const { data } = await axios.get("/users/email", {
-          withCredentials: true,
-        });
-
-        if (data.success) {
-          setCurrentEmail(data.email);
-        } else {
-          setError(data.error);
-          toast.error(data.error);
-        }
-      } catch (error) {
-        setError(error.response.data.error);
-        toast.error(error.response.data.error);
-      }
-    };
-
-    fetchCurrentEmail();
-  }, []);
+  const handleEmailChange = (e) => {
+    setNewEmail(e.target.value);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    try {
-      const { data } = await axios.put(
-        "/users/email",
-        { email },
-        { withCredentials: true }
-      );
+    // Check if the current email matches the user's email
+    if (newEmail === user.email) {
+      toast.error("New email is the same as the current email!");
+      return;
+    }
 
-      if (data.success) {
-        setSuccess(true);
-        setError("");
-        toast.success("Email changed successfully!");
-      } else {
-        setError(data.error);
-        toast.error(data.error);
-      }
+    const data = {
+      email: newEmail,
+    };
+
+    try {
+      // Sending PUT request to update email
+      const response = await axios.put(
+        `/users/updateEmail/${userId}`,
+        data,
+        createAuthHeader()
+      );
+      toast.success(response.data.message); // Success toast
+
+      // Clear the email fields
+      setNewEmail("");
+      setError(""); // Clear any previous errors
     } catch (error) {
-      setError(error.response.data.error);
-      toast.error(error.response.data.error);
+      if (error.response) {
+        console.error("Error response:", error.response.data);
+
+        // Handle specific error codes
+        if (error.response.status === 400) {
+          toast.error(error.response.data.error); // Bad Request error (400)
+        } else if (error.response.status === 404) {
+          toast.error("Not Found: User does not exist"); // Not Found error (404)
+        } else {
+          toast.error(error.response.data.message); // Other errors
+        }
+      } else {
+        console.error("Error:", error.message);
+        toast.error("Something went wrong"); // Fallback error
+      }
     }
   };
 
@@ -70,9 +72,6 @@ const ChangeEmail = () => {
         </h4>
       </div>
       <div className="flex-1 bg-white rounded-lg p-3">
-        <p className="text-sm sm:text-md mb-3 font-semibold text-[#557C55]">
-          Update your email:
-        </p>
         <form className="space-y-2" onSubmit={handleSubmit}>
           <div className="relative">
             <label
@@ -89,10 +88,11 @@ const ChangeEmail = () => {
               <input
                 type="email"
                 id="current-email"
-                value={currentEmail}
+                value={user.email}
                 disabled
                 className="w-full p-3 pl-10 border rounded bg-[#F9F9F9] border-gray-300 text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-[#557C55] transition"
-                placeholder="Enter your new email"
+                placeholder="Enter your current email"
+                required
               />
             </div>
           </div>
@@ -112,20 +112,18 @@ const ChangeEmail = () => {
               <input
                 type="email"
                 id="new-email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                name="newEmail"
+                value={newEmail}
+                onChange={handleEmailChange}
                 className="w-full p-3 pl-10 border rounded bg-[#F9F9F9] border-gray-300 text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-[#557C55] transition"
                 placeholder="Enter your new email"
+                required
               />
             </div>
           </div>
 
           {error && <p className="text-red-500 text-xs sm:text-sm">{error}</p>}
-          {success && (
-            <p className="text-green-500 text-xs sm:text-sm">
-              Email changed successfully!
-            </p>
-          )}
+
           <button
             type="submit"
             className="bg-[#557C55] text-white px-2 py-1 rounded text-xs sm:text-sm hover:bg-[#6EA46E] transition flex items-center justify-center"
