@@ -246,19 +246,19 @@ module.exports.UpdateUserEmail = async (req, res) => {
 module.exports.UpdateUserPassword = async (req, res) => {
   const { currentPassword, newPassword, confirmPassword } = req.body;
   const id = req.params.id;
-
   // Validation
   if (!currentPassword || !newPassword || !confirmPassword) {
-    return res
-      .status(400)
-      .json({ error: "Please fill in all password fields" });
+    return res.status(400).json({
+      success: false,
+      error: "Please provide current, new, and confirm passwords.",
+    });
   }
 
-  // Check if new password matches confirm password
   if (newPassword !== confirmPassword) {
-    return res
-      .status(400)
-      .json({ error: "New password and confirm password do not match" });
+    return res.status(400).json({
+      success: false,
+      error: "New password and confirm password do not match.",
+    });
   }
 
   try {
