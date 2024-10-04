@@ -31,16 +31,12 @@ const ViewProfile = (props) => {
 
     try {
       const authHeader = createAuthHeader();
-      const response = await axios.put(
-        `/admins/update/${profile.id}`,
-        profile,
-        {
-          headers: {
-            ...authHeader,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await axios.put(`/users/update/${profile.id}`, profile, {
+        headers: {
+          ...authHeader,
+          "Content-Type": "application/json",
+        },
+      });
       if (response.status === 200) {
         toast.success("Profile updated successfully!");
       } else {
