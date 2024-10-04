@@ -1,24 +1,29 @@
 import { useState } from "react";
 import axios from "axios";
 import { useSearchParams } from "react-router-dom";
+import { toast } from "react-toastify";
+import { Toast } from "../components";
+import "react-toastify/dist/ReactToastify.css";
 
 const ForgotPassword = () => {
   const [searchParams] = useSearchParams();
   const role = searchParams.get("role");
   const [email, setEmail] = useState("");
-  const [message, setMessage] = useState(null);
-  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const handleForgotPassword = async (event) => {
     event.preventDefault();
+    setLoading(true); // Start loading state
 
     try {
-      const response = await axios.post("/users/forgot-password", {
-        email,
-      });
-      setMessage(response.data.message);
+      const response = await axios.post("/users/forgot-password", { email });
+      toast.success(response.data.message);
+      console.log(response.data.message); // Show success message
     } catch (err) {
-      setError(err.response?.data?.error || "Failed to send reset link.");
+      // Handle error and show error message
+      toast.error(err.response?.data?.error || "Failed to send reset link.");
+    } finally {
+      setLoading(false); // End loading state
     }
   };
 
@@ -27,7 +32,7 @@ const ForgotPassword = () => {
       <div className="max-w-md w-full bg-white rounded-lg shadow-md p-6">
         <button
           onClick={() => window.history.back()}
-          className="mb-4 text-[#FA7070] hover:text-red-600"
+          className="mb-4 text-[#A0D9A4] hover:text-[#557C55]"
         >
           &larr; Back to Login
         </button>
@@ -40,8 +45,6 @@ const ForgotPassword = () => {
           Enter your email address, and we will send you a link to reset your
           password.
         </p>
-        {message && <p className="text-green-500 text-center">{message}</p>}
-        {error && <p className="text-red-500 text-center">{error}</p>}
         <form className="space-y-4" onSubmit={handleForgotPassword}>
           <div>
             <label
@@ -58,15 +61,23 @@ const ForgotPassword = () => {
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#557C55]"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              required // Added required for validation
             />
           </div>
           <button
             type="submit"
-            className="w-full bg-[#557C55] text-white py-2 rounded-md hover:bg-[#6EA46E]"
+            className={`w-full text-white py-2 rounded-md ${
+              loading
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-[#557C55] hover:bg-[#6EA46E]"
+            }`}
+            disabled={loading} // Disable button during loading
           >
-            Send Reset Link
+            {loading ? "Sending..." : "Send Reset Link"}{" "}
+            {/* Change button text */}
           </button>
         </form>
+        <Toast />
       </div>
     </div>
   );
