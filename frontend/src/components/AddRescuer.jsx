@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { FaSave } from "react-icons/fa";
-import { MdPersonAdd } from "react-icons/md"; // New icon for AddRescuer
+import { MdPersonAdd } from "react-icons/md";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { barangaysData } from "../constants/Barangays";
@@ -184,7 +184,7 @@ const AddRescuer = () => {
                 htmlFor="middleInitial"
                 className="block text-sm font-medium text-[#557C55]"
               >
-                Middle Name:
+                Middle Initial:
               </label>
               <input
                 type="text"
@@ -194,7 +194,7 @@ const AddRescuer = () => {
                 onChange={handleChange}
                 required
                 className="mt-1 block w-full px-2 py-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
-                placeholder="Middle name"
+                placeholder="Middle Initial"
               />
             </div>
             <div>
@@ -372,9 +372,9 @@ const AddRescuer = () => {
                   onClick={togglePasswordVisibility}
                 >
                   {showPassword ? (
-                    <AiFillEyeInvisible className="text-gray-400" />
+                    <AiFillEyeInvisible className="text-[#557C55]" />
                   ) : (
-                    <AiFillEye className="text-gray-400" />
+                    <AiFillEye className="text-[#557C55]" />
                   )}
                 </div>
               </div>
@@ -402,9 +402,9 @@ const AddRescuer = () => {
                   onClick={toggleConfirmPasswordVisibility}
                 >
                   {showConfirmPassword ? (
-                    <AiFillEyeInvisible className="text-gray-400" />
+                    <AiFillEyeInvisible className="text-[#557C55]" />
                   ) : (
-                    <AiFillEye className="text-gray-400" />
+                    <AiFillEye className="text-[#557C55]" />
                   )}
                 </div>
               </div>
@@ -417,7 +417,7 @@ const AddRescuer = () => {
               className={`flex items-center justify-center px-3 py-1 sm:px-4 sm:py-2 text-white bg-[#557C55] rounded-md focus:outline-none focus:ring-2 focus:ring-[#2e5f2e] transition ${
                 loading ? "opacity-50 cursor-not-allowed" : ""
               }`}
-              disabled={loading} // Disable the button when loading
+              disabled={loading}
             >
               {loading ? (
                 <span>Loading...</span>
@@ -431,7 +431,7 @@ const AddRescuer = () => {
           </div>
         </form>
       </div>
-      <Toast /> {/* Include Toast notification component */}
+      <Toast />
     </div>
   );
 };

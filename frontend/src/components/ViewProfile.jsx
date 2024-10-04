@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { FaArrowLeft, FaSave, FaEdit, FaTimes } from "react-icons/fa";
+import { FaArrowLeft, FaSave, FaEdit, FaTimes, FaUser } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { createAuthHeader } from "../services/authService";
@@ -59,7 +59,8 @@ const ViewProfile = (props) => {
           className="text-xl text-[#557C55] cursor-pointer"
           onClick={() => navigate(-1)}
         />
-        <h4 className="text-xl font-semibold ml-4 text-[#557C55]">
+        <FaUser className="text-2xl sm:text-3xl text-[#557C55] mr-2" />
+        <h4 className="text-xl sm:text-2xl font-semibold ml-2 text-[#557C55]">
           View Profile
         </h4>
       </div>
@@ -100,7 +101,7 @@ const ViewProfile = (props) => {
             <dt className="font-semibold text-[#557C55]">Last Name:</dt>
             <dd>{profile.last_name}</dd>
 
-            <dt className="font-semibold text-[#557C55]">Middle Name:</dt>
+            <dt className="font-semibold text-[#557C55]">Middle Initial:</dt>
             <dd>{profile.middle_initial}</dd>
 
             <dt className="font-semibold text-[#557C55]">Municipality:</dt>
@@ -134,15 +135,15 @@ const ViewProfile = (props) => {
       {/* Edit Profile Modal */}
       {isEditing && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="relative bg-white rounded-lg p-8 w-2/3 md:w-2/3 lg:w-1/2 max-h-[500px] overflow-y-auto">
-            {/* Close Icon */}
+          <div className="relative bg-white p-8 w-2/3 md:w-2/3 lg:w-1/2 max-h-[500px] overflow-y-auto overflow-y-scroll scrollbar-none">
             <FaTimes
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 cursor-pointer"
+              className="absolute top-4 right-4 text-[#557C55] hover:text-gray-700 cursor-pointer"
               onClick={() => setIsEditing(false)}
             />
-            <h4 className="text-lg font-bold mb-4 text-[#557C55]">
-              Edit Profile
-            </h4>
+            <div className="flex items-center mb-4">
+              <FaUser className="mr-2 text-[#557C55]" />
+              <h4 className="text-lg font-bold text-[#557C55]">Edit Profile</h4>
+            </div>
             <form className="space-y-4" onSubmit={handleSubmit}>
               <div>
                 <label
