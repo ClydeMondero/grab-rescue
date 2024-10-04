@@ -11,7 +11,7 @@ import "react-toastify/dist/ReactToastify.css";
 const AddRescuer = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [loading, setLoading] = useState(false); // Add loading state
+  const [loading, setLoading] = useState(false);
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -159,7 +159,7 @@ const AddRescuer = () => {
       {/* Add Rescuer Form */}
       <div className="flex-1 bg-white rounded-md p-4 sm:p-6 lg:p-8">
         <form className="space-y-4 sm:space-y-6" onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             {/* Form Fields */}
             <div>
               <label
@@ -175,8 +175,8 @@ const AddRescuer = () => {
                 value={formData.firstName}
                 onChange={handleChange}
                 required
-                className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
-                placeholder="Enter first name"
+                className="mt-1 block w-full px-2 py-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
+                placeholder="First name"
               />
             </div>
             <div>
@@ -193,8 +193,8 @@ const AddRescuer = () => {
                 value={formData.middleInitial}
                 onChange={handleChange}
                 required
-                className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
-                placeholder="Enter middle name"
+                className="mt-1 block w-full px-2 py-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
+                placeholder="Middle name"
               />
             </div>
             <div>
@@ -211,8 +211,8 @@ const AddRescuer = () => {
                 value={formData.lastName}
                 onChange={handleChange}
                 required
-                className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
-                placeholder="Enter last name"
+                className="mt-1 block w-full px-2 py-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
+                placeholder="Last name"
               />
             </div>
             <div>
@@ -229,7 +229,7 @@ const AddRescuer = () => {
                 value={formData.birthday}
                 onChange={handleChange}
                 required
-                className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
+                className="mt-1 block w-full px-2 py-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
               />
             </div>
             <div>
@@ -245,7 +245,7 @@ const AddRescuer = () => {
                 name="age"
                 value={formData.age}
                 readOnly
-                className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
+                className="mt-1 block w-full px-2 py-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
                 placeholder="Age"
               />
             </div>
@@ -262,7 +262,7 @@ const AddRescuer = () => {
                 value={formData.municipality}
                 onChange={handleChange}
                 required
-                className="w-full p-3 border rounded-lg bg-gray-100 border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
+                className="w-full p-2 border rounded-lg bg-gray-100 border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
               >
                 <option value="">Select Municipality</option>
                 {Object.keys(barangaysData).map((municipality) => (
@@ -275,7 +275,7 @@ const AddRescuer = () => {
             <div>
               <label
                 htmlFor="barangay"
-                className="block text-sm font-medium text-[#557C55]"
+                className="block text-sm font-semibold text-[#557C55]"
               >
                 Barangay:
               </label>
@@ -285,15 +285,14 @@ const AddRescuer = () => {
                 value={formData.barangay}
                 onChange={handleChange}
                 required
-                className="w-full p-3 border rounded-lg bg-gray-100 border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
+                className="w-full p-2 border rounded-lg bg-gray-100 border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
               >
                 <option value="">Select Barangay</option>
-                {formData.municipality &&
-                  barangaysData[formData.municipality].map((barangay) => (
-                    <option key={barangay} value={barangay}>
-                      {barangay}
-                    </option>
-                  ))}
+                {barangaysData[formData.municipality]?.map((barangay) => (
+                  <option key={barangay} value={barangay}>
+                    {barangay}
+                  </option>
+                ))}
               </select>
             </div>
             <div>
@@ -411,10 +410,11 @@ const AddRescuer = () => {
               </div>
             </div>
           </div>
+          {/* Submit Button */}
           <div className="flex justify-end">
             <button
               type="submit"
-              className={`flex items-center justify-center px-4 py-2 text-white bg-[#557C55] rounded-md focus:outline-none focus:ring-2 focus:ring-[#2e5f2e] transition ${
+              className={`flex items-center justify-center px-3 py-1 sm:px-4 sm:py-2 text-white bg-[#557C55] rounded-md focus:outline-none focus:ring-2 focus:ring-[#2e5f2e] transition ${
                 loading ? "opacity-50 cursor-not-allowed" : ""
               }`}
               disabled={loading} // Disable the button when loading

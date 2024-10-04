@@ -11,6 +11,7 @@ import Sidebar from "./Sidebar";
 import PrivateRoute from "./PrivateRoute";
 import Toast from "./Toast";
 import CitizenMap from "./CitizenMap";
+import ChangeEmail from "./ChangeEmail";
 import RescuerMap from "./RescuerMap";
 import Markers from "./Markers";
 import Route from "./Route";
@@ -36,4 +37,5 @@ export {
   Settings,
   ViewProfile,
   Sidebar,
+  ChangeEmail,
 };
