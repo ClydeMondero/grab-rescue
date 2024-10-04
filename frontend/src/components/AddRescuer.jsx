@@ -5,10 +5,13 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { barangaysData } from "../constants/Barangays";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
+import { Toast } from "../components";
+import "react-toastify/dist/ReactToastify.css";
 
 const AddRescuer = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false); // Add loading state
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -67,8 +70,26 @@ const AddRescuer = () => {
     }
   };
 
+  const resetForm = () => {
+    setFormData({
+      firstName: "",
+      middleInitial: "",
+      lastName: "",
+      birthday: "",
+      municipality: "",
+      barangay: "",
+      contactNumber: "",
+      email: "",
+      username: "",
+      password: "",
+      confirmPassword: "",
+      age: "",
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true); // Start loading state
 
     // Check if formData contains all required fields
     console.log("Form data before submission:", formData);
@@ -92,26 +113,29 @@ const AddRescuer = () => {
             .replace(/([A-Z])/g, " $1")
             .toLowerCase()} field.`
         );
+        setLoading(false); // Stop loading state on error
         return;
       }
     }
 
     if (formData.password !== formData.confirmPassword) {
       toast.error("Passwords do not match");
+      setLoading(false); // Stop loading state on error
       return;
     }
 
     try {
       const response = await axios.post("/rescuers/create", formData);
-      toast.success("Rescuer added successfully:", response.message);
-      console.log("Rescuer added successfully:", response.data);
-      // Handle success, reset form or redirect as needed
+      toast.success("User created successfully! Verification email sent.");
+      console.log("Rescuer added successfully:", response.message);
+      resetForm(); // Reset the form after successful submission
     } catch (error) {
       console.error("Error adding rescuer:", error);
       toast.error("Error adding rescuer. Please try again.");
+    } finally {
+      setLoading(false); // Stop loading state after completion
     }
   };
-
   return (
     <div className="flex-1 p-2 sm:p-4 lg:p-6 h-full bg-gray-50 flex flex-col">
       {/* Header Section */}
@@ -324,19 +348,18 @@ const AddRescuer = () => {
                   className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
                   placeholder="Enter password"
                 />
-                <div
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                <span
+                  className="absolute inset-y-0 right-0 flex items-center pr-2 cursor-pointer"
                   onClick={togglePasswordVisibility}
                 >
                   {showPassword ? (
-                    <AiFillEyeInvisible size={24} color="#557C55" />
+                    <AiFillEyeInvisible className="h-5 w-5 text-gray-500" />
                   ) : (
-                    <AiFillEye size={24} color="#557C55" />
+                    <AiFillEye className="h-5 w-5 text-gray-500" />
                   )}
-                </div>
+                </span>
               </div>
             </div>
-
             <div>
               <label
                 htmlFor="confirmPassword"
@@ -354,31 +377,39 @@ const AddRescuer = () => {
                   className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
                   placeholder="Confirm password"
                 />
-                <div
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                <span
+                  className="absolute inset-y-0 right-0 flex items-center pr-2 cursor-pointer"
                   onClick={toggleConfirmPasswordVisibility}
                 >
                   {showConfirmPassword ? (
-                    <AiFillEyeInvisible size={24} color="#557C55" />
+                    <AiFillEyeInvisible className="h-5 w-5 text-gray-500" />
                   ) : (
-                    <AiFillEye size={24} color="#557C55" />
+                    <AiFillEye className="h-5 w-5 text-gray-500" />
                   )}
-                </div>
+                </span>
               </div>
             </div>
           </div>
 
           {/* Submit Button */}
-          <div className="flex justify-end mt-6">
-            <button
-              type="submit"
-              className="flex items-center px-4 py-2 bg-[#557C55] text-white rounded-md hover:bg-[#3c5e3c] focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
-            >
-              <FaSave className="mr-2" />
-              Save Rescuer
-            </button>
-          </div>
+          <button
+            type="submit"
+            className={`flex items-center justify-center px-4 py-2 text-sm font-semibold text-white bg-[#557C55] rounded-md hover:bg-green-600 transition ${
+              loading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            disabled={loading} // Disable button when loading
+          >
+            {loading ? (
+              <span>Loading...</span>
+            ) : (
+              <>
+                <FaSave className="mr-2" />
+                Save Rescuer
+              </>
+            )}
+          </button>
         </form>
+        <Toast />
       </div>
     </div>
   );
