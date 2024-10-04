@@ -3,9 +3,20 @@ import logo from "../assets/logo.png";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { CitizenMap as Map } from "../components";
+import {
+  FaChevronDown,
+  FaUserCircle,
+  FaUserPlus,
+  FaAmbulance,
+  FaFileAlt,
+} from "react-icons/fa";
+import { FaLocationPin } from "react-icons/fa6";
+import { BiSolidHide, BiSolidAmbulance } from "react-icons/bi";
+import { MdRoute } from "react-icons/md";
 
 const Home = () => {
   const navigate = useNavigate();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   //go to user page if already logged in
   const verifyToken = async () => {
@@ -22,40 +33,96 @@ const Home = () => {
     verifyToken();
   }, []);
 
+  //TODO: add header and footor for big screens
   return (
     <div className="h-screen flex flex-col">
-      <header className="bg-white shadow w-full flex justify-between">
-        <div className="flex items-center p-4 gap-4">
-          <img src={logo} alt="Grab Rescue" className="h-8 w-auto" />
-          <p className="text-2xl font-bold">Grab Rescue</p>
-        </div>
-        <div className="flex flex-row justify-end p-4 gap-4">
+      <div className="w-full h-[80%] relative">
+        <div className="absolute top-4 right-4 m-2 p-2 z-10 rounded-full bg-white shadow-lg">
           <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-            onClick={() => navigate("/login?role=Rescuer")}
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="text-md cursor-pointer text-gray-700 rounded-full p-2 hover:bg-gra"
           >
-            Login as Rescuer
+            <FaChevronDown />
           </button>
-          <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded "
-            onClick={() => navigate("/login?role=Admin")}
-          >
-            Login as Admin
-          </button>
+          {mobileMenuOpen && (
+            <div className="absolute top-14 right-0 w-56 bg-white rounded-md shadow-lg py-2 flex items-center justify-center">
+              <ul className="space-y-2 flex flex-col items-center w-full">
+                <li className="py-2 border-b w-full justify-center">
+                  <a
+                    href="/login?role=Rescuer"
+                    className="flex items-center justify-center w-full text-lg font-semibold hover:underline"
+                  >
+                    <FaAmbulance className="mr-2" />
+                    Login as Rescuer
+                  </a>
+                </li>
+                <li className="py-2 border-b w-full justify-center">
+                  <a
+                    href="/login?role=Admin"
+                    className="flex items-center justify-center w-full text-lg font-semibold hover:underline"
+                  >
+                    <FaUserCircle className="mr-2" />
+                    Login as Admin
+                  </a>
+                </li>
+                <li className="py-2 border-b w-full">
+                  <a
+                    href="/register"
+                    className="flex items-center justify-center w-full text-lg font-semibold hover:underline"
+                  >
+                    <FaUserPlus className="mr-2" />
+                    Register
+                  </a>
+                </li>
+                <li className="py-2">
+                  <a
+                    href="/about"
+                    className="flex items-center w-full text-lg font-semibold hover:underline"
+                  >
+                    <FaFileAlt className="mr-2" />
+                    About
+                  </a>
+                </li>
+              </ul>
+            </div>
+          )}
         </div>
-      </header>
-      <div className="flex flex-col items-center justify-center h-full">
-        <div className="text-center">
-          <p className="text-2xl font-bold mt-5">
-            Need help? We got you covered!
-          </p>
-        </div>
-        <div className="w-full h-4/6 mt-10 bg-gray-200">
-          <Map />
-        </div>
-        <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-10">
+        {/*TODO: update marker icons and route*/}
+        <Map />
+      </div>
+      {/*TODO: call control functions*/}
+      <div className="h-[20%] bg-slate-200 px-2 pb-2 flex flex-col justify-between gap-2">
+        <button className="flex-1 bg-[#FF5757] hover:bg-red-700 text-white font-bold p-2 rounded">
           Request for Help
         </button>
+        <div className="flex items-center gap-4">
+          <div className="bg-white flex items-center justify-around gap-4 rounded-lg px-2 py-4 font-medium text-sm text-center flex-1">
+            <div className="flex flex-col items-center">
+              <button className="bg-gray-200 hover:bg-gray-300 rounded-full p-3 flex items-center justify-center">
+                <FaLocationPin className="text-2xl" />
+              </button>
+              <p>My Location</p>
+            </div>
+            <div className="flex flex-col items-center">
+              <button className="bg-gray-200 hover:bg-gray-300 rounded-full p-3 flex items-center justify-center">
+                <BiSolidAmbulance className="text-2xl" />
+              </button>
+              <p>Nearest Rescuer</p>
+            </div>
+            <div className="flex flex-col items-center">
+              <button className="bg-gray-200 hover:bg-gray-300 rounded-full p-3 flex items-center justify-center">
+                <MdRoute className="text-2xl" />
+              </button>
+              <p>View Route</p>
+            </div>
+            <div className="flex flex-col items-center">
+              <button className="bg-gray-200 hover:bg-gray-300 rounded-full p-3 flex items-center justify-center">
+                <BiSolidHide className="text-2xl" />
+              </button>
+              <p>Hide Route</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
