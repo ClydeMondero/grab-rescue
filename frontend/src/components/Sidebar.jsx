@@ -102,6 +102,13 @@ const Sidebar = () => {
           >
             Change Password
           </Link>
+          <Link
+            to="/admin/changeEmail"
+            className="block px-4 py-2 hover:bg-gray-200"
+            onClick={closeDropdown}
+          >
+            Change Email
+          </Link>
         </div>
       </div>
 
