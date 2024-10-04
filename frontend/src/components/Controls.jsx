@@ -48,6 +48,7 @@ const Controls = ({ mapRef, nearestRescuer, routeData, setRouteOpacity }) => {
       mapRef.current.fitBounds(bounds, { padding: 50 });
     }
   };
+  //TODO: change controls icons
   return (
     <div className="ctrl-group">
       <button onClick={goToNearestRescuer} className="ctrl-icon">
