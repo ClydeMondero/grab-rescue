@@ -78,16 +78,20 @@ module.exports.UpdateUser = async (req, res) => {
   } = req.body;
 
   // Validation
-  if (
-    !firstName ||
-    !lastName ||
-    !birthday ||
-    !municipality ||
-    !barangay ||
-    !contactNumber ||
-    !newUsername
-  ) {
-    return res.status(200).json({ error: "Please fill in all fields" });
+  const missingFields = [];
+
+  if (!firstName) missingFields.push("First Name");
+  if (!lastName) missingFields.push("Last Name");
+  if (!birthday) missingFields.push("Birthday");
+  if (!municipality) missingFields.push("Municipality");
+  if (!barangay) missingFields.push("Barangay");
+  if (!contactNumber) missingFields.push("Contact Number");
+  if (!newUsername) missingFields.push("Username");
+
+  if (missingFields.length > 0) {
+    return res
+      .status(400)
+      .json({ error: `Missing fields: ${missingFields.join(", ")}` });
   }
 
   const age = Math.floor(
@@ -96,8 +100,8 @@ module.exports.UpdateUser = async (req, res) => {
   const MIN_AGE = 18;
 
   if (age < MIN_AGE) {
-    return res.status(200).json({
-      error: `You must be at least ${MIN_AGE} years old to register.`,
+    return res.status(400).json({
+      error: `You must be at least ${MIN_AGE} years old to update your account. You are currently ${age} years old.`,
     });
   }
 
@@ -109,7 +113,7 @@ module.exports.UpdateUser = async (req, res) => {
     ]);
 
     if (existingUsers.length === 0) {
-      return res.status(200).json({ error: "User does not exist" });
+      return res.status(404).json({ error: "User does not exist." });
     }
 
     const oldUsername = existingUsers[0].username;
@@ -124,7 +128,7 @@ module.exports.UpdateUser = async (req, res) => {
       ]);
 
       if (usernameRows.length > 0) {
-        return res.status(200).json({ error: "Username is already taken" });
+        return res.status(400).json({ error: "Username is already taken." });
       }
     }
 
@@ -147,9 +151,9 @@ module.exports.UpdateUser = async (req, res) => {
     ];
 
     await pool.query(updateQuery, values);
-    return res.status(200).json({ message: "User updated successfully" });
+    return res.status(200).json({ message: "User updated successfully." });
   } catch (err) {
-    return res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: `Server error: ${err.message}` });
   }
 };
 
@@ -276,6 +280,23 @@ module.exports.UpdateUserPassword = async (req, res) => {
     const isMatch = await bcrypt.compare(currentPassword, hashedPassword);
     if (!isMatch) {
       return res.status(400).json({ error: "Current password is incorrect" });
+    }
+
+    // Check if the new password is the same as the old one
+    const isNewPasswordSameAsOld = await bcrypt.compare(
+      newPassword,
+      hashedPassword
+    );
+    if (isNewPasswordSameAsOld) {
+      return res.status(400).json({
+        error: "The new password cannot be the same as your old password",
+      });
+    }
+
+    if (newPassword.length < 8) {
+      return res
+        .status(400)
+        .json({ error: "Password must be at least 8 characters long" });
     }
 
     // Hash the new password
@@ -432,6 +453,22 @@ module.exports.ResetPassword = async (req, res) => {
     }
 
     const user = rows[0];
+
+    // Check if the password is the same as the last one
+    const isPasswordTheSame = bcrypt.compareSync(newPassword, user.password);
+
+    if (isPasswordTheSame) {
+      return res.status(400).json({
+        error: "The new password cannot be the same as your old password",
+      });
+    }
+
+    if (newPassword.length < 8) {
+      return res
+        .status(400)
+        .json({ error: "Password must be at least 8 characters long" });
+    }
+
     const salt = bcrypt.genSaltSync(10);
     const hashedPassword = bcrypt.hashSync(newPassword, salt);
 

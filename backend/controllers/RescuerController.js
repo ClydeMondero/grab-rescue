@@ -83,6 +83,34 @@ module.exports.CreateRescuer = async (req, res) => {
     password,
   } = req.body;
 
+  // List of required fields
+  const requiredFields = {
+    firstName: "First Name",
+    lastName: "Last Name",
+    birthday: "Birthday",
+    municipality: "Municipality",
+    barangay: "Barangay",
+    contactNumber: "Contact Number",
+    email: "Email",
+    username: "Username",
+    password: "Password",
+  };
+
+  // Check for missing fields
+  const missingFields = [];
+
+  for (const [key, field] of Object.entries(requiredFields)) {
+    if (!req.body[key]) {
+      missingFields.push(field);
+    }
+  }
+
+  if (missingFields.length > 0) {
+    return res
+      .status(400)
+      .json({ error: `Missing fields: ${missingFields.join(", ")}` });
+  }
+
   // Calculate the user's age based on the provided birthday
   const age = Math.floor(
     (new Date() - new Date(birthday).getTime()) / 3.15576e10
@@ -91,7 +119,13 @@ module.exports.CreateRescuer = async (req, res) => {
 
   if (age < MIN_AGE) {
     return res.status(400).json({
-      error: `You must be at least ${MIN_AGE} years old to register.`,
+      error: `You must be at least ${MIN_AGE} years old to register. You are currently ${age} years old.`,
+    });
+  }
+
+  if (password.length < 8) {
+    return res.status(400).json({
+      error: "Password must be at least 8 characters long.",
     });
   }
 
@@ -103,7 +137,10 @@ module.exports.CreateRescuer = async (req, res) => {
     if (result.rows.length > 0) {
       const existingUser = result.rows[0];
       if (existingUser.username === username) {
-        return res.status(400).json({ error: "Username is already taken" });
+        return res.status(400).json({ error: "Username is already taken." });
+      }
+      if (existingUser.email === email) {
+        return res.status(400).json({ error: "Email is already taken." });
       }
     } else {
       // Hash the password using bcrypt
@@ -164,16 +201,20 @@ module.exports.CreateRescuer = async (req, res) => {
 
       transporter.sendMail(mailOptions, (err, info) => {
         if (err) {
-          return res.status(500).json({ error: err.message });
+          return res
+            .status(500)
+            .json({ error: `Email could not be sent: ${err.message}` });
         } else {
           return res
             .status(200)
-            .json({ message: "User created. Verification email sent." });
+            .json({
+              message: "User created successfully. Verification email sent.",
+            });
         }
       });
     }
   } catch (err) {
-    return res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: `Server error: ${err.message}` });
   }
 };
 
