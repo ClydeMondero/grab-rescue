@@ -23,7 +23,7 @@ const ForgotPassword = () => {
       // Handle error and show error message
       toast.error(err.response?.data?.error || "Failed to send reset link.");
     } finally {
-      setLoading(false); // End loading state
+      setLoading(false);
     }
   };
 
@@ -61,7 +61,7 @@ const ForgotPassword = () => {
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#557C55]"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required // Added required for validation
+              required
             />
           </div>
           <button
@@ -71,10 +71,9 @@ const ForgotPassword = () => {
                 ? "bg-gray-400 cursor-not-allowed"
                 : "bg-[#557C55] hover:bg-[#6EA46E]"
             }`}
-            disabled={loading} // Disable button during loading
+            disabled={loading}
           >
             {loading ? "Sending..." : "Send Reset Link"}{" "}
-            {/* Change button text */}
           </button>
         </form>
         <Toast />

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { FaArrowLeft, FaEnvelope } from "react-icons/fa";
+import { MdMarkEmailRead } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -11,6 +12,7 @@ const ChangeEmail = (props) => {
   const userId = user.id;
   const [newEmail, setNewEmail] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleEmailChange = (e) => {
     setNewEmail(e.target.value);
@@ -18,6 +20,8 @@ const ChangeEmail = (props) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    setIsLoading(true);
 
     const data = {
       email: newEmail,
@@ -52,6 +56,8 @@ const ChangeEmail = (props) => {
         console.error("Error:", error.message);
         toast.error("Something went wrong"); // Fallback error
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -62,7 +68,8 @@ const ChangeEmail = (props) => {
           className="text-lg sm:text-xl text-[#557C55] cursor-pointer"
           onClick={() => navigate(-1)}
         />
-        <h4 className="text-md sm:text-lg font-semibold ml-2 text-[#557C55]">
+        <MdMarkEmailRead className="text-2xl sm:text-3xl text-[#557C55] mr-2" />
+        <h4 className="text-xl sm:text-2xl font-semibold ml-2 text-[#557C55]">
           Change Email
         </h4>
       </div>
@@ -122,8 +129,13 @@ const ChangeEmail = (props) => {
           <button
             type="submit"
             className="bg-[#557C55] text-white px-2 py-1 rounded text-xs sm:text-sm hover:bg-[#6EA46E] transition flex items-center justify-center"
+            disabled={isLoading}
           >
-            Change Email
+            {isLoading ? (
+              <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-[#FFFFFF] mr-2"></div>
+            ) : (
+              "Change Email"
+            )}
           </button>
         </form>
       </div>

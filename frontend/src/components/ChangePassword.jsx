@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FaArrowLeft, FaSync, FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaArrowLeft, FaSync, FaEye, FaEyeSlash, FaKey } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { createAuthHeader } from "../services/authService";
 import axios from "axios";
@@ -89,7 +89,8 @@ const ChangePassword = (props) => {
           className="text-lg sm:text-xl text-[#557C55] cursor-pointer"
           onClick={() => navigate(-1)}
         />
-        <h4 className="text-md sm:text-lg font-semibold ml-2 text-[#557C55]">
+        <FaKey className="text-2xl sm:text-3xl text-[#557C55] mr-2" />
+        <h4 className="text-xl sm:text-2xl font-semibold ml-2 text-[#557C55]">
           Change Password
         </h4>
       </div>
