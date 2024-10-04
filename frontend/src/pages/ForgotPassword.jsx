@@ -2,8 +2,8 @@ import { useState } from "react";
 import axios from "axios";
 import { useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css"; // Ensure styles are imported
-import { data } from "autoprefixer";
+import { Toast } from "../components";
+import "react-toastify/dist/ReactToastify.css";
 
 const ForgotPassword = () => {
   const [searchParams] = useSearchParams();
@@ -77,6 +77,7 @@ const ForgotPassword = () => {
             {/* Change button text */}
           </button>
         </form>
+        <Toast />
       </div>
     </div>
   );
