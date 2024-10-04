@@ -19,12 +19,6 @@ const ChangeEmail = (props) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Check if the current email matches the user's email
-    if (newEmail === user.email) {
-      toast.error("New email is the same as the current email!");
-      return;
-    }
-
     const data = {
       email: newEmail,
     };
@@ -41,6 +35,7 @@ const ChangeEmail = (props) => {
       // Clear the email fields
       setNewEmail("");
       setError(""); // Clear any previous errors
+      navigate("/admin/viewProfile");
     } catch (error) {
       if (error.response) {
         console.error("Error response:", error.response.data);
