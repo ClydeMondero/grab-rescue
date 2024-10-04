@@ -7,7 +7,7 @@ import axios from "axios";
 const ChangePassword = (props) => {
   const navigate = useNavigate();
   const { user } = props;
-  const userId = user.id; // Get user ID from props
+  const userId = user.id;
   const [passwords, setPasswords] = useState({
     currentPassword: "",
     newPassword: "",
@@ -30,40 +30,24 @@ const ChangePassword = (props) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Basic validation
-    if (passwords.newPassword !== passwords.confirmPassword) {
-      alert("New password and confirmation do not match.");
-      return;
-    }
+    const data = {
+      currentPassword: passwords.currentPassword,
+      newPassword: passwords.newPassword,
+      confirmPassword: passwords.confirmPassword,
+    };
 
-    if (passwords.newPassword.length < 6) {
-      alert("New password must be at least 6 characters long.");
-      return;
-    }
-
-    const authHeader = createAuthHeader();
+    console.log("User Id:", userId);
+    console.log("Data being sent:", data);
 
     try {
-      const response = await axios.put(
-        `/users/updatePassword/${userId}`,
-        passwords,
-        {
-          headers: {
-            ...authHeader,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (response.data.success) {
-        alert("Password updated successfully!");
-        navigate(-1);
-      } else {
-        alert(response.data.error);
-      }
+      const response = await axios.put(`/users/updatePassword/${userId}`, data);
+      console.log("Response:", response);
     } catch (error) {
-      console.error("Error updating password:", error);
-      alert("Failed to update password");
+      if (error.response) {
+        console.error("Error response:", error.response.data);
+      } else {
+        console.error("Error:", error.message);
+      }
     }
   };
 
