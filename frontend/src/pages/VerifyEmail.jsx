@@ -1,37 +1,39 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const VerifyEmail = () => {
   const { token } = useParams();
-  const navigate = useNavigate();
   const [exit, setExit] = useState(false);
+  const nav = useNavigate();
 
   useEffect(() => {
     const verifyEmail = async () => {
+      console.log("Token:", token); // Log the token value
       try {
-        await axios.post("/users/verify", { token }, { withCredentials: true });
+        await axios.put(`/users/verify/${token}`);
         toast.success("Your Email has been successfully Verified!", {
           position: "top-center",
-          autoClose: 3000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
           progress: undefined,
+          animation: false,
+          style: {
+            animation: "slideInFromTop 1s ease-in-out",
+            backgroundColor: "inherit",
+          },
         });
         setTimeout(() => {
-          setExit(true);
-          setTimeout(() => navigate("/changeEmail"), 1000);
-        }, 3000);
+          nav("/admin/changeEmail");
+        }, 2000);
       } catch (error) {
         console.error(error);
         toast.error("Failed to verify email", {
           position: "top-center",
-          autoClose: 3000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,
@@ -40,13 +42,13 @@ const VerifyEmail = () => {
         });
         setTimeout(() => {
           setExit(true);
-          setTimeout(() => navigate("/changeEmail"), 1000);
-        }, 3000);
+        }, 2000);
       }
     };
-
-    verifyEmail();
-  }, []);
+    setTimeout(() => {
+      verifyEmail();
+    }, 1000);
+  }, [token]);
 
   return (
     <>
