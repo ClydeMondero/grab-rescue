@@ -3,6 +3,7 @@ import { FaArrowLeft, FaSync, FaEye, FaEyeSlash } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { createAuthHeader } from "../services/authService";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const ChangePassword = (props) => {
   const navigate = useNavigate();
@@ -40,13 +41,36 @@ const ChangePassword = (props) => {
     console.log("Data being sent:", data);
 
     try {
-      const response = await axios.put(`/users/updatePassword/${userId}`, data);
+      // Sending PUT request to update password
+      const response = await axios.put(
+        `/users/updatePassword/${userId}`,
+        data,
+        createAuthHeader()
+      );
       console.log("Response:", response);
+      toast.success(response.data.message); // Success toast
+
+      // Clear the password fields
+      setPasswords({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
     } catch (error) {
       if (error.response) {
         console.error("Error response:", error.response.data);
+
+        // Handle specific error codes
+        if (error.response.status === 400) {
+          toast.error(error.response.data.error); // Bad Request error (400)
+        } else if (error.response.status === 404) {
+          toast.error("Not Found: User does not exist"); // Not Found error (404)
+        } else {
+          toast.error(error.response.data.message); // Other errors
+        }
       } else {
         console.error("Error:", error.message);
+        toast.error("Something went wrong"); // Fallback error
       }
     }
   };
