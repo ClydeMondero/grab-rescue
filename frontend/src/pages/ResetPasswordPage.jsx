@@ -1,34 +1,47 @@
-// ResetPasswordPage.jsx
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { toast } from "react-toastify";
+import { Toast } from "../components";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import "react-toastify/dist/ReactToastify.css";
 
 const ResetPassword = () => {
   const { token } = useParams();
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState(null);
-  const [message, setMessage] = useState(null);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleResetPassword = async (event) => {
     event.preventDefault();
-    if (newPassword !== confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
 
     try {
       const response = await axios.post(`/users/reset-password/${token}`, {
         newPassword,
-        confirmPassword, // Include confirmPassword
+        confirmPassword,
       });
-      setMessage(response.data.message);
-      setError(null);
+
+      // Show success toast for 200 response
+      toast.success(response.data.message);
       setTimeout(() => navigate("/"), 2000);
     } catch (err) {
-      setError(err.response?.data?.error || "Failed to reset password.");
-      setMessage(null);
+      const errorMessage =
+        err.response?.data?.error || "Failed to reset password.";
+
+      // Show error toast for 400 and 404 status
+      if (err.response) {
+        if (err.response.status === 400) {
+          toast.error(errorMessage); // Display the error message for 400 status
+        } else if (err.response.status === 404) {
+          toast.error(errorMessage); // Display the error message for 404 status
+        } else {
+          toast.error("Something went wrong. Please try again."); // General error toast
+        }
+      } else {
+        toast.error("Network error. Please check your connection."); // Handle other cases
+      }
     }
   };
 
@@ -41,8 +54,6 @@ const ResetPassword = () => {
         <p className="text-center text-sm text-gray-600 mb-6">
           Please enter a new password.
         </p>
-        {message && <p className="text-green-500 text-center">{message}</p>}
-        {error && <p className="text-red-500 text-center">{error}</p>}
         <form className="space-y-4" onSubmit={handleResetPassword}>
           <div>
             <label
@@ -51,16 +62,26 @@ const ResetPassword = () => {
             >
               New Password
             </label>
-            <input
-              type="password"
-              id="newPassword"
-              name="newPassword"
-              placeholder="Enter new password"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#557C55]"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              required
-            />
+            <div className="relative">
+              <input
+                type={showNewPassword ? "text" : "password"}
+                id="newPassword"
+                name="newPassword"
+                placeholder="Enter new password"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#557C55]"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                required
+              />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-0 flex items-center pr-3 text-[#557C55]"
+                onClick={() => setShowNewPassword(!showNewPassword)}
+              >
+                {showNewPassword ? <FaEyeSlash /> : <FaEye />}{" "}
+                {/* Toggle icon */}
+              </button>
+            </div>
           </div>
           <div>
             <label
@@ -69,16 +90,26 @@ const ResetPassword = () => {
             >
               Confirm Password
             </label>
-            <input
-              type="password"
-              id="confirmPassword"
-              name="confirmPassword"
-              placeholder="Confirm new password"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#557C55]"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-            />
+            <div className="relative">
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                id="confirmPassword"
+                name="confirmPassword"
+                placeholder="Confirm new password"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#557C55]"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+              />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-0 flex items-center pr-3 text-[#557C55]"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              >
+                {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}{" "}
+                {/* Toggle icon */}
+              </button>
+            </div>
           </div>
           <button
             type="submit"
@@ -87,6 +118,7 @@ const ResetPassword = () => {
             Reset Password
           </button>
         </form>
+        <Toast />
       </div>
     </div>
   );

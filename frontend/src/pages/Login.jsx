@@ -1,4 +1,4 @@
-import logo from "../assets/logo.png";
+import logo from "../../public/logo.png";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";

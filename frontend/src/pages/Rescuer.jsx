@@ -10,6 +10,7 @@ import {
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { handleLogout } from "../services/authService";
+import { RescuerMap as Map } from "../components";
 
 const Rescuer = () => {
   const [activeTab, setActiveTab] = useState("requests");
@@ -62,7 +63,7 @@ const Rescuer = () => {
         </div>
 
         {/* Profile Section */}
-        <div className="relative">
+        <div className="relative z-10">
           <button
             onClick={() => setShowDropdown(!showDropdown)}
             className="flex items-center text-white"
@@ -72,7 +73,7 @@ const Rescuer = () => {
             <FaChevronDown className="text-xl ml-2" />
           </button>
           {showDropdown && (
-            <div className="absolute right-0 mt-2 bg-white text-[#557C55] rounded-lg shadow-lg w-40">
+            <div className="absolute right-0 mt-2 bg-white text-[#557C55] rounded-lg shadow-lg w-40 cursor-pointer">
               <a href="#" className="block px-4 py-2 hover:bg-gray-200">
                 My Profile
               </a>
@@ -91,7 +92,9 @@ const Rescuer = () => {
       </header>
 
       {/* Map Section */}
-      <div className="w-full h-96 bg-gray-300 flex items-center justify-center"></div>
+      <div className="w-full h-96 bg-gray-300 flex items-center justify-center">
+        <Map />
+      </div>
 
       {/* Dashboard Content */}
       <div className="flex-grow p-4 bg-white">{renderContent()}</div>
