@@ -130,7 +130,6 @@ module.exports.RequestPasswordReset = async (req, res) => {
     const expires = new Date(Date.now() + 3600000); // 1 hour from now
     await pool.query(updateQuery, [resetPasswordToken, expires, email]);
 
-    // Use frontend base URL for the reset link
     const resetLink = `${process.env.SITE_URL}/reset-password/${resetPasswordToken}`;
 
     // Email options
