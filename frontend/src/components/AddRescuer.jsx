@@ -106,6 +106,7 @@ const AddRescuer = () => {
       "password",
       "confirmPassword",
     ];
+
     for (const field of requiredFields) {
       if (!formData[field]) {
         toast.error(
@@ -126,16 +127,26 @@ const AddRescuer = () => {
 
     try {
       const response = await axios.post("/rescuers/create", formData);
-      toast.success("User created successfully! Verification email sent.");
-      console.log("Rescuer added successfully:", response.message);
+      toast.success(response.data.message); // Display success message
       resetForm(); // Reset the form after successful submission
     } catch (error) {
-      console.error("Error adding rescuer:", error);
-      toast.error("Error adding rescuer. Please try again.");
+      if (error.response) {
+        // Server responded with a status other than 2xx
+        if (error.response.status === 400) {
+          toast.error(error.response.data.error); // Show the error message from the server
+        } else if (error.response.status === 404) {
+          toast.error("Resource not found. Please check the entered data."); // Custom message for 404
+        } else {
+          toast.error("An unexpected error occurred. Please try again."); // General error message
+        }
+      } else {
+        toast.error("Network error. Please check your connection."); // Handle network errors
+      }
     } finally {
-      setLoading(false); // Stop loading state after completion
+      setLoading(false); // Ensure loading state is reset in all cases
     }
   };
+
   return (
     <div className="flex-1 p-2 sm:p-4 lg:p-6 h-full bg-gray-50 flex flex-col">
       {/* Header Section */}
@@ -145,7 +156,6 @@ const AddRescuer = () => {
           Add Rescuer
         </h4>
       </div>
-
       {/* Add Rescuer Form */}
       <div className="flex-1 bg-white rounded-md p-4 sm:p-6 lg:p-8">
         <form className="space-y-4 sm:space-y-6" onSubmit={handleSubmit}>
@@ -164,6 +174,7 @@ const AddRescuer = () => {
                 name="firstName"
                 value={formData.firstName}
                 onChange={handleChange}
+                required
                 className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
                 placeholder="Enter first name"
               />
@@ -181,6 +192,7 @@ const AddRescuer = () => {
                 name="middleInitial"
                 value={formData.middleInitial}
                 onChange={handleChange}
+                required
                 className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
                 placeholder="Enter middle name"
               />
@@ -198,6 +210,7 @@ const AddRescuer = () => {
                 name="lastName"
                 value={formData.lastName}
                 onChange={handleChange}
+                required
                 className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
                 placeholder="Enter last name"
               />
@@ -215,6 +228,7 @@ const AddRescuer = () => {
                 name="birthday"
                 value={formData.birthday}
                 onChange={handleChange}
+                required
                 className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
               />
             </div>
@@ -247,6 +261,7 @@ const AddRescuer = () => {
                 name="municipality"
                 value={formData.municipality}
                 onChange={handleChange}
+                required
                 className="w-full p-3 border rounded-lg bg-gray-100 border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
               >
                 <option value="">Select Municipality</option>
@@ -260,7 +275,7 @@ const AddRescuer = () => {
             <div>
               <label
                 htmlFor="barangay"
-                className="block text-sm font-semibold text-[#557C55]"
+                className="block text-sm font-medium text-[#557C55]"
               >
                 Barangay:
               </label>
@@ -269,6 +284,7 @@ const AddRescuer = () => {
                 name="barangay"
                 value={formData.barangay}
                 onChange={handleChange}
+                required
                 className="w-full p-3 border rounded-lg bg-gray-100 border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
               >
                 <option value="">Select Barangay</option>
@@ -293,6 +309,7 @@ const AddRescuer = () => {
                 name="contactNumber"
                 value={formData.contactNumber}
                 onChange={handleChange}
+                required
                 className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
                 placeholder="Enter contact number"
               />
@@ -310,6 +327,7 @@ const AddRescuer = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
+                required
                 className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
                 placeholder="Enter email"
               />
@@ -327,6 +345,7 @@ const AddRescuer = () => {
                 name="username"
                 value={formData.username}
                 onChange={handleChange}
+                required
                 className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
                 placeholder="Enter username"
               />
@@ -345,19 +364,20 @@ const AddRescuer = () => {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
+                  required
                   className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
                   placeholder="Enter password"
                 />
-                <span
-                  className="absolute inset-y-0 right-0 flex items-center pr-2 cursor-pointer"
+                <div
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
                   onClick={togglePasswordVisibility}
                 >
                   {showPassword ? (
-                    <AiFillEyeInvisible className="h-5 w-5 text-gray-500" />
+                    <AiFillEyeInvisible className="text-gray-400" />
                   ) : (
-                    <AiFillEye className="h-5 w-5 text-gray-500" />
+                    <AiFillEye className="text-gray-400" />
                   )}
-                </span>
+                </div>
               </div>
             </div>
             <div>
@@ -374,43 +394,44 @@ const AddRescuer = () => {
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleChange}
+                  required
                   className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
                   placeholder="Confirm password"
                 />
-                <span
-                  className="absolute inset-y-0 right-0 flex items-center pr-2 cursor-pointer"
+                <div
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
                   onClick={toggleConfirmPasswordVisibility}
                 >
                   {showConfirmPassword ? (
-                    <AiFillEyeInvisible className="h-5 w-5 text-gray-500" />
+                    <AiFillEyeInvisible className="text-gray-400" />
                   ) : (
-                    <AiFillEye className="h-5 w-5 text-gray-500" />
+                    <AiFillEye className="text-gray-400" />
                   )}
-                </span>
+                </div>
               </div>
             </div>
           </div>
-
-          {/* Submit Button */}
-          <button
-            type="submit"
-            className={`flex items-center justify-center px-4 py-2 text-sm font-semibold text-white bg-[#557C55] rounded-md hover:bg-green-600 transition ${
-              loading ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-            disabled={loading} // Disable button when loading
-          >
-            {loading ? (
-              <span>Loading...</span>
-            ) : (
-              <>
-                <FaSave className="mr-2" />
-                Save Rescuer
-              </>
-            )}
-          </button>
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              className={`flex items-center justify-center px-4 py-2 text-white bg-[#557C55] rounded-md focus:outline-none focus:ring-2 focus:ring-[#2e5f2e] transition ${
+                loading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+              disabled={loading} // Disable the button when loading
+            >
+              {loading ? (
+                <span>Loading...</span>
+              ) : (
+                <>
+                  <FaSave className="mr-2" />
+                  Save Rescuer
+                </>
+              )}
+            </button>
+          </div>
         </form>
-        <Toast />
       </div>
+      <Toast /> {/* Include Toast notification component */}
     </div>
   );
 };
