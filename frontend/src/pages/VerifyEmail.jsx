@@ -31,9 +31,10 @@ const VerifyEmail = () => {
           });
 
           setVerified(true);
+          // Navigate immediately after the toast appears
           setTimeout(() => {
-            nav("/admin/changeEmail");
-          }, 2000);
+            nav("/admin/viewProfile");
+          }, 2000); // Adjust timeout to match the length of the toast animation
         }
       } catch (error) {
         console.error("Error during verification:", error);
@@ -51,11 +52,7 @@ const VerifyEmail = () => {
       }
     };
 
-    const timeoutId = setTimeout(() => {
-      verifyEmail();
-    }, 3000);
-
-    return () => clearTimeout(timeoutId);
+    verifyEmail();
   }, [token, verified, nav]);
 
   return (
