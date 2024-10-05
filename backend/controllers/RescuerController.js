@@ -3,6 +3,7 @@ const env = require("../config/env");
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
+const zxcvbn = require("zxcvbn");
 
 // Get Rescuers with Filtering and Name Search
 module.exports.GetRescuers = async (req, res) => {
@@ -81,6 +82,7 @@ module.exports.CreateRescuer = async (req, res) => {
     email,
     username,
     password,
+    confirmPassword, // Added confirmPassword to the request body
   } = req.body;
 
   // List of required fields
@@ -94,6 +96,7 @@ module.exports.CreateRescuer = async (req, res) => {
     email: "Email",
     username: "Username",
     password: "Password",
+    confirmPassword: "Confirm Password", // Include confirmPassword as a required field
   };
 
   // Check for missing fields
@@ -125,6 +128,15 @@ module.exports.CreateRescuer = async (req, res) => {
     });
   }
 
+  // Check if passwords match
+  if (password !== confirmPassword) {
+    return res.status(200).json({
+      success: false,
+      message: "Passwords do not match.",
+    });
+  }
+
+  // Check password length
   if (password.length < 8) {
     return res.status(200).json({
       success: false,
@@ -132,14 +144,26 @@ module.exports.CreateRescuer = async (req, res) => {
     });
   }
 
-  // Check for a mix of characters in the password
-  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+  // Check password strength using zxcvbn
+  const passwordStrength = zxcvbn(password);
+  if (passwordStrength.score < 3) {
+    return res.status(200).json({
+      success: false,
+      message: "Password is too weak.",
+    });
+  }
 
-  if (!passwordRegex.test(password)) {
+  // Check for required character types (uppercase, lowercase, number, special character)
+  const hasUpperCase = /[A-Z]/.test(password);
+  const hasLowerCase = /[a-z]/.test(password);
+  const hasNumber = /\d/.test(password);
+  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+  if (!hasUpperCase || !hasLowerCase || !hasNumber || !hasSpecialChar) {
     return res.status(200).json({
       success: false,
       message:
-        "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.",
+        "Password must include uppercase, lowercase, number, and special character.",
     });
   }
 

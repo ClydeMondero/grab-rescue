@@ -3,6 +3,7 @@ const env = require("../config/env");
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
+const zxcvbn = require("zxcvbn");
 
 // Get Users with Filtering and Name Search (Rescuers and Admins)
 module.exports.GetUsers = async (req, res) => {
@@ -289,14 +290,14 @@ module.exports.UpdateUserPassword = async (req, res) => {
   if (!currentPassword || !newPassword || !confirmPassword) {
     return res.status(200).json({
       success: false,
-      message: "Please provide current, new, and confirm passwords.",
+      message: "Please provide all passwords.",
     });
   }
 
   if (newPassword !== confirmPassword) {
     return res.status(200).json({
       success: false,
-      message: "New password and confirm password do not match.",
+      message: "Passwords do not match.",
     });
   }
 
@@ -304,17 +305,30 @@ module.exports.UpdateUserPassword = async (req, res) => {
   if (newPassword.length < 8) {
     return res.status(200).json({
       success: false,
-      message: "Password must be at least 8 characters long.",
+      message: "Password must be at least 8 characters.",
     });
   }
 
-  // Check password strength (uppercase, lowercase, number, special character)
-  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
-  if (!passwordRegex.test(newPassword)) {
+  // Check password strength using zxcvbn
+  const passwordStrength = zxcvbn(newPassword);
+  if (passwordStrength.score < 3) {
+    return res.status(200).json({
+      success: false,
+      message: "Password is too weak.",
+    });
+  }
+
+  // Check for required character types (uppercase, lowercase, number, special character)
+  const hasUpperCase = /[A-Z]/.test(newPassword);
+  const hasLowerCase = /[a-z]/.test(newPassword);
+  const hasNumber = /\d/.test(newPassword);
+  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(newPassword);
+
+  if (!hasUpperCase || !hasLowerCase || !hasNumber || !hasSpecialChar) {
     return res.status(200).json({
       success: false,
       message:
-        "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.",
+        "Password must include at least one uppercase, lowercase, number, and special character.",
     });
   }
 
@@ -349,7 +363,7 @@ module.exports.UpdateUserPassword = async (req, res) => {
     if (isNewPasswordSameAsOld) {
       return res.status(200).json({
         success: false,
-        message: "The new password cannot be the same as your old password.",
+        message: "New password cannot be the same as old password.",
       });
     }
 
@@ -526,7 +540,7 @@ module.exports.RequestPasswordReset = async (req, res) => {
   }
 };
 
-// Reset Password// Reset Password
+// Reset Password
 module.exports.ResetPassword = async (req, res) => {
   const { token } = req.params;
   const { newPassword, confirmPassword } = req.body;
@@ -535,7 +549,7 @@ module.exports.ResetPassword = async (req, res) => {
   if (newPassword !== confirmPassword) {
     return res.status(200).json({
       success: false,
-      message: "New password and confirm password do not match.",
+      message: "Passwords do not match.",
     });
   }
 
@@ -543,17 +557,30 @@ module.exports.ResetPassword = async (req, res) => {
   if (newPassword.length < 8) {
     return res.status(200).json({
       success: false,
-      message: "Password must be at least 8 characters long.",
+      message: "Password must be at least 8 characters.",
     });
   }
 
-  // Check password strength (uppercase, lowercase, number, special character)
-  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
-  if (!passwordRegex.test(newPassword)) {
+  // Check password strength using zxcvbn
+  const passwordStrength = zxcvbn(newPassword);
+  if (passwordStrength.score < 3) {
+    return res.status(200).json({
+      success: false,
+      message: "Password is too weak.",
+    });
+  }
+
+  // Check for required character types (uppercase, lowercase, number, special character)
+  const hasUpperCase = /[A-Z]/.test(newPassword);
+  const hasLowerCase = /[a-z]/.test(newPassword);
+  const hasNumber = /\d/.test(newPassword);
+  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(newPassword);
+
+  if (!hasUpperCase || !hasLowerCase || !hasNumber || !hasSpecialChar) {
     return res.status(200).json({
       success: false,
       message:
-        "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.",
+        "Password must include uppercase, lowercase, number, and special character.",
     });
   }
 
@@ -576,7 +603,7 @@ module.exports.ResetPassword = async (req, res) => {
     if (isPasswordTheSame) {
       return res.status(200).json({
         success: false,
-        message: "The new password cannot be the same as your old password.",
+        message: "New password cannot be the same as old password.",
       });
     }
 
