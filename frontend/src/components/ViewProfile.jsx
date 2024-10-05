@@ -3,15 +3,23 @@ import { FaArrowLeft, FaSave, FaEdit, FaTimes, FaUser } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { createAuthHeader } from "../services/authService";
-import { barangaysData } from "../constants/Barangays";
 import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { Toast } from "../components";
 
 const ViewProfile = (props) => {
   const navigate = useNavigate();
-  const { user } = props;
+  const { user } = props; // Assume user is passed as a prop
   const [profile, setProfile] = useState(user);
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+
+  // Redirect if the user is an Admin
+  useEffect(() => {
+    if (user.role === "Admin") {
+      navigate("/admin");
+    }
+  }, [user.role, navigate]);
 
   useEffect(() => {
     console.log(profile);
@@ -68,14 +76,14 @@ const ViewProfile = (props) => {
       {/* Main Profile Container */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Profile Picture Section */}
-        <div className="bg-white shadow-md rounded-lg p-6">
+        <div className="bg-white rounded-lg p-6">
           <h2 className="text-lg font-bold text-[#557C55] mb-4">
             Profile Picture
           </h2>
           <div className="flex justify-center">
             <div className="relative">
               <img
-                src="/path/to/profile-picture.jpg"
+                src="/path/to/profile-picture.jpg" // Change this to your profile picture source
                 alt="Profile"
                 className="rounded-full w-32 h-32 object-cover"
               />
@@ -86,8 +94,9 @@ const ViewProfile = (props) => {
             </div>
           </div>
         </div>
+
         {/* Profile Information Card */}
-        <div className="bg-white shadow-md rounded-lg p-6">
+        <div className="bg-white rounded-lg p-6">
           <h2 className="text-lg font-bold text-[#557C55] mb-4">
             Profile Information
           </h2>
@@ -101,14 +110,15 @@ const ViewProfile = (props) => {
             <dt className="font-semibold text-[#557C55]">Last Name:</dt>
             <dd>{profile.last_name}</dd>
 
-            <dt className="font-semibold text-[#557C55]">Middle Initial:</dt>
-            <dd>{profile.middle_initial}</dd>
+            {user.role === "Admin" && (
+              <>
+                <dt className="font-semibold text-[#557C55]">Municipality:</dt>
+                <dd>{profile.municipality}</dd>
 
-            <dt className="font-semibold text-[#557C55]">Municipality:</dt>
-            <dd>{profile.municipality}</dd>
-
-            <dt className="font-semibold text-[#557C55]">Barangay:</dt>
-            <dd>{profile.barangay}</dd>
+                <dt className="font-semibold text-[#557C55]">Barangay:</dt>
+                <dd>{profile.barangay}</dd>
+              </>
+            )}
 
             <dt className="font-semibold text-[#557C55]">Contact Number:</dt>
             <dd>{profile.contact_number}</dd>
@@ -120,6 +130,7 @@ const ViewProfile = (props) => {
                 : ""}
             </dd>
           </dl>
+
           {/* Edit Profile Button */}
           <div className="mt-6">
             <button
@@ -135,7 +146,7 @@ const ViewProfile = (props) => {
       {/* Edit Profile Modal */}
       {isEditing && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="relative bg-white p-8 w-2/3 md:w-2/3 lg:w-1/2 max-h-[500px] overflow-y-auto overflow-y-scroll scrollbar-none">
+          <div className="relative bg-white p-8 w-2/3 md:w-2/3 lg:w-1/2 max-h-[500px] overflow-y-auto">
             <FaTimes
               className="absolute top-4 right-4 text-[#557C55] hover:text-gray-700 cursor-pointer"
               onClick={() => setIsEditing(false)}
@@ -161,6 +172,8 @@ const ViewProfile = (props) => {
                   className="w-full p-3 border rounded-lg bg-gray-100 border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
                 />
               </div>
+
+              {/* Common fields for both roles */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label
@@ -196,70 +209,43 @@ const ViewProfile = (props) => {
                 </div>
               </div>
 
-              <div>
-                <label
-                  htmlFor="middle_initial"
-                  className="block text-sm font-semibold text-[#557C55]"
-                >
-                  Middle Name:
-                </label>
-                <input
-                  type="text"
-                  id="middle_initial"
-                  name="middle_initial"
-                  value={profile.middle_initial}
-                  onChange={handleProfileChange}
-                  className="w-full p-3 border rounded-lg bg-gray-100 border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label
-                    htmlFor="municipality"
-                    className="block text-sm font-semibold text-[#557C55]"
-                  >
-                    Municipality:
-                  </label>
-                  <select
-                    id="municipality"
-                    name="municipality"
-                    value={profile.municipality}
-                    onChange={handleProfileChange}
-                    className="w-full p-3 border rounded-lg bg-gray-100 border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
-                  >
-                    <option value="">Select Municipality</option>
-                    {Object.keys(barangaysData).map((municipality) => (
-                      <option key={municipality} value={municipality}>
-                        {municipality}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label
-                    htmlFor="barangay"
-                    className="block text-sm font-semibold text-[#557C55]"
-                  >
-                    Barangay:
-                  </label>
-                  <select
-                    id="barangay"
-                    name="barangay"
-                    value={profile.barangay}
-                    onChange={handleProfileChange}
-                    className="w-full p-3 border rounded-lg bg-gray-100 border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
-                  >
-                    <option value="">Select Barangay</option>
-                    {profile.municipality &&
-                      barangaysData[profile.municipality].map((barangay) => (
-                        <option key={barangay} value={barangay}>
-                          {barangay}
-                        </option>
-                      ))}
-                  </select>
-                </div>
-              </div>
+              {/* Only Admins should see these fields */}
+              {user.role === "Admin" && (
+                <>
+                  <div>
+                    <label
+                      htmlFor="municipality"
+                      className="block text-sm font-semibold text-[#557C55]"
+                    >
+                      Municipality:
+                    </label>
+                    <input
+                      type="text"
+                      id="municipality"
+                      name="municipality"
+                      value={profile.municipality}
+                      onChange={handleProfileChange}
+                      className="w-full p-3 border rounded-lg bg-gray-100 border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="barangay"
+                      className="block text-sm font-semibold text-[#557C55]"
+                    >
+                      Barangay:
+                    </label>
+                    <input
+                      type="text"
+                      id="barangay"
+                      name="barangay"
+                      value={profile.barangay}
+                      onChange={handleProfileChange}
+                      className="w-full p-3 border rounded-lg bg-gray-100 border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
+                    />
+                  </div>
+                </>
+              )}
 
               <div>
                 <label
@@ -295,14 +281,17 @@ const ViewProfile = (props) => {
                 />
               </div>
 
-              {/* Save Button */}
-              <button
-                type="submit"
-                className="w-full bg-[#557C55] text-white p-3 rounded-lg font-semibold hover:bg-[#6EA46E] transition"
-              >
-                <FaSave className="inline mr-2" /> Save Profile
-              </button>
+              {/* Submit button */}
+              <div className="flex justify-end">
+                <button
+                  type="submit"
+                  className="bg-[#557C55] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-[#6EA46E] transition flex items-center"
+                >
+                  <FaSave className="mr-2" /> Save Changes
+                </button>
+              </div>
             </form>
+            <Toast />
           </div>
         </div>
       )}
