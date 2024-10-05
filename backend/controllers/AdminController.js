@@ -106,9 +106,10 @@ module.exports.CreateAdmin = async (req, res) => {
   }
 
   if (missingFields.length > 0) {
-    return res
-      .status(400)
-      .json({ error: `Missing fields: ${missingFields.join(", ")}` });
+    return res.status(200).json({
+      success: false,
+      message: `Missing fields: ${missingFields.join(", ")}`,
+    });
   }
 
   // Calculate the user's age based on the provided birthday
@@ -118,14 +119,36 @@ module.exports.CreateAdmin = async (req, res) => {
   const MIN_AGE = 18;
 
   if (age < MIN_AGE) {
-    return res.status(400).json({
-      error: `You must be at least ${MIN_AGE} years old to register. You are currently ${age} years old.`,
+    return res.status(200).json({
+      success: false,
+      message: `You must be at least ${MIN_AGE} years old to register. You are currently ${age} years old.`,
     });
   }
 
   if (password.length < 8) {
-    return res.status(400).json({
-      error: "Password must be at least 8 characters long.",
+    return res.status(200).json({
+      success: false,
+      message: "Password must be at least 8 characters long.",
+    });
+  }
+
+  // Check for a mix of characters in the password
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+
+  if (!passwordRegex.test(password)) {
+    return res.status(200).json({
+      success: false,
+      message:
+        "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.",
+    });
+  }
+
+  // Email format validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return res.status(200).json({
+      success: false,
+      message: "Invalid email format.",
     });
   }
 
@@ -137,10 +160,16 @@ module.exports.CreateAdmin = async (req, res) => {
     if (result.rows.length > 0) {
       const existingUser = result.rows[0];
       if (existingUser.username === username) {
-        return res.status(400).json({ error: "Username is already taken." });
+        return res.status(200).json({
+          success: false,
+          message: "Username is already taken.",
+        });
       }
       if (existingUser.email === email) {
-        return res.status(400).json({ error: "Email is already taken." });
+        return res.status(200).json({
+          success: false,
+          message: "Email is already taken.",
+        });
       }
     } else {
       // Hash the password using bcrypt
@@ -201,249 +230,22 @@ module.exports.CreateAdmin = async (req, res) => {
 
       transporter.sendMail(mailOptions, (err, info) => {
         if (err) {
-          return res
-            .status(500)
-            .json({ error: `Email could not be sent: ${err.message}` });
+          return res.status(200).json({
+            success: false,
+            message: `Email could not be sent: ${err.message}`,
+          });
         } else {
           return res.status(200).json({
+            success: true,
             message: "Admin created successfully. Verification email sent.",
           });
         }
       });
     }
   } catch (err) {
-    return res.status(500).json({ error: `Server error: ${err.message}` });
+    return res.status(200).json({
+      success: false,
+      message: `Server error: ${err.message}`,
+    });
   }
 };
-
-// // Update Admin
-// module.exports.UpdateAdmin = async (req, res) => {
-//   const {
-//     first_name: firstName,
-//     middle_initial: middleInitial,
-//     last_name: lastName,
-//     birthday,
-//     municipality,
-//     barangay,
-//     contact_number: contactNumber,
-//     username: newUsername,
-//   } = req.body;
-
-//   // Validation
-//   if (
-//     !firstName ||
-//     !lastName ||
-//     !birthday ||
-//     !municipality ||
-//     !barangay ||
-//     !contactNumber ||
-//     !newUsername
-//   ) {
-//     return res.status(200).json({ error: "Please fill in all fields" });
-//   }
-
-//   const age = Math.floor(
-//     (new Date() - new Date(birthday).getTime()) / 3.15576e10
-//   );
-//   const MIN_AGE = 18;
-
-//   if (age < MIN_AGE) {
-//     return res.status(200).json({
-//       error: `You must be at least ${MIN_AGE} years old to register.`,
-//     });
-//   }
-
-//   try {
-//     // Check if the user exists
-//     const userQuery = `SELECT username FROM users WHERE id = $1`;
-//     const { rows: existingUsers } = await pool.query(userQuery, [
-//       req.params.id,
-//     ]);
-
-//     if (existingUsers.length === 0) {
-//       return res.status(200).json({ error: "User does not exist" });
-//     }
-
-//     const oldUsername = existingUsers[0].username;
-
-//     if (newUsername && newUsername !== oldUsername) {
-//       // Check if new username is already taken
-//       const usernameQuery =
-//         "SELECT * FROM users WHERE username = $1 AND username != $2";
-//       const { rows: usernameRows } = await pool.query(usernameQuery, [
-//         newUsername,
-//         oldUsername,
-//       ]);
-
-//       if (usernameRows.length > 0) {
-//         return res.status(200).json({ error: "Username is already taken" });
-//       }
-//     }
-
-//     // Update the user in the database without email and password, including age
-//     const updateQuery = `
-//       UPDATE users SET first_name = $1, middle_initial = $2, last_name = $3, birthday = $4, age = $5,
-//       municipality = $6, barangay = $7, contact_number = $8, username = $9 WHERE id = $10
-//     `;
-//     const values = [
-//       firstName,
-//       middleInitial,
-//       lastName,
-//       birthday,
-//       age,
-//       municipality,
-//       barangay,
-//       contactNumber,
-//       newUsername,
-//       req.params.id,
-//     ];
-
-//     await pool.query(updateQuery, values);
-//     return res.status(200).json({ message: "User updated successfully" });
-//   } catch (err) {
-//     return res.status(500).json({ error: err.message });
-//   }
-// };
-
-// // Update Admin Email
-// module.exports.UpdateAdminEmail = async (req, res) => {
-//   const id = req.params.id;
-//   const { email } = req.body;
-
-//   // Validation
-//   if (!email) {
-//     return res.status(400).json({ error: "Please enter an email" });
-//   }
-
-//   // Email format validation
-//   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-//   if (!emailRegex.test(email)) {
-//     return res.status(400).json({ error: "Invalid email format" });
-//   }
-
-//   try {
-//     // Fetch the user's current data from the database
-//     const q = "SELECT * FROM users WHERE id = $1";
-//     const { rows } = await pool.query(q, [id]);
-
-//     if (rows.length === 0) {
-//       return res.status(404).json({ error: "User does not exist" });
-//     }
-
-//     const { email: oldEmail, pending_email: pendingEmail } = rows[0];
-
-//     // Check if the new email is the same as the current or pending email
-//     if (email === oldEmail || email === pendingEmail) {
-//       return res
-//         .status(200)
-//         .json({ message: "The email is the same. No changes made." });
-//     }
-
-//     // Check if the new email is already taken by another user
-//     const emailCheckQuery = "SELECT * FROM users WHERE email = $1";
-//     const emailCheckResult = await pool.query(emailCheckQuery, [email]);
-
-//     if (emailCheckResult.rows.length > 0) {
-//       return res.status(400).json({ error: "Email is already taken" });
-//     }
-
-//     // Generate a unique verification token
-//     const verificationToken = crypto.randomBytes(20).toString("hex");
-
-//     // Update the pending email and verification token in the database
-//     const updateQuery = `
-//       UPDATE users
-//       SET pending_email = $1, verification_token = $2
-//       WHERE id = $3
-//     `;
-//     await pool.query(updateQuery, [email, verificationToken, id]);
-
-//     // Use frontend base URL for the verification link
-//     const verificationLink = `${process.env.SITE_URL}/verify/${verificationToken}`;
-
-//     // Send a verification email to the new email
-//     const transporter = nodemailer.createTransport({
-//       service: "gmail",
-//       auth: {
-//         user: "bhenzmharlbartolome012603@gmail.com",
-//         pass: "owvb wzni fhxu cvbz",
-//       },
-//     });
-
-//     const mailOptions = {
-//       from: "bhenzmharlbartolome012603@gmail.com",
-//       to: email,
-//       subject: "Email Verification",
-//       text: `Please click the following link to verify your new email: ${verificationLink}`,
-//     };
-
-//     transporter.sendMail(mailOptions, (err, info) => {
-//       if (err) {
-//         console.error("Error while sending email:", err);
-//         return res
-//           .status(500)
-//           .json({ error: "Failed to send verification email" });
-//       } else {
-//         return res.status(200).json({
-//           message: "Verification email sent. Please check your new email.",
-//         });
-//       }
-//     });
-//   } catch (err) {
-//     return res.status(500).json({ error: err.message });
-//   }
-// };
-
-// // Update Admin's Password
-// module.exports.UpdateAdminPassword = async (req, res) => {
-//   const { currentPassword, newPassword, confirmPassword } = req.body;
-//   const id = req.params.id;
-
-//   // Validation
-//   if (!currentPassword || !newPassword || !confirmPassword) {
-//     return res
-//       .status(400)
-//       .json({ error: "Please fill in all password fields" });
-//   }
-
-//   // Check if new password matches confirm password
-//   if (newPassword !== confirmPassword) {
-//     return res
-//       .status(400)
-//       .json({ error: "New password and confirm password do not match" });
-//   }
-
-//   try {
-//     // Fetch the user's current password from the database
-//     const q = "SELECT password FROM users WHERE id = $1";
-//     const { rows } = await pool.query(q, [id]);
-
-//     if (rows.length === 0) {
-//       return res.status(404).json({ error: "User does not exist" });
-//     }
-
-//     const { password: hashedPassword } = rows[0];
-
-//     // Compare the current password with the hashed password in the database
-//     const isMatch = await bcrypt.compare(currentPassword, hashedPassword);
-//     if (!isMatch) {
-//       return res.status(400).json({ error: "Current password is incorrect" });
-//     }
-
-//     // Hash the new password
-//     const salt = await bcrypt.genSalt(10);
-//     const newHashedPassword = await bcrypt.hash(newPassword, salt);
-
-//     // Update the password in the database
-//     const updateQuery = `
-//       UPDATE users
-//       SET password = $1
-//       WHERE id = $2
-//     `;
-//     await pool.query(updateQuery, [newHashedPassword, id]);
-
-//     return res.status(200).json({ message: "Password updated successfully" });
-//   } catch (err) {
-//     return res.status(500).json({ error: err.message });
-//   }
-// };

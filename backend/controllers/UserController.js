@@ -45,7 +45,7 @@ module.exports.GetUsers = async (req, res) => {
     const { rows } = await pool.query(q, queryParams);
     return res.status(200).json(rows);
   } catch (err) {
-    return res.status(500).json({ error: err.message });
+    return res.status(200).json({ error: err.message });
   }
 };
 
@@ -56,15 +56,14 @@ module.exports.GetUser = async (req, res) => {
       [req.params.id]
     );
     if (rows.length === 0) {
-      return res.status(404).json({ error: "User not found" });
+      return res.status(200).json({ error: "User not found" });
     }
     return res.status(200).json(rows[0]);
   } catch (err) {
-    return res.status(500).json({ error: err.message });
+    return res.status(200).json({ error: err.message });
   }
 };
 
-// Update User
 module.exports.UpdateUser = async (req, res) => {
   const {
     first_name: firstName,
@@ -89,9 +88,10 @@ module.exports.UpdateUser = async (req, res) => {
   if (!newUsername) missingFields.push("Username");
 
   if (missingFields.length > 0) {
-    return res
-      .status(400)
-      .json({ error: `Missing fields: ${missingFields.join(", ")}` });
+    return res.status(200).json({
+      success: false,
+      message: `Missing fields: ${missingFields.join(", ")}`,
+    });
   }
 
   const age = Math.floor(
@@ -100,8 +100,9 @@ module.exports.UpdateUser = async (req, res) => {
   const MIN_AGE = 18;
 
   if (age < MIN_AGE) {
-    return res.status(400).json({
-      error: `You must be at least ${MIN_AGE} years old to update your account. You are currently ${age} years old.`,
+    return res.status(200).json({
+      success: false,
+      message: `You must be at least ${MIN_AGE} years old to update your account. You are currently ${age} years old.`,
     });
   }
 
@@ -113,7 +114,10 @@ module.exports.UpdateUser = async (req, res) => {
     ]);
 
     if (existingUsers.length === 0) {
-      return res.status(404).json({ error: "User does not exist." });
+      return res.status(200).json({
+        success: false,
+        message: "User does not exist.",
+      });
     }
 
     const oldUsername = existingUsers[0].username;
@@ -128,7 +132,10 @@ module.exports.UpdateUser = async (req, res) => {
       ]);
 
       if (usernameRows.length > 0) {
-        return res.status(400).json({ error: "Username is already taken." });
+        return res.status(200).json({
+          success: false,
+          message: "Username is already taken.",
+        });
       }
     }
 
@@ -151,9 +158,16 @@ module.exports.UpdateUser = async (req, res) => {
     ];
 
     await pool.query(updateQuery, values);
-    return res.status(200).json({ message: "User updated successfully." });
+    return res.status(200).json({
+      success: true,
+      message: "User updated successfully.",
+    });
   } catch (err) {
-    return res.status(500).json({ error: `Server error: ${err.message}` });
+    return res.status(200).json({
+      success: false,
+      message: "Server error.",
+      error: err.message,
+    });
   }
 };
 
@@ -164,13 +178,19 @@ module.exports.UpdateUserEmail = async (req, res) => {
 
   // Validation
   if (!email) {
-    return res.status(400).json({ error: "Please enter an email" });
+    return res.status(200).json({
+      success: false,
+      message: "Please enter an email",
+    });
   }
 
   // Email format validation
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
-    return res.status(400).json({ error: "Invalid email format" });
+    return res.status(200).json({
+      success: false,
+      message: "Invalid email format",
+    });
   }
 
   try {
@@ -179,16 +199,20 @@ module.exports.UpdateUserEmail = async (req, res) => {
     const { rows } = await pool.query(q, [id]);
 
     if (rows.length === 0) {
-      return res.status(404).json({ error: "User does not exist" });
+      return res.status(200).json({
+        success: false,
+        message: "User does not exist",
+      });
     }
 
     const { email: oldEmail, pending_email: pendingEmail } = rows[0];
 
     // Check if the new email is the same as the current or pending email
     if (email === oldEmail || email === pendingEmail) {
-      return res
-        .status(200)
-        .json({ message: "The email is the same. No changes made." });
+      return res.status(200).json({
+        success: true,
+        message: "The email is the same. No changes made.",
+      });
     }
 
     // Check if the new email is already taken by another user
@@ -196,7 +220,10 @@ module.exports.UpdateUserEmail = async (req, res) => {
     const emailCheckResult = await pool.query(emailCheckQuery, [email]);
 
     if (emailCheckResult.rows.length > 0) {
-      return res.status(400).json({ error: "Email is already taken" });
+      return res.status(200).json({
+        success: false,
+        message: "Email is already taken",
+      });
     }
 
     // Generate a unique verification token
@@ -232,17 +259,24 @@ module.exports.UpdateUserEmail = async (req, res) => {
     transporter.sendMail(mailOptions, (err, info) => {
       if (err) {
         console.error("Error while sending email:", err);
-        return res
-          .status(500)
-          .json({ error: "Failed to send verification email" });
+        return res.status(200).json({
+          success: false,
+          message: "Failed to send verification email",
+          error: err.message,
+        });
       } else {
         return res.status(200).json({
+          success: true,
           message: "Verification email sent. Please check your new email.",
         });
       }
     });
   } catch (err) {
-    return res.status(500).json({ error: err.message });
+    return res.status(200).json({
+      success: false,
+      message: "Server error.",
+      error: err.message,
+    });
   }
 };
 
@@ -250,18 +284,37 @@ module.exports.UpdateUserEmail = async (req, res) => {
 module.exports.UpdateUserPassword = async (req, res) => {
   const { currentPassword, newPassword, confirmPassword } = req.body;
   const id = req.params.id;
+
   // Validation
   if (!currentPassword || !newPassword || !confirmPassword) {
-    return res.status(400).json({
+    return res.status(200).json({
       success: false,
-      error: "Please provide current, new, and confirm passwords.",
+      message: "Please provide current, new, and confirm passwords.",
     });
   }
 
   if (newPassword !== confirmPassword) {
-    return res.status(400).json({
+    return res.status(200).json({
       success: false,
-      error: "New password and confirm password do not match.",
+      message: "New password and confirm password do not match.",
+    });
+  }
+
+  // Check password length
+  if (newPassword.length < 8) {
+    return res.status(200).json({
+      success: false,
+      message: "Password must be at least 8 characters long.",
+    });
+  }
+
+  // Check password strength (uppercase, lowercase, number, special character)
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+  if (!passwordRegex.test(newPassword)) {
+    return res.status(200).json({
+      success: false,
+      message:
+        "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.",
     });
   }
 
@@ -271,7 +324,10 @@ module.exports.UpdateUserPassword = async (req, res) => {
     const { rows } = await pool.query(q, [id]);
 
     if (rows.length === 0) {
-      return res.status(404).json({ error: "User does not exist" });
+      return res.status(200).json({
+        success: false,
+        message: "User does not exist.",
+      });
     }
 
     const { password: hashedPassword } = rows[0];
@@ -279,7 +335,10 @@ module.exports.UpdateUserPassword = async (req, res) => {
     // Compare the current password with the hashed password in the database
     const isMatch = await bcrypt.compare(currentPassword, hashedPassword);
     if (!isMatch) {
-      return res.status(400).json({ error: "Current password is incorrect" });
+      return res.status(200).json({
+        success: false,
+        message: "Current password is incorrect.",
+      });
     }
 
     // Check if the new password is the same as the old one
@@ -288,15 +347,10 @@ module.exports.UpdateUserPassword = async (req, res) => {
       hashedPassword
     );
     if (isNewPasswordSameAsOld) {
-      return res.status(400).json({
-        error: "The new password cannot be the same as your old password",
+      return res.status(200).json({
+        success: false,
+        message: "The new password cannot be the same as your old password.",
       });
-    }
-
-    if (newPassword.length < 8) {
-      return res
-        .status(400)
-        .json({ error: "Password must be at least 8 characters long" });
     }
 
     // Hash the new password
@@ -311,9 +365,16 @@ module.exports.UpdateUserPassword = async (req, res) => {
     `;
     await pool.query(updateQuery, [newHashedPassword, id]);
 
-    return res.status(200).json({ message: "Password updated successfully" });
+    return res.status(200).json({
+      success: true,
+      message: "Password updated successfully.",
+    });
   } catch (err) {
-    return res.status(500).json({ error: err.message });
+    return res.status(200).json({
+      success: false,
+      message: "Server error.",
+      error: err.message,
+    });
   }
 };
 
@@ -327,7 +388,10 @@ module.exports.VerifyEmail = async (req, res) => {
     const { rows } = await pool.query(q, [token]);
 
     if (rows.length === 0) {
-      return res.status(400).json({ error: "Invalid or expired token" });
+      return res.status(200).json({
+        success: false,
+        message: "Invalid or expired token.",
+      });
     }
 
     const { pending_email: newEmail, id, verified } = rows[0];
@@ -342,9 +406,10 @@ module.exports.VerifyEmail = async (req, res) => {
       `;
       await pool.query(updateQuery, [id]);
 
-      return res
-        .status(200)
-        .json({ message: "New user email verified successfully." });
+      return res.status(200).json({
+        success: true,
+        message: "New user email verified successfully.",
+      });
     }
 
     // If the user is already verified but there's a pending email, it's an email change verification
@@ -356,22 +421,38 @@ module.exports.VerifyEmail = async (req, res) => {
       `;
       await pool.query(updateQuery, [newEmail, id]);
 
-      return res
-        .status(200)
-        .json({ message: "Email change verified and updated successfully." });
+      return res.status(200).json({
+        success: true,
+        message: "Email change verified and updated successfully.",
+      });
     }
 
     // Fallback case: no pending email or verification case
-    return res.status(400).json({
-      error: "No email change pending or invalid verification request.",
+    return res.status(200).json({
+      success: false,
+      message: "No email change pending or invalid verification request.",
     });
   } catch (err) {
-    return res.status(500).json({ error: err.message });
+    return res.status(200).json({
+      success: false,
+      message: "Server error.",
+      error: err.message,
+    });
   }
 };
+
 // Request Password Reset
 module.exports.RequestPasswordReset = async (req, res) => {
   const { email } = req.body;
+
+  // Email format validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return res.status(200).json({
+      success: false,
+      message: "Invalid email format.",
+    });
+  }
 
   try {
     // Check if the email exists and if it is verified
@@ -379,13 +460,19 @@ module.exports.RequestPasswordReset = async (req, res) => {
     const { rows } = await pool.query(q, [email]);
 
     if (rows.length === 0) {
-      return res.status(404).json({ error: "No user found with that email" });
+      return res.status(200).json({
+        success: false,
+        message: "No user found with that email.",
+      });
     }
 
     const user = rows[0];
 
     if (!user.verified) {
-      return res.status(400).json({ error: "Email address not verified" });
+      return res.status(200).json({
+        success: false,
+        message: "Email address not verified.",
+      });
     }
 
     // Generate a reset password token
@@ -413,33 +500,61 @@ module.exports.RequestPasswordReset = async (req, res) => {
       service: "gmail",
       auth: {
         user: "bhenzmharlbartolome012603@gmail.com",
-        pass: "owvb wzni fhxu cvbz", // Consider using environment variables for sensitive data
+        pass: "owvb wzni fhxu cvbz",
       },
     });
 
     // Send the email
     transporter.sendMail(mailOptions, (err) => {
       if (err) {
-        return res
-          .status(500)
-          .json({ error: "Failed to send reset password email" });
+        return res.status(200).json({
+          success: false,
+          message: "Failed to send reset password email.",
+        });
       }
-      return res.status(200).json({ message: "Password reset email sent" });
+      return res.status(200).json({
+        success: true,
+        message: "Password reset email sent successfully.",
+      });
     });
   } catch (err) {
-    return res.status(500).json({ error: err.message });
+    return res.status(200).json({
+      success: false,
+      message: "Server error.",
+      error: err.message,
+    });
   }
 };
 
-// Reset Password
+// Reset Password// Reset Password
 module.exports.ResetPassword = async (req, res) => {
   const { token } = req.params;
   const { newPassword, confirmPassword } = req.body;
 
+  // Check if passwords match
   if (newPassword !== confirmPassword) {
-    return res
-      .status(400)
-      .json({ error: "New password and confirm password do not match" });
+    return res.status(200).json({
+      success: false,
+      message: "New password and confirm password do not match.",
+    });
+  }
+
+  // Check password length
+  if (newPassword.length < 8) {
+    return res.status(200).json({
+      success: false,
+      message: "Password must be at least 8 characters long.",
+    });
+  }
+
+  // Check password strength (uppercase, lowercase, number, special character)
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+  if (!passwordRegex.test(newPassword)) {
+    return res.status(200).json({
+      success: false,
+      message:
+        "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.",
+    });
   }
 
   try {
@@ -448,37 +563,41 @@ module.exports.ResetPassword = async (req, res) => {
     const { rows } = await pool.query(q, [token, new Date()]);
 
     if (rows.length === 0) {
-      return res.status(400).json({ error: "Invalid or expired token" });
+      return res.status(200).json({
+        success: false,
+        message: "Invalid or expired token.",
+      });
     }
 
     const user = rows[0];
 
-    // Check if the password is the same as the last one
-    const isPasswordTheSame = bcrypt.compareSync(newPassword, user.password);
-
+    // Check if the new password is the same as the old one
+    const isPasswordTheSame = await bcrypt.compare(newPassword, user.password);
     if (isPasswordTheSame) {
-      return res.status(400).json({
-        error: "The new password cannot be the same as your old password",
+      return res.status(200).json({
+        success: false,
+        message: "The new password cannot be the same as your old password.",
       });
     }
 
-    if (newPassword.length < 8) {
-      return res
-        .status(400)
-        .json({ error: "Password must be at least 8 characters long" });
-    }
+    // Hash the new password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
 
-    const salt = bcrypt.genSaltSync(10);
-    const hashedPassword = bcrypt.hashSync(newPassword, salt);
-
+    // Update the password and clear the reset token and expiry
     const updateQuery =
       "UPDATE users SET password = $1, reset_password_token = NULL, reset_password_expires = NULL WHERE id = $2";
     await pool.query(updateQuery, [hashedPassword, user.id]);
 
-    return res
-      .status(200)
-      .json({ message: "Password has been reset successfully" });
+    return res.status(200).json({
+      success: true,
+      message: "Password has been reset successfully.",
+    });
   } catch (err) {
-    return res.status(500).json({ error: err.message });
+    return res.status(200).json({
+      success: false,
+      message: "Server error.",
+      error: err.message,
+    });
   }
 };
