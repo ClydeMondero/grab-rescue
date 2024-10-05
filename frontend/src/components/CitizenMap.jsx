@@ -1,4 +1,10 @@
-import { useState, useRef, useEffect } from "react";
+import {
+  useState,
+  useRef,
+  useEffect,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
 import { GeolocateControl, Map as MapGL } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { getCitizenCookie } from "../services/cookieService";
@@ -11,7 +17,7 @@ import {
 } from "../services/locationService";
 import { Markers, Route, Controls, DistanceEta } from "../components";
 
-const CitizenMap = () => {
+const CitizenMap = forwardRef((props, ref) => {
   const [citizen, setCitizen] = useState({
     longitude: 120.9107,
     latitude: 14.9536,
@@ -33,6 +39,7 @@ const CitizenMap = () => {
 
   const mapRef = useRef();
   const geoControlRef = useRef();
+  const buttonsRef = useRef();
 
   const handleGeolocation = (coords) => {
     const cookie = getCitizenCookie();
@@ -75,6 +82,21 @@ const CitizenMap = () => {
     }
   }, [nearestRescuer, citizen]);
 
+  useImperativeHandle(ref, () => ({
+    locateCitizen: () => {
+      geoControlRef.current?.trigger();
+    },
+    goToNearestRescuer: () => {
+      buttonsRef.current.goToNearestRescuer();
+    },
+    hideRoute: () => {
+      buttonsRef.current.hideRoute();
+    },
+    viewRoute: () => {
+      buttonsRef.current.viewRoute();
+    },
+  }));
+
   return (
     <MapGL
       ref={mapRef}
@@ -111,10 +133,11 @@ const CitizenMap = () => {
         nearestRescuer={nearestRescuer}
         routeData={routeData}
         setRouteOpacity={setRouteOpacity}
+        ref={buttonsRef}
       />
       <DistanceEta distance={distance} eta={eta} />
     </MapGL>
   );
-};
+});
 
 export default CitizenMap;
