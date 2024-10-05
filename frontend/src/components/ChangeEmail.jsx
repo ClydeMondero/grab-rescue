@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { FaArrowLeft, FaEnvelope } from "react-icons/fa";
 import { MdMarkEmailRead } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { Toast } from "../components";
 import { createAuthHeader } from "../services/authService";
 
 const ChangeEmail = (props) => {
@@ -20,7 +22,6 @@ const ChangeEmail = (props) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     setIsLoading(true);
 
     const data = {
@@ -39,11 +40,12 @@ const ChangeEmail = (props) => {
       // Clear the email fields
       setNewEmail("");
       setError(""); // Clear any previous errors
-      navigate("/admin/viewProfile");
+      navigate(
+        user.role === "admin" ? "/admin/viewProfile" : "/rescuer/profile"
+      );
     } catch (error) {
       if (error.response) {
         console.error("Error response:", error.response.data);
-
         // Handle specific error codes
         if (error.response.status === 400) {
           toast.error(error.response.data.error); // Bad Request error (400)
@@ -75,29 +77,32 @@ const ChangeEmail = (props) => {
       </div>
       <div className="flex-1 bg-white rounded-lg p-3">
         <form className="space-y-2" onSubmit={handleSubmit}>
-          <div className="relative">
-            <label
-              htmlFor="current-email"
-              className="block text-xs sm:text-sm font-semibold text-[#557C55]"
-            >
-              Current Email:
-            </label>
-            <div className="relative flex items-center">
-              <FaEnvelope
-                className="absolute left-3 text-[#557C55]"
-                size={20}
-              />
-              <input
-                type="email"
-                id="current-email"
-                value={user.email}
-                disabled
-                className="w-full p-3 pl-10 border rounded bg-[#F9F9F9] border-gray-300 text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-[#557C55] transition"
-                placeholder="Enter your current email"
-                required
-              />
+          {/* Show current email only if the role is not rescuer */}
+          {user.role !== "rescuer" && (
+            <div className="relative">
+              <label
+                htmlFor="current-email"
+                className="block text-xs sm:text-sm font-semibold text-[#557C55]"
+              >
+                Current Email:
+              </label>
+              <div className="relative flex items-center">
+                <FaEnvelope
+                  className="absolute left-3 text-[#557C55]"
+                  size={20}
+                />
+                <input
+                  type="email"
+                  id="current-email"
+                  value={user.email}
+                  disabled
+                  className="w-full p-3 pl-10 border rounded bg-[#F9F9F9] border-gray-300 text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-[#557C55] transition"
+                  placeholder="Enter your current email"
+                  required
+                />
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="relative">
             <label
@@ -138,6 +143,7 @@ const ChangeEmail = (props) => {
             )}
           </button>
         </form>
+        <Toast />
       </div>
     </div>
   );

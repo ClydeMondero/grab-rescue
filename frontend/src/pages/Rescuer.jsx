@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Routes, Route } from "react-router-dom";
+import {Routes, Route } from "react-router-dom";
 import {
   Navigate,
   Status,
@@ -11,6 +11,7 @@ import {
   Hero,
   Bottom,
   RescuerMap,
+  ChangeEmail,
 } from "../components";
 
 const Rescuer = (props) => {
@@ -34,7 +35,11 @@ const Rescuer = (props) => {
           <Route path="/complete" element={<Complete />} />
           <Route path="/feedback" element={<Feedback />} />
           <Route path="/profile" element={<ViewProfile user={user} />} />
-          <Route path="/changePassword" element={<ChangePassword />} />
+          <Route
+            path="/change-password"
+            element={<ChangePassword user={user} />}
+          />
+          <Route path="/change-email" element={<ChangeEmail user={user} />} />
         </Routes>
       </div>
 
