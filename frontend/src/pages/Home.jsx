@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import logo from "../assets/logo.png";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -17,6 +17,7 @@ import { MdRoute } from "react-icons/md";
 const Home = () => {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const buttonsRef = useRef(null);
 
   //go to user page if already logged in
   const verifyToken = async () => {
@@ -63,8 +64,8 @@ const Home = () => {
           </li>
         </ul>
       </div>
-      <div className="w-full h-[80%] relative lg:h-[90%] lg:bg-slate-200">
-        <div className="absolute top-4 right-4 m-2 p-2 z-10 rounded-full bg-white shadow-lg lg:hidden">
+      <div className="w-full h-[80%] relative md:h-[90%] md:bg-slate-200">
+        <div className="absolute top-4 right-4 m-2 p-2 z-10 rounded-full bg-white shadow-lg md:hidden">
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="text-md cursor-pointer text-gray-700 rounded-full p-2 hover:bg-gra"
@@ -115,35 +116,54 @@ const Home = () => {
           )}
         </div>
         {/*TODO: update marker icons and route*/}
-        <Map />
+        <Map ref={buttonsRef} />
       </div>
-      {/*TODO: call control functions*/}
-      <div className="h-[20%] bg-slate-200 px-2 pb-2 flex flex-col justify-between gap-2 lg:h-[10%]">
+      <div className="h-[20%] bg-slate-200 px-2 pb-2 flex flex-col justify-between gap-2 md:h-[10%]">
         <button className="flex-1 bg-[#FF5757] hover:bg-red-700 text-white font-bold p-2 rounded">
           Request for Help
         </button>
-        <div className="flex items-center gap-4 lg:hidden">
+        <div className="flex items-center gap-4 md:hidden">
           <div className="bg-white flex items-center justify-around gap-4 rounded-lg px-2 py-4 font-medium text-sm text-center flex-1">
             <div className="flex flex-col items-center">
-              <button className="bg-gray-200 hover:bg-gray-300 rounded-full p-3 flex items-center justify-center">
+              <button
+                onClick={() => {
+                  buttonsRef.current.locateCitizen();
+                }}
+                className="bg-gray-200 hover:bg-gray-300 rounded-full p-3 flex items-center justify-center"
+              >
                 <FaLocationPin className="text-2xl" />
               </button>
               <p>My Location</p>
             </div>
             <div className="flex flex-col items-center">
-              <button className="bg-gray-200 hover:bg-gray-300 rounded-full p-3 flex items-center justify-center">
+              <button
+                onClick={() => {
+                  buttonsRef.current.goToNearestRescuer();
+                }}
+                className="bg-gray-200 hover:bg-gray-300 rounded-full p-3 flex items-center justify-center"
+              >
                 <BiSolidAmbulance className="text-2xl" />
               </button>
               <p>Nearest Rescuer</p>
             </div>
             <div className="flex flex-col items-center">
-              <button className="bg-gray-200 hover:bg-gray-300 rounded-full p-3 flex items-center justify-center">
+              <button
+                onClick={() => {
+                  buttonsRef.current.viewRoute();
+                }}
+                className="bg-gray-200 hover:bg-gray-300 rounded-full p-3 flex items-center justify-center"
+              >
                 <MdRoute className="text-2xl" />
               </button>
               <p>View Route</p>
             </div>
             <div className="flex flex-col items-center">
-              <button className="bg-gray-200 hover:bg-gray-300 rounded-full p-3 flex items-center justify-center">
+              <button
+                onClick={() => {
+                  buttonsRef.current.hideRoute();
+                }}
+                className="bg-gray-200 hover:bg-gray-300 rounded-full p-3 flex items-center justify-center"
+              >
                 <BiSolidHide className="text-2xl" />
               </button>
               <p>Hide Route</p>
