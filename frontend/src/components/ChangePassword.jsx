@@ -6,11 +6,13 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Toast } from "../components";
+import zxcvbn from "zxcvbn"; // Import zxcvbn for password strength
 
 const ChangePassword = (props) => {
   const navigate = useNavigate();
   const { user } = props;
   const userId = user.id;
+
   const [passwords, setPasswords] = useState({
     currentPassword: "",
     newPassword: "",
@@ -21,6 +23,10 @@ const ChangePassword = (props) => {
     newPassword: false,
     confirmPassword: false,
   });
+  const [passwordStrength, setPasswordStrength] = useState({
+    score: 0,
+    feedback: [],
+  });
 
   const handlePasswordChange = (e) => {
     const { name, value } = e.target;
@@ -28,6 +34,12 @@ const ChangePassword = (props) => {
       ...prevPasswords,
       [name]: value,
     }));
+
+    // Update password strength for new password
+    if (name === "newPassword") {
+      const result = zxcvbn(value);
+      setPasswordStrength(result);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -44,14 +56,16 @@ const ChangePassword = (props) => {
 
     try {
       // Sending PUT request to update password
-      const response = await axios.put(
-        `/users/updatePassword/${userId}`,
-        data,
-        createAuthHeader()
-      );
-      console.log("Response:", response);
-      toast.success(response.data.message); // Success toast
+      const response = await (
+        await axios.put(
+          `/users/updatePassword/${userId}`,
+          data,
+          createAuthHeader()
+        )
+      ).data;
 
+      if (!response.success) throw new Error(response.message);
+      toast.success(response.message);
       // Clear the password fields
       setPasswords({
         currentPassword: "",
@@ -59,21 +73,8 @@ const ChangePassword = (props) => {
         confirmPassword: "",
       });
     } catch (error) {
-      if (error.response) {
-        console.error("Error response:", error.response.data);
-
-        // Handle specific error codes
-        if (error.response.status === 400) {
-          toast.error(error.response.data.error); // Bad Request error (400)
-        } else if (error.response.status === 404) {
-          toast.error("Not Found: User does not exist"); // Not Found error (404)
-        } else {
-          toast.error(error.response.data.message); // Other errors
-        }
-      } else {
-        console.error("Error:", error.message);
-        toast.error("Something went wrong"); // Fallback error
-      }
+      console.error(error.message);
+      toast.error(error.message);
     }
   };
 
@@ -82,6 +83,23 @@ const ChangePassword = (props) => {
       ...prev,
       [field]: !prev[field],
     }));
+  };
+
+  const getStrengthLabel = (score) => {
+    switch (score) {
+      case 0:
+        return "Very Weak";
+      case 1:
+        return "Weak";
+      case 2:
+        return "Fair";
+      case 3:
+        return "Good";
+      case 4:
+        return "Strong";
+      default:
+        return "";
+    }
   };
 
   return (
@@ -129,6 +147,7 @@ const ChangePassword = (props) => {
               )}
             </button>
           </div>
+
           <div className="relative">
             <label
               htmlFor="new-password"
@@ -151,12 +170,60 @@ const ChangePassword = (props) => {
               onClick={() => togglePasswordVisibility("newPassword")}
             >
               {showPasswords.newPassword ? (
-                <FaEyeSlash size={20} color="#557C55" />
+                <FaEyeSlash
+                  style={{ marginTop: "-40px" }}
+                  size={20}
+                  color="#557C55"
+                />
               ) : (
-                <FaEye size={20} color="#557C55" />
+                <FaEye
+                  style={{ marginTop: "-40px" }}
+                  size={20}
+                  color="#557C55"
+                />
               )}
             </button>
+            {/* Password Strength Meter */}
+            <div className="mt-2">
+              <strong className="block text-xs sm:text-sm md:text-base font-semibold text-[#557C55]">
+                Password Strength: {getStrengthLabel(passwordStrength.score)}
+              </strong>
+              <div
+                style={{
+                  width: "100%",
+                  backgroundColor: "#e0e0e0",
+                  borderRadius: "5px",
+                  marginTop: "5px",
+                }}
+              >
+                <div
+                  style={{
+                    width: `${(passwordStrength.score + 1) * 20}%`,
+                    height: "5px",
+                    backgroundColor:
+                      passwordStrength.score === 4
+                        ? "green"
+                        : passwordStrength.score === 3
+                        ? "blue"
+                        : passwordStrength.score === 2
+                        ? "yellow"
+                        : passwordStrength.score === 1
+                        ? "orange"
+                        : "red",
+                    borderRadius: "3px",
+                  }}
+                />
+              </div>
+              {passwordStrength.feedback.length > 0 && (
+                <ul className="text-sm text-red-500">
+                  {passwordStrength.feedback.map((item, index) => (
+                    <li key={index}>{item}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
           </div>
+
           <div className="relative">
             <label
               htmlFor="confirm-password"
@@ -185,6 +252,7 @@ const ChangePassword = (props) => {
               )}
             </button>
           </div>
+
           <button
             type="submit"
             className="bg-[#557C55] text-white px-2 py-1 rounded text-xs sm:text-sm hover:bg-[#6EA46E] transition flex items-center justify-center"
