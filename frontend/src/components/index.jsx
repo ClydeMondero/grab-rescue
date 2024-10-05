@@ -8,16 +8,22 @@ import Rescuers from "./Rescuers";
 import Settings from "./Settings";
 import ViewProfile from "./ViewProfile";
 import Sidebar from "./Sidebar";
+import Bottom from "./Bottom";
+import Hero from "./Hero";
 import PrivateRoute from "./PrivateRoute";
 import Toast from "./Toast";
+import Complete from "./Complete";
 import CitizenMap from "./CitizenMap";
 import ChangeEmail from "./ChangeEmail";
 import RescuerMap from "./RescuerMap";
 import Markers from "./Markers";
+import Feedback from "./Feedback";
 import Route from "./Route";
 import Controls from "./Controls";
 import DistanceEta from "./DistanceEta";
-
+import Navigate from "./Navigate";
+import Requests from "./Requests";
+import Status from "./Status";
 export {
   DistanceEta,
   Markers,
@@ -38,4 +44,11 @@ export {
   ViewProfile,
   Sidebar,
   ChangeEmail,
+  Hero,
+  Feedback,
+  Complete,
+  Bottom,
+  Navigate,
+  Status,
+  Requests,
 };
