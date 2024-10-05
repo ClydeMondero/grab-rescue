@@ -8,6 +8,7 @@ const VerifyEmail = () => {
   const { token } = useParams();
   const [verified, setVerified] = useState(false);
   const [exit, setExit] = useState(false);
+  const [role, setRole] = useState(null); // State to hold the user role
   const nav = useNavigate();
 
   useEffect(() => {
@@ -15,7 +16,9 @@ const VerifyEmail = () => {
       console.log("Token:", token);
       try {
         if (!verified) {
-          await axios.put(`/users/verify/${token}`);
+          const response = await axios.put(`/users/verify/${token}`);
+          const userRole = response.data.role; // Assume the response has the user role
+
           toast.success("Your Email has been successfully Verified!", {
             position: "top-center",
             hideProgressBar: false,
@@ -31,10 +34,18 @@ const VerifyEmail = () => {
           });
 
           setVerified(true);
-          // Navigate immediately after the toast appears
+          setRole(userRole); // Set the role state
+
+          // Navigate based on the role after the toast
           setTimeout(() => {
-            nav("/admin/viewProfile");
-          }, 2000); // Adjust timeout to match the length of the toast animation
+            if (userRole === "admin") {
+              nav("/"); // Navigate to admin dashboard
+            } else if (userRole === "rescuer") {
+              nav("/"); // Navigate to rescuer home
+            } else {
+              nav("/"); // Default route or landing page
+            }
+          }, 2000);
         }
       } catch (error) {
         console.error("Error during verification:", error);
@@ -52,14 +63,18 @@ const VerifyEmail = () => {
       }
     };
 
-    verifyEmail();
+    const timeoutId = setTimeout(() => {
+      verifyEmail();
+    }, 3000);
+
+    return () => clearTimeout(timeoutId);
   }, [token, verified, nav]);
 
   return (
     <>
       <ToastContainer />
       <div className="h-screen flex justify-center items-center">
-        <div className="text-4xl font-bold animate-pulse">
+        <div className="text-6xlxl font-bold animate-pulse text-[#557C55]">
           {verified
             ? "Your Email has been successfully Verified!"
             : "Verifying..."}

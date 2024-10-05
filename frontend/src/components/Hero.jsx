@@ -33,13 +33,13 @@ const Header = () => {
               My Profile
             </Link>
             <Link
-              to="/rescuer/changePassword"
+              to="/rescuer/change-password"
               className="block px-4 py-2 hover:bg-gray-200"
             >
               Change Password
             </Link>
             <Link
-              to="/rescuer/changeEmail"
+              to="/rescuer/change-email"
               className="block px-4 py-2 hover:bg-gray-200"
             >
               Change Email

@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { createAuthHeader } from "../services/authService";
 import axios from "axios";
 import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { Toast } from "../components";
 
 const ChangePassword = (props) => {
   const navigate = useNavigate();
@@ -191,6 +193,7 @@ const ChangePassword = (props) => {
             Update Password
           </button>
         </form>
+        <Toast />
       </div>
     </div>
   );

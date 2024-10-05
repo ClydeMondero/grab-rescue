@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { createAuthHeader } from "../services/authService";
 import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { Toast } from "../components";
 
 const ViewProfile = (props) => {
   const navigate = useNavigate();
@@ -15,7 +17,7 @@ const ViewProfile = (props) => {
   // Redirect if the user is an Admin
   useEffect(() => {
     if (user.role === "Admin") {
-      navigate("/admin"); // Adjust the path according to your routing structure
+      navigate("/admin");
     }
   }, [user.role, navigate]);
 
@@ -289,6 +291,7 @@ const ViewProfile = (props) => {
                 </button>
               </div>
             </form>
+            <Toast />
           </div>
         </div>
       )}
