@@ -4,6 +4,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { Toast } from "../components";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import zxcvbn from "zxcvbn"; // Import zxcvbn
 import "react-toastify/dist/ReactToastify.css";
 
 const ResetPassword = () => {
@@ -12,36 +13,54 @@ const ResetPassword = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState({
+    score: 0,
+    feedback: [],
+  });
   const navigate = useNavigate();
 
   const handleResetPassword = async (event) => {
     event.preventDefault();
 
     try {
-      const response = await axios.post(`/users/reset-password/${token}`, {
-        newPassword,
-        confirmPassword,
-      });
+      const response = await (
+        await axios.post(`/users/reset-password/${token}`, {
+          newPassword,
+          confirmPassword,
+        })
+      ).data;
 
-      // Show success toast for 200 response
-      toast.success(response.data.message);
+      if (!response.success) throw new Error(response.message);
+      toast.success(response.message);
       setTimeout(() => navigate("/"), 2000);
-    } catch (err) {
-      const errorMessage =
-        err.response?.data?.error || "Failed to reset password.";
+    } catch (error) {
+      console.error(error.message);
+      toast.error(error.message);
+    }
+  };
 
-      // Show error toast for 400 and 404 status
-      if (err.response) {
-        if (err.response.status === 400) {
-          toast.error(errorMessage); // Display the error message for 400 status
-        } else if (err.response.status === 404) {
-          toast.error(errorMessage); // Display the error message for 404 status
-        } else {
-          toast.error("Something went wrong. Please try again."); // General error toast
-        }
-      } else {
-        toast.error("Network error. Please check your connection."); // Handle other cases
-      }
+  const handleNewPasswordChange = (e) => {
+    const value = e.target.value;
+    setNewPassword(value);
+    // Update password strength on input change
+    const result = zxcvbn(value);
+    setPasswordStrength(result);
+  };
+
+  const getStrengthLabel = (score) => {
+    switch (score) {
+      case 0:
+        return "Very Weak";
+      case 1:
+        return "Weak";
+      case 2:
+        return "Fair";
+      case 3:
+        return "Good";
+      case 4:
+        return "Strong";
+      default:
+        return "";
     }
   };
 
@@ -70,7 +89,7 @@ const ResetPassword = () => {
                 placeholder="Enter new password"
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#557C55]"
                 value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
+                onChange={handleNewPasswordChange}
                 required
               />
               <button
@@ -79,8 +98,46 @@ const ResetPassword = () => {
                 onClick={() => setShowNewPassword(!showNewPassword)}
               >
                 {showNewPassword ? <FaEyeSlash /> : <FaEye />}{" "}
-                {/* Toggle icon */}
               </button>
+            </div>
+            {/* Password Strength Meter */}
+            <div className="mt-2">
+              <strong className="text-sm text-[#557C55]">
+                Password Strength: {getStrengthLabel(passwordStrength.score)}
+              </strong>
+              <div
+                style={{
+                  width: "100%",
+                  backgroundColor: "#e0e0e0",
+                  borderRadius: "5px",
+                  marginTop: "5px",
+                }}
+              >
+                <div
+                  style={{
+                    width: `${(passwordStrength.score + 1) * 20}%`,
+                    height: "5px",
+                    backgroundColor:
+                      passwordStrength.score === 4
+                        ? "green"
+                        : passwordStrength.score === 3
+                        ? "blue"
+                        : passwordStrength.score === 2
+                        ? "yellow"
+                        : passwordStrength.score === 1
+                        ? "orange"
+                        : "red",
+                    borderRadius: "3px",
+                  }}
+                />
+              </div>
+              {passwordStrength.feedback.length > 0 && (
+                <ul className="text-sm text-red-500">
+                  {passwordStrength.feedback.map((item, index) => (
+                    <li key={index}>{item}</li>
+                  ))}
+                </ul>
+              )}
             </div>
           </div>
           <div>
@@ -107,7 +164,6 @@ const ResetPassword = () => {
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               >
                 {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}{" "}
-                {/* Toggle icon */}
               </button>
             </div>
           </div>

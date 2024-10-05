@@ -14,13 +14,7 @@ const ViewProfile = (props) => {
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
-  // Redirect if the user is an Admin
-  useEffect(() => {
-    if (user.role === "Admin") {
-      navigate("/admin");
-    }
-  }, [user.role, navigate]);
-
+  // Remove the redirect for Admin users
   useEffect(() => {
     console.log(profile);
   }, [profile]);
@@ -39,20 +33,20 @@ const ViewProfile = (props) => {
 
     try {
       const authHeader = createAuthHeader();
-      const response = await axios.put(`/users/update/${profile.id}`, profile, {
-        headers: {
-          ...authHeader,
-          "Content-Type": "application/json",
-        },
-      });
-      if (response.status === 200) {
-        toast.success("Profile updated successfully!");
-      } else {
-        toast.error("Failed to update profile.");
-      }
+      const response = await (
+        await axios.put(`/users/update/${profile.id}`, profile, {
+          headers: {
+            ...authHeader,
+            "Content-Type": "application/json",
+          },
+        })
+      ).data;
+
+      if (!response.success) throw new Error(response.message);
+      toast.success(response.message);
     } catch (error) {
-      console.error("Error updating profile:", error);
-      toast.error("Error updating profile.");
+      console.error(error.message);
+      toast.error(error.message);
     } finally {
       setLoading(false);
       setIsEditing(false);
@@ -110,7 +104,7 @@ const ViewProfile = (props) => {
             <dt className="font-semibold text-[#557C55]">Last Name:</dt>
             <dd>{profile.last_name}</dd>
 
-            {user.role === "Admin" && (
+            {user.account_type === "Admin" && (
               <>
                 <dt className="font-semibold text-[#557C55]">Municipality:</dt>
                 <dd>{profile.municipality}</dd>
@@ -210,7 +204,7 @@ const ViewProfile = (props) => {
               </div>
 
               {/* Only Admins should see these fields */}
-              {user.role === "Admin" && (
+              {user.account_type === "Admin" && (
                 <>
                   <div>
                     <label
@@ -275,26 +269,32 @@ const ViewProfile = (props) => {
                   type="date"
                   id="birthday"
                   name="birthday"
-                  value={profile.birthday}
+                  value={profile.birthday || ""}
                   onChange={handleProfileChange}
                   className="w-full p-3 border rounded-lg bg-gray-100 border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
                 />
               </div>
 
-              {/* Submit button */}
-              <div className="flex justify-end">
+              {/* Save Button */}
+              <div className="mt-6 flex justify-end">
                 <button
                   type="submit"
-                  className="bg-[#557C55] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-[#6EA46E] transition flex items-center"
+                  disabled={loading}
+                  className="bg-[#557C55] text-white px-4 py-2 rounded-md flex items-center hover:bg-[#6EA46E] transition"
                 >
-                  <FaSave className="mr-2" /> Save Changes
+                  {loading ? (
+                    <span className="loader"></span>
+                  ) : (
+                    <FaSave className="mr-2" />
+                  )}
+                  Save Changes
                 </button>
               </div>
             </form>
-            <Toast />
           </div>
         </div>
       )}
+      <Toast />
     </div>
   );
 };
