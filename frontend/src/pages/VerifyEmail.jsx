@@ -34,19 +34,18 @@ const VerifyEmail = () => {
           });
 
           setVerified(true);
-          setRole(userRole); // Set the role state
+          setRole(userRole); 
 
           // Navigate based on the role after the toast
           setTimeout(() => {
             if (userRole === "admin") {
-              nav("/"); // Navigate to admin dashboard
+              nav("/"); // Navigate to home
             } else if (userRole === "rescuer") {
-              nav("/"); // Navigate to rescuer home
+              nav("/"); // Navigate to  home
             } else {
-              nav("/"); // Default route or landing page
+              nav("/"); // Default home
             }
-          }, 2000);
-        }
+          }, 2000);        }
       } catch (error) {
         console.error("Error during verification:", error);
         toast.error("Failed to verify email", {
