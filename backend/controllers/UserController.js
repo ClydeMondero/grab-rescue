@@ -369,7 +369,6 @@ module.exports.VerifyEmail = async (req, res) => {
     return res.status(500).json({ error: err.message });
   }
 };
-
 // Request Password Reset
 module.exports.RequestPasswordReset = async (req, res) => {
   const { email } = req.body;

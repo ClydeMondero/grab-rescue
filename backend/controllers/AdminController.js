@@ -205,11 +205,9 @@ module.exports.CreateAdmin = async (req, res) => {
             .status(500)
             .json({ error: `Email could not be sent: ${err.message}` });
         } else {
-          return res
-            .status(200)
-            .json({
-              message: "Admin created successfully. Verification email sent.",
-            });
+          return res.status(200).json({
+            message: "Admin created successfully. Verification email sent.",
+          });
         }
       });
     }
