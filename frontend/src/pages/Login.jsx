@@ -4,7 +4,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { userLoginSchema } from "../models/Users";
 import { useState } from "react";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
+import {
+  FaEnvelope,
+  FaLock,
+  FaEye,
+  FaEyeSlash,
+  FaArrowLeft,
+} from "react-icons/fa";
 import { Loader, Toast } from "../components";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -23,6 +29,11 @@ const Login = () => {
 
   //navigate
   const navigate = useNavigate();
+
+  //back button function
+  const handleBack = () => {
+    navigate("/", { replace: true });
+  };
 
   //form validation
   const {
@@ -79,62 +90,63 @@ const Login = () => {
   };
 
   return (
-    <div className="w-full h-screen flex items-center justify-center">
-      <div className="max-w-md w-full  bg-white rounded-lg shadow-md p-6">
+    <div className="flex items-center justify-center h-screen bg-[#f5f5f5]">
+      <div className="w-full max-w-md p-6 bg-white rounded-lg">
+        <div className="flex justify-between mb-4">
+          <button
+            type="button"
+            className="text-[#557C55] hover:text-red-600 transition-colors duration-200 ease-in-out flex items-center"
+            onClick={handleBack}
+          >
+            <FaArrowLeft className="h-4 w-4 mr-1" />
+            <span className="text-sm">Back</span>
+          </button>
+        </div>
         <div className="flex justify-center mb-4">
-          <img src={logo} alt="Logo" className="h-24" />
+          <img src={logo} alt="Logo" className="h-12" />
         </div>
         <h2 className="text-center text-2xl font-semibold mb-5">
           Login as {role}
         </h2>
         <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-          <div>
-            <label
-              htmlFor="email"
-              className="block mb-2 font-semibold text-sm text-[#557C55]"
-            >
-              Email
-            </label>
+          <div className="flex items-center border border-gray-300 rounded-md focus-within:border-[#557C55]">
+            <FaEnvelope className="h-6 w-6 ml-2 mr-1 text-gray-600" />
             <input
               {...register("email")}
               type="email"
               id="email"
               name="email"
               placeholder="Enter your email"
-              className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#557C55]"
+              className="w-full px-3 py-2 bg-white focus:outline-none"
             />
           </div>
           {errors.email && (
             <p className="text-red-500 text-sm">{errors.email.message}</p>
           )}
-          <div className="relative">
-            <label
-              htmlFor="password"
-              className="block mb-2 font-semibold text-sm text-[#557C55]"
-            >
-              Password
-            </label>
+          <div className="flex items-center border border-gray-300 rounded-md focus-within:border-[#557C55]">
+            <FaLock className="h-6 w-6 ml-2 mr-1 text-gray-600" />
             <input
               {...register("password")}
               type={showPassword ? "text" : "password"}
               id="password"
               name="password"
               placeholder="Enter your password"
-              className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#557C55]"
+              className="w-full px-3 py-2 bg-white focus:outline-none"
             />
             <span
-              className="absolute top-12 right-3 -translate-y-1/2 cursor-pointer text-gray-600"
+              className="ml-2 mr-2 cursor-pointer text-[#557C55]"
               onClick={() => setShowPassword(!showPassword)}
             >
-              {showPassword ? <FaEye /> : <FaEyeSlash />}
+              {showPassword ? (
+                <FaEyeSlash className="h-6 w-6" />
+              ) : (
+                <FaEye className="h-6 w-6" />
+              )}
             </span>
           </div>
-          {errors.password && (
-            <p className="text-red-500 text-sm">{errors.password.message}</p>
-          )}
           <button
             type="submit"
-            className="w-full bg-red-400 text-white font-bold py-2 rounded-md hover:opacity-80 focus:outline-none"
+            className="w-full bg-[#557C55] text-white font-bold py-2 rounded-md hover:opacity-80 focus:outline-none"
           >
             {loading ? <Loader {...{ isLoading: loading }} /> : "Login"}
           </button>
