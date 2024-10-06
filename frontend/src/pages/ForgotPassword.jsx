@@ -3,6 +3,8 @@ import axios from "axios";
 import { useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Toast } from "../components";
+import { FaArrowLeft, FaEnvelope } from "react-icons/fa";
+import logo from "../../public/logo.png";
 import "react-toastify/dist/ReactToastify.css";
 
 const ForgotPassword = () => {
@@ -13,29 +15,38 @@ const ForgotPassword = () => {
 
   const handleForgotPassword = async (event) => {
     event.preventDefault();
-    setLoading(true); // Start loading state
+    setLoading(true);
 
     try {
-      const response = await axios.post("/users/forgot-password", { email });
-      toast.success(response.data.message);
-      console.log(response.data.message); // Show success message
-    } catch (err) {
-      // Handle error and show error message
-      toast.error(err.response?.data?.error || "Failed to send reset link.");
+      const response = await (
+        await axios.post("/users/forgot-password", { email })
+      ).data;
+      if (!response.success) throw new Error(response.message);
+      toast.success(response.message);
+    } catch (error) {
+      console.error(error.message);
+      toast.error(error.message);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="bg-image-logo bg-cover w-full h-screen flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-md p-6">
-        <button
-          onClick={() => window.history.back()}
-          className="mb-4 text-[#A0D9A4] hover:text-[#557C55]"
-        >
-          &larr; Back to Login
-        </button>
+    <div className="flex items-center justify-center h-screen bg-[#f5f5f5]">
+      <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
+        <div className="flex justify-between mb-4">
+          <button
+            type="button"
+            className="text-[#557C55] hover:text-red-600 transition-colors duration-200 ease-in-out flex items-center"
+            onClick={() => window.history.back()}
+          >
+            <FaArrowLeft className="h-4 w-4 mr-1" />
+            <span className="text-sm">Back</span>
+          </button>
+        </div>
+        <div className="flex justify-center mb-4">
+          <img src={logo} alt="Logo" className="h-12" />
+        </div>
         <h2 className="text-center text-2xl font-semibold mb-5 text-[#557C55]">
           {role === "Admin"
             ? "Admin Forgot Password"
@@ -46,19 +57,14 @@ const ForgotPassword = () => {
           password.
         </p>
         <form className="space-y-4" onSubmit={handleForgotPassword}>
-          <div>
-            <label
-              htmlFor="email"
-              className="block mb-1 font-semibold text-[#557C55]"
-            >
-              Email
-            </label>
+          <div className="flex items-center border border-gray-300 rounded-md focus-within:border-[#557C55]">
+            <FaEnvelope className="h-6 w-6 ml-2 mr-1 text-gray-600" />
             <input
               type="email"
               id="email"
               name="email"
               placeholder="Enter your email"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#557C55]"
+              className="w-full px-3 py-2 bg-white focus:outline-none"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -66,14 +72,14 @@ const ForgotPassword = () => {
           </div>
           <button
             type="submit"
-            className={`w-full text-white py-2 rounded-md ${
+            className={`w-full text-white py-2 rounded-md font-bold ${
               loading
                 ? "bg-gray-400 cursor-not-allowed"
                 : "bg-[#557C55] hover:bg-[#6EA46E]"
             }`}
             disabled={loading}
           >
-            {loading ? "Sending..." : "Send Reset Link"}{" "}
+            {loading ? "Sending..." : "Send Reset Link"}
           </button>
         </form>
         <Toast />
