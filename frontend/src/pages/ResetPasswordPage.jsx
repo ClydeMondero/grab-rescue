@@ -3,9 +3,9 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { Toast } from "../components";
-import { FaEye, FaEyeSlash, FaLock, FaArrowLeft } from "react-icons/fa"; // Import icons
-import zxcvbn from "zxcvbn"; // Import zxcvbn
-import logo from "../../public/logo.png"; // Import logo
+import { FaEye, FaEyeSlash, FaLock, FaArrowLeft } from "react-icons/fa";
+import zxcvbn from "zxcvbn";
+import logo from "../../public/logo.png";
 import "react-toastify/dist/ReactToastify.css";
 
 const ResetPassword = () => {
