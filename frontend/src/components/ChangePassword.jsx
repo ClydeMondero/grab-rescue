@@ -1,5 +1,13 @@
 import { useState } from "react";
-import { FaArrowLeft, FaSync, FaEye, FaEyeSlash, FaKey } from "react-icons/fa";
+import {
+  FaArrowLeft,
+  FaSync,
+  FaEye,
+  FaEyeSlash,
+  FaKey,
+  FaLock,
+  FaLockOpen,
+} from "react-icons/fa"; // Import icons for password fields
 import { useNavigate } from "react-router-dom";
 import { createAuthHeader } from "../services/authService";
 import axios from "axios";
@@ -103,14 +111,14 @@ const ChangePassword = (props) => {
   };
 
   return (
-    <div className="flex-1 p-3 h-100 bg-gray-50 flex flex-col">
-      <div className="flex items-center mb-2">
+    <div className="flex-1 p-3 h-full  flex flex-col">
+      <div className="flex items-center mb-2 max-w-md">
         <FaArrowLeft
           className="text-lg sm:text-xl text-[#557C55] cursor-pointer"
           onClick={() => navigate(-1)}
         />
         <FaKey className="text-2xl sm:text-3xl text-[#557C55] mr-2" />
-        <h4 className="text-xl sm:text-2xl font-semibold ml-2 text-[#557C55]">
+        <h4 className="text-lg sm:text-xl font-semibold ml-2 text-[#557C55]">
           Change Password
         </h4>
       </div>
@@ -119,25 +127,21 @@ const ChangePassword = (props) => {
           Update your password:
         </p>
         <form className="space-y-2" onSubmit={handleSubmit}>
+          {/* Current Password Field */}
           <div className="relative">
-            <label
-              htmlFor="current-password"
-              className="block text-xs sm:text-sm font-semibold text-[#557C55]"
-            >
-              Current Password:
-            </label>
+            <FaLock className="absolute left-3 top-3 text-gray-600" />
             <input
               type={showPasswords.currentPassword ? "text" : "password"}
               id="current-password"
               name="currentPassword"
               value={passwords.currentPassword}
               onChange={handlePasswordChange}
-              className="w-full p-3 pr-12 border rounded bg-[#F9F9F9] border-gray-300 text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-[#557C55] transition"
+              className="w-full p-2 pl-10 pr-12 border rounded bg-[#F9F9F9] border-gray-300 text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-[#557C55] transition"
               placeholder="Enter your current password"
             />
             <button
               type="button"
-              className="absolute inset-y-0 right-3 top-5 flex items-center justify-center"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center justify-center"
               onClick={() => togglePasswordVisibility("currentPassword")}
             >
               {showPasswords.currentPassword ? (
@@ -148,44 +152,32 @@ const ChangePassword = (props) => {
             </button>
           </div>
 
+          {/* New Password Field */}
           <div className="relative">
-            <label
-              htmlFor="new-password"
-              className="block text-xs sm:text-sm font-semibold text-[#557C55]"
-            >
-              New Password:
-            </label>
+            <FaLockOpen className="absolute left-3 top-3 text-gray-600" />
             <input
               type={showPasswords.newPassword ? "text" : "password"}
               id="new-password"
               name="newPassword"
               value={passwords.newPassword}
               onChange={handlePasswordChange}
-              className="w-full p-3 pr-12 border rounded bg-[#F9F9F9] border-gray-300 text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-[#557C55] transition"
+              className="w-full p-2 pl-10 pr-12 border rounded bg-[#F9F9F9] border-gray-300 text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-[#557C55] transition"
               placeholder="Enter a new password"
             />
             <button
               type="button"
-              className="absolute inset-y-0 right-3 top-5 flex items-center justify-center"
+              className="absolute right-3 top-2 sm:top-5 sm:transform sm:-translate-y-1/2 flex items-center justify-center"
               onClick={() => togglePasswordVisibility("newPassword")}
             >
               {showPasswords.newPassword ? (
-                <FaEyeSlash
-                  style={{ marginTop: "-40px" }}
-                  size={20}
-                  color="#557C55"
-                />
+                <FaEyeSlash size={20} color="#557C55" />
               ) : (
-                <FaEye
-                  style={{ marginTop: "-40px" }}
-                  size={20}
-                  color="#557C55"
-                />
+                <FaEye size={20} color="#557C55" />
               )}
             </button>
             {/* Password Strength Meter */}
             <div className="mt-2">
-              <strong className="block text-xs sm:text-sm md:text-base font-semibold text-[#557C55]">
+              <strong className="block text-xs sm:text-sm font-semibold text-[#557C55]">
                 Password Strength: {getStrengthLabel(passwordStrength.score)}
               </strong>
               <div
@@ -199,7 +191,7 @@ const ChangePassword = (props) => {
                 <div
                   style={{
                     width: `${(passwordStrength.score + 1) * 20}%`,
-                    height: "5px",
+                    height: "3px",
                     backgroundColor:
                       passwordStrength.score === 4
                         ? "green"
@@ -215,7 +207,7 @@ const ChangePassword = (props) => {
                 />
               </div>
               {passwordStrength.feedback.length > 0 && (
-                <ul className="text-sm text-red-500">
+                <ul className="text-xs text-red-500">
                   {passwordStrength.feedback.map((item, index) => (
                     <li key={index}>{item}</li>
                   ))}
@@ -224,25 +216,21 @@ const ChangePassword = (props) => {
             </div>
           </div>
 
+          {/* Confirm Password Field */}
           <div className="relative">
-            <label
-              htmlFor="confirm-password"
-              className="block text-xs sm:text-sm font-semibold text-[#557C55]"
-            >
-              Confirm New Password:
-            </label>
+            <FaLockOpen className="absolute left-3 top-3 text-gray-600" />
             <input
               type={showPasswords.confirmPassword ? "text" : "password"}
               id="confirm-password"
               name="confirmPassword"
               value={passwords.confirmPassword}
               onChange={handlePasswordChange}
-              className="w-full p-3 pr-12 border rounded bg-[#F9F9F9] border-gray-300 text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-[#557C55] transition"
+              className="w-full p-2 pl-10 pr-12 border rounded bg-[#F9F9F9] border-gray-300 text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-[#557C55] transition"
               placeholder="Confirm your new password"
             />
             <button
               type="button"
-              className="absolute inset-y-0 right-3 top-5 flex items-center justify-center"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center justify-center"
               onClick={() => togglePasswordVisibility("confirmPassword")}
             >
               {showPasswords.confirmPassword ? (
@@ -261,8 +249,8 @@ const ChangePassword = (props) => {
             Update Password
           </button>
         </form>
-        <Toast />
       </div>
+      <Toast />
     </div>
   );
 };
