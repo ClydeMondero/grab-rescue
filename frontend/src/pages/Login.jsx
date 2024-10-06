@@ -105,7 +105,7 @@ const Login = () => {
         <div className="flex justify-center mb-4">
           <img src={logo} alt="Logo" className="h-12" />
         </div>
-        <h2 className="text-center text-2xl font-semibold mb-5">
+        <h2 className="text-center text-2xl font-semibold mb-5 text-[#557C55]">
           Login as {role}
         </h2>
         <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
