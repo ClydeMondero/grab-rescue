@@ -84,7 +84,7 @@ const ChangeEmail = (props) => {
                 </label>
                 <div className="relative flex items-center">
                   <FaEnvelope
-                    className="absolute left-3 text-[#557C55]"
+                    className="absolute left-3 text-gray-600"
                     size={20}
                   />
                   <input
@@ -101,15 +101,9 @@ const ChangeEmail = (props) => {
             )}
 
             <div className="relative">
-              <label
-                htmlFor="new-email"
-                className="block text-xs sm:text-sm font-semibold text-[#557C55]"
-              >
-                New Email:
-              </label>
               <div className="relative flex items-center">
                 <FaEnvelope
-                  className="absolute left-3 text-[#557C55]"
+                  className="absolute left-3 text-gray-600"
                   size={20}
                 />
                 <input
