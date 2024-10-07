@@ -3,7 +3,9 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { Toast } from "../components";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaEye, FaEyeSlash, FaLock, FaArrowLeft } from "react-icons/fa";
+import zxcvbn from "zxcvbn";
+import logo from "../../public/logo.png";
 import "react-toastify/dist/ReactToastify.css";
 
 const ResetPassword = () => {
@@ -12,112 +14,185 @@ const ResetPassword = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState({
+    score: 0,
+    feedback: [],
+  });
   const navigate = useNavigate();
 
   const handleResetPassword = async (event) => {
     event.preventDefault();
 
     try {
-      const response = await axios.post(`/users/reset-password/${token}`, {
-        newPassword,
-        confirmPassword,
-      });
+      const response = await (
+        await axios.post(`/users/reset-password/${token}`, {
+          newPassword,
+          confirmPassword,
+        })
+      ).data;
 
-      // Show success toast for 200 response
-      toast.success(response.data.message);
+      if (!response.success) throw new Error(response.message);
+      toast.success(response.message);
       setTimeout(() => navigate("/"), 2000);
-    } catch (err) {
-      const errorMessage =
-        err.response?.data?.error || "Failed to reset password.";
+    } catch (error) {
+      console.error(error.message);
+      toast.error(error.message);
+    }
+  };
 
-      // Show error toast for 400 and 404 status
-      if (err.response) {
-        if (err.response.status === 400) {
-          toast.error(errorMessage); // Display the error message for 400 status
-        } else if (err.response.status === 404) {
-          toast.error(errorMessage); // Display the error message for 404 status
-        } else {
-          toast.error("Something went wrong. Please try again."); // General error toast
-        }
-      } else {
-        toast.error("Network error. Please check your connection."); // Handle other cases
-      }
+  const handleNewPasswordChange = (e) => {
+    const value = e.target.value;
+    setNewPassword(value);
+    const result = zxcvbn(value);
+    setPasswordStrength(result);
+  };
+
+  const getStrengthLabel = (score) => {
+    switch (score) {
+      case 0:
+        return "Very Weak";
+      case 1:
+        return "Weak";
+      case 2:
+        return "Fair";
+      case 3:
+        return "Good";
+      case 4:
+        return "Strong";
+      default:
+        return "";
     }
   };
 
   return (
-    <div className="w-full h-screen flex items-center justify-center p-4 bg-gray-100">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-md p-6">
+    <div className="flex items-center justify-center h-screen bg-[#f5f5f5]">
+      <div className="w-full max-w-md p-6 bg-white rounded-lg">
+        {/* Back button */}
+        <div className="flex justify-between mb-4">
+          <button
+            type="button"
+            className="text-[#557C55] hover:text-red-600 transition-colors duration-200 ease-in-out flex items-center"
+            onClick={() => navigate("/", { replace: true })}
+          >
+            <FaArrowLeft className="h-4 w-4 mr-1" />
+            <span className="text-sm">Back</span>
+          </button>
+        </div>
+
+        {/* Logo */}
+        <div className="flex justify-center mb-4">
+          <img src={logo} alt="Logo" className="h-12" />
+        </div>
+
+        {/* Title */}
         <h2 className="text-center text-2xl font-semibold mb-5 text-[#557C55]">
           Reset Your Password
         </h2>
-        <p className="text-center text-sm text-gray-600 mb-6">
-          Please enter a new password.
-        </p>
+
         <form className="space-y-4" onSubmit={handleResetPassword}>
+          {/* New Password Input */}
           <div>
-            <label
-              htmlFor="newPassword"
-              className="block mb-1 font-semibold text-[#557C55]"
-            >
-              New Password
-            </label>
-            <div className="relative">
+            <div className="flex items-center border border-gray-300 rounded-md focus-within:border-[#557C55]">
+              <FaLock className="h-6 w-6 ml-2 mr-1 text-gray-600" />
               <input
                 type={showNewPassword ? "text" : "password"}
                 id="newPassword"
                 name="newPassword"
                 placeholder="Enter new password"
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#557C55]"
+                className="w-full px-3 py-2 bg-white focus:outline-none"
                 value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
+                onChange={handleNewPasswordChange}
                 required
               />
-              <button
-                type="button"
-                className="absolute inset-y-0 right-0 flex items-center pr-3 text-[#557C55]"
+              <span
+                className="ml-2 mr-2 cursor-pointer text-[#557C55]"
                 onClick={() => setShowNewPassword(!showNewPassword)}
               >
-                {showNewPassword ? <FaEyeSlash /> : <FaEye />}{" "}
-                {/* Toggle icon */}
-              </button>
+                {showNewPassword ? (
+                  <FaEyeSlash className="h-6 w-6" />
+                ) : (
+                  <FaEye className="h-6 w-6" />
+                )}
+              </span>
+            </div>
+
+            {/* Password Strength Meter */}
+            <div className="mt-2">
+              <strong className="text-sm text-[#557C55]">
+                Password Strength: {getStrengthLabel(passwordStrength.score)}
+              </strong>
+              <div
+                style={{
+                  width: "100%",
+                  backgroundColor: "#e0e0e0",
+                  borderRadius: "5px",
+                  marginTop: "5px",
+                }}
+              >
+                <div
+                  style={{
+                    width: `${(passwordStrength.score + 1) * 20}%`,
+                    height: "5px",
+                    backgroundColor:
+                      passwordStrength.score === 4
+                        ? "green"
+                        : passwordStrength.score === 3
+                        ? "blue"
+                        : passwordStrength.score === 2
+                        ? "yellow"
+                        : passwordStrength.score === 1
+                        ? "orange"
+                        : "red",
+                    borderRadius: "3px",
+                  }}
+                />
+              </div>
+              {passwordStrength.feedback.length > 0 && (
+                <ul className="text-sm text-red-500">
+                  {passwordStrength.feedback.map((item, index) => (
+                    <li key={index}>{item}</li>
+                  ))}
+                </ul>
+              )}
             </div>
           </div>
+
+          {/* Confirm Password Input */}
           <div>
-            <label
-              htmlFor="confirmPassword"
-              className="block mb-1 font-semibold text-[#557C55]"
-            >
-              Confirm Password
-            </label>
-            <div className="relative">
+            <div className="flex items-center border border-gray-300 rounded-md focus-within:border-[#557C55]">
+              <FaLock className="h-6 w-6 ml-2 mr-1 text-gray-600" />
               <input
                 type={showConfirmPassword ? "text" : "password"}
                 id="confirmPassword"
                 name="confirmPassword"
                 placeholder="Confirm new password"
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#557C55]"
+                className="w-full px-3 py-2 bg-white focus:outline-none"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
               />
-              <button
-                type="button"
-                className="absolute inset-y-0 right-0 flex items-center pr-3 text-[#557C55]"
+              <span
+                className="ml-2 mr-2 cursor-pointer text-[#557C55]"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               >
-                {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}{" "}
-                {/* Toggle icon */}
-              </button>
+                {showConfirmPassword ? (
+                  <FaEyeSlash className="h-6 w-6" />
+                ) : (
+                  <FaEye className="h-6 w-6" />
+                )}
+              </span>
             </div>
           </div>
+
+          {/* Submit Button */}
           <button
             type="submit"
-            className="w-full bg-[#557C55] text-white py-2 rounded-md hover:bg-[#6EA46E]"
+            className="w-full bg-[#557C55] text-white font-bold py-2 rounded-md hover:opacity-80 focus:outline-none"
           >
             Reset Password
           </button>
         </form>
+
         <Toast />
       </div>
     </div>

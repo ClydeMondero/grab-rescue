@@ -6,12 +6,17 @@ import { toast } from "react-toastify";
 import { barangaysData } from "../constants/Barangays";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { Toast } from "../components";
+import zxcvbn from "zxcvbn"; // Import zxcvbn
 import "react-toastify/dist/ReactToastify.css";
 
 const AddRescuer = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState({
+    score: 0,
+    feedback: [],
+  });
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -62,6 +67,14 @@ const AddRescuer = () => {
         [name]: value,
         age: age,
       }));
+    } else if (name === "password") {
+      // Update password strength on password input change
+      const result = zxcvbn(value);
+      setPasswordStrength(result);
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
     } else {
       setFormData((prevData) => ({
         ...prevData,
@@ -85,14 +98,12 @@ const AddRescuer = () => {
       confirmPassword: "",
       age: "",
     });
+    setPasswordStrength({ score: 0, feedback: [] }); // Reset password strength
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true); // Start loading state
-
-    // Check if formData contains all required fields
-    console.log("Form data before submission:", formData);
 
     const requiredFields = [
       "firstName",
@@ -107,43 +118,35 @@ const AddRescuer = () => {
       "confirmPassword",
     ];
 
-    for (const field of requiredFields) {
-      if (!formData[field]) {
-        toast.error(
-          `Please fill out the ${field
-            .replace(/([A-Z])/g, " $1")
-            .toLowerCase()} field.`
-        );
-        setLoading(false); // Stop loading state on error
-        return;
-      }
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      toast.error("Passwords do not match");
-      setLoading(false); // Stop loading state on error
-      return;
-    }
-
     try {
-      const response = await axios.post("/rescuers/create", formData);
-      toast.success(response.data.message); // Display success message
-      resetForm(); // Reset the form after successful submission
+      const response = await (
+        await axios.post("/rescuers/create", formData)
+      ).data;
+      if (!response.success) throw new Error(response.message);
+      toast.success(response.message);
+      resetForm();
     } catch (error) {
-      if (error.response) {
-        // Server responded with a status other than 2xx
-        if (error.response.status === 400) {
-          toast.error(error.response.data.error); // Show the error message from the server
-        } else if (error.response.status === 404) {
-          toast.error("Resource not found. Please check the entered data."); // Custom message for 404
-        } else {
-          toast.error("An unexpected error occurred. Please try again."); // General error message
-        }
-      } else {
-        toast.error("Network error. Please check your connection."); // Handle network errors
-      }
+      console.error(error.message);
+      toast.error(error.message);
     } finally {
-      setLoading(false); // Ensure loading state is reset in all cases
+      setLoading(false);
+    }
+  };
+
+  const getStrengthLabel = (score) => {
+    switch (score) {
+      case 0:
+        return "Very Weak";
+      case 1:
+        return "Weak";
+      case 2:
+        return "Fair";
+      case 3:
+        return "Good";
+      case 4:
+        return "Strong";
+      default:
+        return "";
     }
   };
 
@@ -378,7 +381,47 @@ const AddRescuer = () => {
                   )}
                 </div>
               </div>
+              {/* Password Strength Meter */}
+              <div className="mt-2">
+                <strong className="text-sm text-[#557C55]">
+                  Password Strength: {getStrengthLabel(passwordStrength.score)}
+                </strong>
+                <div
+                  style={{
+                    width: "100%",
+                    backgroundColor: "#e0e0e0",
+                    borderRadius: "5px",
+                    marginTop: "5px",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: `${(passwordStrength.score + 1) * 20}%`,
+                      height: "5px",
+                      backgroundColor:
+                        passwordStrength.score === 4
+                          ? "green"
+                          : passwordStrength.score === 3
+                          ? "blue"
+                          : passwordStrength.score === 2
+                          ? "yellow"
+                          : passwordStrength.score === 1
+                          ? "orange"
+                          : "red",
+                      borderRadius: "3px",
+                    }}
+                  />
+                </div>
+                {passwordStrength.feedback.length > 0 && (
+                  <ul className="text-sm text-red-500">
+                    {passwordStrength.feedback.map((item, index) => (
+                      <li key={index}>{item}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             </div>
+
             <div>
               <label
                 htmlFor="confirmPassword"
