@@ -211,7 +211,7 @@ module.exports.UpdateUserEmail = async (req, res) => {
     // Check if the new email is the same as the current or pending email
     if (email === oldEmail || email === pendingEmail) {
       return res.status(200).json({
-        success: true,
+        success: false,
         message: "The email is the same. No changes made.",
       });
     }

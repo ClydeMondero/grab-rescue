@@ -9,18 +9,12 @@ import { Toast } from "../components";
 
 const ViewProfile = (props) => {
   const navigate = useNavigate();
-  const { user } = props; // Assume user is passed as a prop
+  const { user } = props;
   const [profile, setProfile] = useState(user);
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
-  // Redirect if the user is an Admin
-  useEffect(() => {
-    if (user.role === "Admin") {
-      navigate("/admin");
-    }
-  }, [user.role, navigate]);
-
+  // Remove the redirect for Admin users
   useEffect(() => {
     console.log(profile);
   }, [profile]);
@@ -39,20 +33,20 @@ const ViewProfile = (props) => {
 
     try {
       const authHeader = createAuthHeader();
-      const response = await axios.put(`/users/update/${profile.id}`, profile, {
-        headers: {
-          ...authHeader,
-          "Content-Type": "application/json",
-        },
-      });
-      if (response.status === 200) {
-        toast.success("Profile updated successfully!");
-      } else {
-        toast.error("Failed to update profile.");
-      }
+      const response = await (
+        await axios.put(`/users/update/${profile.id}`, profile, {
+          headers: {
+            ...authHeader,
+            "Content-Type": "application/json",
+          },
+        })
+      ).data;
+
+      if (!response.success) throw new Error(response.message);
+      toast.success(response.message);
     } catch (error) {
-      console.error("Error updating profile:", error);
-      toast.error("Error updating profile.");
+      console.error(error.message);
+      toast.error(error.message);
     } finally {
       setLoading(false);
       setIsEditing(false);
@@ -60,24 +54,24 @@ const ViewProfile = (props) => {
   };
 
   return (
-    <div className="flex-1 p-6 h-full bg-gray-100">
+    <div className="flex-1 p-2 md:p-4 h-full">
       {/* Back button and header */}
-      <div className="flex items-center mb-6">
+      <div className="flex items-center mb-2 md:mb-4">
         <FaArrowLeft
-          className="text-xl text-[#557C55] cursor-pointer"
-          onClick={() => navigate(-1)}
+          className="text-base md:text-lg text-[#557C55] cursor-pointer"
+          onClick={() => navigate("/admin")}
         />
-        <FaUser className="text-2xl sm:text-3xl text-[#557C55] mr-2" />
-        <h4 className="text-xl sm:text-2xl font-semibold ml-2 text-[#557C55]">
+        <FaUser className="text-xl md:text-2xl text-[#557C55] mr-1" />
+        <h4 className="text-sm md:text-lg font-semibold ml-1 text-[#557C55]">
           View Profile
         </h4>
       </div>
 
       {/* Main Profile Container */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 gap-2 md:grid-cols-2 md:gap-4">
         {/* Profile Picture Section */}
-        <div className="bg-white rounded-lg p-6">
-          <h2 className="text-lg font-bold text-[#557C55] mb-4">
+        <div className="bg-white rounded-lg p-2 md:p-4 ">
+          <h2 className="text-xs md:text-sm font-bold text-[#557C55] mb-1">
             Profile Picture
           </h2>
           <div className="flex justify-center">
@@ -85,22 +79,22 @@ const ViewProfile = (props) => {
               <img
                 src="/path/to/profile-picture.jpg" // Change this to your profile picture source
                 alt="Profile"
-                className="rounded-full w-32 h-32 object-cover"
+                className="rounded-full w-20 md:w-32 h-20 md:h-32 object-cover border border-gray-300 shadow-md"
               />
               {/* Upload new picture */}
-              <button className="absolute bottom-0 right-0 bg-[#557C55] text-white p-2 rounded-full hover:bg-[#6EA46E] transition">
-                <FaEdit />
+              <button className="absolute bottom-0 right-0 bg-[#557C55] text-white p-1 md:p-2 rounded-full hover:bg-[#6EA46E] transition shadow-md">
+                <FaEdit className="text-xs md:text-sm" />
               </button>
             </div>
           </div>
         </div>
 
         {/* Profile Information Card */}
-        <div className="bg-white rounded-lg p-6">
-          <h2 className="text-lg font-bold text-[#557C55] mb-4">
+        <div className="bg-white rounded-lg p-2 md:p-4 ">
+          <h2 className="text-xs md:text-sm font-bold text-[#557C55] mb-1">
             Profile Information
           </h2>
-          <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm text-gray-700">
+          <dl className="grid grid-cols-1 gap-1 md:grid-cols-2 md:gap-2 text-xs text-gray-700">
             <dt className="font-semibold text-[#557C55]">Username:</dt>
             <dd>{profile.username}</dd>
 
@@ -110,7 +104,7 @@ const ViewProfile = (props) => {
             <dt className="font-semibold text-[#557C55]">Last Name:</dt>
             <dd>{profile.last_name}</dd>
 
-            {user.role === "Admin" && (
+            {user.account_type === "Admin" && (
               <>
                 <dt className="font-semibold text-[#557C55]">Municipality:</dt>
                 <dd>{profile.municipality}</dd>
@@ -132,12 +126,12 @@ const ViewProfile = (props) => {
           </dl>
 
           {/* Edit Profile Button */}
-          <div className="mt-6">
+          <div className="mt-2 md:mt-4">
             <button
               onClick={() => setIsEditing(true)}
-              className="bg-[#557C55] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-[#6EA46E] transition flex items-center"
+              className="bg-[#557C55] text-white px-2 py-1 md:px-3 md:py-2 rounded-md text-xs font-semibold hover:bg-[#6EA46E] transition flex items-center shadow-md"
             >
-              <FaEdit className="mr-2" /> Edit Profile
+              <FaEdit className="mr-1" /> Edit Profile
             </button>
           </div>
         </div>
@@ -146,20 +140,22 @@ const ViewProfile = (props) => {
       {/* Edit Profile Modal */}
       {isEditing && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="relative bg-white p-8 w-2/3 md:w-2/3 lg:w-1/2 max-h-[500px] overflow-y-auto">
+          <div className="relative bg-white p-2 md:p-4 w-full md:w-2/3 lg:w-1/2 max-h-[500px] overflow-y-auto rounded-lg shadow-lg">
             <FaTimes
-              className="absolute top-4 right-4 text-[#557C55] hover:text-gray-700 cursor-pointer"
+              className="absolute top-2 right-2 text-[#557C55] hover:text-gray-700 cursor-pointer"
               onClick={() => setIsEditing(false)}
             />
-            <div className="flex items-center mb-4">
-              <FaUser className="mr-2 text-[#557C55]" />
-              <h4 className="text-lg font-bold text-[#557C55]">Edit Profile</h4>
+            <div className="flex items-center mb-2 md:mb-4">
+              <FaUser className="mr-1 md:mr-2 text-[#557C55]" />
+              <h4 className="text-sm md:text-lg font-bold text-[#557C55]">
+                Edit Profile
+              </h4>
             </div>
-            <form className="space-y-4" onSubmit={handleSubmit}>
+            <form className="space-y-1 md:space-y-2" onSubmit={handleSubmit}>
               <div>
                 <label
                   htmlFor="username"
-                  className="block text-sm font-semibold text-[#557C55]"
+                  className="block text-xs font-semibold text-[#557C55]"
                 >
                   Username:
                 </label>
@@ -169,16 +165,16 @@ const ViewProfile = (props) => {
                   name="username"
                   value={profile.username}
                   onChange={handleProfileChange}
-                  className="w-full p-3 border rounded-lg bg-gray-100 border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
+                  className="w-full p-1 border rounded-lg bg-gray-100 border-gray-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
                 />
               </div>
 
               {/* Common fields for both roles */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-1 md:gap-2">
                 <div>
                   <label
                     htmlFor="first_name"
-                    className="block text-sm font-semibold text-[#557C55]"
+                    className="block text-xs font-semibold text-[#557C55]"
                   >
                     First Name:
                   </label>
@@ -188,13 +184,13 @@ const ViewProfile = (props) => {
                     name="first_name"
                     value={profile.first_name}
                     onChange={handleProfileChange}
-                    className="w-full p-3 border rounded-lg bg-gray-100 border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
+                    className="w-full p-1 border rounded-lg bg-gray-100 border-gray-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
                   />
                 </div>
                 <div>
                   <label
                     htmlFor="last_name"
-                    className="block text-sm font-semibold text-[#557C55]"
+                    className="block text-xs font-semibold text-[#557C55]"
                   >
                     Last Name:
                   </label>
@@ -204,18 +200,18 @@ const ViewProfile = (props) => {
                     name="last_name"
                     value={profile.last_name}
                     onChange={handleProfileChange}
-                    className="w-full p-3 border rounded-lg bg-gray-100 border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
+                    className="w-full p-1 border rounded-lg bg-gray-100 border-gray-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
                   />
                 </div>
               </div>
 
               {/* Only Admins should see these fields */}
-              {user.role === "Admin" && (
+              {user.account_type === "Admin" && (
                 <>
                   <div>
                     <label
                       htmlFor="municipality"
-                      className="block text-sm font-semibold text-[#557C55]"
+                      className="block text-xs font-semibold text-[#557C55]"
                     >
                       Municipality:
                     </label>
@@ -225,13 +221,13 @@ const ViewProfile = (props) => {
                       name="municipality"
                       value={profile.municipality}
                       onChange={handleProfileChange}
-                      className="w-full p-3 border rounded-lg bg-gray-100 border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
+                      className="w-full p-1 border rounded-lg bg-gray-100 border-gray-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
                     />
                   </div>
                   <div>
                     <label
                       htmlFor="barangay"
-                      className="block text-sm font-semibold text-[#557C55]"
+                      className="block text-xs font-semibold text-[#557C55]"
                     >
                       Barangay:
                     </label>
@@ -241,7 +237,7 @@ const ViewProfile = (props) => {
                       name="barangay"
                       value={profile.barangay}
                       onChange={handleProfileChange}
-                      className="w-full p-3 border rounded-lg bg-gray-100 border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
+                      className="w-full p-1 border rounded-lg bg-gray-100 border-gray-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
                     />
                   </div>
                 </>
@@ -250,7 +246,7 @@ const ViewProfile = (props) => {
               <div>
                 <label
                   htmlFor="contact_number"
-                  className="block text-sm font-semibold text-[#557C55]"
+                  className="block text-xs font-semibold text-[#557C55]"
                 >
                   Contact Number:
                 </label>
@@ -260,41 +256,25 @@ const ViewProfile = (props) => {
                   name="contact_number"
                   value={profile.contact_number}
                   onChange={handleProfileChange}
-                  className="w-full p-3 border rounded-lg bg-gray-100 border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
+                  className="w-full p-1 border rounded-lg bg-gray-100 border-gray-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
                 />
               </div>
 
-              <div>
-                <label
-                  htmlFor="birthday"
-                  className="block text-sm font-semibold text-[#557C55]"
-                >
-                  Birthday:
-                </label>
-                <input
-                  type="date"
-                  id="birthday"
-                  name="birthday"
-                  value={profile.birthday}
-                  onChange={handleProfileChange}
-                  className="w-full p-3 border rounded-lg bg-gray-100 border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
-                />
-              </div>
-
-              {/* Submit button */}
               <div className="flex justify-end">
                 <button
                   type="submit"
-                  className="bg-[#557C55] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-[#6EA46E] transition flex items-center"
+                  className="bg-[#557C55] text-white px-2 py-1 rounded-md text-xs font-semibold hover:bg-[#6EA46E] transition flex items-center shadow-md"
+                  disabled={loading}
                 >
-                  <FaSave className="mr-2" /> Save Changes
+                  {loading ? "Saving..." : "Save Changes"}{" "}
+                  <FaSave className="ml-1" />
                 </button>
               </div>
             </form>
-            <Toast />
           </div>
         </div>
       )}
+      <Toast />
     </div>
   );
 };
