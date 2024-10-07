@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import axios from "axios";
+import { Loader } from "../components";
 
 const PrivateRoute = ({ Component }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -9,6 +10,9 @@ const PrivateRoute = ({ Component }) => {
 
   const verifyToken = async () => {
     setLoading(true);
+
+    // Add a natural delay to avoid multiple requests on fast refreshes
+    await new Promise((resolve) => setTimeout(resolve, 1500));
 
     const { data } = await axios.post("/auth/", {}, { withCredentials: true });
 
@@ -28,8 +32,11 @@ const PrivateRoute = ({ Component }) => {
   }, []);
 
   if (loading) {
-    //TODO: add loading indicator
-    return <div>Loading...</div>;
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <Loader isLoading={loading} color={"#557C55"} />
+      </div>
+    );
   }
 
   if (isAuthenticated) {

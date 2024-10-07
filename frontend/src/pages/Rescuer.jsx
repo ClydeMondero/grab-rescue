@@ -1,5 +1,5 @@
 import { useState } from "react";
-import {Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import {
   Navigate,
   Status,
@@ -8,7 +8,7 @@ import {
   Complete,
   ViewProfile,
   ChangePassword,
-  Hero,
+  Header,
   Bottom,
   RescuerMap,
   ChangeEmail,
@@ -19,7 +19,7 @@ const Rescuer = (props) => {
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col">
       {/* Header */}
-      <Hero />
+      <Header />
 
       {/* Map Section */}
       <div className="w-full h-96 bg-gray-300 flex items-center justify-center">

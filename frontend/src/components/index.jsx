@@ -9,7 +9,6 @@ import Settings from "./Settings";
 import ViewProfile from "./ViewProfile";
 import Sidebar from "./Sidebar";
 import Bottom from "./Bottom";
-import Hero from "./Hero";
 import PrivateRoute from "./PrivateRoute";
 import Toast from "./Toast";
 import Complete from "./Complete";
@@ -24,6 +23,8 @@ import DistanceEta from "./DistanceEta";
 import Navigate from "./Navigate";
 import Requests from "./Requests";
 import Status from "./Status";
+import Header from "./Header";
+
 export {
   DistanceEta,
   Markers,
@@ -44,7 +45,7 @@ export {
   ViewProfile,
   Sidebar,
   ChangeEmail,
-  Hero,
+  Header,
   Feedback,
   Complete,
   Bottom,

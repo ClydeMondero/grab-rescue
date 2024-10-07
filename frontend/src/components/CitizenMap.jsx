@@ -17,7 +17,6 @@ import {
 } from "../services/locationService";
 import { Markers, Route, Controls, DistanceEta } from "../components";
 
-//TODO: update marker icons and route
 const CitizenMap = forwardRef((props, ref) => {
   const [citizen, setCitizen] = useState({
     longitude: 120.9107,
@@ -56,7 +55,6 @@ const CitizenMap = forwardRef((props, ref) => {
     }
 
     const nearest = getNearestRescuer(citizen, rescuers);
-    console.log("Nearest rescuer:", nearest);
     setNearestRescuer(nearest);
     setCitizen({
       longitude: coords.longitude,
