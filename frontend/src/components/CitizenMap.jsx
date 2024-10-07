@@ -17,6 +17,7 @@ import {
 } from "../services/locationService";
 import { Markers, Route, Controls, DistanceEta } from "../components";
 
+//TODO: update marker icons and route
 const CitizenMap = forwardRef((props, ref) => {
   const [citizen, setCitizen] = useState({
     longitude: 120.9107,
@@ -34,8 +35,6 @@ const CitizenMap = forwardRef((props, ref) => {
 
   const [distance, setDistance] = useState();
   const [eta, setEta] = useState();
-
-  const [mapLoaded, setMapLoaded] = useState(false);
 
   const mapRef = useRef();
   const geoControlRef = useRef();
@@ -57,6 +56,7 @@ const CitizenMap = forwardRef((props, ref) => {
     }
 
     const nearest = getNearestRescuer(citizen, rescuers);
+    console.log("Nearest rescuer:", nearest);
     setNearestRescuer(nearest);
     setCitizen({
       longitude: coords.longitude,
@@ -105,7 +105,6 @@ const CitizenMap = forwardRef((props, ref) => {
       mapboxAccessToken={import.meta.env.VITE_MAPBOX_TOKEN}
       onLoad={() => {
         geoControlRef.current?.trigger();
-        setMapLoaded(true);
       }}
     >
       <GeolocateControl
@@ -123,11 +122,7 @@ const CitizenMap = forwardRef((props, ref) => {
         rescuers={rescuers}
         nearestRescuer={nearestRescuer}
       />
-      <Route
-        routeData={routeData}
-        routeOpacity={routeOpacity}
-        mapLoaded={mapLoaded}
-      />
+      <Route routeData={routeData} routeOpacity={routeOpacity} />
       <Controls
         mapRef={mapRef}
         nearestRescuer={nearestRescuer}

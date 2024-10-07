@@ -1,13 +1,11 @@
-import rescuerActive from "../assets/rescuer-active.svg";
-import routeIcon from "../assets/route.svg";
 import hideRoute from "../assets/hide-route.svg";
-import zoomOutIcon from "../assets/zoom-out.svg";
 import { useState, forwardRef, useImperativeHandle } from "react";
+import { BiSolidAmbulance, BiSolidHide, BiSolidShow } from "react-icons/bi";
+import { MdRoute } from "react-icons/md";
 
 const Controls = forwardRef(
   ({ mapRef, nearestRescuer, routeData, setRouteOpacity }, ref) => {
     const [routeToggle, setRouteToggle] = useState(false);
-    const [routeToggleIcon, setRouteToggleIcon] = useState(routeIcon);
 
     const goToNearestRescuer = () => {
       if (nearestRescuer) {
@@ -26,10 +24,6 @@ const Controls = forwardRef(
         routeToggle
           ? setRouteOpacity({ background: 0.2, line: 1 })
           : setRouteOpacity({ background: 0, line: 0 });
-
-        routeToggle
-          ? setRouteToggleIcon(hideRoute)
-          : setRouteToggleIcon(routeIcon);
       }
     };
 
@@ -65,31 +59,20 @@ const Controls = forwardRef(
     return (
       <div className="ctrl-group">
         <button onClick={goToNearestRescuer} className="ctrl-icon">
-          <img
-            src={rescuerActive}
-            width={20}
-            height={20}
-            style={{ display: "block", margin: "auto" }}
-          />
+          <BiSolidAmbulance className="text-xl text-[#557C55] " />
         </button>
         {/*zoom out route */}
         <button className="ctrl-icon" onClick={fitBounds}>
-          <img
-            src={zoomOutIcon}
-            width={18}
-            height={18}
-            style={{ display: "block", margin: "auto" }}
-          />
+          <MdRoute className="text-xl text-[#3B82F6]" />
         </button>
         {/*hide route*/}
         <button className="ctrl-icon" onClick={hideRouteToRescuer}>
           {/*add route icon*/}
-          <img
-            src={routeToggleIcon}
-            width={18}
-            height={18}
-            style={{ display: "block", margin: "auto" }}
-          />
+          {routeToggle ? (
+            <BiSolidShow className="text-xl text-slate-600" />
+          ) : (
+            <BiSolidHide className="text-xl text-slate-600" />
+          )}
         </button>
       </div>
     );

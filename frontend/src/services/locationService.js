@@ -13,8 +13,6 @@ const MIN_DISTANCE_THRESHOLD = 50; //in meters
 export const hasUserMoved = (currentLat, currentLon, lastLat, lastLon) => {
   const distance = getDistance(currentLat, currentLon, lastLat, lastLon);
 
-  console.log(distance);
-
   if (distance >= MIN_DISTANCE_THRESHOLD) {
     return true;
   }
@@ -46,10 +44,9 @@ export const addCitizenLocation = async (longitude, latitude) => {
 
   //adds citizen id to cookies
   setCitizenCookie(id);
-
-  console.log("Location added");
 };
 
+//FIXME: wrong nearest rescuer
 //get nearest rescuer
 export const getNearestRescuer = (citizen, rescuers) => {
   const distances = rescuers.map((rescuer) => {
@@ -78,10 +75,8 @@ export const updateCitizenLocation = (
   const moved = hasUserMoved(prevLon, prevLat, longitude, latitude);
 
   if (moved) {
-    console.log("Location updated", moved);
     updateLocationInFirestore(id, longitude, latitude);
   } else {
-    console.log("Location not updated", moved);
   }
 };
 

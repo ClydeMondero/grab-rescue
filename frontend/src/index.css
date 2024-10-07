@@ -22,7 +22,7 @@
 .mapboxgl-ctrl
   button.mapboxgl-ctrl-geolocate.mapboxgl-ctrl-geolocate-active
   .mapboxgl-ctrl-icon {
-  background-image: url("./assets/accident-active.svg");
+  background-image: url("./assets/accident.svg");
   background-size: 20px 20px;
 }
 
@@ -30,29 +30,23 @@
 .mapboxgl-ctrl
   button.mapboxgl-ctrl-geolocate.mapboxgl-ctrl-geolocate-background
   .mapboxgl-ctrl-icon {
-  background-image: url("./assets/accident-idle.svg");
+  background-image: url("./assets/accident.svg");
   background-size: 20px 20px;
 }
 
 /* Inactive Geolacate Icon *.mapboxgl-ctrl */
 .mapboxgl-ctrl button.mapboxgl-ctrl-geolocate .mapboxgl-ctrl-icon {
-  background-image: url("./assets/accident-inactive.svg");
+  background-image: url("./assets/accident.svg");
   background-size: 20px 20px;
 }
 
-.nearest-rescuer-marker {
-  position: relative;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
+.green-pulse {
+  border-radius: 100%;
   animation: green-pulse 2s infinite;
 }
 
-.citizen-marker {
-  position: relative;
-  width: 25px;
-  height: 25px;
-  border-radius: 50%;
+.red-pulse {
+  border-radius: 100%;
   animation: red-pulse 2s infinite;
 }
 
@@ -113,7 +107,7 @@
 
 @keyframes green-pulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.7);
+    box-shadow: 0 0 0 0 rgba(0, 148, 0, 0.7);
   }
   70% {
     box-shadow: 0 0 0 20px rgba(255, 0, 0, 0);
