@@ -34,14 +34,16 @@ export const setCitizenCookie = (id) => {
   const encryptedID = encryptID(id);
 
   Cookies.set("citizen_token", encryptedID, {
-    expires: 7,
+    expires: 14,
     secure: true,
     sameSite: "Lax",
   });
 };
-
 export const getCitizenCookie = () => {
   const citizenCookie = Cookies.get("citizen_token");
+  if (!citizenCookie) {
+    return null;
+  }
 
   return decryptID(citizenCookie);
 };
