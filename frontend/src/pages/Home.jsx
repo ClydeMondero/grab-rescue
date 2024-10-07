@@ -3,13 +3,7 @@ import logo from "../assets/logo.png";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { CitizenMap as Map } from "../components";
-import {
-  FaChevronDown,
-  FaUserCircle,
-  FaUserPlus,
-  FaAmbulance,
-  FaFileAlt,
-} from "react-icons/fa";
+import { FaChevronDown } from "react-icons/fa";
 import { FaLocationPin } from "react-icons/fa6";
 import { BiSolidHide, BiSolidAmbulance } from "react-icons/bi";
 import { MdRoute } from "react-icons/md";
@@ -37,30 +31,38 @@ const Home = () => {
   //TODO: add footer for big screens
   return (
     <div className="h-dvh flex flex-col">
-      <div className="hidden  lg:h-[10%] bg-[#557C55] text-white shadow-lg px-4 py-2 lg:flex items-center justify-between">
+      <div className="hidden  lg:h-[10%] bg-accent text-white shadow-lg px-4 py-2 lg:flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <img src={logo} alt="logo" className="h-12" />
+          <img src={logo} alt="logo" className="h-12 text-primary" />
         </div>
         <ul className="space-x-4 flex items-center justify-center">
-          <li className="hover:underline">
-            <a href="/about" className="text-md font-semibold">
+          <li>
+            <p
+              className="text-lg font-semibold cursor-pointer text-text-primary"
+              onClick={() => navigate("/about")}
+            >
               About
-            </a>
+            </p>
           </li>
-          <li className="border-[2px] border-white px-4 py-2 rounded-md">
-            <a href="/login?role=Rescuer" className="text-md font-semibold">
+          <li
+            onClick={() => navigate("/login?role=Rescuer")}
+            className="cursor-pointer text-text-primary border-primary border-[2px] px-4 py-2 rounded-md hover:opacity-80"
+          >
+            <p className="text-primary text-md font-semibold">
               Login as Rescuer
-            </a>
+            </p>
           </li>
-          <li className="border-[2px] border-white px-4 py-2 rounded-md">
-            <a href="/login?role=Admin" className="text-md font-semibold">
-              Login as Admin
-            </a>
+          <li
+            onClick={() => navigate("/login?role=Admin")}
+            className="cursor-pointer border-[2px] border-primary px-4 py-2 rounded-md hover:opacity-80"
+          >
+            <p className="text-primary text-md font-semibold">Login as Admin</p>
           </li>
-          <li className="bg-white text-[#557C55] px-4 py-2 hover:underline rounded-md">
-            <a href="/register" className="text-md font-semibold">
-              Be a Rescuer
-            </a>
+          <li
+            onClick={() => navigate("/register")}
+            className="bg-primary text-white border-[2px] border-primary px-4 py-2 cursor-pointer rounded-md hover:opacity-80"
+          >
+            <p className="text-md font-semibold">Be a Rescuer</p>
           </li>
         </ul>
       </div>
@@ -70,35 +72,32 @@ const Home = () => {
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="text-md cursor-pointer text-gray-700 rounded-full p-2 hover:bg-gra"
           >
-            <FaChevronDown />
+            <FaChevronDown className="text-primary" />
           </button>
           {mobileMenuOpen && (
-            <div className="absolute top-14 right-0 w-56 bg-white rounded-md shadow-lg py-2 flex items-center justify-center">
+            <div className="absolute top-14 right-0 w-56 bg-background rounded-md shadow-lg py-2 flex items-center justify-center">
               <ul className="space-y-2 flex flex-col items-center w-full">
                 <li className="py-2 border-b w-full justify-center">
                   <a
                     href="/login?role=Rescuer"
-                    className="flex items-center justify-center w-full text-lg font-semibold hover:underline"
+                    className="flex items-center justify-center w-full text-lg font-semibold "
                   >
-                    <FaAmbulance className="mr-2" />
                     Login as Rescuer
                   </a>
                 </li>
                 <li className="py-2 border-b w-full justify-center">
                   <a
                     href="/login?role=Admin"
-                    className="flex items-center justify-center w-full text-lg font-semibold hover:underline"
+                    className="flex items-center justify-center w-full text-lg font-semibold "
                   >
-                    <FaUserCircle className="mr-2" />
                     Login as Admin
                   </a>
                 </li>
                 <li className="py-2 border-b w-full">
                   <a
                     href="/register"
-                    className="flex items-center justify-center w-full text-lg font-semibold hover:underline"
+                    className="flex items-center justify-center w-full text-lg font-semibold "
                   >
-                    <FaUserPlus className="mr-2" />
                     Be a Rescuer
                   </a>
                 </li>
@@ -107,7 +106,6 @@ const Home = () => {
                     href="/about"
                     className="flex items-center w-full text-lg font-semibold hover:underline"
                   >
-                    <FaFileAlt className="mr-2" />
                     About
                   </a>
                 </li>
@@ -117,8 +115,8 @@ const Home = () => {
         </div>
         <Map ref={buttonsRef} />
       </div>
-      <div className="h-[20%] bg-slate-200 px-2 pb-2 flex flex-col justify-between gap-2 md:h-[10%]">
-        <button className="flex-1 bg-[#FF5757] hover:bg-red-700 text-white font-bold p-2 rounded">
+      <div className="h-[20%] bg-background-light px-2 pb-2 flex flex-col justify-between gap-2 md:h-[10%]">
+        <button className="flex-1 bg-secondary hover:opacity-80 text-white font-bold p-2 rounded">
           Request for Help
         </button>
         <div className="flex items-center gap-4 md:hidden">
@@ -128,44 +126,44 @@ const Home = () => {
                 onClick={() => {
                   buttonsRef.current.locateCitizen();
                 }}
-                className="bg-gray-200 hover:bg-gray-300 rounded-full p-3 flex items-center justify-center"
+                className="bg-background-light rounded-full p-3 flex items-center justify-center"
               >
-                <FaLocationPin className="text-2xl" />
+                <FaLocationPin className="text-2xl text-text-primary" />
               </button>
-              <p>My Location</p>
+              <p className="text-text-primary">My Location</p>
             </div>
             <div className="flex flex-col items-center">
               <button
                 onClick={() => {
                   buttonsRef.current.goToNearestRescuer();
                 }}
-                className="bg-gray-200 hover:bg-gray-300 rounded-full p-3 flex items-center justify-center"
+                className="bg-background-light rounded-full p-3 flex items-center justify-center"
               >
-                <BiSolidAmbulance className="text-2xl" />
+                <BiSolidAmbulance className="text-text-primary text-2xl" />
               </button>
-              <p>Nearest Rescuer</p>
+              <p className="text-text-primary">Nearest Rescuer</p>
             </div>
             <div className="flex flex-col items-center">
               <button
                 onClick={() => {
                   buttonsRef.current.viewRoute();
                 }}
-                className="bg-gray-200 hover:bg-gray-300 rounded-full p-3 flex items-center justify-center"
+                className="bg-background-light rounded-full p-3 flex items-center justify-center"
               >
-                <MdRoute className="text-2xl" />
+                <MdRoute className="text-2xl text-text-primary" />
               </button>
-              <p>View Route</p>
+              <p className="text-text-primary">View Route</p>
             </div>
             <div className="flex flex-col items-center">
               <button
                 onClick={() => {
                   buttonsRef.current.hideRoute();
                 }}
-                className="bg-gray-200 hover:bg-gray-300 rounded-full p-3 flex items-center justify-center"
+                className="bg-background-light rounded-full p-3 flex items-center justify-center"
               >
-                <BiSolidHide className="text-2xl" />
+                <BiSolidHide className="text-text-primary text-2xl" />
               </button>
-              <p>Hide Route</p>
+              <p className="text-text-primary">Hide Route</p>
             </div>
           </div>
         </div>

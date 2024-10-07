@@ -55,23 +55,22 @@ const Controls = forwardRef(
         fitBounds();
       },
     }));
-    //TODO: change controls icons
     return (
       <div className="ctrl-group">
         <button onClick={goToNearestRescuer} className="ctrl-icon">
-          <BiSolidAmbulance className="text-xl text-[#557C55] " />
+          <BiSolidAmbulance className="text-xl text-primary " />
         </button>
         {/*zoom out route */}
         <button className="ctrl-icon" onClick={fitBounds}>
-          <MdRoute className="text-xl text-[#3B82F6]" />
+          <MdRoute className="text-xl text-highlight" />
         </button>
         {/*hide route*/}
         <button className="ctrl-icon" onClick={hideRouteToRescuer}>
           {/*add route icon*/}
           {routeToggle ? (
-            <BiSolidShow className="text-xl text-slate-600" />
+            <BiSolidShow className="text-xl text-background-dark" />
           ) : (
-            <BiSolidHide className="text-xl text-slate-600" />
+            <BiSolidHide className="text-xl text-background-dark" />
           )}
         </button>
       </div>

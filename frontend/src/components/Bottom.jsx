@@ -9,7 +9,7 @@ import {
 
 const Bottom = () => {
   return (
-    <div className="bg-[#557C55] text-white flex justify-around py-3">
+    <div className="bg-[#58BC6B] text-white flex justify-around py-3">
       <Link
         to="/rescuer/requests"
         className={`flex flex-col items-center ${
