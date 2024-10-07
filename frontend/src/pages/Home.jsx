@@ -36,7 +36,7 @@ const Home = () => {
 
   //TODO: add footer for big screens
   return (
-    <div className="h-screen flex flex-col">
+    <div className="h-dvh flex flex-col">
       <div className="hidden  lg:h-[10%] bg-[#557C55] text-white shadow-lg px-4 py-2 lg:flex items-center justify-between">
         <div className="flex items-center gap-4">
           <img src={logo} alt="logo" className="h-12" />
@@ -115,7 +115,6 @@ const Home = () => {
             </div>
           )}
         </div>
-        {/*TODO: update marker icons and route*/}
         <Map ref={buttonsRef} />
       </div>
       <div className="h-[20%] bg-slate-200 px-2 pb-2 flex flex-col justify-between gap-2 md:h-[10%]">

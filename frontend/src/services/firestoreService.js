@@ -26,7 +26,6 @@ export const addLocationToFirestore = async (
   try {
     const docRef = await addDoc(collection(store, "locations"), location);
 
-    console.log("Document written with ID: ", docRef.id);
     return { id: docRef.id };
   } catch (error) {
     console.error("Error adding document: ", error);
@@ -50,7 +49,6 @@ export const updateLocationInFirestore = async (
 
   try {
     await updateDoc(doc(store, "locations", id), location);
-    console.log("Document updated with ID: ", id);
   } catch (error) {
     console.error("Error updating document: ", error);
   }
