@@ -16,6 +16,7 @@ import {
   getRouteData,
 } from "../services/locationService";
 import { Markers, Route, Controls, DistanceEta } from "../components";
+import { map } from "zod";
 
 const CitizenMap = forwardRef((props, ref) => {
   const [citizen, setCitizen] = useState({
@@ -31,6 +32,11 @@ const CitizenMap = forwardRef((props, ref) => {
     background: 0.2,
     line: 1,
   });
+
+  const bounds = [
+    [120.8585, 14.8867],
+    [121.0972, 15.0197],
+  ];
 
   const [distance, setDistance] = useState();
   const [eta, setEta] = useState();
@@ -101,6 +107,7 @@ const CitizenMap = forwardRef((props, ref) => {
       initialViewState={citizen}
       mapStyle={"mapbox://styles/mapbox/streets-v12"}
       mapboxAccessToken={import.meta.env.VITE_MAPBOX_TOKEN}
+      maxBounds={bounds}
       onLoad={() => {
         geoControlRef.current?.trigger();
       }}
