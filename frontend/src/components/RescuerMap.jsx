@@ -1,18 +1,42 @@
-import { useState, useRef } from "react";
-import { GeolocateControl, Map as MapGL } from "react-map-gl";
+import { useState, useRef, useEffect } from "react";
+import { GeolocateControl, Map as MapGL, Marker } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
+import { Canvas } from "@react-three/fiber";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import ambulanceModel from "../assets/ambulance/scene.gltf";
+import { useLoader } from "@react-three/fiber";
+import { PerspectiveCamera } from "@react-three/drei";
+
+const Model = () => {
+  const gltf = useLoader(GLTFLoader, ambulanceModel);
+  const model = gltf.scene;
+
+  model.rotation.set(Math.PI / 2, Math.PI, 0);
+  model.scale.set(0.5, 0.5, 0.5);
+
+  model.traverse((child) => {
+    if (child.isMesh) {
+      child.material.color.setHex(0x99ff99);
+    }
+  });
+
+  return <primitive object={model} />;
+};
 
 const RescuerMap = () => {
   const [rescuer, setRescuer] = useState({
     longitude: 120.9107,
     latitude: 14.9536,
-    zoom: 15,
+    zoom: 18,
   });
-
-  const [mapLoaded, setMapLoaded] = useState(false);
 
   const mapRef = useRef();
   const geoControlRef = useRef();
+
+  const bounds = [
+    [120.8585, 14.8867],
+    [121.0972, 15.0197],
+  ];
 
   const handleGeolocation = (coords) => {
     setRescuer({
@@ -21,16 +45,16 @@ const RescuerMap = () => {
     });
   };
 
-  //TODO: add markers, route, distance, eta, diff view
   return (
     <MapGL
       ref={mapRef}
       initialViewState={rescuer}
       mapStyle={"mapbox://styles/mapbox/streets-v12"}
       mapboxAccessToken={import.meta.env.VITE_MAPBOX_TOKEN}
+      maxBounds={bounds}
+      maxZoom={18}
       onLoad={() => {
         geoControlRef.current?.trigger();
-        setMapLoaded(true);
       }}
     >
       <GeolocateControl
@@ -43,6 +67,25 @@ const RescuerMap = () => {
           handleGeolocation(coords);
         }}
       />
+
+      <Marker longitude={rescuer.longitude} latitude={rescuer.latitude}>
+        <Canvas
+          style={{ width: "150px", height: "150px", background: "transparent" }}
+        >
+          <PerspectiveCamera
+            makeDefault
+            position={[0, 0, 100]} // Fixed camera position
+            fov={100} // Field of view
+          />
+
+          {/* Adding lights */}
+          <ambientLight intensity={0.5} />
+          <directionalLight position={[0, 10, 10]} intensity={1} />
+
+          {/* Displaying the model with rotation */}
+          <Model />
+        </Canvas>
+      </Marker>
     </MapGL>
   );
 };

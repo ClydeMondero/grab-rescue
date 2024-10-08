@@ -1,10 +1,12 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
+import glsl from "vite-plugin-glsl";
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
+    glsl(),
     react(),
     VitePWA({
       registerType: "autoUpdate",
@@ -51,4 +53,5 @@ export default defineConfig({
       },
     }),
   ],
+  assetsInclude: ["**/*.gltf", "**/*.glb"],
 });
