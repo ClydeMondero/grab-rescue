@@ -14,10 +14,9 @@ const Requests = () => {
       </div>
 
       {/* Scrollable Request Cards Section */}
-      <div className="flex-1 overflow-y-auto max-h-[calc(100vh-200px)] space-y-6">
+      <div className="flex-1 overflow-y-auto max-h-[calc(100vh-200px)] space-y-3">
         {[1, 2, 3, 4, 5, 6].map((request) => (
-          <Link
-            to={`/rescuer/request-details/${request}`} // Dynamic route for each request
+          <div
             key={request}
             className="block p-4 bg-white border border-gray-300 rounded-md hover:bg-gray-100 transition-colors"
           >
@@ -46,12 +45,15 @@ const Requests = () => {
 
               {/* Action Section */}
               <div className="flex items-center">
-                <span className="px-4 py-2 text-sm sm:text-base font-semibold text-white bg-[#557C55] hover:bg-green-600 transition-colors rounded">
+                <Link
+                  to="/rescuer/navigate"
+                  className="px-4 py-2 text-sm sm:text-base font-semibold text-white bg-[#557C55] hover:bg-green-600 transition-colors rounded"
+                >
                   Accept
-                </span>
+                </Link>
               </div>
             </div>
-          </Link>
+          </div>
         ))}
       </div>
     </div>
