@@ -21,7 +21,7 @@ const Rescuer = (props) => {
       <div className="flex-grow p-4 bg-white">
         <Routes>
           <Route path="/requests" element={<Requests />} />
-          <Route path="/navigate" element={<Navigate />} />
+          <Route path="/navigate" element={<Navigate user={user} />} />
           <Route path="/profile" element={<ViewProfile user={user} />} />
           <Route
             path="/request-details/:id"
