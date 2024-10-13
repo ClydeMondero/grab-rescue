@@ -11,20 +11,17 @@ import Sidebar from "./Sidebar";
 import Bottom from "./Bottom";
 import PrivateRoute from "./PrivateRoute";
 import Toast from "./Toast";
-import Complete from "./Complete";
 import CitizenMap from "./CitizenMap";
 import ChangeEmail from "./ChangeEmail";
 import RescuerMap from "./RescuerMap";
 import Markers from "./Markers";
-import Feedback from "./Feedback";
 import Route from "./Route";
 import Controls from "./Controls";
 import DistanceEta from "./DistanceEta";
 import Navigate from "./Navigate";
 import Requests from "./Requests";
-import Status from "./Status";
 import Header from "./Header";
-
+import RequestDetails from "./RequestDetails";
 export {
   DistanceEta,
   Markers,
@@ -46,10 +43,8 @@ export {
   Sidebar,
   ChangeEmail,
   Header,
-  Feedback,
-  Complete,
+  RequestDetails,
   Bottom,
   Navigate,
-  Status,
   Requests,
 };
