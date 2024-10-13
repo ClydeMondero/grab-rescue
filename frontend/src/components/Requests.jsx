@@ -4,18 +4,18 @@ import { Link } from "react-router-dom";
 
 const Requests = () => {
   return (
-    <div className="bg-gradient-to-br from-white to-gray-100 rounded-md p-4 sm:p-6 md:p-8 lg:p-10 max-w-4xl mx-auto">
+    <div className="bg-gradient-to-br from-white to-gray-100 min-h-screen flex flex-col p-4 sm:p-6 md:p-8 lg:p-10">
       {/* Header Section */}
-      <div className="flex flex-col sm:flex-row items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row items-center justify-between mb-4">
         <h2 className="text-2xl sm:text-3xl font-bold text-[#557C55] flex items-center space-x-2">
           <FaExclamationTriangle className="text-red-500" />
           <span>Emergency Requests</span>
         </h2>
       </div>
 
-      {/* Request Cards */}
-      <div className="overflow-y-auto max-h-96 space-y-6">
-        {[1, 2, 3].map((request) => (
+      {/* Scrollable Request Cards Section */}
+      <div className="flex-1 overflow-y-auto max-h-[calc(100vh-200px)] space-y-6">
+        {[1, 2, 3, 4, 5, 6].map((request) => (
           <Link
             to={`/rescuer/request-details/${request}`} // Dynamic route for each request
             key={request}
