@@ -14,11 +14,12 @@ import {
 const Rescuer = (props) => {
   const { user } = props;
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col">
+    <div className="min-h-screen flex flex-col bg-gray-100">
       {/* Header */}
       <Header />
-      {/* Routes for Rescuer pages */}
-      <div className="flex-grow p-4 bg-white">
+
+      {/* Main content with dynamic height */}
+      <div className="flex-grow overflow-auto p-4 bg-white">
         <Routes>
           <Route path="/requests" element={<Requests />} />
           <Route path="/navigate" element={<Navigate user={user} />} />
@@ -35,7 +36,7 @@ const Rescuer = (props) => {
         </Routes>
       </div>
 
-      {/* Bottom Navigation */}
+      {/* Bottom Navigation always visible */}
       <Bottom />
     </div>
   );
