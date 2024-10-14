@@ -20,14 +20,16 @@ const Navigate = () => {
   };
 
   return (
-    <div className="relative min-h-screen bg-gray-100">
-      {/* Map filling the entire screen */}
-      <div className="w-full h-screen rounded-md overflow-hidden border border-gray-300">
-        <Map />
+    <div className="relative bg-gray-100 flex flex-col h-[calc(100vh-160px)]">
+      {/* Full-screen map */}
+      <div className="flex-1">
+        <div className="w-full h-full rounded-md overflow-hidden border border-gray-300">
+          <Map />
+        </div>
       </div>
 
-      {/* Container for Citizen Information */}
-      <div className="absolute bottom-0 w-full p-4 bg-white rounded-t-lg shadow-lg">
+      {/* Citizen Information Section */}
+      <div className="absolute bottom-0 w-full p-4 bg-white rounded-t-lg shadow-lg max-h-[250px] overflow-y-auto">
         {/* Floating Information */}
         <div className="absolute top-[-60px] left-0 right-0 flex justify-center space-x-4">
           <p className="text-gray-600">Distance: {citizenDetails.distance}</p>

@@ -8,15 +8,16 @@ const RequestDetails = ({ user }) => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4 md:p-6">
-      <div className="max-w-6xl mx-auto bg-white rounded-md">
+    <div className="min-h-screen flex flex-col">
+      {/* Main container */}
+      <div className="max-w-6xl w-full mx-auto bg-white rounded-md flex-1 overflow-y-auto h-[calc(100vh-160px)]">
         {/* Header Section */}
-        <div className="flex justify-between items-center p-6 border-b">
-          <h1 className="text-2xl md:text-3xl font-bold text-[#557C55]">
+        <div className="flex justify-between items-center p-4 md:p-6 border-b">
+          <h1 className="text-xl md:text-3xl font-bold text-[#557C55]">
             Request Details #{id}
           </h1>
           <button
-            className="flex items-center bg-[#557C55] text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors"
+            className="flex items-center bg-[#557C55] text-white px-3 py-2 rounded-md hover:bg-green-600 transition-colors"
             onClick={() => navigate(-1)}
           >
             <FaArrowLeft className="mr-2" />
@@ -25,22 +26,22 @@ const RequestDetails = ({ user }) => {
         </div>
 
         {/* Request Time */}
-        <p className="text-sm text-gray-600 mb-4 p-6">
+        <p className="text-sm text-gray-600 mb-4 px-4 md:px-6">
           <strong className="text-[#557C55]">Requested at:</strong> 12:45 PM
         </p>
 
         {/* Map Section */}
-        <div className="mb-6 p-6">
+        <div className="mb-6 px-4 md:px-6">
           <h2 className="text-lg font-semibold text-[#557C55] mb-2">
             Location Map
           </h2>
-          <div className="w-full h-64 rounded-md overflow-hidden border border-gray-300">
+          <div className="w-full h-40 md:h-64 rounded-md overflow-hidden border border-gray-300">
             <Map />
           </div>
         </div>
 
         {/* Citizen Information Section */}
-        <div className="mb-6 p-6 border-t border-gray-200">
+        <div className="mb-6 px-4 md:px-6 border-t border-gray-200">
           <h2 className="text-lg font-semibold text-[#557C55] mb-4">
             Citizen Information
           </h2>
@@ -65,7 +66,7 @@ const RequestDetails = ({ user }) => {
         </div>
 
         {/* Victim Information Section */}
-        <div className="mb-6 p-6 border-t border-gray-200">
+        <div className="mb-6 px-4 md:px-6 border-t border-gray-200">
           <h2 className="text-lg font-semibold text-[#557C55] mb-4">
             Victim Information
           </h2>
@@ -81,7 +82,7 @@ const RequestDetails = ({ user }) => {
           <img
             src="https://picsum.photos/400"
             alt="Example victim"
-            className="w-full h-60 rounded-md mt-4 object-cover"
+            className="w-full h-40 md:h-60 rounded-md mt-4 object-cover"
             style={{ backgroundColor: "#557C55" }}
           />
         </div>
