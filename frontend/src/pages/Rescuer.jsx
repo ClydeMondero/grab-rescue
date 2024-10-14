@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import {
   Navigate,
@@ -10,15 +9,16 @@ import {
   ChangeEmail,
   RequestDetails,
 } from "../components";
+import { RescuerMap as Map } from "../components";
 
 const Rescuer = (props) => {
   const { user } = props;
+
   return (
-    <div className="min-h-screen flex flex-col bg-gray-100">
+    <div className="min-h-screen flex flex-col">
       {/* Header */}
       <Header />
 
-      {/* Main content with dynamic height */}
       <div className="flex-grow overflow-auto p-4 bg-white">
         <Routes>
           <Route path="/requests" element={<Requests />} />
