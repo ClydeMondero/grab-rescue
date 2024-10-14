@@ -3,7 +3,7 @@ import { FaTasks, FaLocationArrow } from "react-icons/fa";
 
 const Bottom = () => {
   return (
-    <div className="bg-[#58BC6B] text-white flex justify-around py-3">
+    <div className="bg-background text-white flex justify-around py-3">
       <Link
         to="/rescuer/requests"
         className={`flex flex-col items-center ${
@@ -12,8 +12,8 @@ const Bottom = () => {
             : ""
         }`}
       >
-        <FaTasks className="text-xl" />
-        <span className="text-xs">Requests</span>
+        <FaTasks className="text-xl text-primary" />
+        <span className="text-xs text-primary">Requests</span>
       </Link>
       <Link
         to="/rescuer/navigate"
@@ -23,8 +23,8 @@ const Bottom = () => {
             : ""
         }`}
       >
-        <FaLocationArrow className="text-xl" />
-        <span className="text-xs">Navigate</span>
+        <FaLocationArrow className="text-xl text-primary" />
+        <span className="text-xs text-primary">Navigate</span>
       </Link>
     </div>
   );

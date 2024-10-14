@@ -20,35 +20,37 @@ const Navigate = () => {
   };
 
   return (
-    <div className="relative min-h-screen bg-gray-100">
-      {/* Map filling the entire screen */}
-      <div className="w-full h-screen rounded-md overflow-hidden border border-gray-300">
-        <Map />
+    <div className="relative bg-gray-100 flex flex-col h-[calc(100vh-160px)]">
+      {/* Full-screen map */}
+      <div className="flex-1">
+        <div className="w-full h-full rounded-md overflow-hidden border border-gray-300">
+          <Map />
+        </div>
       </div>
 
-      {/* Container for Citizen Information */}
-      <div className="absolute bottom-0 w-full p-4 bg-white rounded-t-lg shadow-lg">
+      {/* Citizen Information Section */}
+      <div className="absolute bottom-0 w-full p-4  rounded-t-lg shadow-lg max-h-[250px] overflow-y-auto">
         {/* Floating Information */}
-        <div className="absolute top-[-60px] left-0 right-0 flex justify-center space-x-4">
-          <p className="text-gray-600">Distance: {citizenDetails.distance}</p>
-          <p className="text-gray-600">ETA: {citizenDetails.eta}</p>
-          <p className="text-gray-600">
+        <div className="absolute top-[-4px] left-0 right-0 flex justify-center space-x-4 text-xs">
+          <p className="text-secondary">Distance: {citizenDetails.distance}</p>
+          <p className="text-secondary">ETA: {citizenDetails.eta}</p>
+          <p className="text-secondary">
             Request Time: {citizenDetails.requestTime}
           </p>
         </div>
 
         {/* Main Info Section */}
-        <div className="flex items-center justify-between cursor-pointer border border-gray-300 rounded-md p-2 hover:bg-gray-100 transition-colors">
+        <div className="flex items-center justify-between cursor-pointer border bg-background border-primary rounded-md p-2 ">
           <div className="flex flex-col flex-1">
-            <h3 className="font-bold text-[#557C55] text-3xl">
+            <h3 className="font-bold text-primary text-3xl">
               {citizenDetails.name}
             </h3>
-            <p className="text-gray-600">
-              <strong className="text-[#557C55]">Location:</strong>{" "}
+            <p className="text-primary-dark">
+              <strong className="text-secondary">Location:</strong>{" "}
               {citizenDetails.location}
             </p>
             <p className="text-gray-600">
-              <strong className="text-[#557C55]">Status:</strong>{" "}
+              <strong className="text-secondary">Status:</strong>{" "}
               <span
                 className={
                   citizenDetails.requestStatus === "Pending"
@@ -64,7 +66,7 @@ const Navigate = () => {
           </div>
           <div className="flex items-center space-x-4">
             {/* Phone Call Button */}
-            <button className="flex items-center justify-center w-12 h-12 bg-[#557C55] rounded-full text-white text-2xl">
+            <button className="flex items-center justify-center w-12 h-12 bg-primary rounded-full text-white text-2xl">
               <BiPhoneCall />
             </button>
             {/* Toggle Details Button */}
@@ -73,9 +75,9 @@ const Navigate = () => {
               onClick={() => setShowDetails(!showDetails)} // Toggle details
             >
               {showDetails ? (
-                <AiFillEyeInvisible className="text-2xl text-[#557C55]" />
+                <AiFillEyeInvisible className="text-2xl text-secondary" />
               ) : (
-                <AiFillEye className="text-2xl text-[#557C55]" />
+                <AiFillEye className="text-2xl text-secondary" />
               )}
             </button>
           </div>
@@ -83,27 +85,27 @@ const Navigate = () => {
 
         {/* Popup with Details */}
         {showDetails && (
-          <div className="mt-4 p-4 bg-white border border-gray-300 rounded-md">
-            <h4 className="font-bold text-[#557C55]">Details:</h4>
+          <div className="mt-4 p-4 bg-white border border-primary rounded-md">
+            <h4 className="font-bold text-primary-dark">Details:</h4>
             <img
               src={citizenDetails.photo}
               alt="Citizen"
               className="w-24 h-24 object-cover rounded-full mb-2"
             />
             <p>
-              <strong className="text-[#557C55]">Victim's Name:</strong>{" "}
+              <strong className="text-secondary">Victim's Name:</strong>{" "}
               {citizenDetails.name}
             </p>
             <p>
-              <strong className="text-[#557C55]">Age:</strong>{" "}
+              <strong className="text-secondary">Age:</strong>{" "}
               {citizenDetails.age}
             </p>
             <p>
-              <strong className="text-[#557C55]">Gender:</strong>{" "}
+              <strong className="text-secondary">Gender:</strong>{" "}
               {citizenDetails.gender}
             </p>
             <p>
-              <strong className="text-[#557C55]">Description:</strong>{" "}
+              <strong className="text-secondary">Description:</strong>{" "}
               {citizenDetails.description}
             </p>
             <button
