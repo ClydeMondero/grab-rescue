@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { Toast } from "../components";
-import { FaEye, FaEyeSlash, FaLock, FaArrowLeft } from "react-icons/fa";
+import { FaEye, FaEyeSlash, FaLock, FaChevronLeft } from "react-icons/fa";
 import zxcvbn from "zxcvbn";
 import logo from "../../public/logo.png";
 import "react-toastify/dist/ReactToastify.css";
@@ -74,8 +74,10 @@ const ResetPassword = () => {
             className="text-[#557C55] hover:text-red-600 transition-colors duration-200 ease-in-out flex items-center"
             onClick={() => navigate("/", { replace: true })}
           >
-            <FaArrowLeft className="h-4 w-4 mr-1" />
-            <span className="text-sm">Back</span>
+            <FaChevronLeft
+              className="text-xl text-background-dark cursor-pointer"
+              onClick={() => window.history.back()}
+            />
           </button>
         </div>
 
@@ -85,15 +87,15 @@ const ResetPassword = () => {
         </div>
 
         {/* Title */}
-        <h2 className="text-center text-2xl font-semibold mb-5 text-[#557C55]">
+        <h2 className="text-center text-2xl font-semibold mb-5 text-text-primary">
           Reset Your Password
         </h2>
 
         <form className="space-y-4" onSubmit={handleResetPassword}>
           {/* New Password Input */}
           <div>
-            <div className="flex items-center border border-gray-300 rounded-md focus-within:border-[#557C55]">
-              <FaLock className="h-6 w-6 ml-2 mr-1 text-gray-600" />
+            <div className="flex items-center border border-background-medium rounded-md focus-within:border-primary-medium">
+              <FaLock className="h-6 w-6 ml-2 mr-1 text-primary-dark" />
               <input
                 type={showNewPassword ? "text" : "password"}
                 id="newPassword"
@@ -109,58 +111,60 @@ const ResetPassword = () => {
                 onClick={() => setShowNewPassword(!showNewPassword)}
               >
                 {showNewPassword ? (
-                  <FaEyeSlash className="h-6 w-6" />
+                  <FaEyeSlash className="text-lg text-background-medium" />
                 ) : (
-                  <FaEye className="h-6 w-6" />
+                  <FaEye className="text-lg text-background-medium" />
                 )}
               </span>
             </div>
 
             {/* Password Strength Meter */}
-            <div className="mt-2">
-              <strong className="text-sm text-[#557C55]">
-                Password Strength: {getStrengthLabel(passwordStrength.score)}
-              </strong>
-              <div
-                style={{
-                  width: "100%",
-                  backgroundColor: "#e0e0e0",
-                  borderRadius: "5px",
-                  marginTop: "5px",
-                }}
-              >
+            {newPassword.length > 0 && (
+              <div className="mt-2">
+                <p className="text-sm text-text-secondary">
+                  Password Strength: {getStrengthLabel(passwordStrength.score)}
+                </p>
                 <div
                   style={{
-                    width: `${(passwordStrength.score + 1) * 20}%`,
-                    height: "5px",
-                    backgroundColor:
-                      passwordStrength.score === 4
-                        ? "green"
-                        : passwordStrength.score === 3
-                        ? "blue"
-                        : passwordStrength.score === 2
-                        ? "yellow"
-                        : passwordStrength.score === 1
-                        ? "orange"
-                        : "red",
-                    borderRadius: "3px",
+                    width: "100%",
+                    backgroundColor: "#f5f5f5",
+                    borderRadius: "5px",
+                    marginTop: "5px",
                   }}
-                />
+                >
+                  <div
+                    style={{
+                      width: `${(passwordStrength.score + 1) * 20}%`,
+                      height: "5px",
+                      backgroundColor:
+                        passwordStrength.score === 4
+                          ? "#557C55"
+                          : passwordStrength.score === 3
+                          ? "#6495ED"
+                          : passwordStrength.score === 2
+                          ? "#f7dc6f"
+                          : passwordStrength.score === 1
+                          ? "#ffa500"
+                          : "#ff3737",
+                      borderRadius: "3px",
+                    }}
+                  />
+                </div>
+                {passwordStrength.feedback.length > 0 && (
+                  <ul className="text-sm text-red-500">
+                    {passwordStrength.feedback.map((item, index) => (
+                      <li key={index}>{item}</li>
+                    ))}
+                  </ul>
+                )}
               </div>
-              {passwordStrength.feedback.length > 0 && (
-                <ul className="text-sm text-red-500">
-                  {passwordStrength.feedback.map((item, index) => (
-                    <li key={index}>{item}</li>
-                  ))}
-                </ul>
-              )}
-            </div>
+            )}
           </div>
 
           {/* Confirm Password Input */}
           <div>
-            <div className="flex items-center border border-gray-300 rounded-md focus-within:border-[#557C55]">
-              <FaLock className="h-6 w-6 ml-2 mr-1 text-gray-600" />
+            <div className="flex items-center border border-background-medium rounded-md focus-within:border-primary-medium">
+              <FaLock className="h-6 w-6 ml-2 mr-1 text-primary-dark" />
               <input
                 type={showConfirmPassword ? "text" : "password"}
                 id="confirmPassword"
@@ -176,9 +180,9 @@ const ResetPassword = () => {
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               >
                 {showConfirmPassword ? (
-                  <FaEyeSlash className="h-6 w-6" />
+                  <FaEyeSlash className="text-lg text-background-medium" />
                 ) : (
-                  <FaEye className="h-6 w-6" />
+                  <FaEye className="text-lg text-background-medium" />
                 )}
               </span>
             </div>
