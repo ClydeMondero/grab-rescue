@@ -77,3 +77,22 @@ export const checkUser = async (id) => {
   });
   return users.find((user) => user.id === id);
 };
+
+//get requests from firestore
+export const getRequestsFromFirestore = async () => {
+  try {
+    const querySnapshot = await getDocs(collection(store, "requests"));
+    const requests = [];
+
+    querySnapshot.forEach((doc) => {
+      requests.push({ id: doc.id, ...doc.data() });
+    });
+    return requests;
+  } catch (error) {
+    console.error("Error getting documents: ", error);
+    return [];
+  }
+};
+
+//TODO: add request to firestore
+//TODO: upload picture in firebase storage

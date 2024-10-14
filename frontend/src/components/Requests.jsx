@@ -1,8 +1,26 @@
 import React from "react";
 import { FaExclamationTriangle } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import { getRequestsFromFirestore } from "../services/firestoreService";
+import { useState, useEffect } from "react";
 
 const Requests = () => {
+  const [requests, setRequests] = useState([]);
+
+  const getRequests = async () => {
+    const requests = await getRequestsFromFirestore();
+
+    setRequests(requests);
+
+    requests.map((request) => {
+      console.log(request);
+    });
+  };
+
+  useEffect(() => {
+    getRequests();
+  }, []);
+
   return (
     <div className="bg-gradient-to-br from-white to-gray-100 min-h-screen flex flex-col p-4 sm:p-6 md:p-8 lg:p-10">
       {/* Header Section */}
@@ -15,7 +33,7 @@ const Requests = () => {
 
       {/* Scrollable Request Cards Section */}
       <div className="flex-1 overflow-y-auto max-h-[calc(100vh-200px)] space-y-3">
-        {[1, 2, 3, 4, 5, 6].map((request) => (
+        {requests.map((request) => (
           <div
             key={request}
             className="block p-4 bg-white border border-gray-300 rounded-md hover:bg-gray-100 transition-colors"
@@ -25,21 +43,29 @@ const Requests = () => {
               <div className="mb-4 sm:mb-0">
                 <h3 className="text-lg font-bold text-[#557C55] mb-2 flex items-center space-x-2">
                   <FaExclamationTriangle className="text-red-500" />
-                  <span>High Priority Request #{request}</span>
                 </h3>
                 <p className="text-sm text-gray-600">
-                  <strong className="text-[#557C55]">Location:</strong> 123 Main
-                  St
+                  <strong className="text-[#557C55]">Location: </strong>
+                  {request.address}
                 </p>
                 <p className="text-sm text-gray-600">
-                  <strong className="text-[#557C55]">Distance:</strong> 1.2 km
+                  <strong className="text-[#557C55]">Distance: </strong>
+                  {request.distance}m
                 </p>
                 <p className="text-sm text-gray-600">
-                  <strong className="text-[#557C55]">ETA:</strong> 10:00 AM
+                  <strong className="text-[#557C55]">ETA: </strong>{" "}
+                  {request.eta}
                 </p>
                 <p className="text-sm text-gray-600">
-                  <strong className="text-[#557C55]">Request Time:</strong>{" "}
-                  10:00 AM
+                  <strong className="text-[#557C55]">Request Time: </strong>
+                  {new Intl.DateTimeFormat("en-US", {
+                    year: "numeric",
+                    month: "2-digit",
+                    day: "2-digit",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                  }).format(new Date(request.timestamp))}
                 </p>
               </div>
 
