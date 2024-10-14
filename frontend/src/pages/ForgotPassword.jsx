@@ -3,7 +3,7 @@ import axios from "axios";
 import { useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Toast } from "../components";
-import { FaArrowLeft, FaEnvelope } from "react-icons/fa";
+import { FaChevronLeft, FaEnvelope } from "react-icons/fa";
 import logo from "../../public/logo.png";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -32,33 +32,29 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="flex items-center justify-center h-screen bg-[#f5f5f5]">
-      <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
+    <div className="flex items-center justify-center h-screen bg-background-light">
+      <div className="w-full max-w-md p-6 bg-background rounded-lg shadow-sm">
         <div className="flex justify-between mb-4">
-          <button
-            type="button"
-            className="text-[#557C55] hover:text-red-600 transition-colors duration-200 ease-in-out flex items-center"
+          <FaChevronLeft
+            className="text-xl text-background-dark cursor-pointer"
             onClick={() => window.history.back()}
-          >
-            <FaArrowLeft className="h-4 w-4 mr-1" />
-            <span className="text-sm">Back</span>
-          </button>
+          />
         </div>
         <div className="flex justify-center mb-4">
           <img src={logo} alt="Logo" className="h-12" />
         </div>
-        <h2 className="text-center text-2xl font-semibold mb-5 text-[#557C55]">
+        <h2 className="text-center text-2xl font-semibold mb-5 text-text-primary">
           {role === "Admin"
             ? "Admin Forgot Password"
             : "Rescuer Forgot Password"}
         </h2>
-        <p className="text-center text-sm text-gray-600 mb-6">
+        <p className="text-center text-sm text-text-secondary mb-6">
           Enter your email address, and we will send you a link to reset your
           password.
         </p>
         <form className="space-y-4" onSubmit={handleForgotPassword}>
-          <div className="flex items-center border border-gray-300 rounded-md focus-within:border-[#557C55]">
-            <FaEnvelope className="h-6 w-6 ml-2 mr-1 text-gray-600" />
+          <div className="flex items-center border border-background-medium rounded-md focus-within:border-primary-medium">
+            <FaEnvelope className="h-6 w-6 ml-2 mr-1 text-primary-dark" />
             <input
               type="email"
               id="email"
@@ -74,8 +70,8 @@ const ForgotPassword = () => {
             type="submit"
             className={`w-full text-white py-2 rounded-md font-bold ${
               loading
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-[#557C55] hover:bg-[#6EA46E]"
+                ? "bg-background-medium cursor-not-allowed"
+                : "bg-primary-medium hover:opacity-80 cursor-pointer"
             }`}
             disabled={loading}
           >
