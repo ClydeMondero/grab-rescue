@@ -19,7 +19,7 @@ const Rescuer = (props) => {
       {/* Header */}
       <Header />
 
-      <div className="flex-grow overflow-auto p-4 bg-white">
+      <div className="flex-grow overflow-auto p-4 bg-slate-50">
         <Routes>
           <Route path="/requests" element={<Requests />} />
           <Route path="/navigate" element={<Navigate user={user} />} />
