@@ -59,7 +59,13 @@ const ViewProfile = (props) => {
       <div className="flex items-center mb-2 md:mb-4">
         <FaArrowLeft
           className="text-base md:text-lg text-[#557C55] cursor-pointer"
-          onClick={() => navigate("/admin")}
+          onClick={() => {
+            if (user.account_type === "Admin") {
+              navigate("/admin");
+            } else if (user.account_type === "Rescuer") {
+              navigate("/rescuer");
+            }
+          }}
         />
         <FaUser className="text-xl md:text-2xl text-[#557C55] mr-1" />
         <h4 className="text-sm md:text-lg font-semibold ml-1 text-[#557C55]">

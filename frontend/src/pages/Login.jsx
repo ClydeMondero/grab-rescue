@@ -9,7 +9,7 @@ import {
   FaLock,
   FaEye,
   FaEyeSlash,
-  FaArrowLeft,
+  FaChevronLeft,
 } from "react-icons/fa";
 import { Loader, Toast } from "../components";
 import axios from "axios";
@@ -90,41 +90,37 @@ const Login = () => {
   };
 
   return (
-    <div className="flex items-center justify-center h-screen bg-[#f5f5f5]">
-      <div className="w-full max-w-md p-6 bg-white rounded-lg">
+    <div className="flex items-center justify-center h-screen bg-background-light">
+      <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-sm">
         <div className="flex justify-between mb-4">
-          <button
-            type="button"
-            className="text-[#557C55] hover:text-red-600 transition-colors duration-200 ease-in-out flex items-center"
+          <FaChevronLeft
+            className="text-xl text-background-dark cursor-pointer"
             onClick={handleBack}
-          >
-            <FaArrowLeft className="h-4 w-4 mr-1" />
-            <span className="text-sm">Back</span>
-          </button>
+          />
         </div>
         <div className="flex justify-center mb-4">
           <img src={logo} alt="Logo" className="h-12" />
         </div>
-        <h2 className="text-center text-2xl font-semibold mb-5 text-[#557C55]">
+        <h2 className="text-center text-2xl font-semibold mb-5 text-primary-dark">
           Login as {role}
         </h2>
         <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-          <div className="flex items-center border border-gray-300 rounded-md focus-within:border-[#557C55]">
-            <FaEnvelope className="h-6 w-6 ml-2 mr-1 text-gray-600" />
+          <div className="flex items-center border border-background-medium rounded-md focus-within:border-primary-medium">
+            <FaEnvelope className="h-6 w-6 ml-2 mr-1 text-primary-dark" />
             <input
               {...register("email")}
               type="email"
               id="email"
               name="email"
               placeholder="Enter your email"
-              className="w-full px-3 py-2 bg-white focus:outline-none"
+              className="w-full px-3 py-2 bg-background focus:outline-none"
             />
           </div>
           {errors.email && (
             <p className="text-red-500 text-sm">{errors.email.message}</p>
           )}
-          <div className="flex items-center border border-gray-300 rounded-md focus-within:border-[#557C55]">
-            <FaLock className="h-6 w-6 ml-2 mr-1 text-gray-600" />
+          <div className="flex items-center border border-background-medium rounded-md focus-within:border-primary-medium">
+            <FaLock className="h-6 w-6 ml-2 mr-1 text-primary-dark" />
             <input
               {...register("password")}
               type={showPassword ? "text" : "password"}
@@ -134,31 +130,30 @@ const Login = () => {
               className="w-full px-3 py-2 bg-white focus:outline-none"
             />
             <span
-              className="ml-2 mr-2 cursor-pointer text-[#557C55]"
+              className="ml-2 mr-2 cursor-pointer text-background-dark"
               onClick={() => setShowPassword(!showPassword)}
             >
               {showPassword ? (
-                <FaEyeSlash className="h-6 w-6" />
+                <FaEyeSlash className="text-lg text-background-medium" />
               ) : (
-                <FaEye className="h-6 w-6" />
+                <FaEye className="text-lg text-background-medium" />
               )}
             </span>
           </div>
           <button
             type="submit"
-            className="w-full bg-[#557C55] text-white font-bold py-2 rounded-md hover:opacity-80 focus:outline-none"
+            className="w-full bg-primary-medium text-white font-bold py-2 rounded-md hover:opacity-80 focus:outline-none"
           >
             {loading ? <Loader {...{ isLoading: loading }} /> : "Login"}
           </button>
-          <p className="text-center text-sm mt-2 text-[#557C55]">
-            Forgot your password?{" "}
-            <a
-              href={`/forgot-password?role=${role}`}
-              className="text-[#FA7070] hover:text-red-600 transition-colors duration-200 ease-in-out"
-            >
-              Reset it here
-            </a>
-          </p>
+          <a
+            href={`/forgot-password?role=${role}`}
+            className="text-[#FA7070] hover:text-red-600 transition-colors duration-200 ease-in-out"
+          >
+            <p className="text-center text-sm mt-2 text-text-secondary">
+              Forgot your password?{" "}
+            </p>
+          </a>
         </form>
         <Toast />
       </div>

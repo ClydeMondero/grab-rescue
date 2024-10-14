@@ -22,12 +22,12 @@ const Requests = () => {
   }, []);
 
   return (
-    <div className="bg-gradient-to-br from-white to-gray-100 min-h-screen flex flex-col p-4 sm:p-6 md:p-8 lg:p-10">
+    <div className=" flex flex-col p-4 sm:p-6 md:p-8 lg:p-10 max-w-7xl w-full mx-auto h-[calc(100vh-160px)]">
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row items-center justify-between mb-4">
         <h2 className="text-2xl sm:text-3xl font-bold text-[#557C55] flex items-center space-x-2">
-          <FaExclamationTriangle className="text-red-500" />
-          <span>Emergency Requests</span>
+          <FaExclamationTriangle className="text-secondary" />
+          <span className="text-primary-dark">Emergency Requests</span>
         </h2>
       </div>
 
@@ -69,16 +69,17 @@ const Requests = () => {
                 </p>
               </div>
 
-              {/* Action Section */}
-              <div className="flex items-center">
-                <Link
-                  to="/rescuer/navigate"
-                  className="px-4 py-2 text-sm sm:text-base font-semibold text-white bg-[#557C55] hover:bg-green-600 transition-colors rounded"
-                >
-                  Accept
-                </Link>
+                {/* Action Section */}
+                <div className="flex items-center">
+                  <Link
+                    to="/rescuer/navigate"
+                    className="px-4 py-2 text-sm sm:text-base font-semibold text-white bg-primary hover:bg-green-600 transition-colors rounded"
+                  >
+                    Accept
+                  </Link>
+                </div>
               </div>
-            </div>
+            </Link>
           </div>
         ))}
       </div>

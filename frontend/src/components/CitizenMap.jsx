@@ -16,6 +16,8 @@ import {
   getRouteData,
 } from "../services/locationService";
 import { Markers, Route, Controls, DistanceEta } from "../components";
+import { Loader } from "../components";
+import { FaLocationPin } from "react-icons/fa6";
 
 const CitizenMap = forwardRef((props, ref) => {
   const [citizen, setCitizen] = useState({
@@ -41,11 +43,17 @@ const CitizenMap = forwardRef((props, ref) => {
   const [distance, setDistance] = useState();
   const [eta, setEta] = useState();
 
+  const [watchState, setWatchState] = useState("OFF");
+
+  const [locating, setLocating] = useState(true);
+
   const mapRef = useRef();
   const geoControlRef = useRef();
   const buttonsRef = useRef();
 
   const handleGeolocation = (coords) => {
+    if (!mapRef.current) return;
+
     const cookie = getCitizenCookie();
 
     if (cookie) {
@@ -101,44 +109,109 @@ const CitizenMap = forwardRef((props, ref) => {
     },
   }));
 
+  const handleWatchState = (watchState) => {
+    switch (watchState) {
+      case "OFF":
+      case "ACTIVE_ERROR":
+      case "WAITING_ACTIVE":
+        setLocating(true);
+        break;
+      case "ACTIVE_LOCK":
+      case "BACKGROUND":
+        setLocating(false);
+        break;
+      default:
+        console.log("Unknown watch state:", watchState);
+    }
+  };
+
+  useEffect(() => {
+    handleWatchState(watchState);
+  }, [watchState]);
+
+  useEffect(() => {
+    const checkWatchState = () => {
+      if (geoControlRef.current && geoControlRef.current._watchState) {
+        setWatchState(geoControlRef.current._watchState);
+        console.log("watchState: ", watchState);
+      }
+    };
+
+    const interval = setInterval(checkWatchState, 1000); // Check every second
+
+    return () => clearInterval(interval); // Clean up interval on unmount
+  }, [geoControlRef.current, watchState]);
+
   return (
-    <MapGL
-      ref={mapRef}
-      initialViewState={citizen}
-      mapStyle={"mapbox://styles/mapbox/streets-v12"}
-      mapboxAccessToken={import.meta.env.VITE_MAPBOX_TOKEN}
-      maxBounds={bounds}
-      maxzoom={15}
-      onLoad={() => {
-        geoControlRef.current?.trigger();
-      }}
-    >
-      <GeolocateControl
-        ref={geoControlRef}
-        position="top-right"
-        positionOptions={{ enableHighAccuracy: true }}
-        trackUserLocation={true}
-        showUserLocation={false}
-        onGeolocate={({ coords }) => {
-          handleGeolocation(coords);
+    <>
+      <MapGL
+        ref={mapRef}
+        initialViewState={citizen}
+        mapStyle={"mapbox://styles/mapbox/streets-v12"}
+        mapboxAccessToken={import.meta.env.VITE_MAPBOX_TOKEN}
+        maxBounds={bounds}
+        maxzoom={15}
+        onLoad={() => {
+          geoControlRef.current?.trigger();
         }}
-      />
-      <Markers
-        myMarker={citizen}
-        otherMarkers={rescuers}
-        nearestOtherMarker={nearestRescuer}
-        markerType={"citizen"}
-      />
-      <Route routeData={routeData} routeOpacity={routeOpacity} />
-      <Controls
-        mapRef={mapRef}
-        nearestRescuer={nearestRescuer}
-        routeData={routeData}
-        setRouteOpacity={setRouteOpacity}
-        ref={buttonsRef}
-      />
-      <DistanceEta distance={distance} eta={eta} />
-    </MapGL>
+      >
+        {/*FIXME: Geolocate bug */}
+        <GeolocateControl
+          ref={geoControlRef}
+          position="top-right"
+          positionOptions={{ enableHighAccuracy: true }}
+          trackUserLocation={true}
+          showUserLocation={false}
+          onGeolocate={({ coords }) => {
+            handleGeolocation(coords);
+          }}
+        />
+
+        <Controls
+          mapRef={mapRef}
+          nearestRescuer={nearestRescuer}
+          routeData={routeData}
+          setRouteOpacity={setRouteOpacity}
+          ref={buttonsRef}
+        />
+
+        {locating && (
+          <>
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
+              <div className="flex flex-col items-center gap-2">
+                <div className="flex items-center gap-4 p-4 shadow-sm rounded-md bg-primary-medium">
+                  <span className="text-md font-medium text-white">
+                    Locating you
+                  </span>
+                  <Loader
+                    isLoading={true}
+                    color={"white"}
+                    size={20}
+                    className="mb-4"
+                  />
+                </div>
+                <FaLocationPin className="text-3xl text-secondary" />
+              </div>
+            </div>
+          </>
+        )}
+
+        {!locating && (
+          <>
+            <Markers
+              myMarker={citizen}
+              otherMarkers={rescuers}
+              nearestOtherMarker={nearestRescuer}
+              markerType={"citizen"}
+            />
+
+            <Route routeData={routeData} routeOpacity={routeOpacity} />
+
+            <DistanceEta distance={distance} eta={eta} />
+          </>
+        )}
+      </MapGL>
+    </>
   );
 });
 
