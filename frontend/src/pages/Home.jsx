@@ -3,23 +3,24 @@ import logo from "../assets/logo.png";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { CitizenMap as Map } from "../components";
-import { FaChevronDown } from "react-icons/fa";
+import { FaChevronDown, FaExclamationTriangle } from "react-icons/fa";
 import { FaLocationPin } from "react-icons/fa6";
 import { BiSolidHide, BiSolidAmbulance } from "react-icons/bi";
 import { MdRoute } from "react-icons/md";
+import RequestModal from "../components/RequestModal";
 
 const Home = () => {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false); // State for modal
   const buttonsRef = useRef(null);
 
-  //go to user page if already logged in
+  // Verify token function
   const verifyToken = async () => {
     const { data } = await axios.post("/auth/", {}, { withCredentials: true });
 
     if (data.success) {
       const role = data.user.account_type;
-
       navigate("/" + role.toLowerCase(), { replace: true });
     }
   };
@@ -28,10 +29,9 @@ const Home = () => {
     verifyToken();
   }, []);
 
-  //TODO: add footer for big screens
   return (
     <div className="h-dvh flex flex-col">
-      <div className="hidden  lg:h-[10%] bg-accent text-white shadow-lg px-4 py-2 lg:flex items-center justify-between">
+      <div className="hidden lg:h-[10%] bg-accent text-white shadow-lg px-4 py-2 lg:flex items-center justify-between">
         <div className="flex items-center gap-4">
           <img src={logo} alt="logo" className="h-12 text-primary" />
         </div>
@@ -70,7 +70,7 @@ const Home = () => {
         <div className="absolute top-4 right-4 m-2 p-2 z-10 rounded-full bg-white shadow-lg md:hidden">
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="text-md cursor-pointer text-gray-700 rounded-full p-2 hover:bg-gra"
+            className="text-md cursor-pointer text-gray-700 rounded-full p-2 hover:bg-gray-200"
           >
             <FaChevronDown className="text-primary" />
           </button>
@@ -116,7 +116,10 @@ const Home = () => {
         <Map ref={buttonsRef} />
       </div>
       <div className="h-[20%] bg-background-light px-2 pb-2 flex flex-col justify-between gap-2 md:h-[10%]">
-        <button className="flex-1 bg-secondary hover:opacity-80 text-white font-bold p-2 rounded">
+        <button
+          className="flex-1 bg-secondary hover:opacity-80 text-white font-bold p-2 rounded"
+          onClick={() => setModalOpen(true)} // Open modal on click
+        >
           Request for Help
         </button>
         <div className="flex items-center gap-4 md:hidden">
@@ -168,6 +171,11 @@ const Home = () => {
           </div>
         </div>
       </div>
+      {modalOpen && (
+        <RequestModal
+          onClose={() => setModalOpen(false)} // Close modal function
+        />
+      )}
     </div>
   );
 };
