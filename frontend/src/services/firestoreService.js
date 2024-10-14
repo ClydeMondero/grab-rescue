@@ -11,6 +11,7 @@ import { store } from "../../firebaseConfig";
 export const addLocationToFirestore = async (
   longitude,
   latitude,
+  address,
   role,
   timestamp = new Date().toISOString(),
   status = "available" //available, assigned, in-transit, unavailable
@@ -21,6 +22,7 @@ export const addLocationToFirestore = async (
     role,
     timestamp,
     status,
+    address,
   };
 
   try {
@@ -37,14 +39,17 @@ export const updateLocationInFirestore = async (
   id,
   longitude,
   latitude,
+  address,
   timestamp = new Date().toISOString(),
   status = "available" //available, assigned, in-transit, unavailable
 ) => {
   const location = {
+    id,
     longitude,
     latitude,
     timestamp,
     status,
+    address,
   };
 
   try {
