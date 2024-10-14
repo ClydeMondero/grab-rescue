@@ -69,17 +69,16 @@ const Requests = () => {
                 </p>
               </div>
 
-                {/* Action Section */}
-                <div className="flex items-center">
-                  <Link
-                    to="/rescuer/navigate"
-                    className="px-4 py-2 text-sm sm:text-base font-semibold text-white bg-primary hover:bg-green-600 transition-colors rounded"
-                  >
-                    Accept
-                  </Link>
-                </div>
+              {/* Action Section */}
+              <div className="flex items-center">
+                <Link
+                  to="/rescuer/navigate"
+                  className="px-4 py-2 text-sm sm:text-base font-semibold text-white bg-primary hover:bg-green-600 transition-colors rounded"
+                >
+                  Accept
+                </Link>
               </div>
-            </Link>
+            </div>
           </div>
         ))}
       </div>
