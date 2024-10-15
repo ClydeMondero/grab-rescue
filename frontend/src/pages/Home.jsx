@@ -15,8 +15,9 @@ const Home = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [formVisible, setFormVisible] = useState(false);
-  const buttonsRef = useRef(null);
+  const mapRef = useRef(null);
   const [requesting, setRequesting] = useState(false);
+  const [locating, setLocating] = useState(true);
 
   // Verify token function
   const verifyToken = async () => {
@@ -28,10 +29,6 @@ const Home = () => {
     }
   };
 
-  useEffect(() => {
-    verifyToken();
-  }, []);
-
   const handleModalConfirm = () => {
     setModalOpen(false);
     setRequesting(true);
@@ -41,6 +38,22 @@ const Home = () => {
   const handleModalCancel = () => {
     setModalOpen(false); // Just close the modal, don't show the form
   };
+
+  const handleLocatingChange = (newLocatingState) => {
+    setLocating(newLocatingState); // Update only when locating changes
+  };
+
+  useEffect(() => {
+    verifyToken();
+  }, []);
+
+  useEffect(() => {
+    console.log("Locating", locating);
+  }, [locating]);
+
+  useEffect(() => {
+    console.log("Requesting", requesting);
+  }, [requesting]);
 
   return (
     <div className="h-dvh w-screen overflow-hidden flex flex-col">
@@ -136,7 +149,7 @@ const Home = () => {
         </div>
 
         {/* Map Component */}
-        <Map ref={buttonsRef} />
+        <Map ref={mapRef} onLocatingChange={handleLocatingChange} />
 
         {/* MultiStepForm Component (visible after modal closes) */}
         {formVisible && (
@@ -152,20 +165,29 @@ const Home = () => {
           requesting ? "hidden" : ""
         } h-[20%] w-full bg-background-light px-2 pb-2 flex flex-col justify-between gap-2 md:h-[10%]`}
       >
-        {!requesting && (
-          <button
-            className="flex-1 bg-secondary hover:opacity-80 text-white font-bold p-2 rounded"
-            onClick={() => setModalOpen(true)} // Open modal on click
-          >
-            Request for Help
-          </button>
-        )}
+        {!requesting &&
+          (!locating ? (
+            <button
+              className="flex-1 bg-secondary hover:opacity-80 text-white font-bold p-2 rounded"
+              onClick={() => setModalOpen(true)} // Open modal on click
+            >
+              Request for Help
+            </button>
+          ) : (
+            <button
+              className="flex-1 bg-background-medium  text-white font-bold p-2 rounded"
+              disabled={true}
+            >
+              Tracking your Location
+            </button>
+          ))}
+
         <div className="flex items-center gap-4 md:hidden">
           <div className="bg-white flex items-center justify-around gap-4 rounded-lg px-2 py-4 font-medium text-sm text-center flex-1">
             <div className="flex flex-col items-center">
               <button
                 onClick={() => {
-                  buttonsRef.current.locateCitizen();
+                  mapRef.current.locateCitizen();
                 }}
                 className="bg-background-light rounded-full p-3 flex items-center justify-center"
               >
@@ -176,7 +198,7 @@ const Home = () => {
             <div className="flex flex-col items-center">
               <button
                 onClick={() => {
-                  buttonsRef.current.goToNearestRescuer();
+                  mapRef.current.goToNearestRescuer();
                 }}
                 className="bg-background-light rounded-full p-3 flex items-center justify-center"
               >
@@ -187,7 +209,7 @@ const Home = () => {
             <div className="flex flex-col items-center">
               <button
                 onClick={() => {
-                  buttonsRef.current.viewRoute();
+                  mapRef.current.viewRoute();
                 }}
                 className="bg-background-light rounded-full p-3 flex items-center justify-center"
               >
@@ -198,7 +220,7 @@ const Home = () => {
             <div className="flex flex-col items-center">
               <button
                 onClick={() => {
-                  buttonsRef.current.hideRoute();
+                  mapRef.current.hideRoute();
                 }}
                 className="bg-background-light rounded-full p-3 flex items-center justify-center"
               >

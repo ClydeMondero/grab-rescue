@@ -46,6 +46,7 @@ const CitizenMap = forwardRef((props, ref) => {
   const [watchState, setWatchState] = useState("OFF");
 
   const [locating, setLocating] = useState(true);
+  const { onLocatingChange } = props;
 
   //TODO: locating message
   const [locatingMessage, setLocatingMessage] = useState("");
@@ -171,6 +172,12 @@ const CitizenMap = forwardRef((props, ref) => {
 
       // Clean up the interval when the component unmounts or locating stops
       return () => clearInterval(intervalId);
+    }
+  }, [locating]);
+
+  useEffect(() => {
+    if (onLocatingChange) {
+      onLocatingChange(locating);
     }
   }, [locating]);
 
