@@ -47,14 +47,6 @@ const Home = () => {
     verifyToken();
   }, []);
 
-  useEffect(() => {
-    console.log("Locating", locating);
-  }, [locating]);
-
-  useEffect(() => {
-    console.log("Requesting", requesting);
-  }, [requesting]);
-
   return (
     <div className="h-dvh w-screen overflow-hidden flex flex-col">
       {/* Desktop Navbar */}
