@@ -9,7 +9,7 @@ const authRoute = require("./routes/AuthRoute");
 const rescuerRoute = require("./routes/RescuerRoute");
 const adminRoute = require("./routes/AdminRoute");
 
-const url = env.SITE_URL;
+const url = env.API_URL;
 const port = env.PORT;
 
 app.listen(port, () => {

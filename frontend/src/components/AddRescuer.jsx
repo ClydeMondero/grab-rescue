@@ -1,14 +1,22 @@
 import { useState } from "react";
 import { FaSave } from "react-icons/fa";
-import { MdPersonAdd } from "react-icons/md"; // New icon for AddRescuer
+import { MdPersonAdd } from "react-icons/md";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { barangaysData } from "../constants/Barangays";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
+import { Toast } from "../components";
+import zxcvbn from "zxcvbn"; // Import zxcvbn
+import "react-toastify/dist/ReactToastify.css";
 
 const AddRescuer = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState({
+    score: 0,
+    feedback: [],
+  });
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -59,6 +67,14 @@ const AddRescuer = () => {
         [name]: value,
         age: age,
       }));
+    } else if (name === "password") {
+      // Update password strength on password input change
+      const result = zxcvbn(value);
+      setPasswordStrength(result);
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
     } else {
       setFormData((prevData) => ({
         ...prevData,
@@ -67,11 +83,27 @@ const AddRescuer = () => {
     }
   };
 
+  const resetForm = () => {
+    setFormData({
+      firstName: "",
+      middleInitial: "",
+      lastName: "",
+      birthday: "",
+      municipality: "",
+      barangay: "",
+      contactNumber: "",
+      email: "",
+      username: "",
+      password: "",
+      confirmPassword: "",
+      age: "",
+    });
+    setPasswordStrength({ score: 0, feedback: [] }); // Reset password strength
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Check if formData contains all required fields
-    console.log("Form data before submission:", formData);
+    setLoading(true); // Start loading state
 
     const requiredFields = [
       "firstName",
@@ -85,30 +117,36 @@ const AddRescuer = () => {
       "password",
       "confirmPassword",
     ];
-    for (const field of requiredFields) {
-      if (!formData[field]) {
-        toast.error(
-          `Please fill out the ${field
-            .replace(/([A-Z])/g, " $1")
-            .toLowerCase()} field.`
-        );
-        return;
-      }
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      toast.error("Passwords do not match");
-      return;
-    }
 
     try {
-      const response = await axios.post("/rescuers/create", formData);
-      toast.success("Rescuer added successfully:", response.message);
-      console.log("Rescuer added successfully:", response.data);
-      // Handle success, reset form or redirect as needed
+      const response = await (
+        await axios.post("/rescuers/create", formData)
+      ).data;
+      if (!response.success) throw new Error(response.message);
+      toast.success(response.message);
+      resetForm();
     } catch (error) {
-      console.error("Error adding rescuer:", error);
-      toast.error("Error adding rescuer. Please try again.");
+      console.error(error.message);
+      toast.error(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getStrengthLabel = (score) => {
+    switch (score) {
+      case 0:
+        return "Very Weak";
+      case 1:
+        return "Weak";
+      case 2:
+        return "Fair";
+      case 3:
+        return "Good";
+      case 4:
+        return "Strong";
+      default:
+        return "";
     }
   };
 
@@ -121,11 +159,10 @@ const AddRescuer = () => {
           Add Rescuer
         </h4>
       </div>
-
       {/* Add Rescuer Form */}
       <div className="flex-1 bg-white rounded-md p-4 sm:p-6 lg:p-8">
         <form className="space-y-4 sm:space-y-6" onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             {/* Form Fields */}
             <div>
               <label
@@ -140,8 +177,9 @@ const AddRescuer = () => {
                 name="firstName"
                 value={formData.firstName}
                 onChange={handleChange}
-                className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
-                placeholder="Enter first name"
+                required
+                className="mt-1 block w-full px-2 py-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
+                placeholder="First name"
               />
             </div>
             <div>
@@ -149,7 +187,7 @@ const AddRescuer = () => {
                 htmlFor="middleInitial"
                 className="block text-sm font-medium text-[#557C55]"
               >
-                Middle Name:
+                Middle Initial:
               </label>
               <input
                 type="text"
@@ -157,8 +195,9 @@ const AddRescuer = () => {
                 name="middleInitial"
                 value={formData.middleInitial}
                 onChange={handleChange}
-                className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
-                placeholder="Enter middle name"
+                required
+                className="mt-1 block w-full px-2 py-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
+                placeholder="Middle Initial"
               />
             </div>
             <div>
@@ -174,8 +213,9 @@ const AddRescuer = () => {
                 name="lastName"
                 value={formData.lastName}
                 onChange={handleChange}
-                className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
-                placeholder="Enter last name"
+                required
+                className="mt-1 block w-full px-2 py-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
+                placeholder="Last name"
               />
             </div>
             <div>
@@ -191,7 +231,8 @@ const AddRescuer = () => {
                 name="birthday"
                 value={formData.birthday}
                 onChange={handleChange}
-                className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
+                required
+                className="mt-1 block w-full px-2 py-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
               />
             </div>
             <div>
@@ -207,7 +248,7 @@ const AddRescuer = () => {
                 name="age"
                 value={formData.age}
                 readOnly
-                className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
+                className="mt-1 block w-full px-2 py-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
                 placeholder="Age"
               />
             </div>
@@ -223,7 +264,8 @@ const AddRescuer = () => {
                 name="municipality"
                 value={formData.municipality}
                 onChange={handleChange}
-                className="w-full p-3 border rounded-lg bg-gray-100 border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
+                required
+                className="w-full p-2 border rounded-lg bg-gray-100 border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
               >
                 <option value="">Select Municipality</option>
                 {Object.keys(barangaysData).map((municipality) => (
@@ -245,15 +287,15 @@ const AddRescuer = () => {
                 name="barangay"
                 value={formData.barangay}
                 onChange={handleChange}
-                className="w-full p-3 border rounded-lg bg-gray-100 border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
+                required
+                className="w-full p-2 border rounded-lg bg-gray-100 border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
               >
                 <option value="">Select Barangay</option>
-                {formData.municipality &&
-                  barangaysData[formData.municipality].map((barangay) => (
-                    <option key={barangay} value={barangay}>
-                      {barangay}
-                    </option>
-                  ))}
+                {barangaysData[formData.municipality]?.map((barangay) => (
+                  <option key={barangay} value={barangay}>
+                    {barangay}
+                  </option>
+                ))}
               </select>
             </div>
             <div>
@@ -269,6 +311,7 @@ const AddRescuer = () => {
                 name="contactNumber"
                 value={formData.contactNumber}
                 onChange={handleChange}
+                required
                 className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
                 placeholder="Enter contact number"
               />
@@ -286,6 +329,7 @@ const AddRescuer = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
+                required
                 className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
                 placeholder="Enter email"
               />
@@ -303,6 +347,7 @@ const AddRescuer = () => {
                 name="username"
                 value={formData.username}
                 onChange={handleChange}
+                required
                 className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
                 placeholder="Enter username"
               />
@@ -321,6 +366,7 @@ const AddRescuer = () => {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
+                  required
                   className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
                   placeholder="Enter password"
                 />
@@ -329,11 +375,50 @@ const AddRescuer = () => {
                   onClick={togglePasswordVisibility}
                 >
                   {showPassword ? (
-                    <AiFillEyeInvisible size={24} color="#557C55" />
+                    <AiFillEyeInvisible className="text-[#557C55]" />
                   ) : (
-                    <AiFillEye size={24} color="#557C55" />
+                    <AiFillEye className="text-[#557C55]" />
                   )}
                 </div>
+              </div>
+              {/* Password Strength Meter */}
+              <div className="mt-2">
+                <strong className="text-sm text-[#557C55]">
+                  Password Strength: {getStrengthLabel(passwordStrength.score)}
+                </strong>
+                <div
+                  style={{
+                    width: "100%",
+                    backgroundColor: "#e0e0e0",
+                    borderRadius: "5px",
+                    marginTop: "5px",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: `${(passwordStrength.score + 1) * 20}%`,
+                      height: "5px",
+                      backgroundColor:
+                        passwordStrength.score === 4
+                          ? "green"
+                          : passwordStrength.score === 3
+                          ? "blue"
+                          : passwordStrength.score === 2
+                          ? "yellow"
+                          : passwordStrength.score === 1
+                          ? "orange"
+                          : "red",
+                      borderRadius: "3px",
+                    }}
+                  />
+                </div>
+                {passwordStrength.feedback.length > 0 && (
+                  <ul className="text-sm text-red-500">
+                    {passwordStrength.feedback.map((item, index) => (
+                      <li key={index}>{item}</li>
+                    ))}
+                  </ul>
+                )}
               </div>
             </div>
 
@@ -351,6 +436,7 @@ const AddRescuer = () => {
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleChange}
+                  required
                   className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
                   placeholder="Confirm password"
                 />
@@ -359,27 +445,36 @@ const AddRescuer = () => {
                   onClick={toggleConfirmPasswordVisibility}
                 >
                   {showConfirmPassword ? (
-                    <AiFillEyeInvisible size={24} color="#557C55" />
+                    <AiFillEyeInvisible className="text-[#557C55]" />
                   ) : (
-                    <AiFillEye size={24} color="#557C55" />
+                    <AiFillEye className="text-[#557C55]" />
                   )}
                 </div>
               </div>
             </div>
           </div>
-
           {/* Submit Button */}
-          <div className="flex justify-end mt-6">
+          <div className="flex justify-end">
             <button
               type="submit"
-              className="flex items-center px-4 py-2 bg-[#557C55] text-white rounded-md hover:bg-[#3c5e3c] focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
+              className={`flex items-center justify-center px-3 py-1 sm:px-4 sm:py-2 text-white bg-[#557C55] rounded-md focus:outline-none focus:ring-2 focus:ring-[#2e5f2e] transition ${
+                loading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+              disabled={loading}
             >
-              <FaSave className="mr-2" />
-              Save Rescuer
+              {loading ? (
+                <span>Loading...</span>
+              ) : (
+                <>
+                  <FaSave className="mr-2" />
+                  Save Rescuer
+                </>
+              )}
             </button>
           </div>
         </form>
       </div>
+      <Toast />
     </div>
   );
 };

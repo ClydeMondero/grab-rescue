@@ -7,6 +7,7 @@ dotenv.config({
 
 module.exports = {
   SITE_URL: process.env.SITE_URL,
+  API_URL: process.env.API_URL,
   NODE_ENV: process.env.NODE_ENV,
   DATABASE_URL: process.env.DATABASE_URL,
   PORT: process.env.PORT,
