@@ -8,11 +8,13 @@ import { FaLocationPin } from "react-icons/fa6";
 import { BiSolidHide, BiSolidAmbulance } from "react-icons/bi";
 import { MdRoute } from "react-icons/md";
 import RequestModal from "../components/RequestModal";
+import MultiStepForm from "./MultiStepForm";
 
 const Home = () => {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [modalOpen, setModalOpen] = useState(false); // State for modal
+  const [modalOpen, setModalOpen] = useState(false);
+  const [formVisible, setFormVisible] = useState(false);
   const buttonsRef = useRef(null);
 
   // Verify token function
@@ -29,8 +31,14 @@ const Home = () => {
     verifyToken();
   }, []);
 
+  const handleModalClose = () => {
+    setModalOpen(false); // Close the modal
+    setFormVisible(true); // Show the form after modal closes
+  };
+
   return (
-    <div className="h-dvh flex flex-col">
+    <div className="min-h-screen w-screen overflow-hidden flex flex-col">
+      {/* Desktop Navbar */}
       <div className="hidden lg:h-[10%] bg-accent text-white shadow-lg px-4 py-2 lg:flex items-center justify-between">
         <div className="flex items-center gap-4">
           <img src={logo} alt="logo" className="h-12 text-primary" />
@@ -66,7 +74,14 @@ const Home = () => {
           </li>
         </ul>
       </div>
-      <div className="w-full h-[80%] relative md:h-[90%] md:bg-slate-200">
+
+      {/* Map and Form Section */}
+      <div
+        className={`w-full flex-1 relative md:h-[90%] md:bg-slate-200 ${
+          formVisible ? "grid grid-cols-1 md:grid-cols-2" : ""
+        }`}
+      >
+        {/* Mobile Menu */}
         <div className="absolute top-4 right-4 m-2 p-2 z-10 rounded-full bg-white shadow-lg md:hidden">
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -113,9 +128,20 @@ const Home = () => {
             </div>
           )}
         </div>
+
+        {/* Map Component */}
         <Map ref={buttonsRef} />
+
+        {/* MultiStepForm Component (visible after modal closes) */}
+        {formVisible && (
+          <div className="p-4 bg-white shadow-md flex flex-col justify-center items-center md:h-full md:p-6">
+            <MultiStepForm />
+          </div>
+        )}
       </div>
-      <div className="h-[20%] bg-background-light px-2 pb-2 flex flex-col justify-between gap-2 md:h-[10%]">
+
+      {/* Mobile Buttons */}
+      <div className="h-[20%] w-full bg-background-light px-2 pb-2 flex flex-col justify-between gap-2 md:h-[10%]">
         <button
           className="flex-1 bg-secondary hover:opacity-80 text-white font-bold p-2 rounded"
           onClick={() => setModalOpen(true)} // Open modal on click
@@ -171,11 +197,8 @@ const Home = () => {
           </div>
         </div>
       </div>
-      {modalOpen && (
-        <RequestModal
-          onClose={() => setModalOpen(false)} // Close modal function
-        />
-      )}
+
+      {modalOpen && <RequestModal onClose={handleModalClose} />}
     </div>
   );
 };
