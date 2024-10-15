@@ -3,24 +3,12 @@ import { FaExclamationTriangle } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { getRequestsFromFirestore } from "../services/firestoreService";
 import { useState, useEffect } from "react";
-
-const Requests = () => {
-  const [requests, setRequests] = useState([]);
-
-  const getRequests = async () => {
-    const requests = await getRequestsFromFirestore();
-
-    setRequests(requests);
-
-    requests.map((request) => {
-      console.log(request);
-    });
+import { getDistance } from "../utils/DistanceUtility";
+//TODO: Calculate ETA and Distance then show on request card
+const Requests = ({ requests }) => {
+  const handleAccept = (request) => {
+    console.log(request);
   };
-
-  useEffect(() => {
-    getRequests();
-  }, []);
-
   return (
     <div className=" flex flex-col p-4 sm:p-6 md:p-8 lg:p-10 max-w-7xl w-full mx-auto h-[calc(100vh-160px)]">
       {/* Header Section */}
@@ -35,7 +23,7 @@ const Requests = () => {
       <div className="flex-1 overflow-y-auto max-h-[calc(100vh-200px)] space-y-3">
         {requests.map((request) => (
           <div
-            key={request}
+            key={request.id}
             className="block p-4 bg-white border border-gray-300 rounded-md hover:bg-gray-100 transition-colors"
           >
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between w-full">
@@ -46,11 +34,11 @@ const Requests = () => {
                 </h3>
                 <p className="text-sm text-gray-600">
                   <strong className="text-[#557C55]">Location: </strong>
-                  {request.address}
+                  {request.location.address}
                 </p>
                 <p className="text-sm text-gray-600">
                   <strong className="text-[#557C55]">Distance: </strong>
-                  {request.distance}m
+                  {getDistance}
                 </p>
                 <p className="text-sm text-gray-600">
                   <strong className="text-[#557C55]">ETA: </strong>{" "}
@@ -71,12 +59,12 @@ const Requests = () => {
 
               {/* Action Section */}
               <div className="flex items-center">
-                <Link
-                  to="/rescuer/navigate"
+                <button
+                  onClick={() => handleAccept(request.id)}
                   className="px-4 py-2 text-sm sm:text-base font-semibold text-white bg-primary hover:bg-green-600 transition-colors rounded"
                 >
                   Accept
-                </Link>
+                </button>
               </div>
             </div>
           </div>

@@ -10,9 +10,25 @@ import {
   RequestDetails,
 } from "../components";
 import { RescuerMap as Map } from "../components";
+import { useState, useEffect } from "react";
+import { getRequestsFromFirestore } from "../services/firestoreService";
 
 const Rescuer = (props) => {
   const { user } = props;
+  const [requests, setRequests] = useState([]);
+  const getRequests = async () => {
+    const requests = await getRequestsFromFirestore();
+
+    setRequests(requests);
+
+    requests.map((request) => {
+      console.log(request);
+    });
+  };
+
+  useEffect(() => {
+    getRequests();
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -21,7 +37,7 @@ const Rescuer = (props) => {
 
       <div className="flex-grow overflow-auto p-4 bg-slate-50">
         <Routes>
-          <Route path="/requests" element={<Requests />} />
+          <Route path="/requests" element={<Requests requests={requests} />} />
           <Route path="/navigate" element={<Navigate user={user} />} />
           <Route path="/profile" element={<ViewProfile user={user} />} />
           <Route
