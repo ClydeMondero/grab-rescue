@@ -72,7 +72,7 @@ const Home = () => {
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="text-md cursor-pointer text-gray-700 rounded-full p-2 hover:bg-gray-200"
           >
-            <FaChevronDown className="text-primary" />
+            <FaChevronDown className="text-primary-medium" />
           </button>
           {mobileMenuOpen && (
             <div className="absolute top-14 right-0 w-56 bg-background rounded-md shadow-lg py-2 flex items-center justify-center">

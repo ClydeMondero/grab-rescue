@@ -47,9 +47,25 @@ const CitizenMap = forwardRef((props, ref) => {
 
   const [locating, setLocating] = useState(true);
 
+  //TODO: locating message
+  const [locatingMessage, setLocatingMessage] = useState("");
+
   const mapRef = useRef();
   const geoControlRef = useRef();
   const buttonsRef = useRef();
+
+  const messages = [
+    "We’re trying to locate you, please hold tight!",
+    "Hang on! Finding your location...",
+    "Getting your current position...",
+    "Locating you, this may take a moment.",
+    "Looking for your coordinates...",
+    "Tip: Make sure your GPS is enabled for better accuracy.",
+    "Tip: Try to stay in an open area for a quicker location fix.",
+    "For the best results, keep Wi-Fi on and data enabled.",
+    "Still having trouble? Try moving to an area with better signal.",
+    "Location taking longer than expected? Check your GPS settings.",
+  ];
 
   const handleGeolocation = (coords) => {
     if (!mapRef.current) return;
@@ -114,11 +130,13 @@ const CitizenMap = forwardRef((props, ref) => {
       case "OFF":
       case "ACTIVE_ERROR":
       case "WAITING_ACTIVE":
+      case "BACKGROUND_ERROR":
         setLocating(true);
+
         break;
       case "ACTIVE_LOCK":
       case "BACKGROUND":
-        setLocating(false);
+        setLocating(true);
         break;
       default:
         console.log("Unknown watch state:", watchState);
@@ -133,7 +151,6 @@ const CitizenMap = forwardRef((props, ref) => {
     const checkWatchState = () => {
       if (geoControlRef.current && geoControlRef.current._watchState) {
         setWatchState(geoControlRef.current._watchState);
-        console.log("watchState: ", watchState);
       }
     };
 
@@ -141,6 +158,21 @@ const CitizenMap = forwardRef((props, ref) => {
 
     return () => clearInterval(interval); // Clean up interval on unmount
   }, [geoControlRef.current, watchState]);
+
+  useEffect(() => {
+    if (locating) {
+      const changeMessage = () => {
+        const randomIndex = Math.floor(Math.random() * messages.length);
+        setLocatingMessage(messages[randomIndex]);
+      };
+
+      // Set interval for changing message less frequently (every 10 seconds)
+      const intervalId = setInterval(changeMessage, 10000);
+
+      // Clean up the interval when the component unmounts or locating stops
+      return () => clearInterval(intervalId);
+    }
+  }, [locating]);
 
   return (
     <>
@@ -155,7 +187,6 @@ const CitizenMap = forwardRef((props, ref) => {
           geoControlRef.current?.trigger();
         }}
       >
-        {/*FIXME: Geolocate bug */}
         <GeolocateControl
           ref={geoControlRef}
           position="top-right"
@@ -179,16 +210,19 @@ const CitizenMap = forwardRef((props, ref) => {
           <>
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
               <div className="flex flex-col items-center gap-2">
-                <div className="flex items-center gap-4 p-4 shadow-sm rounded-md bg-primary-medium">
-                  <span className="text-md font-medium text-white">
-                    Locating you
-                  </span>
-                  <Loader
-                    isLoading={true}
-                    color={"white"}
-                    size={20}
-                    className="mb-4"
-                  />
+                <div className="flex-col items-center justify-center p-4 shadow-sm rounded-md bg-primary-medium">
+                  <div className="flex items-center justify-center gap-4 ">
+                    <span className="text-lg font-medium text-white">
+                      Locating you
+                    </span>
+                    <Loader
+                      isLoading={true}
+                      color={"white"}
+                      size={20}
+                      className="mb-4"
+                    />
+                  </div>
+                  <span className="text-white text-sm">{locatingMessage}</span>
                 </div>
                 <FaLocationPin className="text-3xl text-secondary" />
               </div>
