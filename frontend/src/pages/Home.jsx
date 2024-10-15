@@ -16,6 +16,7 @@ const Home = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [formVisible, setFormVisible] = useState(false);
   const buttonsRef = useRef(null);
+  const [requesting, setRequesting] = useState(false);
 
   // Verify token function
   const verifyToken = async () => {
@@ -31,9 +32,14 @@ const Home = () => {
     verifyToken();
   }, []);
 
-  const handleModalClose = () => {
-    setModalOpen(false); 
-    setFormVisible(true);   
+  const handleModalConfirm = () => {
+    setModalOpen(false);
+    setRequesting(true);
+    setFormVisible(true);
+  };
+
+  const handleModalCancel = () => {
+    setModalOpen(false); // Just close the modal, don't show the form
   };
 
   return (
@@ -141,13 +147,19 @@ const Home = () => {
       </div>
 
       {/* Mobile Buttons */}
-      <div className="h-[20%] w-full bg-background-light px-2 pb-2 flex flex-col justify-between gap-2 md:h-[10%]">
-        <button
-          className="flex-1 bg-secondary hover:opacity-80 text-white font-bold p-2 rounded"
-          onClick={() => setModalOpen(true)} // Open modal on click
-        >
-          Request for Help
-        </button>
+      <div
+        className={`${
+          requesting ? "hidden" : ""
+        } h-[20%] w-full bg-background-light px-2 pb-2 flex flex-col justify-between gap-2 md:h-[10%]`}
+      >
+        {!requesting && (
+          <button
+            className="flex-1 bg-secondary hover:opacity-80 text-white font-bold p-2 rounded"
+            onClick={() => setModalOpen(true)} // Open modal on click
+          >
+            Request for Help
+          </button>
+        )}
         <div className="flex items-center gap-4 md:hidden">
           <div className="bg-white flex items-center justify-around gap-4 rounded-lg px-2 py-4 font-medium text-sm text-center flex-1">
             <div className="flex flex-col items-center">
@@ -198,7 +210,12 @@ const Home = () => {
         </div>
       </div>
 
-      {modalOpen && <RequestModal onClose={handleModalClose} />}
+      {modalOpen && (
+        <RequestModal
+          onConfirm={handleModalConfirm} // Handle modal confirmation to show the form
+          onCancel={handleModalCancel} // Handle modal cancellation to simply close the modal
+        />
+      )}
     </div>
   );
 };
