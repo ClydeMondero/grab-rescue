@@ -37,7 +37,7 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen w-screen overflow-hidden flex flex-col">
+    <div className="h-dvh w-screen overflow-hidden flex flex-col">
       {/* Desktop Navbar */}
       <div className="hidden lg:h-[10%] bg-accent text-white shadow-lg px-4 py-2 lg:flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -87,7 +87,7 @@ const Home = () => {
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="text-md cursor-pointer text-gray-700 rounded-full p-2 hover:bg-gray-200"
           >
-            <FaChevronDown className="text-primary" />
+            <FaChevronDown className="text-primary-medium" />
           </button>
           {mobileMenuOpen && (
             <div className="absolute top-14 right-0 w-56 bg-background rounded-md shadow-lg py-2 flex items-center justify-center">
