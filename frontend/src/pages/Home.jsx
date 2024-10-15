@@ -37,7 +37,7 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen w-screen overflow-hidden flex flex-col">
+    <div className="h-dvh w-screen overflow-hidden flex flex-col">
       {/* Desktop Navbar */}
       <div className="hidden lg:h-[10%] bg-accent text-white shadow-lg px-4 py-2 lg:flex items-center justify-between">
         <div className="flex items-center gap-4">
