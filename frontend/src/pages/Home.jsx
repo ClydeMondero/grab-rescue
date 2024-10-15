@@ -32,8 +32,8 @@ const Home = () => {
   }, []);
 
   const handleModalClose = () => {
-    setModalOpen(false); // Close the modal
-    setFormVisible(true); // Show the form after modal closes
+    setModalOpen(false); 
+    setFormVisible(true);   
   };
 
   return (
