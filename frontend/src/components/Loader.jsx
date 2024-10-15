@@ -3,6 +3,7 @@ import "ldrs/cardio";
 const Loader = ({ isLoading, color, size = 25 }) => {
   const loaderColor = color ? color : "#fff";
 
+  //FIXME: loader not showing in production
   return (
     <div aria-live="polite" aria-busy={isLoading}>
       {isLoading && (
