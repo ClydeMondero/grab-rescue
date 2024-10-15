@@ -10,7 +10,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "concurrently": "^8.2.2",
-    "zxcvbn": "^4.4.2"
+    "concurrently": "^8.2.2"
   }
 }
