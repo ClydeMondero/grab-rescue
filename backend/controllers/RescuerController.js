@@ -3,6 +3,7 @@ const env = require("../config/env");
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
+const zxcvbn = require("zxcvbn");
 
 // Get Rescuers with Filtering and Name Search
 module.exports.GetRescuers = async (req, res) => {
@@ -81,7 +82,38 @@ module.exports.CreateRescuer = async (req, res) => {
     email,
     username,
     password,
+    confirmPassword, // Added confirmPassword to the request body
   } = req.body;
+
+  // List of required fields
+  const requiredFields = {
+    firstName: "First Name",
+    lastName: "Last Name",
+    birthday: "Birthday",
+    municipality: "Municipality",
+    barangay: "Barangay",
+    contactNumber: "Contact Number",
+    email: "Email",
+    username: "Username",
+    password: "Password",
+    confirmPassword: "Confirm Password", // Include confirmPassword as a required field
+  };
+
+  // Check for missing fields
+  const missingFields = [];
+
+  for (const [key, field] of Object.entries(requiredFields)) {
+    if (!req.body[key]) {
+      missingFields.push(field);
+    }
+  }
+
+  if (missingFields.length > 0) {
+    return res.status(200).json({
+      success: false,
+      message: `Missing fields: ${missingFields.join(", ")}`,
+    });
+  }
 
   // Calculate the user's age based on the provided birthday
   const age = Math.floor(
@@ -90,8 +122,57 @@ module.exports.CreateRescuer = async (req, res) => {
   const MIN_AGE = 18;
 
   if (age < MIN_AGE) {
-    return res.status(400).json({
-      error: `You must be at least ${MIN_AGE} years old to register.`,
+    return res.status(200).json({
+      success: false,
+      message: `You must be at least ${MIN_AGE} years old to register. You are currently ${age} years old.`,
+    });
+  }
+
+  // Check if passwords match
+  if (password !== confirmPassword) {
+    return res.status(200).json({
+      success: false,
+      message: "Passwords do not match.",
+    });
+  }
+
+  // Check password length
+  if (password.length < 8) {
+    return res.status(200).json({
+      success: false,
+      message: "Password must be at least 8 characters long.",
+    });
+  }
+
+  // Check password strength using zxcvbn
+  const passwordStrength = zxcvbn(password);
+  if (passwordStrength.score < 3) {
+    return res.status(200).json({
+      success: false,
+      message: "Password is too weak.",
+    });
+  }
+
+  // Check for required character types (uppercase, lowercase, number, special character)
+  const hasUpperCase = /[A-Z]/.test(password);
+  const hasLowerCase = /[a-z]/.test(password);
+  const hasNumber = /\d/.test(password);
+  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+  if (!hasUpperCase || !hasLowerCase || !hasNumber || !hasSpecialChar) {
+    return res.status(200).json({
+      success: false,
+      message:
+        "Password must include uppercase, lowercase, number, and special character.",
+    });
+  }
+
+  // Email format validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return res.status(200).json({
+      success: false,
+      message: "Invalid email format.",
     });
   }
 
@@ -103,7 +184,16 @@ module.exports.CreateRescuer = async (req, res) => {
     if (result.rows.length > 0) {
       const existingUser = result.rows[0];
       if (existingUser.username === username) {
-        return res.status(400).json({ error: "Username is already taken" });
+        return res.status(200).json({
+          success: false,
+          message: "Username is already taken.",
+        });
+      }
+      if (existingUser.email === email) {
+        return res.status(200).json({
+          success: false,
+          message: "Email is already taken.",
+        });
       }
     } else {
       // Hash the password using bcrypt
@@ -143,7 +233,10 @@ module.exports.CreateRescuer = async (req, res) => {
       const insertResult = await pool.query(insertQuery, values);
       const userId = insertResult.rows[0].id;
 
-      // Send a verification email to the user
+      // Use frontend base URL for the verification link
+      const verificationLink = `${process.env.SITE_URL}/verify/${verificationToken}`;
+
+      // Send a verification email to the new email
       const transporter = nodemailer.createTransport({
         service: "gmail",
         auth: {
@@ -153,251 +246,30 @@ module.exports.CreateRescuer = async (req, res) => {
       });
 
       const mailOptions = {
-        from: "your_email_here",
+        from: "bhenzmharlbartolome012603@gmail.com",
         to: email,
         subject: "Email Verification",
-        text: `Please click the following link to verify your email: http://localhost:4000/users/verify/${verificationToken}`,
+        text: `Please click the following link to verify your new email: ${verificationLink}`,
       };
 
       transporter.sendMail(mailOptions, (err, info) => {
         if (err) {
-          return res.status(500).json({ error: err.message });
+          return res.status(200).json({
+            success: false,
+            message: `Email could not be sent: ${err.message}`,
+          });
         } else {
-          return res
-            .status(200)
-            .json({ message: "User created. Verification email sent." });
+          return res.status(200).json({
+            success: true,
+            message: "User created successfully. Verification email sent.",
+          });
         }
       });
     }
   } catch (err) {
-    return res.status(500).json({ error: err.message });
-  }
-};
-
-// Update Rescuer
-module.exports.UpdateRescuer = async (req, res) => {
-  const {
-    first_name: firstName,
-    middle_initial: middleInitial,
-    last_name: lastName,
-    birthday,
-    municipality,
-    barangay,
-    contact_number: contactNumber,
-    username: newUsername,
-  } = req.body;
-
-  // Validation
-  if (
-    !firstName ||
-    !lastName ||
-    !birthday ||
-    !municipality ||
-    !barangay ||
-    !contactNumber ||
-    !newUsername
-  ) {
-    return res.status(200).json({ error: "Please fill in all fields" });
-  }
-
-  const age = Math.floor(
-    (new Date() - new Date(birthday).getTime()) / 3.15576e10
-  );
-  const MIN_AGE = 18;
-
-  if (age < MIN_AGE) {
     return res.status(200).json({
-      error: `You must be at least ${MIN_AGE} years old to register.`,
+      success: false,
+      message: `Server error: ${err.message}`,
     });
-  }
-
-  try {
-    // Check if the user exists
-    const userQuery = `SELECT username FROM users WHERE id = $1`;
-    const { rows: existingUsers } = await pool.query(userQuery, [
-      req.params.id,
-    ]);
-
-    if (existingUsers.length === 0) {
-      return res.status(200).json({ error: "User does not exist" });
-    }
-
-    const oldUsername = existingUsers[0].username;
-
-    if (newUsername && newUsername !== oldUsername) {
-      // Check if new username is already taken
-      const usernameQuery =
-        "SELECT * FROM users WHERE username = $1 AND username != $2";
-      const { rows: usernameRows } = await pool.query(usernameQuery, [
-        newUsername,
-        oldUsername,
-      ]);
-
-      if (usernameRows.length > 0) {
-        return res.status(200).json({ error: "Username is already taken" });
-      }
-    }
-
-    // Update the user in the database without email and password, including age
-    const updateQuery = `
-      UPDATE users SET first_name = $1, middle_initial = $2, last_name = $3, birthday = $4, age = $5,
-      municipality = $6, barangay = $7, contact_number = $8, username = $9 WHERE id = $10
-    `;
-    const values = [
-      firstName,
-      middleInitial,
-      lastName,
-      birthday,
-      age,
-      municipality,
-      barangay,
-      contactNumber,
-      newUsername,
-      req.params.id,
-    ];
-
-    await pool.query(updateQuery, values);
-    return res.status(200).json({ message: "User updated successfully" });
-  } catch (err) {
-    return res.status(500).json({ error: err.message });
-  }
-};
-
-// Update Rescuer's email
-module.exports.UpdateRescuerEmail = async (req, res) => {
-  const id = req.params.id;
-  const { email } = req.body;
-
-  // Validation
-  if (!email) {
-    return res.status(400).json({ error: "Please enter an email" });
-  }
-
-  // Email format validation
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    return res.status(400).json({ error: "Invalid email format" });
-  }
-
-  try {
-    // Fetch the user's current email from the database
-    const q = "SELECT * FROM users WHERE id = $1";
-    const { rows } = await pool.query(q, [id]);
-
-    if (rows.length === 0)
-      return res.status(404).json({ error: "User does not exist" });
-
-    const { email: oldEmail } = rows[0];
-
-    // Check if the new email is the same as the old email
-    if (email === oldEmail) {
-      return res
-        .status(200)
-        .json({ message: "The email is the same. No changes made." });
-    }
-
-    // Check if the new email is already taken
-    const emailCheckQuery = "SELECT * FROM users WHERE email = $1";
-    const emailCheckResult = await pool.query(emailCheckQuery, [email]);
-
-    if (emailCheckResult.rows.length > 0) {
-      return res.status(400).json({ error: "Email is already taken" });
-    }
-
-    // Generate a unique verification token
-    const verificationToken = crypto.randomBytes(20).toString("hex");
-
-    // Proceed to update the email and verification token in the database
-    const updateQuery = `
-      UPDATE users
-      SET email = $1, verification_token = $2, verified = false
-      WHERE id = $3
-    `;
-    await pool.query(updateQuery, [email, verificationToken, id]);
-
-    // Send a verification email to the user
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: "bhenzmharlbartolome012603@gmail.com",
-        pass: "owvb wzni fhxu cvbz",
-      },
-    });
-
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
-      to: email,
-      subject: "Email Verification",
-      text: `Please click the following link to verify your new email: http://localhost:4000/users/verify/${verificationToken}`,
-    };
-
-    transporter.sendMail(mailOptions, (err, info) => {
-      if (err) {
-        console.error("Error while sending email:", err);
-        return res
-          .status(500)
-          .json({ error: "Failed to send verification email" });
-      } else {
-        console.log("Verification email sent:", info.response);
-        return res
-          .status(200)
-          .json({ message: "Email updated. Verification email sent." });
-      }
-    });
-  } catch (err) {
-    return res.status(500).json({ error: err.message });
-  }
-};
-
-module.exports.UpdateRescuerPassword = async (req, res) => {
-  const { currentPassword, newPassword, confirmPassword } = req.body;
-  const id = req.params.id;
-
-  // Validation
-  if (!currentPassword || !newPassword || !confirmPassword) {
-    return res
-      .status(400)
-      .json({ error: "Please fill in all password fields" });
-  }
-
-  // Check if new password matches confirm password
-  if (newPassword !== confirmPassword) {
-    return res
-      .status(400)
-      .json({ error: "New password and confirm password do not match" });
-  }
-
-  try {
-    // Fetch the user's current password from the database
-    const q = "SELECT password FROM users WHERE id = $1";
-    const { rows } = await pool.query(q, [id]);
-
-    if (rows.length === 0) {
-      return res.status(404).json({ error: "User does not exist" });
-    }
-
-    const { password: hashedPassword } = rows[0];
-
-    // Compare the current password with the hashed password in the database
-    const isMatch = await bcrypt.compare(currentPassword, hashedPassword);
-    if (!isMatch) {
-      return res.status(400).json({ error: "Current password is incorrect" });
-    }
-
-    // Hash the new password
-    const salt = await bcrypt.genSalt(10);
-    const newHashedPassword = await bcrypt.hash(newPassword, salt);
-
-    // Update the password in the database
-    const updateQuery = `
-      UPDATE users 
-      SET password = $1 
-      WHERE id = $2
-    `;
-    await pool.query(updateQuery, [newHashedPassword, id]);
-
-    return res.status(200).json({ message: "Password updated successfully" });
-  } catch (err) {
-    return res.status(500).json({ error: err.message });
   }
 };

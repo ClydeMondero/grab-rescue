@@ -1,0 +1,11 @@
+Model Information:
+* title:	russian ambulance
+* source:	https://sketchfab.com/3d-models/russian-ambulance-3f2709a3d0be486fb809289122786090
+* author:	REM_Yankee (https://sketchfab.com/REM_Yankee)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "russian ambulance" (https://sketchfab.com/3d-models/russian-ambulance-3f2709a3d0be486fb809289122786090) by REM_Yankee (https://sketchfab.com/REM_Yankee) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

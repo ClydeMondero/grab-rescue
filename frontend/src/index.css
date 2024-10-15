@@ -1,4 +1,30 @@
 @tailwind base;
+:root {
+  --primary: #eaeff2;
+  --secondary: #557c55;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--secondary) var(--primary);
+}
+
+/* Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+  width: 15px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--primary);
+  border-radius: 5px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--secondary);
+  border-radius: 14px;
+}
+
 @tailwind components;
 @tailwind utilities;
 
@@ -11,11 +37,18 @@
   background-color: #6ea46e;
 }
 
+.mapboxgl-ctrl-logo {
+  display: none !important;
+}
+.mapboxgl-ctrl-bottom-right {
+  display: none !important;
+}
+
 /* Active Geolacate Icon */
 .mapboxgl-ctrl
   button.mapboxgl-ctrl-geolocate.mapboxgl-ctrl-geolocate-active
   .mapboxgl-ctrl-icon {
-  background-image: url("./assets/accident-active.svg");
+  background-image: url("./assets/accident.svg");
   background-size: 20px 20px;
 }
 
@@ -23,29 +56,23 @@
 .mapboxgl-ctrl
   button.mapboxgl-ctrl-geolocate.mapboxgl-ctrl-geolocate-background
   .mapboxgl-ctrl-icon {
-  background-image: url("./assets/accident-idle.svg");
+  background-image: url("./assets/accident.svg");
   background-size: 20px 20px;
 }
 
 /* Inactive Geolacate Icon *.mapboxgl-ctrl */
 .mapboxgl-ctrl button.mapboxgl-ctrl-geolocate .mapboxgl-ctrl-icon {
-  background-image: url("./assets/accident-inactive.svg");
+  background-image: url("./assets/accident.svg");
   background-size: 20px 20px;
 }
 
-.nearest-rescuer-marker {
-  position: relative;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
+.green-pulse {
+  border-radius: 100%;
   animation: green-pulse 2s infinite;
 }
 
-.citizen-marker {
-  position: relative;
-  width: 25px;
-  height: 25px;
-  border-radius: 50%;
+.red-pulse {
+  border-radius: 100%;
   animation: red-pulse 2s infinite;
 }
 
@@ -76,17 +103,16 @@
   box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
 }
 
-.distance-details {
+.distance-eta {
   position: absolute;
   bottom: 10px;
   left: 50%;
   transform: translateX(-50%);
-  background-color: rgba(255, 255, 255, 0.8);
   padding: 10px 20px;
   border-radius: 10px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
   font-size: 14px;
-  z-index: 1000;
+  z-index: 10;
   display: flex;
   gap: 0.5rem;
 }
@@ -105,12 +131,30 @@
 
 @keyframes green-pulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.7);
+    box-shadow: 0 0 0 0 rgba(0, 148, 0, 0.7);
   }
   70% {
     box-shadow: 0 0 0 20px rgba(255, 0, 0, 0);
   }
   100% {
     box-shadow: 0 0 0 0 rgba(255, 0, 0, 0);
+  }
+}
+
+@media (max-width: 768px) {
+  .ctrl-group {
+    display: none;
+  }
+  .mapboxgl-ctrl-top-right {
+    display: none;
+  }
+}
+
+@media (min-width: 768px) {
+  .ctrl-group {
+    display: flex;
+  }
+  .mapboxgl-ctrl-top-right {
+    display: block;
   }
 }

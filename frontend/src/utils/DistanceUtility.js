@@ -14,13 +14,24 @@ export const getDistance = (lat1, lon1, lat2, lon2) => {
 
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-  return R * c; //return distance in km
+  return R * c * 1000; //return distance in meters
 };
 
-export const formatDistance = (distance) =>
-  (distance / 1000).toFixed(2) + " km"; // Convert meters to kilometers
+export const formatDistance = (distance) => {
+  if (distance < 1000) return `${Math.round(distance)} m`;
+  else return `${Math.round(distance / 1000)} km`;
+};
 
 export const formatDuration = (duration) => {
-  const minutes = Math.floor(duration / 60);
-  return `${minutes} min`;
+  const hours = Math.floor(duration / 3600);
+  const minutes = Math.floor((duration % 3600) / 60);
+  const seconds = Math.floor(duration % 60);
+
+  if (hours > 0) {
+    return `${hours} hr`;
+  } else if (minutes > 0) {
+    return `${minutes} min`;
+  } else {
+    return `${seconds} sec`;
+  }
 };
