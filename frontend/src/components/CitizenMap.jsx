@@ -136,7 +136,7 @@ const CitizenMap = forwardRef((props, ref) => {
         break;
       case "ACTIVE_LOCK":
       case "BACKGROUND":
-        setLocating(true);
+        setLocating(false);
         break;
       default:
         console.log("Unknown watch state:", watchState);
