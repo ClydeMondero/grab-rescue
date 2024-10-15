@@ -103,7 +103,6 @@ export const updateCitizenLocation = async (
 
   if (moved) {
     updateLocationInFirestore(id, longitude, latitude, address);
-  } else {
   }
 };
 
