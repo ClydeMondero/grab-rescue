@@ -2,6 +2,7 @@ import {
   collection,
   addDoc,
   getDocs,
+  getDoc,
   doc,
   updateDoc,
 } from "firebase/firestore";
@@ -12,17 +13,17 @@ export const addLocationToFirestore = async (
   longitude,
   latitude,
   address,
+  userId,
   role,
-  timestamp = new Date().toISOString(),
-  status = "available" //available, assigned, in-transit, unavailable
+  timestamp = new Date().toISOString()
 ) => {
   const location = {
     longitude,
     latitude,
+    address,
+    userId,
     role,
     timestamp,
-    status,
-    address,
   };
 
   try {
@@ -99,5 +100,102 @@ export const getRequestsFromFirestore = async () => {
   }
 };
 
-//TODO: add request to firestore
-//TODO: upload picture in firebase storage
+//add request to firestore
+export const addRequestToFirestore = async (
+  citizenId,
+  location,
+  timestamp = new Date().toISOString(),
+  status = "pending"
+) => {
+  const request = {
+    citizenId,
+    location,
+    timestamp,
+    status,
+  };
+  try {
+    const docRef = await addDoc(collection(store, "requests"), request);
+    return { id: docRef.id };
+  } catch (error) {
+    console.error("Error adding document: ", error);
+    return null;
+  }
+};
+
+//TODO: Implement Follow up function
+// update request in firestore with follow-up details
+export const updateRequestInFirestore = async (
+  requestId,
+  citizenName,
+  phone,
+  incidentPicture
+) => {
+  const updateData = {
+    citizenName,
+    phone,
+  };
+
+  try {
+    if (incidentPicture) {
+      const pictureURL = await uploadImageToFirebaseStorage(incidentPicture);
+      if (pictureURL) {
+        updateData.incidentPicture = pictureURL;
+      }
+    }
+
+    await updateDoc(doc(store, "requests", requestId), updateData);
+  } catch (error) {
+    console.error("Error updating document: ", error);
+  }
+};
+
+// Function to upload image to Firebase Storage
+export const uploadImageToFirebaseStorage = async (file) => {
+  const storage = getStorage(store);
+  const storageRef = ref(storage, `images/${file.name}`);
+
+  try {
+    await uploadBytes(storageRef, file);
+    const downloadURL = await getDownloadURL(storageRef);
+    return downloadURL;
+  } catch (error) {
+    console.error("Error uploading image: ", error);
+    return null;
+  }
+};
+
+// update request in firestore when rescuer accepts
+export const acceptRescueRequestInFirestore = async (
+  rescuerId,
+  requestId,
+  status = "assigned"
+) => {
+  const updateData = {
+    rescuerId,
+    status,
+    acceptedTimestamp: new Date().toISOString(),
+  };
+  try {
+    await updateDoc(doc(store, "requests", requestId), updateData);
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating document: ", error);
+    return { success: false, error: error.message };
+  }
+};
+
+// get location from firestore
+export const getLocationFromFirestore = async (id) => {
+  try {
+    const docRef = doc(store, "locations", id);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      return docSnap.data();
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error("Error getting document: ", error);
+    return null;
+  }
+};

@@ -7,13 +7,14 @@ import {
 } from "react";
 import { GeolocateControl, Map as MapGL } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { getCitizenCookie } from "../services/cookieService";
+import { getCitizenCookie, generateID } from "../services/cookieService";
 import {
   addCitizenLocation,
   updateCitizenLocation,
   getNearestRescuer,
   getRescuerLocations,
   getRouteData,
+  getAddress,
 } from "../services/locationService";
 import { Markers, Route, Controls, DistanceEta } from "../components";
 import { Loader } from "../components";
@@ -81,7 +82,9 @@ const CitizenMap = forwardRef((props, ref) => {
         coords.latitude
       );
     } else {
-      addCitizenLocation(coords.longitude, coords.latitude);
+      const citizenId = generateID();
+
+      addCitizenLocation(coords.longitude, coords.latitude, citizenId);
     }
 
     const nearest = getNearestRescuer(citizen, rescuers);
@@ -122,6 +125,14 @@ const CitizenMap = forwardRef((props, ref) => {
     },
     viewRoute: () => {
       buttonsRef.current.viewRoute();
+    },
+    getRequestData: async () => {
+      return {
+        longitude: citizen.longitude,
+        latitude: citizen.latitude,
+        address: address,
+        citizenId: citizenId,
+      };
     },
   }));
 

@@ -9,6 +9,11 @@ import { BiSolidHide, BiSolidAmbulance } from "react-icons/bi";
 import { MdRoute } from "react-icons/md";
 import RequestModal from "../components/RequestModal";
 import MultiStepForm from "./MultiStepForm";
+import {
+  addRequestToFirestore,
+  getLocationFromFirestore,
+} from "../services/firestoreService";
+import { getCitizenCookie } from "../services/cookieService";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -29,7 +34,20 @@ const Home = () => {
     }
   };
 
-  const handleModalConfirm = () => {
+  // latitude,
+  //   longitude,
+  //   address,
+  //   (timestamp = new Date().toISOString()),
+  //   (status = "pending"),
+  //   citizenId;
+
+  const handleModalConfirm = async () => {
+    if (mapRef.current) {
+      const id = getCitizenCookie();
+      const location = await getLocationFromFirestore(id);
+      addRequestToFirestore(id, location);
+    }
+
     setModalOpen(false);
     setRequesting(true);
     setFormVisible(true);

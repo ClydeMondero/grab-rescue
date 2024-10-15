@@ -38,7 +38,7 @@ export const getRouteData = async (rescuer, citizen) => {
 };
 
 //add user location to firestore and set cookie
-export const addCitizenLocation = async (longitude, latitude) => {
+export const addCitizenLocation = async (longitude, latitude, userId) => {
   const address = await getAddress(longitude, latitude);
 
   //add user location to firestore
@@ -46,6 +46,7 @@ export const addCitizenLocation = async (longitude, latitude) => {
     longitude,
     latitude,
     address,
+    userId,
     "citizen"
   );
 
@@ -53,7 +54,8 @@ export const addCitizenLocation = async (longitude, latitude) => {
   setCitizenCookie(id);
 };
 
-const getAddress = async (longitude, latitude) => {
+//FIXME: not accurate address
+export const getAddress = async (longitude, latitude) => {
   const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${
     import.meta.env.VITE_MAPBOX_TOKEN
   }`;
