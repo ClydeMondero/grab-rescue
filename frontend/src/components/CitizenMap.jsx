@@ -62,10 +62,9 @@ const CitizenMap = forwardRef((props, ref) => {
     "Locating you, this may take a moment.",
     "Looking for your coordinates...",
     "Tip: Make sure your GPS is enabled for better accuracy.",
-    "Tip: Try to stay in an open area for a quicker location fix.",
     "For the best results, keep Wi-Fi on and data enabled.",
-    "Still having trouble? Try moving to an area with better signal.",
     "Location taking longer than expected? Check your GPS settings.",
+    "Tip: Some ad blockers may interfere with our location services. Try disabling them.",
   ];
 
   const handleGeolocation = (coords) => {
@@ -194,6 +193,7 @@ const CitizenMap = forwardRef((props, ref) => {
           geoControlRef.current?.trigger();
         }}
       >
+        {/*FIXME: Geolocator Bug */}
         <GeolocateControl
           ref={geoControlRef}
           position="top-right"
