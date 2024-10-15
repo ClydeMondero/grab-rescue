@@ -1,12 +1,10 @@
-import React from "react";
-
-const RequestModal = ({ onClose }) => {
+const RequestModal = ({ onConfirm, onCancel }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-4 w-11/12 max-w-md md:w-1/3 relative">
         {/* Close button */}
         <button
-          onClick={onClose}
+          onClick={onCancel}
           className="text-2xl absolute top-1 right-2 text-primary-dark hover:text-gray-800"
         >
           &times;
@@ -14,7 +12,7 @@ const RequestModal = ({ onClose }) => {
 
         {/* Success message */}
         <p className="mb-6 text-2xl md:text-2xl text-primary text-center font-bold">
-          Your rescue request has been sent successfully!
+          Before sending Request:
         </p>
 
         {/* Policy message in bullet form with gap between list items */}
@@ -39,10 +37,16 @@ const RequestModal = ({ onClose }) => {
         {/* Buttons */}
         <div className="flex flex-col items-center gap-4">
           <button
-            className="w-full border text-primary-dark px-4 py-2 rounded hover:bg-secondary hover:text-white md:text-base text-sm"
-            onClick={onClose}
+            className="w-full bg-primary-medium hover:bg-primary text-white px-4 py-2 rounded md:text-base text-sm"
+            onClick={onConfirm}
           >
-            Close
+            Confirm
+          </button>
+          <button
+            className="w-full border text-primary-dark px-4 py-2 rounded hover:bg-secondary hover:text-white md:text-base text-sm"
+            onClick={onCancel}
+          >
+            Cancel
           </button>
         </div>
       </div>
