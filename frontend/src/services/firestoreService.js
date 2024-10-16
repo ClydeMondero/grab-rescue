@@ -31,7 +31,7 @@ export const addLocationToFirestore = async (
     console.log("Document written with ID: ", docRef.id);
     return { id: docRef.id };
   } catch (error) {
-    console.error("Error adding document: ", error);
+    console.log("Error adding document: ", error);
   }
 };
 
@@ -45,7 +45,6 @@ export const updateLocationInFirestore = async (
   status = "available" //available, assigned, in-transit, unavailable
 ) => {
   const location = {
-    id,
     longitude,
     latitude,
     timestamp,

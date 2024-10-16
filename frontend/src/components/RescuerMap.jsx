@@ -6,9 +6,10 @@ import { LocatingIndicator } from "../components";
 import { RescuerMarker } from "../components";
 import {
   addUserLocation,
+  updateUserLocation,
   getRescuerLocations,
 } from "../services/locationService";
-import { getCookie } from "../services/cookieService";
+import { getUserCookie } from "../services/cookieService";
 
 const RescuerMap = () => {
   const [rescuer, setRescuer] = useState({
@@ -32,37 +33,31 @@ const RescuerMap = () => {
   //TODO: save rescuer location
   const handleGeolocation = async (coords) => {
     if (!mapRef.current) return;
-    const cookie = getCookie("token");
+    const cookie = getUserCookie("token");
 
-    console.log(locations);
+    // Use find to check if the location already exists
+    const existingLocation = locations.find(
+      (location) => location.userId === cookie
+    );
 
-    let found = false;
-    locations.map((location) => {
-      if (location.userId === cookie) {
-        found = true;
-      }
-    });
-
-    if (found) {
+    if (existingLocation) {
       console.log("updating rescuer location");
+
+      // If location exists, update it
+      updateUserLocation(
+        existingLocation.id,
+        rescuer.longitude,
+        rescuer.latitude,
+        coords.longitude,
+        coords.latitude
+      );
     } else {
       console.log("adding rescuer location");
-      // addUserLocation(coords.longitude, coords.latitude, "rescuer", cookie);
+
+      // If location does not exist, add a new one
+      addUserLocation(coords.longitude, coords.latitude, "rescuer", cookie);
     }
 
-    //console.log(cookie);
-
-    // if (cookie) {
-    //   updateCitizenLocation(
-    //     cookie,
-    //     citizen.longitude,
-    //     citizen.latitude,
-    //     coords.longitude,
-    //     coords.latitude
-    //   );
-    // } else {
-    //   addUserLocation(coords.longitude, coords.latitude, "rescuer");
-    // }
     setRescuer({
       longitude: coords.longitude,
       latitude: coords.latitude,
