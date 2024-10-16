@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-export const useLocating = (onLocatingChange, geoControlRef) => {
+export const useLocating = (geoControlRef, onLocatingChange) => {
   const [watchState, setWatchState] = useState("OFF");
 
   const [locating, setLocating] = useState(true);

@@ -1,27 +1,9 @@
 import { useState, useRef, useEffect } from "react";
 import { GeolocateControl, Map as MapGL, Marker } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { Canvas } from "@react-three/fiber";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
-import ambulanceModel from "../assets/ambulance/scene.gltf";
-import { useLoader } from "@react-three/fiber";
-import { PerspectiveCamera } from "@react-three/drei";
-
-const Model = () => {
-  const gltf = useLoader(GLTFLoader, ambulanceModel);
-  const model = gltf.scene;
-
-  model.rotation.set(Math.PI / 2, Math.PI, 0);
-  model.scale.set(0.5, 0.5, 0.5);
-
-  model.traverse((child) => {
-    if (child.isMesh) {
-      child.material.color.setHex(0x99ff99);
-    }
-  });
-
-  return <primitive object={model} />;
-};
+import { useLocating } from "../hooks";
+import { LocatingIndicator } from "../components";
+import { RescuerMarker } from "../components";
 
 const RescuerMap = () => {
   const [rescuer, setRescuer] = useState({
@@ -33,12 +15,12 @@ const RescuerMap = () => {
   const mapRef = useRef();
   const geoControlRef = useRef();
 
+  const locating = useLocating(geoControlRef);
+
   const bounds = [
     [120.8585, 14.8867],
     [121.0972, 15.0197],
   ];
-
-  //TODO: add locating indicator
 
   //TODO: save rescuer location
   const handleGeolocation = (coords) => {
@@ -68,7 +50,7 @@ const RescuerMap = () => {
     });
   };
 
-  https: return (
+  return (
     <MapGL
       ref={mapRef}
       initialViewState={rescuer}
@@ -91,24 +73,13 @@ const RescuerMap = () => {
         }}
       />
 
-      <Marker longitude={rescuer.longitude} latitude={rescuer.latitude}>
-        <Canvas
-          style={{ width: "150px", height: "150px", background: "transparent" }}
-        >
-          <PerspectiveCamera
-            makeDefault
-            position={[0, 0, 100]} // Fixed camera position
-            fov={100} // Field of view
-          />
+      {locating && <LocatingIndicator locating={locating} type="rescuer" />}
 
-          {/* Adding lights */}
-          <ambientLight intensity={0.5} />
-          <directionalLight position={[0, 10, 10]} intensity={1} />
-
-          {/* Displaying the model with rotation */}
-          <Model />
-        </Canvas>
-      </Marker>
+      {!locating && (
+        <Marker longitude={rescuer.longitude} latitude={rescuer.latitude}>
+          <RescuerMarker view="top-down" />
+        </Marker>
+      )}
     </MapGL>
   );
 };

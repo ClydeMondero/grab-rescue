@@ -9,7 +9,6 @@ import {
   ChangeEmail,
   RequestDetails,
 } from "../components";
-import { RescuerMap as Map } from "../components";
 import { useState, useEffect } from "react";
 import { getRequestsFromFirestore } from "../services/firestoreService";
 
