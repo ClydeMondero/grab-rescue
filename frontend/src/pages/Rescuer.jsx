@@ -10,7 +10,10 @@ import {
   RequestDetails,
 } from "../components";
 import { useState, useEffect } from "react";
-import { getRequestsFromFirestore } from "../services/firestoreService";
+import {
+  getRequestsFromFirestore,
+  acceptRescueRequestInFirestore,
+} from "../services/firestoreService";
 
 const Rescuer = (props) => {
   const { user } = props;
@@ -20,6 +23,12 @@ const Rescuer = (props) => {
   const handleSelectedRequest = (request) => {
     setSelectedRequest(request);
   };
+  //TODO: Handle other status change
+  useEffect(() => {
+    if (selectedRequest) {
+      acceptRescueRequestInFirestore(user.id, selectedRequest);
+    }
+  });
 
   const getRequests = async () => {
     const requests = await getRequestsFromFirestore();
