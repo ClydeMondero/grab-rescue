@@ -34,13 +34,6 @@ const Home = () => {
     }
   };
 
-  // latitude,
-  //   longitude,
-  //   address,
-  //   (timestamp = new Date().toISOString()),
-  //   (status = "pending"),
-  //   citizenId;
-
   const handleModalConfirm = async () => {
     if (mapRef.current) {
       const id = getCitizenCookie();

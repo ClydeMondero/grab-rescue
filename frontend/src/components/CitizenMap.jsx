@@ -54,7 +54,7 @@ const CitizenMap = forwardRef((props, ref) => {
   const geoControlRef = useRef();
   const buttonsRef = useRef();
 
-  const locating = useLocating(onLocatingChange, geoControlRef);
+  const locating = useLocating(geoControlRef, onLocatingChange);
 
   const handleGeolocation = (coords) => {
     if (!mapRef.current) return;
@@ -149,7 +149,7 @@ const CitizenMap = forwardRef((props, ref) => {
           ref={buttonsRef}
         />
 
-        {locating && <LocatingIndicator locating={locating} />}
+        {locating && <LocatingIndicator locating={locating} type="citizen" />}
 
         {!locating && (
           <>
