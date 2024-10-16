@@ -1,3 +1,3 @@
-import useAuthentication from "./useAuthentication";
+import { useLocating } from "./useLocating";
 
-export { useAuthentication };
+export { useLocating };
