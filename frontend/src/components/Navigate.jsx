@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { RescuerMap as Map } from "../components";
 import { BiPhoneCall } from "react-icons/bi";
 import { getRequestFromFirestore } from "../services/firestoreService";
-//TODO: Show Request Data
 const Navigate = ({ requestID }) => {
   const [showDetails, setShowDetails] = useState(false);
   const [requestData, setRequestData] = useState(null);

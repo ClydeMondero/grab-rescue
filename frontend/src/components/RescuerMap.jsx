@@ -11,6 +11,7 @@ import {
 } from "../services/locationService";
 import { getUserCookie } from "../services/cookieService";
 
+//TODO: Show markers, controls, routes
 const RescuerMap = () => {
   const [rescuer, setRescuer] = useState({
     longitude: 120.9107,

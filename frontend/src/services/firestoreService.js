@@ -137,7 +137,7 @@ export const addRequestToFirestore = async (
   }
 };
 
-//TODO: Implement Follow up function
+//TODO: Use updateRequestInFirestore to send follow up details
 // update request in firestore with follow-up details
 export const updateRequestInFirestore = async (
   requestId,
@@ -179,6 +179,7 @@ export const uploadImageToFirebaseStorage = async (file) => {
   }
 };
 
+//TODO: update request status
 // update request in firestore when rescuer accepts
 export const acceptRescueRequestInFirestore = async (
   rescuerId,
