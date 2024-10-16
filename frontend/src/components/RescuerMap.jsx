@@ -38,14 +38,37 @@ const RescuerMap = () => {
     [121.0972, 15.0197],
   ];
 
+  //TODO: add locating indicator
+
+  //TODO: save rescuer location
   const handleGeolocation = (coords) => {
+    if (!mapRef.current) return;
+
+    // const cookie = getCitizenCookie();
+
+    // if (cookie) {
+    //   updateCitizenLocation(
+    //     cookie,
+    //     citizen.longitude,
+    //     citizen.latitude,
+    //     coords.longitude,
+    //     coords.latitude
+    //   );
+    // } else {
+    //   const citizenId = generateID();
+
+    //   addCitizenLocation(coords.longitude, coords.latitude, citizenId);
+    // }
+
+    // const nearest = getNearestRescuer(citizen, rescuers);
+    // setNearestRescuer(nearest);
     setRescuer({
       longitude: coords.longitude,
       latitude: coords.latitude,
     });
   };
 
-  return (
+  https: return (
     <MapGL
       ref={mapRef}
       initialViewState={rescuer}
