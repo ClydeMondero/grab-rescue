@@ -22,7 +22,10 @@ import Navigate from "./Navigate";
 import Requests from "./Requests";
 import Header from "./Header";
 import RequestDetails from "./RequestDetails";
+import LocatingIndicator from "./LocatingIndicator";
+
 export {
+  LocatingIndicator,
   DistanceEta,
   Markers,
   Route,
