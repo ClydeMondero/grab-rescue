@@ -15,6 +15,8 @@ import {
   acceptRescueRequestInFirestore,
 } from "../services/firestoreService";
 
+//TODO: Handle Offline Rescuers
+
 const Rescuer = (props) => {
   const { user } = props;
   const [requests, setRequests] = useState([]);
