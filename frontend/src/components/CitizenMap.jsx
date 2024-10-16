@@ -10,7 +10,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import { getCitizenCookie, generateID } from "../services/cookieService";
 import {
   addUserLocation,
-  updateCitizenLocation,
+  updateUserLocation,
   getNearestRescuer,
   getRescuerLocations,
   getRouteData,
@@ -59,10 +59,10 @@ const CitizenMap = forwardRef((props, ref) => {
   const handleGeolocation = (coords) => {
     if (!mapRef.current) return;
 
-    const cookie = getCitizenCookie();
+    const cookie = getCitizenCookie("citizen_token");
 
     if (cookie) {
-      updateCitizenLocation(
+      updateUserLocation(
         cookie,
         citizen.longitude,
         citizen.latitude,

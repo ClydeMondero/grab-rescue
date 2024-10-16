@@ -30,20 +30,6 @@ const Model = ({ view }) => {
     }
   });
 
-  // view == "top-down"
-  //   ? model.rotation.set(Math.PI / 2, Math.PI, 0)
-  //   : model.rotation.set(0, Math.PI / 2, 0);
-
-  // view == "top-down"
-  //   ? model.scale.set(0.5, 0.5, 0.5)
-  //   : model.scale.set(1, 1, 1);
-
-  // model.traverse((child) => {
-  //   if (child.isMesh) {
-  //     child.material.color.setHex(0x99ff99);
-  //   }
-  // });
-
   return <primitive object={model} />;
 };
 

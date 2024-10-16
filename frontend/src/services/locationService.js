@@ -99,8 +99,8 @@ export const getNearestRescuer = (citizen, rescuers) => {
 };
 
 // update location if moved
-export const updateCitizenLocation = async (
-  id,
+export const updateUserLocation = async (
+  locationId,
   prevLon,
   prevLat,
   longitude,
@@ -111,7 +111,7 @@ export const updateCitizenLocation = async (
   const address = await getAddress(longitude, latitude);
 
   if (moved) {
-    updateLocationInFirestore(id, longitude, latitude, address);
+    updateLocationInFirestore(locationId, longitude, latitude, address);
   }
 };
 
