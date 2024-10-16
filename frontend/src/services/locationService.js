@@ -38,7 +38,12 @@ export const getRouteData = async (rescuer, citizen) => {
 };
 
 //add user location to firestore and set cookie
-export const addCitizenLocation = async (longitude, latitude, userId) => {
+export const addUserLocation = async (
+  longitude,
+  latitude,
+  role,
+  userId = null
+) => {
   const address = await getAddress(longitude, latitude);
 
   //add user location to firestore
@@ -46,12 +51,14 @@ export const addCitizenLocation = async (longitude, latitude, userId) => {
     longitude,
     latitude,
     address,
-    userId,
-    "citizen"
+    role,
+    userId
   );
 
   //adds citizen id to cookies
-  setCitizenCookie(id);
+  if (role === "citizen") {
+    setCitizenCookie(id);
+  }
 };
 
 //FIXME: not accurate address

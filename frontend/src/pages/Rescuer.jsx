@@ -15,14 +15,11 @@ import { getRequestsFromFirestore } from "../services/firestoreService";
 const Rescuer = (props) => {
   const { user } = props;
   const [requests, setRequests] = useState([]);
+
   const getRequests = async () => {
     const requests = await getRequestsFromFirestore();
 
     setRequests(requests);
-
-    requests.map((request) => {
-      console.log(request);
-    });
   };
 
   useEffect(() => {

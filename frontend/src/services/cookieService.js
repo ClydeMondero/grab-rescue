@@ -21,12 +21,34 @@ export const getCookie = (cookieName) => {
 };
 
 export const encryptID = (id) => {
-  return CryptoJS.AES.encrypt(id, import.meta.env.VITE_SECRET_KEY).toString();
+  const payload = { id: id };
+  const header = { alg: "HS256", typ: "JWT" };
+  const secretKey = import.meta.env.VITE_SECRET_KEY;
+
+  const token = `${btoa(JSON.stringify(header))}.${btoa(
+    JSON.stringify(payload)
+  )}.${CryptoJS.HmacSHA256(
+    `${btoa(JSON.stringify(header))}.${btoa(JSON.stringify(payload))}`,
+    secretKey
+  ).toString(CryptoJS.enc.Base64)}`;
+  return token;
 };
 
 export const decryptID = (id) => {
-  const bytes = CryptoJS.AES.decrypt(id, import.meta.env.VITE_SECRET_KEY);
-  return bytes.toString(CryptoJS.enc.Utf8);
+  const [header, payload, signature] = id.split(".");
+  const secretKey = import.meta.env.VITE_SECRET_KEY;
+
+  const expectedSignature = CryptoJS.HmacSHA256(
+    `${header}.${payload}`,
+    secretKey
+  ).toString(CryptoJS.enc.Base64);
+
+  if (signature !== expectedSignature) {
+    throw new Error("Invalid signature");
+  }
+
+  const payloadDecoded = JSON.parse(atob(payload));
+  return payloadDecoded.id;
 };
 
 //set citizen cookie

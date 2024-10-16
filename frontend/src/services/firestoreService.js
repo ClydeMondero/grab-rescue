@@ -13,22 +13,22 @@ export const addLocationToFirestore = async (
   longitude,
   latitude,
   address,
-  userId,
   role,
+  userId,
   timestamp = new Date().toISOString()
 ) => {
   const location = {
     longitude,
     latitude,
     address,
-    userId,
     role,
+    userId,
     timestamp,
   };
 
   try {
     const docRef = await addDoc(collection(store, "locations"), location);
-
+    console.log("Document written with ID: ", docRef.id);
     return { id: docRef.id };
   } catch (error) {
     console.error("Error adding document: ", error);
