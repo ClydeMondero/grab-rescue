@@ -14,7 +14,6 @@ import {
   getNearestRescuer,
   getRescuerLocations,
   getRouteData,
-  getAddress,
 } from "../services/locationService";
 import {
   Markers,
@@ -23,6 +22,7 @@ import {
   DistanceEta,
   LocatingIndicator,
 } from "../components";
+import { useLocating } from "../hooks";
 
 const CitizenMap = forwardRef((props, ref) => {
   const [citizen, setCitizen] = useState({
@@ -48,14 +48,13 @@ const CitizenMap = forwardRef((props, ref) => {
   const [distance, setDistance] = useState();
   const [eta, setEta] = useState();
 
-  const [watchState, setWatchState] = useState("OFF");
-
-  const [locating, setLocating] = useState(true);
   const { onLocatingChange } = props;
 
   const mapRef = useRef();
   const geoControlRef = useRef();
   const buttonsRef = useRef();
+
+  const locating = useLocating(onLocatingChange, geoControlRef);
 
   const handleGeolocation = (coords) => {
     if (!mapRef.current) return;
@@ -115,55 +114,7 @@ const CitizenMap = forwardRef((props, ref) => {
     viewRoute: () => {
       buttonsRef.current.viewRoute();
     },
-    getRequestData: async () => {
-      return {
-        longitude: citizen.longitude,
-        latitude: citizen.latitude,
-        address: address,
-        citizenId: citizenId,
-      };
-    },
   }));
-
-  const handleWatchState = (watchState) => {
-    switch (watchState) {
-      case "OFF":
-      case "ACTIVE_ERROR":
-      case "WAITING_ACTIVE":
-      case "BACKGROUND_ERROR":
-        setLocating(true);
-
-        break;
-      case "ACTIVE_LOCK":
-      case "BACKGROUND":
-        setLocating(false);
-        break;
-      default:
-        console.log("Unknown watch state:", watchState);
-    }
-  };
-
-  useEffect(() => {
-    handleWatchState(watchState);
-  }, [watchState]);
-
-  useEffect(() => {
-    const checkWatchState = () => {
-      if (geoControlRef.current && geoControlRef.current._watchState) {
-        setWatchState(geoControlRef.current._watchState);
-      }
-    };
-
-    const interval = setInterval(checkWatchState, 1000); // Check every second
-
-    return () => clearInterval(interval); // Clean up interval on unmount
-  }, [geoControlRef.current, watchState]);
-
-  useEffect(() => {
-    if (onLocatingChange) {
-      onLocatingChange(locating);
-    }
-  }, [locating]);
 
   return (
     <>
