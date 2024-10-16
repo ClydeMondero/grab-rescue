@@ -4,6 +4,11 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import { useLocating } from "../hooks";
 import { LocatingIndicator } from "../components";
 import { RescuerMarker } from "../components";
+import {
+  addUserLocation,
+  getRescuerLocations,
+} from "../services/locationService";
+import { getCookie } from "../services/cookieService";
 
 const RescuerMap = () => {
   const [rescuer, setRescuer] = useState({
@@ -11,6 +16,8 @@ const RescuerMap = () => {
     latitude: 14.9536,
     zoom: 18,
   });
+
+  const [locations, setLocations] = useState([]);
 
   const mapRef = useRef();
   const geoControlRef = useRef();
@@ -23,10 +30,27 @@ const RescuerMap = () => {
   ];
 
   //TODO: save rescuer location
-  const handleGeolocation = (coords) => {
+  const handleGeolocation = async (coords) => {
     if (!mapRef.current) return;
+    const cookie = getCookie("token");
 
-    // const cookie = getCitizenCookie();
+    console.log(locations);
+
+    let found = false;
+    locations.map((location) => {
+      if (location.userId === cookie) {
+        found = true;
+      }
+    });
+
+    if (found) {
+      console.log("updating rescuer location");
+    } else {
+      console.log("adding rescuer location");
+      // addUserLocation(coords.longitude, coords.latitude, "rescuer", cookie);
+    }
+
+    //console.log(cookie);
 
     // if (cookie) {
     //   updateCitizenLocation(
@@ -37,18 +61,17 @@ const RescuerMap = () => {
     //     coords.latitude
     //   );
     // } else {
-    //   const citizenId = generateID();
-
-    //   addCitizenLocation(coords.longitude, coords.latitude, citizenId);
+    //   addUserLocation(coords.longitude, coords.latitude, "rescuer");
     // }
-
-    // const nearest = getNearestRescuer(citizen, rescuers);
-    // setNearestRescuer(nearest);
     setRescuer({
       longitude: coords.longitude,
       latitude: coords.latitude,
     });
   };
+
+  useEffect(() => {
+    getRescuerLocations(setLocations);
+  }, []);
 
   return (
     <MapGL

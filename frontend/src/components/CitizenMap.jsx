@@ -9,7 +9,7 @@ import { GeolocateControl, Map as MapGL } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { getCitizenCookie, generateID } from "../services/cookieService";
 import {
-  addCitizenLocation,
+  addUserLocation,
   updateCitizenLocation,
   getNearestRescuer,
   getRescuerLocations,
@@ -72,7 +72,7 @@ const CitizenMap = forwardRef((props, ref) => {
     } else {
       const citizenId = generateID();
 
-      addCitizenLocation(coords.longitude, coords.latitude, citizenId);
+      addUserLocation(coords.longitude, coords.latitude, "citizen", citizenId);
     }
 
     const nearest = getNearestRescuer(citizen, rescuers);
