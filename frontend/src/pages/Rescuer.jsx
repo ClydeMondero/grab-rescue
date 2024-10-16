@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate as RouterNavigate } from "react-router-dom";
 import {
   Navigate,
   Requests,
@@ -15,16 +15,24 @@ import { getRequestsFromFirestore } from "../services/firestoreService";
 const Rescuer = (props) => {
   const { user } = props;
   const [requests, setRequests] = useState([]);
+  const [selectedRequest, setSelectedRequest] = useState(null);
+
+  const handleSelectedRequest = (request) => {
+    setSelectedRequest(request);
+  };
 
   const getRequests = async () => {
     const requests = await getRequestsFromFirestore();
-
     setRequests(requests);
   };
 
   useEffect(() => {
     getRequests();
   }, []);
+
+  useEffect(() => {
+    console.log("Selected Request:", selectedRequest);
+  }, [selectedRequest]);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -33,8 +41,31 @@ const Rescuer = (props) => {
 
       <div className="flex-grow overflow-auto p-4 bg-slate-50">
         <Routes>
-          <Route path="/requests" element={<Requests requests={requests} />} />
-          <Route path="/navigate" element={<Navigate user={user} />} />
+          {/* Default Route to Navigate */}
+          <Route
+            path="/"
+            element={<RouterNavigate to="/rescuer/navigate" replace />}
+          />
+
+          <Route
+            path="/requests"
+            element={
+              <Requests
+                requests={requests}
+                onSelectRequest={handleSelectedRequest}
+              />
+            }
+          />
+          <Route
+            path="/navigate"
+            element={
+              <Navigate
+                user={user}
+                requests={requests}
+                requestID={selectedRequest}
+              />
+            }
+          />
           <Route path="/profile" element={<ViewProfile user={user} />} />
           <Route
             path="/request-details/:id"

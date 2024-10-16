@@ -1,13 +1,17 @@
 import React from "react";
 import { FaExclamationTriangle } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import { getRequestsFromFirestore } from "../services/firestoreService";
+import { getRequestFromFirestore } from "../services/firestoreService";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { getDistance } from "../utils/DistanceUtility";
+
 //TODO: Calculate ETA and Distance then show on request card
-const Requests = ({ requests }) => {
-  const handleAccept = (request) => {
-    console.log(request);
+const Requests = ({ requests, onSelectRequest }) => {
+  const nav = useNavigate();
+  const handleAccept = (requestID) => {
+    onSelectRequest(requestID);
+    nav("/rescuer/navigate");
   };
   return (
     <div className=" flex flex-col p-4 sm:p-6 md:p-8 lg:p-10 max-w-7xl w-full mx-auto h-[calc(100vh-160px)]">
@@ -38,11 +42,10 @@ const Requests = ({ requests }) => {
                 </p>
                 <p className="text-sm text-gray-600">
                   <strong className="text-[#557C55]">Distance: </strong>
-                  {getDistance}
+                  {}
                 </p>
                 <p className="text-sm text-gray-600">
-                  <strong className="text-[#557C55]">ETA: </strong>{" "}
-                  {request.eta}
+                  <strong className="text-[#557C55]">ETA: </strong> {}
                 </p>
                 <p className="text-sm text-gray-600">
                   <strong className="text-[#557C55]">Request Time: </strong>

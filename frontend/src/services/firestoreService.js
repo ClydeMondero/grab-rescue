@@ -42,7 +42,7 @@ export const updateLocationInFirestore = async (
   latitude,
   address,
   timestamp = new Date().toISOString(),
-  status = "available" //available, assigned, in-transit, unavailable
+  status = "available" //pending, available, assigned, in-transit, unavailable
 ) => {
   const location = {
     longitude,
@@ -96,6 +96,22 @@ export const getRequestsFromFirestore = async () => {
   } catch (error) {
     console.error("Error getting documents: ", error);
     return [];
+  }
+};
+
+//get request from firestore
+export const getRequestFromFirestore = async (id) => {
+  try {
+    const docRef = doc(store, "requests", id);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      return { id: docSnap.id, ...docSnap.data() };
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error("Error getting document: ", error);
+    return null;
   }
 };
 
