@@ -42,8 +42,6 @@ const RescuerMap = () => {
     );
 
     if (existingLocation) {
-      console.log("updating rescuer location");
-
       // If location exists, update it
       updateUserLocation(
         existingLocation.id,
@@ -53,8 +51,6 @@ const RescuerMap = () => {
         coords.latitude
       );
     } else {
-      console.log("adding rescuer location");
-
       // If location does not exist, add a new one
       addUserLocation(coords.longitude, coords.latitude, "rescuer", cookie);
     }

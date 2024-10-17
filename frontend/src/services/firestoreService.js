@@ -15,7 +15,8 @@ export const addLocationToFirestore = async (
   address,
   role,
   userId,
-  timestamp = new Date().toISOString()
+  timestamp = new Date().toISOString(),
+  status = "online" //online, assigned, in-transit, offline
 ) => {
   const location = {
     longitude,
@@ -23,6 +24,7 @@ export const addLocationToFirestore = async (
     address,
     role,
     userId,
+    status,
     timestamp,
   };
 
@@ -41,8 +43,7 @@ export const updateLocationInFirestore = async (
   longitude,
   latitude,
   address,
-  timestamp = new Date().toISOString(),
-  status = "available" //pending, available, assigned, in-transit, unavailable
+  timestamp = new Date().toISOString()
 ) => {
   const location = {
     longitude,
@@ -121,7 +122,7 @@ export const addRequestToFirestore = async (
   citizenId,
   location,
   timestamp = new Date().toISOString(),
-  status = "pending"
+  status = "pending" //pending, assigned, in-progress, completed
 ) => {
   const request = {
     citizenId,
