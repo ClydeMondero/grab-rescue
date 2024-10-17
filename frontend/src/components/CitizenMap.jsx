@@ -12,7 +12,6 @@ import {
   addUserLocation,
   updateUserLocation,
   getNearestRescuer,
-  getRescuerLocations,
   getRouteData,
 } from "../services/locationService";
 import {
@@ -23,6 +22,7 @@ import {
   LocatingIndicator,
 } from "../components";
 import { useLocating } from "../hooks";
+import { getLocationsFromFirestore } from "../services/firestoreService";
 
 const CitizenMap = forwardRef((props, ref) => {
   const [citizen, setCitizen] = useState({
@@ -56,8 +56,9 @@ const CitizenMap = forwardRef((props, ref) => {
 
   const locating = useLocating(geoControlRef, onLocatingChange);
 
-  const handleGeolocation = (coords) => {
-    if (!mapRef.current) return;
+  const handleGeolocation = async (coords) => {
+    const locations = await getLocationsFromFirestore("rescuer");
+    setRescuers(locations);
 
     const cookie = getCitizenCookie("citizen_token");
 
@@ -90,10 +91,6 @@ const CitizenMap = forwardRef((props, ref) => {
     setDistance(route.distance);
     setEta(route.duration);
   };
-
-  useEffect(() => {
-    getRescuerLocations(setRescuers);
-  }, []);
 
   useEffect(() => {
     if (nearestRescuer) {

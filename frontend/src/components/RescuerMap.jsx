@@ -7,9 +7,9 @@ import { RescuerMarker } from "../components";
 import {
   addUserLocation,
   updateUserLocation,
-  getRescuerLocations,
 } from "../services/locationService";
-import { getUserCookie } from "../services/cookieService";
+import { getIDFromCookie } from "../services/authService";
+import { getLocationsFromFirestore } from "../services/firestoreService";
 
 //TODO: Show markers, controls, routes
 const RescuerMap = () => {
@@ -33,16 +33,13 @@ const RescuerMap = () => {
 
   //TODO: fix duplcate locations
   const handleGeolocation = async (coords) => {
-    getRescuerLocations(setLocations);
+    const locations = await getLocationsFromFirestore("rescuer");
 
-    if (!mapRef.current) return;
-    if (!locations) return;
-
-    const cookie = getUserCookie("token");
+    const id = await getIDFromCookie();
 
     // Use some to check if the location already exists
     const existingLocation = locations.find(
-      (location) => location.userId === cookie
+      (location) => location.userId === id
     );
 
     if (existingLocation) {
@@ -56,7 +53,7 @@ const RescuerMap = () => {
       );
     } else {
       // If location does not exist, add a new one
-      addUserLocation(coords.longitude, coords.latitude, "rescuer", cookie);
+      addUserLocation(coords.longitude, coords.latitude, "rescuer", id);
     }
 
     setRescuer({

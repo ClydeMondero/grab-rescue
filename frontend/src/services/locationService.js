@@ -114,10 +114,3 @@ export const updateUserLocation = async (
     updateLocationInFirestore(locationId, longitude, latitude, address);
   }
 };
-
-//get locations from firestore
-export const getRescuerLocations = async (setRescuers) => {
-  const locations = await getLocationsFromFirestore("rescuer");
-
-  setRescuers(locations);
-};
