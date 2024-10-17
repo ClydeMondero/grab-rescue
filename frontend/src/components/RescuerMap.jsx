@@ -19,7 +19,7 @@ const RescuerMap = () => {
     zoom: 18,
   });
 
-  const [locations, setLocations] = useState([]);
+  const [locations, setLocations] = useState(null);
 
   const mapRef = useRef();
   const geoControlRef = useRef();
@@ -31,12 +31,16 @@ const RescuerMap = () => {
     [121.0972, 15.0197],
   ];
 
-  //TODO: save rescuer location
+  //TODO: fix duplcate locations
   const handleGeolocation = async (coords) => {
+    getRescuerLocations(setLocations);
+
     if (!mapRef.current) return;
+    if (!locations) return;
+
     const cookie = getUserCookie("token");
 
-    // Use find to check if the location already exists
+    // Use some to check if the location already exists
     const existingLocation = locations.find(
       (location) => location.userId === cookie
     );
@@ -60,10 +64,6 @@ const RescuerMap = () => {
       latitude: coords.latitude,
     });
   };
-
-  useEffect(() => {
-    getRescuerLocations(setLocations);
-  }, []);
 
   return (
     <MapGL
