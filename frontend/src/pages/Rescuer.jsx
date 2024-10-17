@@ -41,10 +41,6 @@ const Rescuer = (props) => {
     getRequests();
   }, []);
 
-  useEffect(() => {
-    console.log("Selected Request:", selectedRequest);
-  }, [selectedRequest]);
-
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
