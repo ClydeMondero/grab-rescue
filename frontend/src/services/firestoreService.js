@@ -116,6 +116,7 @@ export const getRequestFromFirestore = async (id) => {
 };
 
 //add request to firestore
+//TODO: Send request to nearest rescuer
 export const addRequestToFirestore = async (
   citizenId,
   location,
