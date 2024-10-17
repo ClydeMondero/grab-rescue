@@ -31,7 +31,6 @@ const RescuerMap = () => {
     [121.0972, 15.0197],
   ];
 
-  //TODO: fix duplcate locations
   const handleGeolocation = async (coords) => {
     const locations = await getLocationsFromFirestore("rescuer");
 
