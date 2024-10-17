@@ -11,7 +11,7 @@ import { getCookie } from "./cookieService";
  *
  * @return {Promise<number>} The user ID
  */
-export const verifyToken = async () => {
+export const getIDFromCookie = async () => {
   const { data } = await axios.post("/auth/", {}, { withCredentials: true });
 
   const userId = data.user.id;
@@ -29,7 +29,7 @@ export const verifyToken = async () => {
  * @return {void}
  */
 export const handleLogout = async (navigate) => {
-  const userId = await verifyToken();
+  const userId = await getIDFromCookie();
 
   const { data } = await axios.post(
     "/auth/logout",

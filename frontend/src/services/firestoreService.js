@@ -71,6 +71,7 @@ export const getLocationsFromFirestore = async (role) => {
       locations.push({ id: doc.id, ...doc.data() });
     }
   });
+
   return locations;
 };
 
