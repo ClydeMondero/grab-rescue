@@ -9,13 +9,14 @@ import {
   ChangeEmail,
   RequestDetails,
 } from "../components";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import {
   getRequestsFromFirestore,
   acceptRescueRequestInFirestore,
 } from "../services/firestoreService";
 
 import { RescuerProvider } from "../contexts/RescuerContext";
+import { StatusContext } from "../contexts/StatusContext";
 
 //TODO: Handle Offline Rescuers
 
@@ -23,6 +24,7 @@ const Rescuer = (props) => {
   const { user } = props;
   const [requests, setRequests] = useState([]);
   const [selectedRequest, setSelectedRequest] = useState(null);
+  const { getId } = useContext(StatusContext);
 
   const handleSelectedRequest = (request) => {
     setSelectedRequest(request);
@@ -35,6 +37,8 @@ const Rescuer = (props) => {
   });
 
   useEffect(() => {
+    getId();
+
     const unsubscribe = getRequestsFromFirestore(setRequests);
 
     return () => {
