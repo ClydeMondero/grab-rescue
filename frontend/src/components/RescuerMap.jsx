@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useContext } from "react";
 import { GeolocateControl, Map as MapGL, Marker } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useLocating } from "../hooks";
@@ -10,15 +10,12 @@ import {
 } from "../services/locationService";
 import { getIDFromCookie } from "../services/authService";
 import { getLocationsFromFirestore } from "../services/firestoreService";
+import { RescuerContext } from "../contexts/RescuerContext";
 
 //TODO: Show markers, controls, routes
+//TODO: show no current request
 const RescuerMap = () => {
-  const [rescuer, setRescuer] = useState({
-    longitude: 120.9107,
-    latitude: 14.9536,
-    zoom: 18,
-  });
-
+  const { rescuer, setRescuer } = useContext(RescuerContext);
   const [locations, setLocations] = useState(null);
 
   const mapRef = useRef();
