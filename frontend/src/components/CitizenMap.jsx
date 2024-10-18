@@ -31,7 +31,7 @@ const CitizenMap = forwardRef((props, ref) => {
     zoom: 15,
   });
 
-  const [rescuers, setRescuers] = useState([]);
+  const [rescuers, setRescuers] = useState(null);
   const [nearestRescuer, setNearestRescuer] = useState(null);
 
   const [routeData, setRouteData] = useState(null);
@@ -57,9 +57,7 @@ const CitizenMap = forwardRef((props, ref) => {
   const locating = useLocating(geoControlRef, onLocatingChange);
 
   const handleGeolocation = async (coords) => {
-    const locations = await getLocationsFromFirestore("rescuer");
-    setRescuers(locations);
-
+    if (rescuers == null) return;
     const cookie = getCitizenCookie("citizen_token");
 
     if (cookie) {
@@ -93,10 +91,24 @@ const CitizenMap = forwardRef((props, ref) => {
   };
 
   useEffect(() => {
+    const unsubscribe = getLocationsFromFirestore("rescuer", setRescuers);
+
+    return () => {
+      // Unsubscribe from the listener when the component unmounts
+      unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
     if (nearestRescuer) {
       getRoute();
     }
-  }, [nearestRescuer, citizen]);
+  }, [nearestRescuer, citizen, rescuers]);
+
+  useEffect(() => {
+    console.log("distance", distance);
+    console.log("eta", eta);
+  }, [distance, eta]);
 
   useImperativeHandle(ref, () => ({
     locateCitizen: () => {
@@ -113,6 +125,7 @@ const CitizenMap = forwardRef((props, ref) => {
     },
   }));
 
+  //TODO: route not real time
   return (
     <>
       <MapGL
@@ -159,7 +172,7 @@ const CitizenMap = forwardRef((props, ref) => {
 
             <Route routeData={routeData} routeOpacity={routeOpacity} />
 
-            <DistanceEta distance={distance} eta={eta} />
+            {distance && eta && <DistanceEta distance={distance} eta={eta} />}
           </>
         )}
       </MapGL>

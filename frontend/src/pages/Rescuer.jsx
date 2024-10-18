@@ -15,6 +15,8 @@ import {
   acceptRescueRequestInFirestore,
 } from "../services/firestoreService";
 
+import { RescuerProvider } from "../contexts/RescuerContext";
+
 //TODO: Handle Offline Rescuers
 
 const Rescuer = (props) => {
@@ -32,13 +34,13 @@ const Rescuer = (props) => {
     }
   });
 
-  const getRequests = async () => {
-    const requests = await getRequestsFromFirestore();
-    setRequests(requests);
-  };
-
   useEffect(() => {
-    getRequests();
+    const unsubscribe = getRequestsFromFirestore(setRequests);
+
+    return () => {
+      // Unsubscribe from the listener when the component unmounts
+      unsubscribe();
+    };
   }, []);
 
   return (
@@ -47,43 +49,45 @@ const Rescuer = (props) => {
       <Header />
 
       <div className="flex-grow overflow-auto p-4 bg-slate-50">
-        <Routes>
-          {/* Default Route to Navigate */}
-          <Route
-            path="/"
-            element={<RouterNavigate to="/rescuer/navigate" replace />}
-          />
+        <RescuerProvider>
+          <Routes>
+            {/* Default Route to Navigate */}
+            <Route
+              path="/"
+              element={<RouterNavigate to="/rescuer/navigate" replace />}
+            />
 
-          <Route
-            path="/requests"
-            element={
-              <Requests
-                requests={requests}
-                onSelectRequest={handleSelectedRequest}
-              />
-            }
-          />
-          <Route
-            path="/navigate"
-            element={
-              <Navigate
-                user={user}
-                requests={requests}
-                requestID={selectedRequest}
-              />
-            }
-          />
-          <Route path="/profile" element={<ViewProfile user={user} />} />
-          <Route
-            path="/request-details/:id"
-            element={<RequestDetails user={user} />}
-          />
-          <Route
-            path="/change-password"
-            element={<ChangePassword user={user} />}
-          />
-          <Route path="/change-email" element={<ChangeEmail user={user} />} />
-        </Routes>
+            <Route
+              path="/requests"
+              element={
+                <Requests
+                  requests={requests}
+                  onSelectRequest={handleSelectedRequest}
+                />
+              }
+            />
+            <Route
+              path="/navigate"
+              element={
+                <Navigate
+                  user={user}
+                  requests={requests}
+                  requestID={selectedRequest}
+                />
+              }
+            />
+            <Route path="/profile" element={<ViewProfile user={user} />} />
+            <Route
+              path="/request-details/:id"
+              element={<RequestDetails user={user} />}
+            />
+            <Route
+              path="/change-password"
+              element={<ChangePassword user={user} />}
+            />
+            <Route path="/change-email" element={<ChangeEmail user={user} />} />
+          </Routes>
+        </RescuerProvider>
       </div>
 
       {/* Bottom Navigation always visible */}
