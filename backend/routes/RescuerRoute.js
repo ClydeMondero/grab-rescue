@@ -1,9 +1,14 @@
+// routes/RescuerRoute.js
 const router = require("express").Router();
-const { CreateRescuer } = require("../controllers/RescuerController");
-const { GetRescuers } = require("../controllers/RescuerController");
-const { GetRescuer } = require("../controllers/RescuerController");
+const {
+  CreateRescuer,
+  GetRescuers,
+  GetRescuer,
+} = require("../controllers/RescuerController");
 
+// Route to create rescuer
 router.post("/create", CreateRescuer);
+
 router.get("/get", GetRescuers);
 router.get("/get/:id", GetRescuer);
 

@@ -83,7 +83,7 @@ const ViewProfile = (props) => {
           <div className="flex justify-center">
             <div className="relative">
               <img
-                src="/path/to/profile-picture.jpg" // Change this to your profile picture source
+                src={profile.profile_image}
                 alt="Profile"
                 className="rounded-full w-20 md:w-32 h-20 md:h-32 object-cover border border-gray-300 shadow-md"
               />
