@@ -1,9 +1,9 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 import logo from "../assets/logo.png";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { CitizenMap as Map } from "../components";
-import { FaChevronDown, FaExclamationTriangle } from "react-icons/fa";
+import { FaChevronDown } from "react-icons/fa";
 import { FaLocationPin } from "react-icons/fa6";
 import { BiSolidHide, BiSolidAmbulance } from "react-icons/bi";
 import { MdRoute } from "react-icons/md";
@@ -14,15 +14,19 @@ import {
   getLocationFromFirestore,
 } from "../services/firestoreService";
 import { getCitizenCookie } from "../services/cookieService";
+import { StatusContext } from "../contexts/StatusContext";
 
 const Home = () => {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [formVisible, setFormVisible] = useState(false);
-  const mapRef = useRef(null);
   const [requesting, setRequesting] = useState(false);
   const [locating, setLocating] = useState(true);
+
+  const { getId } = useContext(StatusContext);
+
+  const mapRef = useRef(null);
 
   // Verify token function
   const verifyToken = async () => {
@@ -55,6 +59,7 @@ const Home = () => {
   };
 
   useEffect(() => {
+    getId();
     verifyToken();
   }, []);
 
