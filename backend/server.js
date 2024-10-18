@@ -36,3 +36,6 @@ app.use("/auth", authRoute);
 app.use("/users", userRoute);
 app.use("/rescuers", rescuerRoute);
 app.use("/admins", adminRoute);
+
+//static files
+app.use("/uploads", express.static("uploads"));

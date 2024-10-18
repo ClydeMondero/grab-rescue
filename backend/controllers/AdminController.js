@@ -8,7 +8,7 @@ const zxcvbn = require("zxcvbn");
 module.exports.GetAdmins = async (req, res) => {
   const queryParams = [];
   let q =
-    "SELECT id, first_name, middle_initial, last_name, municipality, barangay, contact_number, is_online, verified FROM users WHERE account_type = 'Admin'";
+    "SELECT id, first_name, middle_initial, last_name, municipality, barangay, profile_image, contact_number, is_online, verified FROM users WHERE account_type = 'Admin'";
 
   let paramCounter = 1; // To dynamically number the query parameters
 
@@ -59,7 +59,7 @@ module.exports.GetAdmins = async (req, res) => {
 // Get Specific Admin
 module.exports.GetAdmin = async (req, res) => {
   const q =
-    "SELECT id, first_name, middle_initial, last_name, municipality, barangay, contact_number, is_online, verified FROM users WHERE id = $1";
+    "SELECT id, first_name, middle_initial, last_name, municipality, barangay, profile_image, contact_number, is_online, verified FROM users WHERE id = $1";
   try {
     const { rows } = await pool.query(q, [req.params.id]);
     res.status(200).json(rows);
@@ -81,6 +81,7 @@ module.exports.CreateAdmin = async (req, res) => {
     email,
     username,
     password,
+    confirmPassword,
   } = req.body;
 
   // List of required fields
@@ -94,6 +95,7 @@ module.exports.CreateAdmin = async (req, res) => {
     email: "Email",
     username: "Username",
     password: "Password",
+    confirmPassword: "Confirm Password",
   };
 
   // Check for missing fields
@@ -112,6 +114,24 @@ module.exports.CreateAdmin = async (req, res) => {
     });
   }
 
+  // Validate username length
+  const MIN_USERNAME_LENGTH = 6;
+  const MAX_USERNAME_LENGTH = 15;
+
+  if (username.length < MIN_USERNAME_LENGTH) {
+    return res.status(200).json({
+      success: false,
+      message: `Username must be at least ${MIN_USERNAME_LENGTH} characters long.`,
+    });
+  }
+
+  if (username.length > MAX_USERNAME_LENGTH) {
+    return res.status(200).json({
+      success: false,
+      message: `Username must be no more than ${MAX_USERNAME_LENGTH} characters long.`,
+    });
+  }
+
   // Calculate the user's age based on the provided birthday
   const age = Math.floor(
     (new Date() - new Date(birthday).getTime()) / 3.15576e10
@@ -122,6 +142,14 @@ module.exports.CreateAdmin = async (req, res) => {
     return res.status(200).json({
       success: false,
       message: `You must be at least ${MIN_AGE} years old to register. You are currently ${age} years old.`,
+    });
+  }
+
+  // Check if passwords match
+  if (password !== confirmPassword) {
+    return res.status(200).json({
+      success: false,
+      message: "Passwords do not match.",
     });
   }
 
@@ -185,6 +213,23 @@ module.exports.CreateAdmin = async (req, res) => {
         });
       }
     } else {
+      // Upload the profile image if available
+      let profileImageUrl = null;
+      if (req.file) {
+        const uploadResponse = await UploadProfileImage(req, res);
+        if (uploadResponse.success) {
+          profileImageUrl = uploadResponse.fileUrl;
+        } else {
+          return res.status(200).json({
+            success: false,
+            message: "Failed to upload profile image.",
+          });
+        }
+      } else {
+        // Use a default image URL if no image is uploaded
+        profileImageUrl = "https://www.gravatar.com/avatar/?d=mp";
+      }
+
       // Hash the password using bcrypt
       const salt = bcrypt.genSaltSync(10);
       const hash = bcrypt.hashSync(password, salt);
@@ -192,15 +237,15 @@ module.exports.CreateAdmin = async (req, res) => {
       // Generate verification token
       const verificationToken = crypto.randomBytes(32).toString("hex");
 
-      // Insert the user into the database
+      // Insert the new rescuer into the database
       const insertQuery = `
-        INSERT INTO users(
-          first_name, middle_initial, last_name, birthday, age, municipality, 
-          barangay, contact_number, email, username, password, account_type, 
-          verified, is_online, verification_token
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
-        RETURNING id
-      `;
+      INSERT INTO users (
+        first_name, middle_initial, last_name, birthday, age, municipality, 
+        barangay, profile_image, contact_number, email, username, password, account_type, 
+        verified, is_online, verification_token
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+      RETURNING id
+    `;
       const values = [
         firstName,
         middleInitial,
@@ -209,6 +254,7 @@ module.exports.CreateAdmin = async (req, res) => {
         age,
         municipality,
         barangay,
+        profileImageUrl,
         contactNumber,
         email,
         username,
@@ -250,7 +296,7 @@ module.exports.CreateAdmin = async (req, res) => {
         } else {
           return res.status(200).json({
             success: true,
-            message: "Admin created successfully. Verification email sent.",
+            message: "User created successfully. Verification email sent.",
           });
         }
       });

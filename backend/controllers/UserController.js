@@ -4,11 +4,12 @@ const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const zxcvbn = require("zxcvbn");
+const uploadFile = require("../utils/fileUpload");
 
 // Get Users with Filtering and Name Search (Rescuers and Admins)
 module.exports.GetUsers = async (req, res) => {
   let q = `
-    SELECT id, first_name, middle_initial, last_name, to_char(birthday, 'YYYY-MM-DD') AS birthday, municipality, barangay, contact_number, username,
+    SELECT id, first_name, middle_initial, last_name, to_char(birthday, 'YYYY-MM-DD') AS birthday, municipality, barangay, profile_image, contact_number, username,
     is_online, verified, account_type FROM users WHERE 1=1
   `;
 
@@ -50,10 +51,11 @@ module.exports.GetUsers = async (req, res) => {
   }
 };
 
+// Get User
 module.exports.GetUser = async (req, res) => {
   try {
     const { rows } = await pool.query(
-      "SELECT id, first_name, middle_initial, last_name, to_char(birthday, 'YYYY-MM-DD') AS birthday, municipality, barangay, contact_number, username, is_online, verified, account_type FROM users WHERE id = $1",
+      "SELECT id, first_name, middle_initial, last_name, to_char(birthday, 'YYYY-MM-DD') AS birthday, municipality, barangay, profile_image, contact_number, username, is_online, verified, account_type FROM users WHERE id = $1",
       [req.params.id]
     );
     if (rows.length === 0) {
@@ -65,6 +67,7 @@ module.exports.GetUser = async (req, res) => {
   }
 };
 
+// Update User
 module.exports.UpdateUser = async (req, res) => {
   const {
     first_name: firstName,
@@ -95,6 +98,24 @@ module.exports.UpdateUser = async (req, res) => {
     });
   }
 
+  // Username length validation
+  const MIN_USERNAME_LENGTH = 6;
+  const MAX_USERNAME_LENGTH = 15;
+
+  if (newUsername.length < MIN_USERNAME_LENGTH) {
+    return res.status(200).json({
+      success: false,
+      message: `Username must be at least ${MIN_USERNAME_LENGTH} characters long.`,
+    });
+  }
+
+  if (newUsername.length > MAX_USERNAME_LENGTH) {
+    return res.status(200).json({
+      success: false,
+      message: `Username must be no more than ${MAX_USERNAME_LENGTH} characters long.`,
+    });
+  }
+
   const age = Math.floor(
     (new Date() - new Date(birthday).getTime()) / 3.15576e10
   );
@@ -109,7 +130,7 @@ module.exports.UpdateUser = async (req, res) => {
 
   try {
     // Check if the user exists
-    const userQuery = `SELECT username FROM users WHERE id = $1`;
+    const userQuery = `SELECT username, profile_image FROM users WHERE id = $1`;
     const { rows: existingUsers } = await pool.query(userQuery, [
       req.params.id,
     ]);
@@ -122,6 +143,7 @@ module.exports.UpdateUser = async (req, res) => {
     }
 
     const oldUsername = existingUsers[0].username;
+    const oldProfileImageUrl = existingUsers[0].profile_image;
 
     if (newUsername && newUsername !== oldUsername) {
       // Check if new username is already taken
@@ -140,10 +162,25 @@ module.exports.UpdateUser = async (req, res) => {
       }
     }
 
+    // Handle profile image upload
+    let profileImageUrl = oldProfileImageUrl; // Use existing image by default
+
+    if (req.file) {
+      const uploadResponse = await UploadProfileImage(req, res);
+      if (uploadResponse.success) {
+        profileImageUrl = uploadResponse.fileUrl; // Update to new image URL
+      } else {
+        return res.status(200).json({
+          success: false,
+          message: "Failed to upload profile image.",
+        });
+      }
+    }
+
     // Update the user in the database without email and password, including age
     const updateQuery = `
       UPDATE users SET first_name = $1, middle_initial = $2, last_name = $3, birthday = $4, age = $5,
-      municipality = $6, barangay = $7, contact_number = $8, username = $9 WHERE id = $10
+      municipality = $6, barangay = $7, contact_number = $8, username = $9, profile_image = $10 WHERE id = $11
     `;
     const values = [
       firstName,
@@ -155,6 +192,7 @@ module.exports.UpdateUser = async (req, res) => {
       barangay,
       contactNumber,
       newUsername,
+      profileImageUrl,
       req.params.id,
     ];
 
@@ -625,6 +663,32 @@ module.exports.ResetPassword = async (req, res) => {
       success: false,
       message: "Server error.",
       error: err.message,
+    });
+  }
+};
+
+// Profile Image Upload Handler
+module.exports.UploadProfileImage = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(200).json({
+        success: false,
+        message: "No file uploaded.",
+      });
+    }
+
+    // Get file URL to store in the database
+    const fileUrl = `/uploads/${req.file.filename}`;
+
+    return res.status(200).json({
+      success: true,
+      message: "Profile image uploaded successfully.",
+      fileUrl,
+    });
+  } catch (err) {
+    return res.status(200).json({
+      success: false,
+      message: `Error uploading profile image: ${err.message}`,
     });
   }
 };
