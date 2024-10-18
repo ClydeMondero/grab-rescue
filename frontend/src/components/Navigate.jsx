@@ -32,17 +32,13 @@ const Navigate = ({ requestID }) => {
   };
 
   return (
-    <div className="relative bg-gray-100 flex flex-col h-[calc(100vh-160px)]">
+    <div className="h-full bg-background-light p-2">
       {/* Full-screen map */}
-      <div className="flex-1">
-        <div className="w-full h-full rounded-md overflow-hidden border border-gray-300">
-          <Map mapRef={mapRef} />
-        </div>
-      </div>
+      <Map mapRef={mapRef} />
 
       {/* Citizen Information Section - Render only if requestData is available */}
       {requestData && (
-        <div className="absolute bottom-0 w-full p-4 rounded-t-lg shadow-lg max-h-[250px] overflow-y-auto">
+        <div className="h-[10%] p-4 shadow-lg">
           {/* Floating Information */}
           <div className="absolute top-[-4px] left-0 right-0 flex justify-center space-x-4 text-xs">
             <p className="text-secondary">

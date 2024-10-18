@@ -1,6 +1,6 @@
 import "ldrs/cardio";
 
-const Loader = ({ isLoading, color, size = 25 }) => {
+const Loader = ({ isLoading, color, size = 50 }) => {
   const loaderColor = color ? color : "#fff";
 
   //FIXME: loader not showing in production

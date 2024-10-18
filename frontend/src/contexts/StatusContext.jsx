@@ -56,7 +56,7 @@ const StatusProvider = ({ children }) => {
       timeoutRef.current = setTimeout(() => {
         // Update Firestore status to 'offline' here
         updateLocationStatus(id, "offline");
-      }, 60000);
+      }, 300000);
     }
 
     return () => {

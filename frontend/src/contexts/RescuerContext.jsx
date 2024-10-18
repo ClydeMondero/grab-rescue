@@ -9,8 +9,10 @@ const RescuerProvider = ({ children }) => {
     zoom: 18,
   });
 
+  const [page, setPage] = useState("navigate");
+
   return (
-    <RescuerContext.Provider value={{ rescuer, setRescuer }}>
+    <RescuerContext.Provider value={{ rescuer, setRescuer, page, setPage }}>
       {children}
     </RescuerContext.Provider>
   );

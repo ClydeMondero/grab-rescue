@@ -24,7 +24,6 @@ const Rescuer = (props) => {
   const { user } = props;
   const [requests, setRequests] = useState([]);
   const [selectedRequest, setSelectedRequest] = useState(null);
-  console.log(useContext(StatusContext));
   const { getId } = useContext(StatusContext);
 
   const handleSelectedRequest = (request) => {
@@ -49,12 +48,12 @@ const Rescuer = (props) => {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* Header */}
-      <Header />
+    <div className="h-dvh flex flex-col">
+      <RescuerProvider>
+        {/* Header */}
+        <Header />
 
-      <div className="flex-grow overflow-auto p-4 bg-slate-50">
-        <RescuerProvider>
+        <div className="flex-1 bg-slate-50">
           <Routes>
             {/* Default Route to Navigate */}
             <Route
@@ -92,11 +91,11 @@ const Rescuer = (props) => {
             />
             <Route path="/change-email" element={<ChangeEmail user={user} />} />
           </Routes>
-        </RescuerProvider>
-      </div>
+        </div>
 
-      {/* Bottom Navigation always visible */}
-      <Bottom />
+        {/* Bottom Navigation always visible */}
+        <Bottom />
+      </RescuerProvider>
     </div>
   );
 };
