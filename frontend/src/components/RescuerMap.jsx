@@ -32,7 +32,7 @@ const RescuerMap = () => {
   ];
 
   const handleGeolocation = async (coords) => {
-    const locations = await getLocationsFromFirestore("rescuer");
+    if (locations == null) return;
 
     const id = await getIDFromCookie();
 
@@ -60,6 +60,15 @@ const RescuerMap = () => {
       latitude: coords.latitude,
     });
   };
+
+  useEffect(() => {
+    const unsubscribe = getLocationsFromFirestore("rescuer", setLocations);
+
+    return () => {
+      // Unsubscribe from the listener when the component unmounts
+      unsubscribe();
+    };
+  }, []);
 
   return (
     <MapGL

@@ -32,13 +32,13 @@ const Rescuer = (props) => {
     }
   });
 
-  const getRequests = async () => {
-    const requests = await getRequestsFromFirestore();
-    setRequests(requests);
-  };
-
   useEffect(() => {
-    getRequests();
+    const unsubscribe = getRequestsFromFirestore(setRequests);
+
+    return () => {
+      // Unsubscribe from the listener when the component unmounts
+      unsubscribe();
+    };
   }, []);
 
   return (
