@@ -2,7 +2,7 @@ import logo from "../../public/logo.png";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { userLoginSchema } from "../models/Users";
+import { userLoginSchema } from "../models/Users"; // Ensure this handles email/username properly
 import { useState } from "react";
 import {
   FaEnvelope,
@@ -17,25 +17,25 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const Login = () => {
-  //get query params
+  // Get query params
   const [searchParams] = useSearchParams();
   const role = searchParams.get("role");
 
-  //show password
+  // Show password state
   const [showPassword, setShowPassword] = useState(false);
 
-  //loading
+  // Loading state
   const [loading, setLoading] = useState(false);
 
-  //navigate
+  // Navigation
   const navigate = useNavigate();
 
-  //back button function
+  // Back button function
   const handleBack = () => {
     navigate("/", { replace: true });
   };
 
-  //form validation
+  // Form validation
   const {
     register,
     handleSubmit,
@@ -45,12 +45,12 @@ const Login = () => {
     resolver: zodResolver(userLoginSchema),
   });
 
-  //handle form submission
+  // Handle form submission
   const onSubmit = (data) => {
     login(data);
   };
 
-  //handle login
+  // Handle login
   const login = async ({ email, password }) => {
     try {
       setLoading(true);
@@ -58,7 +58,7 @@ const Login = () => {
       const { data } = await axios.post(
         "/auth/login",
         {
-          email: email,
+          email: email, // Use the email/username input here
           password: password,
           role: role,
         },
@@ -73,19 +73,13 @@ const Login = () => {
           navigate("/" + role.toLowerCase(), { replace: true });
         }, 1500);
       } else {
-        if (data.error) {
-          toast.error(data.message);
-          console.error(data.error);
-        } else {
-          toast.warning(data.message);
-        }
+        toast[data.error ? "error" : "warning"](data.message);
       }
-
-      setLoading(false);
 
       reset();
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      toast.error("An error occurred. Please try again.");
     }
   };
 
@@ -109,10 +103,10 @@ const Login = () => {
             <FaEnvelope className="h-6 w-6 ml-2 mr-1 text-primary-dark" />
             <input
               {...register("email")}
-              type="email"
+              type="text"
               id="email"
               name="email"
-              placeholder="Enter your email"
+              placeholder="Enter your email or username"
               className="w-full px-3 py-2 bg-background focus:outline-none"
             />
           </div>
@@ -144,7 +138,7 @@ const Login = () => {
             type="submit"
             className="w-full bg-primary-medium text-white font-bold py-2 rounded-md hover:opacity-80 focus:outline-none"
           >
-            {loading ? <Loader {...{ isLoading: loading }} /> : "Login"}
+            {loading ? <Loader isLoading={loading} /> : "Login"}
           </button>
           <a
             href={`/forgot-password?role=${role}`}
