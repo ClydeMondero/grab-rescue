@@ -8,7 +8,7 @@ module.exports.Login = async (req, res) => {
 
   // Get the user from the database
   const q =
-    "SELECT * FROM users WHERE email = $1 or username = $1 AND verified = true";
+    "SELECT * FROM users WHERE (email = $1 OR username = $1) AND verified = true";
   db.query(q, [email], (err, data) => {
     if (err) {
       return res.status(200).json({
