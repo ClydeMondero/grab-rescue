@@ -1,9 +1,15 @@
+// routes/AdminRoute.js
 const router = require("express").Router();
-const { CreateAdmin } = require("../controllers/AdminController");
-const { GetAdmins } = require("../controllers/AdminController");
-const { GetAdmin } = require("../controllers/AdminController");
+const {
+  CreateAdmin,
+  GetAdmins,
+  GetAdmin,
+} = require("../controllers/AdminController");
 
+// Route to create admin
 router.post("/create", CreateAdmin);
+
 router.get("/get", GetAdmins);
 router.get("/get/:id", GetAdmin);
+
 module.exports = router;

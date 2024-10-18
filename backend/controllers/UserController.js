@@ -8,7 +8,7 @@ const zxcvbn = require("zxcvbn");
 // Get Users with Filtering and Name Search (Rescuers and Admins)
 module.exports.GetUsers = async (req, res) => {
   let q = `
-    SELECT id, first_name, middle_initial, last_name, to_char(birthday, 'YYYY-MM-DD') AS birthday, municipality, barangay, contact_number, username,
+    SELECT id, first_name, middle_initial, last_name, to_char(birthday, 'YYYY-MM-DD') AS birthday, municipality, barangay, profile_image, contact_number, username,
     is_online, verified, account_type FROM users WHERE 1=1
   `;
 
@@ -50,10 +50,11 @@ module.exports.GetUsers = async (req, res) => {
   }
 };
 
+// Get User
 module.exports.GetUser = async (req, res) => {
   try {
     const { rows } = await pool.query(
-      "SELECT id, first_name, middle_initial, last_name, to_char(birthday, 'YYYY-MM-DD') AS birthday, municipality, barangay, contact_number, username, is_online, verified, account_type FROM users WHERE id = $1",
+      "SELECT id, first_name, middle_initial, last_name, to_char(birthday, 'YYYY-MM-DD') AS birthday, municipality, barangay, profile_image, contact_number, username, is_online, verified, account_type FROM users WHERE id = $1",
       [req.params.id]
     );
     if (rows.length === 0) {
@@ -65,6 +66,7 @@ module.exports.GetUser = async (req, res) => {
   }
 };
 
+// Update User
 module.exports.UpdateUser = async (req, res) => {
   const {
     first_name: firstName,
@@ -92,6 +94,24 @@ module.exports.UpdateUser = async (req, res) => {
     return res.status(200).json({
       success: false,
       message: `Missing fields: ${missingFields.join(", ")}`,
+    });
+  }
+
+  // Username length validation
+  const MIN_USERNAME_LENGTH = 6;
+  const MAX_USERNAME_LENGTH = 15;
+
+  if (newUsername.length < MIN_USERNAME_LENGTH) {
+    return res.status(200).json({
+      success: false,
+      message: `Username must be at least ${MIN_USERNAME_LENGTH} characters long.`,
+    });
+  }
+
+  if (newUsername.length > MAX_USERNAME_LENGTH) {
+    return res.status(200).json({
+      success: false,
+      message: `Username must be no more than ${MAX_USERNAME_LENGTH} characters long.`,
     });
   }
 

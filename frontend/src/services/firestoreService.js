@@ -227,6 +227,7 @@ export const uploadImageToFirebaseStorage = async (file) => {
 };
 
 //TODO: update request status
+//TODO: add ETA and Distance to request
 // update request in firestore when rescuer accepts
 export const acceptRescueRequestInFirestore = async (
   rescuerId,

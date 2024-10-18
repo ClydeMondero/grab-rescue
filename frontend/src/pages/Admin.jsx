@@ -12,10 +12,24 @@ import {
   ChangeEmail,
   Toast,
 } from "../components";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
+import { getRequestsFromFirestore } from "../services/firestoreService";
 
 const Admin = (props) => {
   const { user } = props;
+  const [requests, setRequests] = useState([]);
+
+  useEffect(() => {
+    const unsubscribe = getRequestsFromFirestore(setRequests);
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+  // Log the requests whenever they are updated
+  useEffect(() => {
+    console.log("Updated requests:", requests);
+  }, [requests]);
 
   return (
     <div className="flex">
@@ -28,12 +42,12 @@ const Admin = (props) => {
           <Route path="/addRescuer" element={<AddRescuer user={user} />} />
           <Route
             path="/incomingRequests"
-            element={<IncomingRequests user={user} />}
+            element={<IncomingRequests user={user} requests={requests} />}
           />
           <Route path="/rescuers" element={<Rescuers user={user} />} />
           <Route
             path="/ongoingRescues"
-            element={<OngoingRescues user={user} />}
+            element={<OngoingRescues user={user} requests={requests} />}
           />
           <Route
             path="/generateReports"
