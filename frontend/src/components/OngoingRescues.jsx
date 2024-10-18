@@ -7,7 +7,7 @@ const OngoingRescues = ({ requests }) => {
     .map((request, index) => ({
       id: index + 1,
       location: request.location.address,
-      rescuer: `Rescuer ID: ${request.rescuerId}`,
+      rescuer: `${request.rescuerId}`,
       status: request.status,
       acceptedTimestamp: new Intl.DateTimeFormat("en-US", {
         year: "numeric",
@@ -17,7 +17,6 @@ const OngoingRescues = ({ requests }) => {
         minute: "2-digit",
         second: "2-digit",
       }).format(new Date(request.acceptedTimestamp)),
-      //TODO: Add ETA and Distance
       estimatedArrivalTime: "TBD",
       estimatedDepartureTime: "TBD",
     }));
@@ -39,13 +38,11 @@ const OngoingRescues = ({ requests }) => {
     }
   };
 
-  // Generate page numbers
   const pageNumbers = [];
   for (let i = 1; i <= totalPages; i++) {
     pageNumbers.push(i);
   }
 
-  // Determine which page numbers to show
   const visiblePages =
     pageNumbers.length <= 5
       ? pageNumbers
@@ -59,93 +56,113 @@ const OngoingRescues = ({ requests }) => {
   };
 
   return (
-    <div className="flex-1 p-2 sm:p-3 lg:p-4 h-full bg-gray-50 flex flex-col">
-      <div className="flex items-center mb-4 sm:mb-6 pb-2 sm:pb-4">
+    <div className="flex-1 p-2 sm:p-3 lg:p-4 h-full  flex flex-col bg-gray-50">
+      {/* Header */}
+      <div className="flex items-center mb-4 sm:mb-6 pb-2 sm:pb-4  border-b border-gray-200">
         <FaAmbulance className="text-xl sm:text-3xl text-[#557C55] mr-2 sm:mr-3" />
-        <h4 className="text-md sm:text-2xl font-semibold text-[#557C55]">
-          Ongoing Rescues
+        <h4 className="text-lg sm:text-2xl font-semibold text-[#557C55]">
+          Ongoing Rescue Operations
         </h4>
       </div>
 
       <p className="mb-4 text-sm sm:text-md text-gray-600">
-        Track the status of ongoing rescue operations:
+        Monitoring the status and progress of active rescue efforts.
       </p>
 
-      <div className="bg-white rounded-lg p-2 sm:p-4 flex flex-col flex-1">
-        {showMap && (
-          <div className="mb-4 sm:mb-6">
-            <h5 className="text-lg sm:text-2xl font-semibold mb-2">
-              Map for {showMap}
-            </h5>
-            <div
-              className="map-placeholder bg-[#eaeaea] rounded-lg"
-              style={{ height: "200px" }}
-            >
-              <p className="text-center pt-4 text-sm sm:text-base">
-                Map showing location: {showMap}
-              </p>
-            </div>
-            <button
-              className="bg-[#FA7070] text-white px-3 py-1 sm:px-4 sm:py-2 rounded-md mt-2 hover:bg-[#ff4444] transition text-xs sm:text-sm"
-              onClick={() => setShowMap(false)}
-            >
-              Hide Map
-            </button>
+      {/* Map Toggle */}
+      {showMap && (
+        <div className="mb-4 sm:mb-6">
+          <h5 className="text-lg sm:text-2xl font-semibold mb-2 text-primary">
+            <p className="text-secondary">Location Map:</p>
+            {showMap}
+          </h5>
+          <div
+            className="map-placeholder bg-[#eaeaea] rounded-lg"
+            style={{ height: "200px" }}
+          >
+            <p className="text-center pt-4 text-sm sm:text-base">
+              Map displaying location: {showMap}
+            </p>
           </div>
-        )}
+          <button
+            className="bg-[#FA7070] text-white px-3 py-1 sm:px-4 sm:py-2 rounded-md mt-2 hover:bg-[#ff4444] transition text-xs sm:text-sm"
+            onClick={() => setShowMap(false)}
+          >
+            Hide Map
+          </button>
+        </div>
+      )}
 
+      {/* Rescue Data Table */}
+      <div className=" rounded-lg p-2 sm:p-4 flex flex-col flex-1">
         <div className="overflow-x-auto">
-          <table className="min-w-full text-xs sm:text-sm rounded-lg border border-gray-200">
-            <thead className="bg-[#557C55] text-white text-left">
+          <table className="min-w-full text-xs sm:text-sm rounded-lg border border-primary-medium">
+            <thead className="bg-primary-medium">
               <tr>
-                <th className="px-2 sm:px-4 py-1 sm:py-3">#</th>
-                <th className="px-2 sm:px-4 py-1 sm:py-3">Location</th>
-                <th className="px-2 sm:px-4 py-1 sm:py-3">Rescuer</th>
-                <th className="px-2 sm:px-4 py-1 sm:py-3">
+                <th className="px-2 sm:px-4 py-2 sm:py-3 text-sm font-medium text-warning border border-gray-300">
+                  #
+                </th>
+                <th className="px-2 sm:px-4 py-2 sm:py-3 text-sm font-semibold text-white border border-gray-300">
+                  RID
+                </th>
+                <th className="px-2 sm:px-4 py-2 sm:py-3 text-sm font-semibold text-white border border-gray-300">
+                  Location
+                </th>
+                <th className="px-2 sm:px-4 py-2 sm:py-3 text-sm font-semibold text-white border border-gray-300">
                   Accepted Timestamp
                 </th>
-                <th className="px-2 sm:px-4 py-1 sm:py-3">Distance</th>
-                <th className="px-2 sm:px-4 py-1 sm:py-3">ETA</th>
-                <th className="px-2 sm:px-4 py-1 sm:py-3">Status</th>
-                <th className="px-2 sm:px-4 py-1 sm:py-3">Map</th>
+                <th className="px-2 sm:px-4 py-2 sm:py-3 text-sm font-semibold text-white border border-gray-300">
+                  Distance
+                </th>
+                <th className="px-2 sm:px-4 py-2 sm:py-3 text-sm font-semibold text-white border border-gray-300">
+                  ETA
+                </th>
+                <th className="px-2 sm:px-4 py-2 sm:py-3 text-sm font-semibold text-white border border-gray-300">
+                  Status
+                </th>
+                <th className="px-2 sm:px-4 py-2 sm:py-3 text-sm font-semibold text-white border border-gray-300">
+                  Map
+                </th>
               </tr>
             </thead>
             <tbody>
               {paginatedRescues.map((rescue, index) => (
                 <tr
                   key={rescue.id}
-                  className={`border-b ${
-                    index % 2 === 0 ? "bg-white" : "bg-[#F0F0F0]"
-                  }`}
+                  className={`border-b text-center ${
+                    index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                  } border border-gray-300`}
                 >
-                  <td className="px-2 sm:px-4 py-1 sm:py-2">{rescue.id}</td>
-                  <td className="px-2 sm:px-4 py-1 sm:py-2">
-                    {rescue.location}
+                  <td className="px-2 sm:px-4 py-1 sm:py-2 text-secondary font-semibold border border-gray-300">
+                    {rescue.id}
                   </td>
-                  <td className="px-2 sm:px-4 py-1 sm:py-2">
+                  <td className="px-2 sm:px-4 py-1 sm:py-2 font-semibold text-primary-dark border border-gray-300">
                     {rescue.rescuer}
                   </td>
-                  <td className="px-2 sm:px-4 py-1 sm:py-2">
+                  <td className="px-2 sm:px-4 py-1 sm:py-2 font-semibold text-primary-medium border border-gray-300">
+                    {rescue.location}
+                  </td>
+                  <td className="px-2 sm:px-4 py-1 sm:py-2 font-semibold text-primary-dark border border-gray-300">
                     {rescue.acceptedTimestamp}
                   </td>
-                  <td className="px-2 sm:px-4 py-1 sm:py-2">
+                  <td className="px-2 sm:px-4 py-1 sm:py-2 font-semibold text-primary-dark border border-gray-300">
                     {rescue.estimatedArrivalTime}
                   </td>
-                  <td className="px-2 sm:px-4 py-1 sm:py-2">
+                  <td className="px-2 sm:px-4 py-1 sm:py-2 font-semibold text-primary-dark border border-gray-300">
                     {rescue.estimatedDepartureTime}
                   </td>
                   <td
-                    className={`px-2 sm:px-4 py-1 sm:py-2 ${
+                    className={`px-2 sm:px-4 py-1 sm:py-2 font-semibold ${
                       rescue.status === "In Progress"
-                        ? "text-[#4158A6]"
-                        : "text-black"
-                    }`}
+                        ? "text-secondary"
+                        : "text-info"
+                    } border border-gray-300`}
                   >
                     {rescue.status}
                   </td>
-                  <td className="px-2 sm:px-4 py-1 sm:py-2">
+                  <td className="px-2 sm:px-4 py-1 sm:py-2 border border-gray-300">
                     <button
-                      className="bg-[#6EA46E] text-white px-2 sm:px-3 py-1 sm:py-1 rounded-md text-xs sm:text-sm hover:bg-[#557C55] transition"
+                      className="bg-primary text-white px-2 sm:px-3 py-1 sm:py-1 rounded-md text-xs sm:text-sm hover:bg-info transition"
                       onClick={() => handleShowMap(rescue.location)}
                     >
                       Show Map
@@ -173,9 +190,9 @@ const OngoingRescues = ({ requests }) => {
                 key={pageNumber}
                 className={`px-2 py-1 text-xs border rounded-md ${
                   currentPage === pageNumber
-                    ? "bg-[#557C55] text-white"
-                    : "bg-white text-[#557C55] border-[#557C55]"
-                } hover:bg-[#4a6b4a]`}
+                    ? "bg-secondary text-white"
+                    : "bg-primary-medium text-white border-primary-medium"
+                } hover:bg-primary`}
                 onClick={() => handlePageChange(pageNumber)}
               >
                 {pageNumber}
@@ -184,7 +201,7 @@ const OngoingRescues = ({ requests }) => {
           </div>
           {currentPage < totalPages && (
             <button
-              className="w-full mt-1 px-2 py-1 text-xs bg-[#557C55] text-white rounded-md hover:bg-[#4a6b4a] sm:w-auto sm:mt-0"
+              className="w-full mt-1 px-2 py-1 text-xs bg-primary-medium text-white rounded-md hover:bg-primary sm:w-auto sm:mt-0"
               onClick={() => handlePageChange(currentPage + 1)}
             >
               Next &gt;
