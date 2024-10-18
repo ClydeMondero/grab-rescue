@@ -8,9 +8,7 @@ const {
   UpdateUser,
   UpdateUserEmail,
   UpdateUserPassword,
-  UploadProfileImage, // Import the new handler
 } = require("../controllers/UserController");
-const { upload, handleMulterError } = require("../utils/fileUpload"); // Import upload middleware
 
 // Get users route
 router.get("/get", GetUsers);
@@ -35,13 +33,5 @@ router.put("/updateEmail/:id", UpdateUserEmail);
 
 // Update user password route
 router.put("/updatePassword/:id", UpdateUserPassword);
-
-// Upload profile image route
-router.post(
-  "/upload-profile-image",
-  upload.single("profileImage"),
-  handleMulterError,
-  UploadProfileImage
-);
 
 module.exports = router;

@@ -6,15 +6,8 @@ const {
   GetAdmin,
 } = require("../controllers/AdminController");
 
-const { upload, handleMulterError } = require("../utils/fileUpload");
-
 // Route to create admin
-router.post(
-  "/create",
-  upload.single("profileImage"),
-  handleMulterError,
-  CreateAdmin
-);
+router.post("/create", CreateAdmin);
 
 router.get("/get", GetAdmins);
 router.get("/get/:id", GetAdmin);

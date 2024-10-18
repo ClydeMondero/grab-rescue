@@ -6,15 +6,8 @@ const {
   GetRescuer,
 } = require("../controllers/RescuerController");
 
-const { upload, handleMulterError } = require("../utils/fileUpload");
-
-// Route to create rescuer with profile image upload
-router.post(
-  "/create",
-  upload.single("profileImage"),
-  handleMulterError,
-  CreateRescuer
-);
+// Route to create rescuer
+router.post("/create", CreateRescuer);
 
 router.get("/get", GetRescuers);
 router.get("/get/:id", GetRescuer);
