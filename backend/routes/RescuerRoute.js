@@ -1,4 +1,4 @@
-// RescuerRoute.js
+// routes/RescuerRoute.js
 const router = require("express").Router();
 const {
   CreateRescuer,
@@ -6,13 +6,16 @@ const {
   GetRescuer,
 } = require("../controllers/RescuerController");
 
-// Consider adding the image upload middleware if needed
+const { upload, handleMulterError } = require("../utils/fileUpload");
+
+// Route to create rescuer with profile image upload
 router.post(
   "/create",
   upload.single("profileImage"),
   handleMulterError,
   CreateRescuer
 );
+
 router.get("/get", GetRescuers);
 router.get("/get/:id", GetRescuer);
 
