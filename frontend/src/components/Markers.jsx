@@ -29,30 +29,31 @@ const Markers = ({
       )}
 
       {otherMarkers &&
-        otherMarkers.map((marker) => {
-          return (
-            <Marker
-              key={marker.id}
-              longitude={marker.longitude}
-              latitude={marker.latitude}
-            >
-              <div className="flex flex-col items-center justify-center">
-                <BiSolidAmbulance
-                  className={
-                    marker.id === nearestOtherMarker?.id
-                      ? "text-4xl text-primary green-pulse"
-                      : "text-4xl text-primary"
-                  }
-                />
-                {nearestOtherMarker?.id === marker.id && (
-                  <p className="bg-background px-2 py-1 rounded-full text-text-primary text-md font-semibold">
-                    Nearest Rescuer
-                  </p>
-                )}
-              </div>
-            </Marker>
-          );
-        })}
+        otherMarkers.map(
+          (marker) =>
+            marker.status === "online" && (
+              <Marker
+                key={marker.id}
+                longitude={marker.longitude}
+                latitude={marker.latitude}
+              >
+                <div className="flex flex-col items-center justify-center">
+                  <BiSolidAmbulance
+                    className={
+                      marker.id === nearestOtherMarker?.id
+                        ? "text-4xl text-primary green-pulse"
+                        : "text-4xl text-primary"
+                    }
+                  />
+                  {nearestOtherMarker?.id === marker.id && (
+                    <p className="bg-background px-2 py-1 rounded-full text-text-primary text-md font-semibold">
+                      Nearest Rescuer
+                    </p>
+                  )}
+                </div>
+              </Marker>
+            )
+        )}
     </>
   );
 };
