@@ -37,17 +37,17 @@ const handleMulterError = (err, req, res, next) => {
   if (err instanceof multer.MulterError) {
     // Handle Multer-specific errors
     if (err.code === "LIMIT_FILE_SIZE") {
-      return res.status(400).json({
+      return res.status(200).json({
         success: false,
         message: "Uploaded image exceeds the 10 MB limit.",
       });
     }
-    return res.status(400).json({
+    return res.status(200).json({
       success: false,
       message: err.message,
     });
   } else if (err) {
-    return res.status(400).json({ success: false, message: err.message });
+    return res.status(200).json({ success: false, message: err.message });
   }
   next();
 };
