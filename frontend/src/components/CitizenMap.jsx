@@ -105,11 +105,6 @@ const CitizenMap = forwardRef((props, ref) => {
     }
   }, [nearestRescuer, citizen, rescuers]);
 
-  useEffect(() => {
-    console.log("distance", distance);
-    console.log("eta", eta);
-  }, [distance, eta]);
-
   useImperativeHandle(ref, () => ({
     locateCitizen: () => {
       geoControlRef.current?.trigger();

@@ -9,6 +9,7 @@ import { getRouteData } from "../services/locationService";
 // TODO: Add Status in Request Card
 // TODO: Make selected request persistent using cookies
 //TODO: format request datas
+//TODO: update request by adding distance and eta
 
 const Requests = ({ requests, onSelectRequest }) => {
   const navigate = useNavigate();
