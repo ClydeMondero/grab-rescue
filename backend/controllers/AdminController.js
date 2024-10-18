@@ -213,23 +213,6 @@ module.exports.CreateAdmin = async (req, res) => {
         });
       }
     } else {
-      // Upload the profile image if available
-      let profileImageUrl = null;
-      if (req.file) {
-        const uploadResponse = await UploadProfileImage(req, res);
-        if (uploadResponse.success) {
-          profileImageUrl = uploadResponse.fileUrl;
-        } else {
-          return res.status(200).json({
-            success: false,
-            message: "Failed to upload profile image.",
-          });
-        }
-      } else {
-        // Use a default image URL if no image is uploaded
-        profileImageUrl = "https://www.gravatar.com/avatar/?d=mp";
-      }
-
       // Hash the password using bcrypt
       const salt = bcrypt.genSaltSync(10);
       const hash = bcrypt.hashSync(password, salt);
@@ -241,9 +224,9 @@ module.exports.CreateAdmin = async (req, res) => {
       const insertQuery = `
       INSERT INTO users (
         first_name, middle_initial, last_name, birthday, age, municipality, 
-        barangay, profile_image, contact_number, email, username, password, account_type, 
+        barangay, contact_number, email, username, password, account_type, 
         verified, is_online, verification_token
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
       RETURNING id
     `;
       const values = [
@@ -254,7 +237,6 @@ module.exports.CreateAdmin = async (req, res) => {
         age,
         municipality,
         barangay,
-        profileImageUrl,
         contactNumber,
         email,
         username,
