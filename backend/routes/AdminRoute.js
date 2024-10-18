@@ -1,9 +1,19 @@
+// AdminRoute.js
 const router = require("express").Router();
-const { CreateAdmin } = require("../controllers/AdminController");
-const { GetAdmins } = require("../controllers/AdminController");
-const { GetAdmin } = require("../controllers/AdminController");
+const {
+  CreateAdmin,
+  GetAdmins,
+  GetAdmin,
+} = require("../controllers/AdminController");
 
-router.post("/create", CreateAdmin);
+// Consider adding the image upload middleware if needed
+router.post(
+  "/create",
+  upload.single("profileImage"),
+  handleMulterError,
+  CreateAdmin
+);
 router.get("/get", GetAdmins);
 router.get("/get/:id", GetAdmin);
+
 module.exports = router;
