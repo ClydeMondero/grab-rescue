@@ -1,5 +1,5 @@
 import { useContext, useState, useEffect } from "react";
-import { FaExclamationTriangle } from "react-icons/fa";
+import { FaExclamation } from "react-icons/fa";
 import { BiSolidHappyBeaming } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
 import { RescuerContext } from "../contexts/RescuerContext";
@@ -9,7 +9,6 @@ import { getRouteData } from "../services/locationService";
 // TODO: Add Status in Request Card
 // TODO: Make selected request persistent using cookies
 //TODO: format request datas
-//TODO: update request by adding distance and eta
 
 const Requests = ({ requests, onSelectRequest }) => {
   const navigate = useNavigate();
@@ -28,34 +27,38 @@ const Requests = ({ requests, onSelectRequest }) => {
     navigate("/rescuer/navigate");
   };
 
-  // Fetch route data for each request
-  useEffect(() => {
-    const fetchRoutes = async () => {
-      const newRouteData = {};
-      for (const request of requests) {
-        const route = await getRouteData(rescuer, request.location);
-        newRouteData[request.id] = route;
-      }
-      setRouteData(newRouteData);
-    };
-
-    if (requests.length > 0) {
-      fetchRoutes();
+  const fetchRoutes = async () => {
+    const newRouteData = {};
+    for (const request of requests) {
+      const route = await getRouteData(rescuer, request.location);
+      newRouteData[request.id] = route;
     }
-  }, [requests, rescuer]);
+    setRouteData(newRouteData);
+  };
 
   // Filter out assigned requests
   const unassignedRequests = requests.filter(
     (request) => request.status !== "assigned"
   );
 
+  // Fetch route data for each request
+  useEffect(() => {
+    if (requests.length > 0) {
+      fetchRoutes();
+    }
+  }, [requests, rescuer]);
+
+  useEffect(() => {
+    fetchRoutes;
+  }, []);
+
   return (
-    <div className="flex flex-col p-4 sm:p-6 md:p-8 lg:p-10 max-w-7xl w-full mx-auto h-[calc(100vh-160px)]">
+    <div className="flex flex-col p-6">
       {/* Header Section */}
-      <div className="flex flex-col sm:flex-row items-center justify-between mb-4">
-        <h2 className="text-2xl sm:text-3xl font-bold text-[#557C55] flex items-center space-x-2">
-          <FaExclamationTriangle className="text-secondary" />
-          <span className="text-primary-dark">Emergency Requests</span>
+      <div className="hidden flex-col items-start justify-between mb-4 md:flex">
+        <h2 className="text-3xl font-bold text-[#557C55] flex items-center gap-2">
+          <FaExclamation className="text-secondary" />
+          <span className="text-primary-dark">Requests</span>
         </h2>
       </div>
 
@@ -73,20 +76,17 @@ const Requests = ({ requests, onSelectRequest }) => {
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between w-full">
                   {/* Request Info */}
                   <div className="mb-4 sm:mb-0">
-                    <h3 className="text-lg font-bold text-[#557C55] mb-2 flex items-center space-x-2">
-                      <FaExclamationTriangle className="text-red-500" />
-                    </h3>
                     <p className="text-sm text-gray-600">
                       <strong className="text-[#557C55]">Location: </strong>
                       {request.location && request.location.address}
                     </p>
                     <p className="text-sm text-gray-600">
                       <strong className="text-[#557C55]">Distance: </strong>
-                      {route.distance || "Loading..."}
+                      {route.distance && route.distance}
                     </p>
                     <p className="text-sm text-gray-600">
                       <strong className="text-[#557C55]">ETA: </strong>
-                      {route.duration || "Loading..."}
+                      {route.duration && route.duration}
                     </p>
                     <p className="text-sm text-gray-600">
                       <strong className="text-[#557C55]">Request Time: </strong>

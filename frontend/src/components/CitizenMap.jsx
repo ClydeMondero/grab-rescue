@@ -120,7 +120,6 @@ const CitizenMap = forwardRef((props, ref) => {
     },
   }));
 
-  //TODO: route not real time
   return (
     <>
       <MapGL

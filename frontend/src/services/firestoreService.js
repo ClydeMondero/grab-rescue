@@ -54,7 +54,6 @@ export const updateLocationStatus = async (id, status) => {
     const locationRef = doc(store, "locations", location.id);
     try {
       await updateDoc(locationRef, { status });
-      console.log(id, "id is changing status to", status);
     } catch (error) {
       console.error(`Error updating location status to ${status}: `, error);
     }
