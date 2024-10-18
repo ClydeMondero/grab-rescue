@@ -7,6 +7,7 @@ import {
   updateDoc,
   query,
   onSnapshot,
+  where,
 } from "firebase/firestore";
 import { store } from "../../firebaseConfig";
 
@@ -35,6 +36,39 @@ export const addLocationToFirestore = async (
     return { id: docRef.id };
   } catch (error) {
     console.log("Error adding document: ", error);
+  }
+};
+
+//update location status to offline
+export const updateLocationStatus = async (id, status) => {
+  const q = query(collection(store, "locations"), where("userId", "==", id));
+
+  const querySnapshot = await getDocs(q);
+
+  const location = querySnapshot.docs.map((doc) => ({
+    ...doc.data(),
+    id: doc.id,
+  }))[0];
+
+  if (location) {
+    const locationRef = doc(store, "locations", location.id);
+    try {
+      await updateDoc(locationRef, { status });
+    } catch (error) {
+      console.error(`Error updating location status to ${status}: `, error);
+    }
+  }
+};
+
+//get userId from location document in firestore
+export const getIDFromLocation = async (id) => {
+  const locationRef = doc(store, "locations", id);
+  const docSnap = await getDoc(locationRef);
+
+  if (docSnap.exists()) {
+    return docSnap.data().userId;
+  } else {
+    return null;
   }
 };
 
