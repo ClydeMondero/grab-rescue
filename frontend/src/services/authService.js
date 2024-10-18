@@ -1,6 +1,7 @@
 import axios from "axios";
 import { toast } from "react-toastify";
 import { getCookie } from "./cookieService";
+import { updateLocationStatus } from "../services/firestoreService";
 
 /**
  * Verifies the token
@@ -40,6 +41,7 @@ export const handleLogout = async (navigate) => {
   );
 
   if (data.success) {
+    updateLocationStatus(userId, "offline");
     navigate("/");
     return;
   }

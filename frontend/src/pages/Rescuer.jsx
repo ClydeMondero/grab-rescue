@@ -24,6 +24,7 @@ const Rescuer = (props) => {
   const { user } = props;
   const [requests, setRequests] = useState([]);
   const [selectedRequest, setSelectedRequest] = useState(null);
+  console.log(useContext(StatusContext));
   const { getId } = useContext(StatusContext);
 
   const handleSelectedRequest = (request) => {

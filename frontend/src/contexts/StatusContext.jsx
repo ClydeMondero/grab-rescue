@@ -66,7 +66,7 @@ const StatusProvider = ({ children }) => {
   }, [isOnline]);
 
   return (
-    <StatusContext.Provider value={{ isOnline, getId }}>
+    <StatusContext.Provider value={{ isOnline, getId, id }}>
       {children}
     </StatusContext.Provider>
   );

@@ -3,7 +3,7 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { userLoginSchema } from "../models/Users"; // Ensure this handles email/username properly
-import { useState } from "react";
+import { useContext, useState } from "react";
 import {
   FaEnvelope,
   FaLock,
@@ -14,7 +14,8 @@ import {
 import { Loader, Toast } from "../components";
 import axios from "axios";
 import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { StatusContext } from "../contexts/StatusContext";
+import { updateLocationStatus } from "../services/firestoreService";
 
 const Login = () => {
   // Get query params
@@ -26,6 +27,8 @@ const Login = () => {
 
   // Loading state
   const [loading, setLoading] = useState(false);
+
+  const { id } = useContext(StatusContext);
 
   // Navigation
   const navigate = useNavigate();
@@ -69,6 +72,7 @@ const Login = () => {
 
       if (data.success) {
         toast.success(data.message);
+        updateLocationStatus(id, "offline");
         setTimeout(() => {
           navigate("/" + role.toLowerCase(), { replace: true });
         }, 1500);
