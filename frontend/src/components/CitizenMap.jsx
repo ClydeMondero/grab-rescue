@@ -105,6 +105,11 @@ const CitizenMap = forwardRef((props, ref) => {
     }
   }, [nearestRescuer, citizen, rescuers]);
 
+  useEffect(() => {
+    console.log("distance", distance);
+    console.log("eta", eta);
+  }, [distance, eta]);
+
   useImperativeHandle(ref, () => ({
     locateCitizen: () => {
       geoControlRef.current?.trigger();
@@ -120,6 +125,7 @@ const CitizenMap = forwardRef((props, ref) => {
     },
   }));
 
+  //TODO: route not real time
   return (
     <>
       <MapGL
@@ -166,7 +172,7 @@ const CitizenMap = forwardRef((props, ref) => {
 
             <Route routeData={routeData} routeOpacity={routeOpacity} />
 
-            <DistanceEta distance={distance} eta={eta} />
+            {distance && eta && <DistanceEta distance={distance} eta={eta} />}
           </>
         )}
       </MapGL>

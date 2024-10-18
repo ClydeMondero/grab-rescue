@@ -1,15 +1,21 @@
-import React from "react";
+import { useContext, useState, useEffect } from "react";
 import { FaExclamationTriangle } from "react-icons/fa";
 import { BiSolidHappyBeaming } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
-import { getDistance } from "../utils/DistanceUtility";
+import { RescuerContext } from "../contexts/RescuerContext";
+import { getRouteData } from "../services/locationService";
 
-//TODO: Add Completed Button
-//TODO: Add Status in Request Card
-//TODO: Make selected request persistent using cookies
-//TODO: Calculate ETA and Distance then show on request card
+// TODO: Add Completed Button
+// TODO: Add Status in Request Card
+// TODO: Make selected request persistent using cookies
+//TODO: format request datas
+
 const Requests = ({ requests, onSelectRequest }) => {
   const navigate = useNavigate();
+  const { rescuer } = useContext(RescuerContext);
+
+  // State to store routes data for requests
+  const [routeData, setRouteData] = useState({});
 
   /**
    * Handle Accept button click
@@ -20,6 +26,22 @@ const Requests = ({ requests, onSelectRequest }) => {
     onSelectRequest(requestID);
     navigate("/rescuer/navigate");
   };
+
+  // Fetch route data for each request
+  useEffect(() => {
+    const fetchRoutes = async () => {
+      const newRouteData = {};
+      for (const request of requests) {
+        const route = await getRouteData(rescuer, request.location);
+        newRouteData[request.id] = route;
+      }
+      setRouteData(newRouteData);
+    };
+
+    if (requests.length > 0) {
+      fetchRoutes();
+    }
+  }, [requests, rescuer]);
 
   // Filter out assigned requests
   const unassignedRequests = requests.filter(
@@ -39,59 +61,59 @@ const Requests = ({ requests, onSelectRequest }) => {
       {/* Scrollable Request Cards Section */}
       <div className="flex-1 overflow-y-auto max-h-[calc(100vh-200px)] space-y-3">
         {unassignedRequests.length > 0 ? (
-          unassignedRequests.map((request) => (
-            <div
-              key={request.id}
-              className="block p-4 bg-white border border-gray-300 rounded-md hover:bg-gray-100 transition-colors"
-            >
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between w-full">
-                {/* Request Info */}
-                <div className="mb-4 sm:mb-0">
-                  <h3 className="text-lg font-bold text-[#557C55] mb-2 flex items-center space-x-2">
-                    <FaExclamationTriangle className="text-red-500" />
-                  </h3>
-                  <p className="text-sm text-gray-600">
-                    <strong className="text-[#557C55]">Location: </strong>
-                    {request.location && request.location.address}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    <strong className="text-[#557C55]">Distance: </strong>
-                    {request.location &&
-                      getDistance(
-                        request.location.latitude,
-                        request.location.longitude
-                      )}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    <strong className="text-[#557C55]">ETA: </strong> Coming
-                    soon...
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    <strong className="text-[#557C55]">Request Time: </strong>
-                    {request.timestamp &&
-                      new Intl.DateTimeFormat("en-US", {
-                        year: "numeric",
-                        month: "2-digit",
-                        day: "2-digit",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                        second: "2-digit",
-                      }).format(new Date(request.timestamp))}
-                  </p>
-                </div>
+          unassignedRequests.map((request) => {
+            const route = routeData[request.id] || {};
 
-                {/* Action Section */}
-                <div className="flex items-center">
-                  <button
-                    onClick={() => handleAccept(request.id)}
-                    className="px-4 py-2 text-sm sm:text-base font-semibold text-white bg-primary hover:bg-green-600 transition-colors rounded"
-                  >
-                    Accept
-                  </button>
+            return (
+              <div
+                key={request.id}
+                className="block p-4 bg-white border border-gray-300 rounded-md hover:bg-gray-100 transition-colors"
+              >
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between w-full">
+                  {/* Request Info */}
+                  <div className="mb-4 sm:mb-0">
+                    <h3 className="text-lg font-bold text-[#557C55] mb-2 flex items-center space-x-2">
+                      <FaExclamationTriangle className="text-red-500" />
+                    </h3>
+                    <p className="text-sm text-gray-600">
+                      <strong className="text-[#557C55]">Location: </strong>
+                      {request.location && request.location.address}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      <strong className="text-[#557C55]">Distance: </strong>
+                      {route.distance || "Loading..."}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      <strong className="text-[#557C55]">ETA: </strong>
+                      {route.duration || "Loading..."}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      <strong className="text-[#557C55]">Request Time: </strong>
+                      {request.timestamp &&
+                        new Intl.DateTimeFormat("en-US", {
+                          year: "numeric",
+                          month: "2-digit",
+                          day: "2-digit",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          second: "2-digit",
+                        }).format(new Date(request.timestamp))}
+                    </p>
+                  </div>
+
+                  {/* Action Section */}
+                  <div className="flex items-center">
+                    <button
+                      onClick={() => handleAccept(request.id)}
+                      className="px-4 py-2 text-sm sm:text-base font-semibold text-white bg-primary hover:bg-green-600 transition-colors rounded"
+                    >
+                      Accept
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))
+            );
+          })
         ) : (
           <NoRequests />
         )}
