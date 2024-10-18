@@ -5,6 +5,8 @@ import {
   getDoc,
   doc,
   updateDoc,
+  query,
+  onSnapshot,
 } from "firebase/firestore";
 import { store } from "../../firebaseConfig";
 
@@ -60,19 +62,23 @@ export const updateLocationInFirestore = async (
   }
 };
 
-//get locations from firestore based on role that are active
-export const getLocationsFromFirestore = async (role) => {
-  const querySnapshot = await getDocs(collection(store, "locations"));
+export const getLocationsFromFirestore = (role, setLocations) => {
+  const q = query(collection(store, "locations"));
 
-  const locations = [];
+  // Set up the real-time listener
+  const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    const locations = [];
 
-  querySnapshot.forEach((doc) => {
-    if (doc.data().role === role) {
-      locations.push({ id: doc.id, ...doc.data() });
-    }
+    querySnapshot.forEach((doc) => {
+      if (doc.data().role === role) {
+        locations.push({ id: doc.id, ...doc.data() });
+      }
+    });
+
+    setLocations(locations); // Update the locations in real-time
   });
 
-  return locations;
+  return unsubscribe; // To stop listening when needed
 };
 
 //check if user exists
@@ -86,18 +92,22 @@ export const checkUser = async (id) => {
 };
 
 //get requests from firestore
-export const getRequestsFromFirestore = async () => {
+export const getRequestsFromFirestore = (setRequests) => {
   try {
-    const querySnapshot = await getDocs(collection(store, "requests"));
-    const requests = [];
+    const q = query(collection(store, "requests")); // Modify to target the correct collection
 
-    querySnapshot.forEach((doc) => {
-      requests.push({ id: doc.id, ...doc.data() });
+    // Set up a Firestore listener
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const requests = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setRequests(requests); // Update requests state in real-time
     });
-    return requests;
+
+    return unsubscribe; // Return unsubscribe function to stop listening if needed
   } catch (error) {
-    console.error("Error getting documents: ", error);
-    return [];
+    console.error("Error fetching requests: ", error);
   }
 };
 

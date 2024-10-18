@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { RescuerMap as Map } from "../components";
 import { BiPhoneCall } from "react-icons/bi";
 import { getRequestFromFirestore } from "../services/firestoreService";
+
 const Navigate = ({ requestID }) => {
   const [showDetails, setShowDetails] = useState(false);
   const [requestData, setRequestData] = useState(null);
+
+  const mapRef = useRef();
 
   const getRequestData = async () => {
     if (requestID === null) return;
@@ -33,7 +36,7 @@ const Navigate = ({ requestID }) => {
       {/* Full-screen map */}
       <div className="flex-1">
         <div className="w-full h-full rounded-md overflow-hidden border border-gray-300">
-          <Map />
+          <Map mapRef={mapRef} />
         </div>
       </div>
 
