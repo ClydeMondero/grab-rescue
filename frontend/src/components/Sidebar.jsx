@@ -115,34 +115,12 @@ const Sidebar = () => {
       {/* Sidebar Dashboard */}
       <div className="flex flex-col space-y-2 mt-6">
         <Link
-          to="/admin/addRescuer"
-          className="flex items-center px-4 py-2 hover:bg-[#6EA46E]"
-        >
-          <FaUserPlus
-            className={`text-lg ${!isOpen ? "text-xl" : "text-lg"}`}
-          />
-          <span className={`${!isOpen && "hidden"} ml-4 duration-300`}>
-            Add Rescuer
-          </span>
-        </Link>
-        <Link
           to="/admin/incomingRequests"
           className="flex items-center px-4 py-2 hover:bg-[#6EA46E]"
         >
           <MdMail className={`text-lg ${!isOpen ? "text-xl" : "text-lg"}`} />
           <span className={`${!isOpen && "hidden"} ml-4 duration-300`}>
             Incoming Requests
-          </span>
-        </Link>
-        <Link
-          to="/admin/rescuers"
-          className="flex items-center px-4 py-2 hover:bg-[#6EA46E]"
-        >
-          <MdAssignmentInd
-            className={`text-lg ${!isOpen ? "text-xl" : "text-lg"}`}
-          />
-          <span className={`${!isOpen && "hidden"} ml-4 duration-300`}>
-            Rescuers
           </span>
         </Link>
         <Link
@@ -154,6 +132,29 @@ const Sidebar = () => {
           />
           <span className={`${!isOpen && "hidden"} ml-4 duration-300`}>
             Ongoing Rescues
+          </span>
+        </Link>
+        <Link
+          to="/admin/addRescuer"
+          className="flex items-center px-4 py-2 hover:bg-[#6EA46E]"
+        >
+          <FaUserPlus
+            className={`text-lg ${!isOpen ? "text-xl" : "text-lg"}`}
+          />
+          <span className={`${!isOpen && "hidden"} ml-4 duration-300`}>
+            Add Rescuer
+          </span>
+        </Link>
+
+        <Link
+          to="/admin/rescuers"
+          className="flex items-center px-4 py-2 hover:bg-[#6EA46E]"
+        >
+          <MdAssignmentInd
+            className={`text-lg ${!isOpen ? "text-xl" : "text-lg"}`}
+          />
+          <span className={`${!isOpen && "hidden"} ml-4 duration-300`}>
+            Rescuers
           </span>
         </Link>
         <Link
