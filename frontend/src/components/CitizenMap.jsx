@@ -22,7 +22,7 @@ import {
   LocatingIndicator,
 } from "../components";
 import { useLocating } from "../hooks";
-import { getLocationsFromFirestore } from "../services/firestoreService";
+import { getOnlineLocationsFromFirestore } from "../services/firestoreService";
 
 const CitizenMap = forwardRef((props, ref) => {
   const [citizen, setCitizen] = useState({
@@ -91,7 +91,7 @@ const CitizenMap = forwardRef((props, ref) => {
   };
 
   useEffect(() => {
-    const unsubscribe = getLocationsFromFirestore("rescuer", setRescuers);
+    const unsubscribe = getOnlineLocationsFromFirestore("rescuer", setRescuers);
 
     return () => {
       // Unsubscribe from the listener when the component unmounts

@@ -142,7 +142,7 @@ const Login = () => {
             type="submit"
             className="w-full bg-primary-medium text-white font-bold py-2 rounded-md hover:opacity-80 focus:outline-none"
           >
-            {loading ? <Loader isLoading={loading} /> : "Login"}
+            {loading ? <Loader isLoading={loading} size={25} /> : "Login"}
           </button>
           <a
             href={`/forgot-password?role=${role}`}
