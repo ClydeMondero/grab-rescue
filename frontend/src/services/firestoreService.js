@@ -115,6 +115,28 @@ export const getLocationsFromFirestore = (role, setLocations) => {
   return unsubscribe; // To stop listening when needed
 };
 
+export const getOnlineLocationsFromFirestore = (role, setLocations) => {
+  const q = query(
+    collection(store, "locations"),
+    where("status", "==", "online")
+  );
+
+  // Set up the real-time listener
+  const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    const locations = [];
+
+    querySnapshot.forEach((doc) => {
+      if (doc.data().role === role) {
+        locations.push({ id: doc.id, ...doc.data() });
+      }
+    });
+
+    setLocations(locations); // Update the locations in real-time
+  });
+
+  return unsubscribe; // To stop listening when needed
+};
+
 //check if user exists
 export const checkUser = async (id) => {
   const querySnapshot = await getDocs(collection(store, "users"));

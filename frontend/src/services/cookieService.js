@@ -40,6 +40,25 @@ export const setCitizenCookie = (id) => {
   });
 };
 
+export const setRequestCookie = (id) => {
+  const encryptedID = encryptID(id);
+
+  Cookies.set("request_token", encryptedID, {
+    expires: 14,
+    secure: true,
+    sameSite: "Lax",
+  });
+};
+
+export const getRequestCookie = () => {
+  const requestCookie = Cookies.get("request_token");
+  if (!requestCookie) {
+    return null;
+  }
+
+  return decryptID(requestCookie);
+};
+
 export const getCitizenCookie = () => {
   const citizenCookie = Cookies.get("citizen_token");
   if (!citizenCookie) {

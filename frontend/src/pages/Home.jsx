@@ -6,14 +6,20 @@ import { CitizenMap as Map } from "../components";
 import { FaChevronDown } from "react-icons/fa";
 import { FaLocationPin } from "react-icons/fa6";
 import { BiSolidHide, BiSolidAmbulance } from "react-icons/bi";
+import { MdDragHandle } from "react-icons/md";
 import { MdRoute } from "react-icons/md";
 import RequestModal from "../components/RequestModal";
 import MultiStepForm from "./MultiStepForm";
 import {
   addRequestToFirestore,
   getLocationFromFirestore,
+  getRequestFromFirestore,
 } from "../services/firestoreService";
-import { getCitizenCookie } from "../services/cookieService";
+import {
+  getCitizenCookie,
+  getRequestCookie,
+  setRequestCookie,
+} from "../services/cookieService";
 import { StatusContext } from "../contexts/StatusContext";
 
 const Home = () => {
@@ -21,8 +27,9 @@ const Home = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [formVisible, setFormVisible] = useState(false);
-  const [requesting, setRequesting] = useState(false);
   const [locating, setLocating] = useState(true);
+  const [requesting, setRequesting] = useState(false);
+  const [request, setRequest] = useState(null);
 
   const { getId } = useContext(StatusContext);
 
@@ -38,13 +45,34 @@ const Home = () => {
     }
   };
 
-  const handleModalConfirm = async () => {
-    if (mapRef.current) {
-      const id = getCitizenCookie();
-      const location = await getLocationFromFirestore(id);
-      addRequestToFirestore(id, location);
+  const checkRequest = async () => {
+    const requestId = getRequestCookie();
+
+    if (requestId) {
+      handleRequesting();
+    } else {
+      return;
     }
 
+    const onGoingRequest = await getRequestFromFirestore(requestId);
+    setRequest(onGoingRequest);
+  };
+
+  const handleModalConfirm = async () => {
+    if (mapRef.current) {
+      const citizenId = getCitizenCookie();
+
+      const location = await getLocationFromFirestore(citizenId);
+
+      const { id } = await addRequestToFirestore(citizenId, location);
+
+      setRequestCookie(id);
+    }
+
+    handleRequesting();
+  };
+
+  const handleRequesting = () => {
     setModalOpen(false);
     setRequesting(true);
     setFormVisible(true);
@@ -61,7 +89,14 @@ const Home = () => {
   useEffect(() => {
     getId();
     verifyToken();
+    checkRequest();
   }, []);
+
+  useEffect(() => {
+    if (mapRef.current && mapRef.current.resize) {
+      mapRef.current.resize();
+    }
+  }, [formVisible]);
 
   //TODO: add site explanation
   return (
@@ -105,8 +140,8 @@ const Home = () => {
 
       {/* Map and Form Section */}
       <div
-        className={`w-full flex-1 relative md:h-[90%] md:bg-slate-200 ${
-          formVisible ? "grid grid-cols-1 md:grid-cols-2" : ""
+        className={`h-full w-full relative flex flex-col md:h-[90%] bg-background-light ${
+          formVisible ? "justify-around" : ""
         }`}
       >
         {/* Mobile Menu */}
@@ -118,7 +153,7 @@ const Home = () => {
             <FaChevronDown className="text-primary-medium" />
           </button>
           {mobileMenuOpen && (
-            <div className="absolute top-14 right-0 w-56 bg-background rounded-md shadow-lg py-2 flex items-center justify-center">
+            <div className="absolute top-14 right-0 w-56 bg-background text-primary-medium rounded-md shadow-lg py-2 flex items-center justify-center">
               <ul className="space-y-2 flex flex-col items-center w-full">
                 <li className="py-2 border-b w-full justify-center">
                   <a
@@ -160,24 +195,43 @@ const Home = () => {
         {/* Map Component */}
         <Map ref={mapRef} onLocatingChange={handleLocatingChange} />
 
-        {/* MultiStepForm Component (visible after modal closes) */}
-        {formVisible && (
-          <div className="p-4 bg-white shadow-md flex flex-col justify-center items-center md:h-full md:p-6">
-            <MultiStepForm />
-          </div>
-        )}
+        {/* Sliding Pane */}
+        <div
+          className={`${
+            formVisible ? "bg-white" : "bg-primary-medium"
+          } p-2 w-full flex flex-col items-center transition-all duration-300 ease-in-out ${
+            formVisible ? "h-[100%]" : "h-[10%]"
+          }`}
+        >
+          <MdDragHandle
+            onClick={() => setFormVisible(!formVisible)}
+            className="text-background-medium h-10 w-10"
+          />
+          <p
+            className={`text-lg font-bold ${
+              formVisible ? "text-primary-medium" : "text-white"
+            }`}
+          >
+            Provide Information
+          </p>
+
+          {formVisible && <MultiStepForm />}
+        </div>
       </div>
 
-      {/* Mobile Buttons */}
+      {/* Buttons */}
       <div
-        className={`${
-          requesting ? "hidden" : ""
-        } h-[20%] w-full bg-background-light px-2 pb-2 flex flex-col justify-between gap-2 md:h-[10%]`}
+        className={`w-full ${
+          requesting ? "h-[15%]" : "h-[25%]"
+        }flex flex-col gap-2 bg-background-light p-2 justify-center md:h-[10%] ${
+          requesting ? "md:hidden" : ""
+        }`}
       >
+        {/* Request Button */}
         {!requesting &&
           (!locating ? (
             <button
-              className="flex-1 bg-secondary hover:opacity-80 text-white font-bold p-2 rounded"
+              className="flex-1 bg-secondary hover:opacity-80 text-white font-bold p-4 rounded"
               onClick={() => setModalOpen(true)} // Open modal on click
             >
               Request for Help
@@ -191,52 +245,51 @@ const Home = () => {
             </button>
           ))}
 
-        <div className="flex items-center gap-4 md:hidden">
-          <div className="bg-white flex items-center justify-around gap-4 rounded-lg px-2 py-4 font-medium text-sm text-center flex-1">
-            <div className="flex flex-col items-center">
-              <button
-                onClick={() => {
-                  mapRef.current.locateCitizen();
-                }}
-                className="bg-background-light rounded-full p-3 flex items-center justify-center"
-              >
-                <FaLocationPin className="text-2xl text-text-primary" />
-              </button>
-              <p className="text-text-primary">My Location</p>
-            </div>
-            <div className="flex flex-col items-center">
-              <button
-                onClick={() => {
-                  mapRef.current.goToNearestRescuer();
-                }}
-                className="bg-background-light rounded-full p-3 flex items-center justify-center"
-              >
-                <BiSolidAmbulance className="text-text-primary text-2xl" />
-              </button>
-              <p className="text-text-primary">Nearest Rescuer</p>
-            </div>
-            <div className="flex flex-col items-center">
-              <button
-                onClick={() => {
-                  mapRef.current.viewRoute();
-                }}
-                className="bg-background-light rounded-full p-3 flex items-center justify-center"
-              >
-                <MdRoute className="text-2xl text-text-primary" />
-              </button>
-              <p className="text-text-primary">View Route</p>
-            </div>
-            <div className="flex flex-col items-center">
-              <button
-                onClick={() => {
-                  mapRef.current.hideRoute();
-                }}
-                className="bg-background-light rounded-full p-3 flex items-center justify-center"
-              >
-                <BiSolidHide className="text-text-primary text-2xl" />
-              </button>
-              <p className="text-text-primary">Hide Route</p>
-            </div>
+        {/* Mobile Map Buttons (only show on mobile screens) */}
+        <div className="flex-1 bg-white flex items-center justify-around gap-4 rounded-lg px-2 py-4 font-medium text-sm text-center md:hidden">
+          <div className="flex flex-col items-center">
+            <button
+              onClick={() => {
+                mapRef.current.locateCitizen();
+              }}
+              className="bg-background-light rounded-full p-3 flex items-center justify-center"
+            >
+              <FaLocationPin className="text-2xl text-text-primary" />
+            </button>
+            <p className="text-text-primary">My Location</p>
+          </div>
+          <div className="flex flex-col items-center">
+            <button
+              onClick={() => {
+                mapRef.current.goToNearestRescuer();
+              }}
+              className="bg-background-light rounded-full p-3 flex items-center justify-center"
+            >
+              <BiSolidAmbulance className="text-text-primary text-2xl" />
+            </button>
+            <p className="text-text-primary">Nearest Rescuer</p>
+          </div>
+          <div className="flex flex-col items-center">
+            <button
+              onClick={() => {
+                mapRef.current.viewRoute();
+              }}
+              className="bg-background-light rounded-full p-3 flex items-center justify-center"
+            >
+              <MdRoute className="text-2xl text-text-primary" />
+            </button>
+            <p className="text-text-primary">View Route</p>
+          </div>
+          <div className="flex flex-col items-center">
+            <button
+              onClick={() => {
+                mapRef.current.hideRoute();
+              }}
+              className="bg-background-light rounded-full p-3 flex items-center justify-center"
+            >
+              <BiSolidHide className="text-text-primary text-2xl" />
+            </button>
+            <p className="text-text-primary">Hide Route</p>
           </div>
         </div>
       </div>
