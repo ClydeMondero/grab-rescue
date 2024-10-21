@@ -196,27 +196,29 @@ const Home = () => {
         <Map ref={mapRef} onLocatingChange={handleLocatingChange} />
 
         {/* Sliding Pane */}
-        <div
-          className={`${
-            formVisible ? "bg-white" : "bg-primary-medium"
-          } p-2 w-full flex flex-col items-center transition-all duration-300 ease-in-out ${
-            formVisible ? "h-[100%]" : "h-[10%]"
-          }`}
-        >
-          <MdDragHandle
-            onClick={() => setFormVisible(!formVisible)}
-            className="text-background-medium h-10 w-10"
-          />
-          <p
-            className={`text-lg font-bold ${
-              formVisible ? "text-primary-medium" : "text-white"
+        {requesting && (
+          <div
+            className={`${
+              formVisible ? "bg-white" : "bg-primary-medium"
+            } p-2 w-full flex flex-col items-center transition-all duration-300 ease-in-out ${
+              formVisible ? "h-[100%]" : "h-[10%]"
             }`}
           >
-            Provide Information
-          </p>
+            <MdDragHandle
+              onClick={() => setFormVisible(!formVisible)}
+              className="text-background-medium h-10 w-10"
+            />
+            <p
+              className={`text-lg font-bold ${
+                formVisible ? "text-primary-medium" : "text-white"
+              }`}
+            >
+              Provide Information
+            </p>
 
-          {formVisible && <MultiStepForm />}
-        </div>
+            {formVisible && <MultiStepForm />}
+          </div>
+        )}
       </div>
 
       {/* Buttons */}
@@ -231,14 +233,14 @@ const Home = () => {
         {!requesting &&
           (!locating ? (
             <button
-              className="flex-1 bg-secondary hover:opacity-80 text-white font-bold p-4 rounded"
+              className="w-full flex-1 bg-secondary hover:opacity-80 text-white font-bold p-4 rounded-lg"
               onClick={() => setModalOpen(true)} // Open modal on click
             >
               Request for Help
             </button>
           ) : (
             <button
-              className="flex-1 bg-background-medium  text-white font-bold p-2 rounded"
+              className="w-full flex-1 bg-background-medium  text-white font-bold p-4 rounded-lg"
               disabled={true}
             >
               Tracking your Location

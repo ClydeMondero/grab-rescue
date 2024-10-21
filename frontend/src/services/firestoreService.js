@@ -39,7 +39,7 @@ export const addLocationToFirestore = async (
   }
 };
 
-//update location status to offline
+//update location status
 export const updateLocationStatus = async (id, status) => {
   const q = query(collection(store, "locations"), where("userId", "==", id));
 

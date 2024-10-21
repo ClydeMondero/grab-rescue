@@ -10,6 +10,7 @@ import {
 } from "../services/locationService";
 import { getIDFromCookie } from "../services/authService";
 import { getLocationsFromFirestore } from "../services/firestoreService";
+import { getLocationCookie } from "../services/cookieService";
 import { RescuerContext } from "../contexts/RescuerContext";
 
 //TODO: Show markers, controls, routes
@@ -28,10 +29,12 @@ const RescuerMap = () => {
     [121.0972, 15.0197],
   ];
 
+  //TODO: fix geolocation so that it does not update often
   const handleGeolocation = async (coords) => {
     if (locations == null) return;
 
     const id = await getIDFromCookie();
+    const previousLocation = getLocationCookie();
 
     // Use some to check if the location already exists
     const existingLocation = locations.find(

@@ -7,7 +7,12 @@ import {
 } from "react";
 import { GeolocateControl, Map as MapGL } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { getCitizenCookie, generateID } from "../services/cookieService";
+import {
+  getCitizenCookie,
+  generateID,
+  getLocationCookie,
+  setLocationCookie,
+} from "../services/cookieService";
 import {
   addUserLocation,
   updateUserLocation,
@@ -56,20 +61,46 @@ const CitizenMap = forwardRef((props, ref) => {
 
   const locating = useLocating(geoControlRef, onLocatingChange);
 
+  //TODO: fix geolocation so that it does not update often
   const handleGeolocation = async (coords) => {
     if (rescuers == null) return;
-    const cookie = getCitizenCookie("citizen_token");
+    const cookie = getCitizenCookie();
+    const previousLocation = getLocationCookie();
 
-    if (cookie) {
-      updateUserLocation(
-        cookie,
-        citizen.longitude,
-        citizen.latitude,
-        coords.longitude,
-        coords.latitude
-      );
+    if (cookie && previousLocation) {
+      if (
+        parseFloat(previousLocation.longitude).toFixed(4) ===
+          parseFloat(coords.longitude).toFixed(4) &&
+        parseFloat(previousLocation.latitude).toFixed(4) ===
+          parseFloat(coords.latitude).toFixed(4)
+      ) {
+        console.log("Location is the same");
+        return;
+      } else {
+        setLocationCookie({
+          latitude: coords.latitude,
+          longitude: coords.longitude,
+        });
+
+        console.log("Updating Location");
+
+        updateUserLocation(
+          cookie,
+          citizen.longitude,
+          citizen.latitude,
+          coords.longitude,
+          coords.latitude
+        );
+      }
     } else {
       const citizenId = generateID();
+
+      console.log("Adding Location");
+
+      setLocationCookie({
+        latitude: coords.latitude,
+        longitude: coords.longitude,
+      });
 
       addUserLocation(coords.longitude, coords.latitude, "citizen", citizenId);
     }
