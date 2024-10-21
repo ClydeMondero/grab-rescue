@@ -50,6 +50,40 @@ export const setRequestCookie = (id) => {
   });
 };
 
+export const setLocationCookie = ({ latitude, longitude }) => {
+  Cookies.set("location", JSON.stringify({ latitude, longitude }), {
+    expires: 14,
+    secure: true,
+    sameSite: "Lax",
+  });
+};
+
+export const getLocationCookie = () => {
+  const location = Cookies.get("location");
+  if (location) {
+    return JSON.parse(location);
+  } else {
+    return null;
+  }
+};
+
+export const setStatusCookie = (status) => {
+  Cookies.set("status", status, {
+    expires: 14,
+    secure: true,
+    sameSite: "Lax",
+  });
+};
+
+export const getStatusCookie = () => {
+  const status = Cookies.get("status");
+  if (!status) {
+    return null;
+  }
+
+  return status;
+};
+
 export const getRequestCookie = () => {
   const requestCookie = Cookies.get("request_token");
   if (!requestCookie) {
