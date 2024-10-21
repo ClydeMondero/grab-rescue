@@ -1,5 +1,5 @@
 import { useContext, useState, useEffect } from "react";
-import { FaExclamation } from "react-icons/fa";
+import { FaMapMarkerAlt } from "react-icons/fa";
 import { BiSolidHappyBeaming } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
 import { RescuerContext } from "../contexts/RescuerContext";
@@ -8,7 +8,7 @@ import { getRouteData } from "../services/locationService";
 // TODO: Add Completed Button
 // TODO: Add Status in Request Card
 // TODO: Make selected request persistent using cookies
-//TODO: format request datas
+// TODO: format request datas
 
 const Requests = ({ requests, onSelectRequest }) => {
   const navigate = useNavigate();
@@ -22,7 +22,11 @@ const Requests = ({ requests, onSelectRequest }) => {
    * @param {string} requestID - Request ID to accept
    */
   const handleAccept = (requestID) => {
-    // Select the request and navigate to navigate page
+    onSelectRequest(requestID);
+    navigate("/rescuer/navigate");
+  };
+
+  const handleNavigate = (requestID) => {
     onSelectRequest(requestID);
     navigate("/rescuer/navigate");
   };
@@ -36,47 +40,51 @@ const Requests = ({ requests, onSelectRequest }) => {
     setRouteData(newRouteData);
   };
 
-  // Filter out assigned requests
-  const unassignedRequests = requests.filter(
-    (request) => request.status !== "assigned"
-  );
-
-  // Fetch route data for each request
   useEffect(() => {
     if (requests.length > 0) {
       fetchRoutes();
     }
   }, [requests, rescuer]);
 
-  useEffect(() => {
-    fetchRoutes;
-  }, []);
-
   return (
     <div className="flex flex-col p-6">
       {/* Header Section */}
       <div className="hidden flex-col items-start justify-between mb-4 md:flex">
         <h2 className="text-3xl font-bold text-[#557C55] flex items-center gap-2">
-          <FaExclamation className="text-secondary" />
-          <span className="text-primary-dark">Requests</span>
+          Requests
         </h2>
       </div>
 
       {/* Scrollable Request Cards Section */}
       <div className="flex-1 overflow-y-auto max-h-[calc(100vh-200px)] space-y-3">
-        {unassignedRequests.length > 0 ? (
-          unassignedRequests.map((request) => {
+        {requests.length > 0 ? (
+          requests.map((request) => {
             const route = routeData[request.id] || {};
 
             return (
               <div
                 key={request.id}
-                className="block p-4 bg-white border border-gray-300 rounded-md hover:bg-gray-100 transition-colors"
+                className="block bg-white border border-gray-300 rounded-md overflow-hidden"
               >
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between w-full">
+                {/* Image Section */}
+                <div className="relative">
+                  <img
+                    src="https://via.placeholder.com/400x200" // replace with actual image if available
+                    alt="Request Location"
+                    className="w-full h-40 object-cover"
+                  />
+                  {/* Pin Icon for Navigation */}
+                  <FaMapMarkerAlt
+                    className="absolute top-2 right-2 text-2xl text-secondary cursor-pointer"
+                    onClick={() => handleNavigate(request.id)}
+                  />
+                </div>
+
+                {/* Request Info & Action */}
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4">
                   {/* Request Info */}
-                  <div className="mb-4 sm:mb-0">
-                    <p className="text-sm text-gray-600">
+                  <div className="flex-1">
+                    <p className="text-sm text-gray-600 truncate max-w-[300px] overflow-ellipsis">
                       <strong className="text-[#557C55]">Location: </strong>
                       {request.location && request.location.address}
                     </p>
@@ -102,8 +110,8 @@ const Requests = ({ requests, onSelectRequest }) => {
                     </p>
                   </div>
 
-                  {/* Action Section */}
-                  <div className="flex items-center">
+                  {/* Accept Button */}
+                  <div className="flex-shrink-0 mt-4 sm:mt-0">
                     <button
                       onClick={() => handleAccept(request.id)}
                       className="px-4 py-2 text-sm sm:text-base font-semibold text-white bg-primary hover:bg-green-600 transition-colors rounded"
