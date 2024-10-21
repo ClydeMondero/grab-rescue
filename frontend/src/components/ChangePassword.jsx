@@ -35,6 +35,7 @@ const ChangePassword = (props) => {
     score: 0,
     feedback: [],
   });
+  const [showPasswordMeter, setShowPasswordMeter] = useState(false);
 
   const handlePasswordChange = (e) => {
     const { name, value } = e.target;
@@ -42,6 +43,11 @@ const ChangePassword = (props) => {
       ...prevPasswords,
       [name]: value,
     }));
+
+    // Show password meter only when user starts typing in the field
+    if (name === "newPassword" && value.length > 0) {
+      setShowPasswordMeter(true);
+    }
 
     // Update password strength for new password
     if (name === "newPassword") {
@@ -80,6 +86,7 @@ const ChangePassword = (props) => {
         newPassword: "",
         confirmPassword: "",
       });
+      setShowPasswordMeter(false);
     } catch (error) {
       console.error(error.message);
       toast.error(error.message);
@@ -176,44 +183,46 @@ const ChangePassword = (props) => {
               )}
             </button>
             {/* Password Strength Meter */}
-            <div className="mt-2">
-              <strong className="block text-xs sm:text-sm font-semibold text-[#557C55]">
-                Password Strength: {getStrengthLabel(passwordStrength.score)}
-              </strong>
-              <div
-                style={{
-                  width: "100%",
-                  backgroundColor: "#e0e0e0",
-                  borderRadius: "5px",
-                  marginTop: "5px",
-                }}
-              >
+            {showPasswordMeter && (
+              <div className="mt-2">
+                <strong className="block text-xs sm:text-sm font-semibold text-[#557C55]">
+                  Password Strength: {getStrengthLabel(passwordStrength.score)}
+                </strong>
                 <div
                   style={{
-                    width: `${(passwordStrength.score + 1) * 20}%`,
-                    height: "3px",
-                    backgroundColor:
-                      passwordStrength.score === 4
-                        ? "green"
-                        : passwordStrength.score === 3
-                        ? "blue"
-                        : passwordStrength.score === 2
-                        ? "yellow"
-                        : passwordStrength.score === 1
-                        ? "orange"
-                        : "red",
-                    borderRadius: "3px",
+                    width: "100%",
+                    backgroundColor: "#e0e0e0",
+                    borderRadius: "5px",
+                    marginTop: "5px",
                   }}
-                />
+                >
+                  <div
+                    style={{
+                      width: `${(passwordStrength.score + 1) * 20}%`,
+                      height: "3px",
+                      backgroundColor:
+                        passwordStrength.score === 4
+                          ? "green"
+                          : passwordStrength.score === 3
+                          ? "blue"
+                          : passwordStrength.score === 2
+                          ? "yellow"
+                          : passwordStrength.score === 1
+                          ? "orange"
+                          : "red",
+                      borderRadius: "3px",
+                    }}
+                  />
+                </div>
+                {passwordStrength.feedback.length > 0 && (
+                  <ul className="text-xs text-red-500">
+                    {passwordStrength.feedback.map((item, index) => (
+                      <li key={index}>{item}</li>
+                    ))}
+                  </ul>
+                )}
               </div>
-              {passwordStrength.feedback.length > 0 && (
-                <ul className="text-xs text-red-500">
-                  {passwordStrength.feedback.map((item, index) => (
-                    <li key={index}>{item}</li>
-                  ))}
-                </ul>
-              )}
-            </div>
+            )}
           </div>
 
           {/* Confirm Password Field */}
