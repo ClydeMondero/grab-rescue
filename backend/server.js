@@ -8,6 +8,7 @@ const userRoute = require("./routes/UserRoute");
 const authRoute = require("./routes/AuthRoute");
 const rescuerRoute = require("./routes/RescuerRoute");
 const adminRoute = require("./routes/AdminRoute");
+const logRoute = require("./routes/LogRoute");
 
 const url = env.API_URL;
 const port = env.PORT;
@@ -36,3 +37,4 @@ app.use("/auth", authRoute);
 app.use("/users", userRoute);
 app.use("/rescuers", rescuerRoute);
 app.use("/admins", adminRoute);
+app.use("/logs", logRoute);
