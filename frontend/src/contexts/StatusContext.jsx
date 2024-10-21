@@ -1,5 +1,10 @@
 import { createContext, useState, useEffect, useRef } from "react";
-import { getCitizenCookie, getUserCookie } from "../services/cookieService";
+import {
+  getCitizenCookie,
+  getStatusCookie,
+  getUserCookie,
+  setStatusCookie,
+} from "../services/cookieService";
 import { getIDFromCookie } from "../services/authService";
 import {
   getIDFromLocation,
@@ -47,16 +52,29 @@ const StatusProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    if (isOnline) {
-      // Clear timeout when coming back online
-      updateLocationStatus(id, "online");
-      clearTimeout(timeoutRef.current);
-    } else {
-      // Set timeout when going offline
-      timeoutRef.current = setTimeout(() => {
-        // Update Firestore status to 'offline' here
-        updateLocationStatus(id, "offline");
-      }, 300000);
+    const statusCookie = getStatusCookie();
+
+    if (!isOnline) {
+      if (!statusCookie || statusCookie == "online") {
+        timeoutRef.current = setTimeout(() => {
+          setStatusCookie("offline");
+
+          updateLocationStatus(id, "offline");
+
+          console.log("Setting user's status to offline");
+        }, 60000);
+      }
+    } else if (isOnline) {
+      if (!statusCookie || statusCookie == "offline") {
+        setStatusCookie("online");
+
+        updateLocationStatus(id, "online");
+        clearTimeout(timeoutRef.current);
+
+        console.log("Setting user's status to online");
+      } else {
+        console.log("User is already online");
+      }
     }
 
     return () => {

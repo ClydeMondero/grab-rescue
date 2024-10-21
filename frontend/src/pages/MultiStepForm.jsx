@@ -1,80 +1,38 @@
 import React, { useState } from "react";
 
-//TODO: adjust color
-//TODO: send data
 const MultiStepForm = () => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     phoneNumber: "",
     name: "",
     relation: "",
-    picture: null,
+    picture: "",
   });
 
-  const [currentInput, setCurrentInput] = useState("");
-
-  const handleChange = (e) => {
-    const { value } = e.target;
-    setCurrentInput(value);
-  };
-
-  const handleFileChange = (e) => {
-    setCurrentInput(e.target.files[0]);
-  };
-
   const nextStep = () => {
-    if (step === 1 && !currentInput) {
+    if (step === 1 && !formData.phoneNumber) {
       alert("Phone number is required.");
       return;
     }
 
-    const updatedFormData = { ...formData };
-    if (step === 1) {
-      updatedFormData.phoneNumber = currentInput;
-    } else if (step === 2) {
-      updatedFormData.name = currentInput;
-    } else if (step === 3) {
-      updatedFormData.relation = currentInput;
-    } else if (step === 4) {
-      updatedFormData.picture = currentInput;
-    }
-
-    setFormData(updatedFormData);
-    setCurrentInput("");
     setStep(step + 1);
-  };
-
-  const skipStep = () => {
-    setCurrentInput("");
-    if (step === 4) {
-      handleSubmit();
-    } else {
-      setStep(step + 1);
-    }
   };
 
   const prevStep = () => {
     setStep(step - 1);
   };
+  const handleChange = (e) => {
+    const { name, value, files } = e.target;
+    setFormData({
+      ...formData,
+      [name]: files ? files[0] : value, // Handle file input separately
+    });
+  };
 
-  const handleSubmit = async (e) => {
-    if (e) {
-      e.preventDefault();
-    }
-
-    const formDataToSend = new FormData();
-    formDataToSend.append("phoneNumber", formData.phoneNumber);
-    formDataToSend.append("name", formData.name);
-    formDataToSend.append("relation", formData.relation);
-    formDataToSend.append("picture", formData.picture);
-
+  const handleSubmit = async () => {
     try {
-      const response = await fetch("/api/incident-report", {
-        method: "POST",
-        body: formDataToSend,
-      });
-      const data = await response.json();
-      console.log(data);
+      console.log("formDataToSend", formData);
+      // TODO: send data to firebase or your backend service
     } catch (error) {
       console.error("Error submitting the form:", error);
     }
@@ -86,14 +44,15 @@ const MultiStepForm = () => {
         return (
           <div className="h-full flex flex-col justify-center gap-4">
             <div className="flex flex-col gap-4">
-              <h2 className="text-md font-semibold text-primary-dark">
+              <h2 className="text-md font-semibold text-text-secondary">
                 Phone Number (required):
               </h2>
               <input
                 type="tel"
-                value={currentInput.slice(0, 11)}
-                onChange={handleChange}
+                name="phoneNumber"
                 required
+                value={formData.phoneNumber}
+                onChange={handleChange}
                 autoComplete="tel"
                 maxLength={11}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -111,10 +70,13 @@ const MultiStepForm = () => {
         return (
           <div className="h-full flex flex-col justify-center gap-4">
             <div className="flex flex-col gap-4">
-              <h2 className="text-md font-semibold text-primary-dark">Name:</h2>
+              <h2 className="text-md font-semibold text-text-secondary">
+                Name:
+              </h2>
               <input
                 type="text"
-                value={currentInput}
+                name="name"
+                value={formData.name}
                 onChange={handleChange}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
               />
@@ -128,18 +90,12 @@ const MultiStepForm = () => {
                   Back
                 </button>
                 <button
-                  className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-300 h-12 w-1/2"
+                  className="bg-primary text-white font-semibold py-2 px-4 rounded-lg transition duration-300 h-12 w-1/2"
                   onClick={nextStep}
                 >
                   Next
                 </button>
               </div>
-              <button
-                className="border bg-warning hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-300 h-12 w-full"
-                onClick={skipStep}
-              >
-                Skip
-              </button>
             </div>
           </div>
         );
@@ -147,12 +103,13 @@ const MultiStepForm = () => {
         return (
           <div className="h-full flex flex-col justify-center gap-4">
             <div className="flex flex-col gap-4">
-              <h2 className="text-md font-semibold text-primary-dark">
+              <h2 className="text-md font-semibold text-text-secondary">
                 Relation to the Victim:
               </h2>
               <input
                 type="text"
-                value={currentInput}
+                name="relation"
+                value={formData.relation}
                 onChange={handleChange}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
               />
@@ -166,18 +123,12 @@ const MultiStepForm = () => {
                   Back
                 </button>
                 <button
-                  className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-300 h-12 w-1/2"
+                  className="bg-primary text-white font-semibold py-2 px-4 rounded-lg transition duration-300 h-12 w-1/2"
                   onClick={nextStep}
                 >
                   Next
                 </button>
               </div>
-              <button
-                className="border bg-warning hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-300 h-12 w-full"
-                onClick={skipStep}
-              >
-                Skip
-              </button>
             </div>
           </div>
         );
@@ -185,13 +136,15 @@ const MultiStepForm = () => {
         return (
           <div className="h-full flex flex-col justify-center gap-4">
             <div className="flex flex-col gap-4">
-              <h2 className="text-md font-semibold text-primary-dark">
+              <h2 className="text-md font-semibold text-text-secondary">
                 Upload Picture:
               </h2>
               <input
                 type="file"
+                name="picture"
                 accept="image/*"
-                onChange={handleFileChange}
+                value={formData.picture}
+                onChange={handleChange}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
               />
             </div>
@@ -204,18 +157,12 @@ const MultiStepForm = () => {
                   Back
                 </button>
                 <button
-                  className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-300 h-12 w-1/2"
+                  className="bg-primary text-white font-semibold py-2 px-4 rounded-lg transition duration-300 h-12 w-1/2"
                   onClick={handleSubmit}
                 >
                   Submit
                 </button>
               </div>
-              <button
-                className="border bg-warning hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-300 h-12 w-full"
-                onClick={skipStep}
-              >
-                Skip
-              </button>
             </div>
           </div>
         );
