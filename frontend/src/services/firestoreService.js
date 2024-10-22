@@ -206,27 +206,39 @@ export const addRequestToFirestore = async (
   }
 };
 
-//TODO: Use updateRequestInFirestore to send follow up details
 // update request in firestore with follow-up details
 export const updateRequestInFirestore = async (
   requestId,
-  citizenName,
-  phone,
-  incidentPicture
-) => {
-  const updateData = {
-    citizenName,
+  {
     phone,
-  };
+    citizenName,
+    citizenRelation,
+    incidentPicture,
+    incidentDescription,
+  } = {}
+) => {
+  const updateData = { phone };
+
+  if (citizenName) {
+    updateData.citizenName = citizenName;
+  }
+
+  if (citizenRelation) {
+    updateData.citizenRelation = citizenRelation;
+  }
+
+  if (incidentDescription) {
+    updateData.incidentDescription = incidentDescription;
+  }
+
+  // if (incidentPicture) {
+  //   const pictureURL = await uploadImageToFirebaseStorage(incidentPicture);
+  //   if (pictureURL) {
+  //     updateData.incidentPicture = pictureURL;
+  //   }
+  // }
 
   try {
-    if (incidentPicture) {
-      const pictureURL = await uploadImageToFirebaseStorage(incidentPicture);
-      if (pictureURL) {
-        updateData.incidentPicture = pictureURL;
-      }
-    }
-
     await updateDoc(doc(store, "requests", requestId), updateData);
   } catch (error) {
     console.error("Error updating document: ", error);

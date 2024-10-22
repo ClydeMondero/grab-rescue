@@ -28,6 +28,7 @@ import {
 } from "../components";
 import { useLocating } from "../hooks";
 import { getOnlineLocationsFromFirestore } from "../services/firestoreService";
+import { map } from "zod";
 
 const CitizenMap = forwardRef((props, ref) => {
   const [citizen, setCitizen] = useState({
@@ -63,20 +64,21 @@ const CitizenMap = forwardRef((props, ref) => {
 
   //TODO: fix geolocation so that it does not update often
   const handleGeolocation = async (coords) => {
+    if (mapRef.current.resize()) {
+      mapRef.current.resize();
+    }
+
     if (rescuers == null) return;
     const cookie = getCitizenCookie();
     const previousLocation = getLocationCookie();
 
     if (cookie && previousLocation) {
       if (
-        parseFloat(previousLocation.longitude).toFixed(4) ===
+        parseFloat(previousLocation.longitude).toFixed(4) !=
           parseFloat(coords.longitude).toFixed(4) &&
-        parseFloat(previousLocation.latitude).toFixed(4) ===
+        parseFloat(previousLocation.latitude).toFixed(4) !=
           parseFloat(coords.latitude).toFixed(4)
       ) {
-        console.log("Location is the same");
-        return;
-      } else {
         setLocationCookie({
           latitude: coords.latitude,
           longitude: coords.longitude,
@@ -107,6 +109,7 @@ const CitizenMap = forwardRef((props, ref) => {
 
     const nearest = getNearestRescuer(citizen, rescuers);
     setNearestRescuer(nearest);
+
     setCitizen({
       longitude: coords.longitude,
       latitude: coords.latitude,
