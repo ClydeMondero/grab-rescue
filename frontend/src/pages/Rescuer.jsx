@@ -18,8 +18,6 @@ import {
 import { RescuerProvider } from "../contexts/RescuerContext";
 import { StatusContext } from "../contexts/StatusContext";
 
-//TODO: Handle Offline Rescuers
-
 const Rescuer = (props) => {
   const { user } = props;
   const [requests, setRequests] = useState([]);

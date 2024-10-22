@@ -31,10 +31,13 @@ const RescuerMap = () => {
 
   //TODO: fix geolocation so that it does not update often
   const handleGeolocation = async (coords) => {
+    if (mapRef.current.resize()) {
+      mapRef.current.resize();
+    }
+
     if (locations == null) return;
 
     const id = await getIDFromCookie();
-    const previousLocation = getLocationCookie();
 
     // Use some to check if the location already exists
     const existingLocation = locations.find(

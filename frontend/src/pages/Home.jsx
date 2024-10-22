@@ -198,11 +198,14 @@ const Home = () => {
         {/* Sliding Pane */}
         {requesting && (
           <div
-            className={`${
-              formVisible ? "bg-white" : "bg-primary-medium"
-            } p-2 w-full flex flex-col items-center transition-all duration-300 ease-in-out ${
+            className={`
+              ${
+                formVisible
+                  ? "bg-white border-x-background-medium border-t-2"
+                  : "bg-primary-medium"
+              } p-2 w-full flex flex-col items-center transition-all duration-300 ease-in-out rounded-t-2xl ${
               formVisible ? "h-[100%]" : "h-[10%]"
-            }`}
+            } `}
           >
             <MdDragHandle
               onClick={() => setFormVisible(!formVisible)}
@@ -216,7 +219,7 @@ const Home = () => {
               Provide Information
             </p>
 
-            {formVisible && <MultiStepForm />}
+            {formVisible && <MultiStepForm request={request} />}
           </div>
         )}
       </div>
