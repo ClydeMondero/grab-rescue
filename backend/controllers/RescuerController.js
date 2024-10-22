@@ -261,11 +261,11 @@ module.exports.CreateRescuer = async (req, res) => {
       const subject = await getTokenSubject(token);
 
       const insertResult = await pool.query(insertQuery, values);
-      const userId = insertResult.rows[0].id;
+      //const userId = insertResult.rows[0].id;
 
       // Log the rescuer creation
       await CreateLog({
-        userId,
+        userId: subject,
         action: `Rescuer with username: ${username} has been added successfully.`,
       });
 
