@@ -129,7 +129,7 @@ const MultiStepForm = ({ request }) => {
           <div className="h-full flex flex-col justify-center gap-4">
             <div className="flex flex-col gap-4">
               <h2 className="text-md font-semibold text-text-secondary">
-                Name
+                Your Name
               </h2>
               <input
                 type="text"
@@ -195,7 +195,7 @@ const MultiStepForm = ({ request }) => {
           <div className="h-full flex flex-col justify-center gap-4">
             <div className="flex flex-col gap-4">
               <h2 className="text-md font-semibold text-text-secondary">
-                Upload Picture
+                Upload Proof of Incident
               </h2>
               <img
                 className="w-full h-48 object-cover rounded-lg mt-2"
@@ -308,6 +308,7 @@ const MultiStepForm = ({ request }) => {
         phone: request.phone ?? "",
         citizenName: request.citizenName ?? "",
         citizenRelation: request.citizenRelation ?? "",
+        incidentPicture: request.incidentPicture ?? "",
         incidentDescription: request.incidentDescription ?? "",
       });
     }

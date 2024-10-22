@@ -9,7 +9,8 @@ import {
   onSnapshot,
   where,
 } from "firebase/firestore";
-import { store } from "../../firebaseConfig";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { store, storage } from "../../firebaseConfig";
 
 //add location to firestore
 export const addLocationToFirestore = async (
@@ -231,12 +232,12 @@ export const updateRequestInFirestore = async (
     updateData.incidentDescription = incidentDescription;
   }
 
-  // if (incidentPicture) {
-  //   const pictureURL = await uploadImageToFirebaseStorage(incidentPicture);
-  //   if (pictureURL) {
-  //     updateData.incidentPicture = pictureURL;
-  //   }
-  // }
+  if (incidentPicture) {
+    const pictureURL = await uploadImageToFirebaseStorage(incidentPicture);
+    if (pictureURL) {
+      updateData.incidentPicture = pictureURL;
+    }
+  }
 
   try {
     await updateDoc(doc(store, "requests", requestId), updateData);
@@ -247,8 +248,7 @@ export const updateRequestInFirestore = async (
 
 // Function to upload image to Firebase Storage
 export const uploadImageToFirebaseStorage = async (file) => {
-  const storage = getStorage(store);
-  const storageRef = ref(storage, `images/${file.name}`);
+  const storageRef = ref(storage, `incidentPictures/${file.name}`);
 
   try {
     await uploadBytes(storageRef, file);
@@ -261,7 +261,6 @@ export const uploadImageToFirebaseStorage = async (file) => {
 };
 
 //TODO: update request status
-//TODO: add ETA and Distance to request
 // update request in firestore when rescuer accepts
 export const acceptRescueRequestInFirestore = async (
   rescuerId,
