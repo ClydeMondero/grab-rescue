@@ -4,6 +4,8 @@ const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const zxcvbn = require("zxcvbn");
+const { getTokenSubject } = require("../utils/SecretToken");
+const { CreateLog } = require("./LogController");
 
 // Get Rescuers with Filtering and Name Search
 module.exports.GetRescuers = async (req, res) => {
@@ -248,8 +250,24 @@ module.exports.CreateRescuer = async (req, res) => {
         verificationToken,
       ];
 
+      // extracts the "Authorization Header" from request
+      const auth = req.headers.authorization;
+
+      // extracts the ACTUAL token from the string "Bearer ....token"
+      const token = auth.substring(7, auth.length);
+
+      // extracts the content of the token used upon token creation (i.e. user_id)
+      // in this case, it extracts the user id of the request sender
+      const subject = await getTokenSubject(token);
+
       const insertResult = await pool.query(insertQuery, values);
-      const userId = insertResult.rows[0].id;
+      //const userId = insertResult.rows[0].id;
+
+      // Log the rescuer creation
+      await CreateLog({
+        userId: subject,
+        action: `Rescuer with username: ${username} has been added successfully.`,
+      });
 
       // Use frontend base URL for the verification link
       const verificationLink = `${process.env.SITE_URL}/verify/${verificationToken}`;

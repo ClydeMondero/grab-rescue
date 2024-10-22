@@ -8,8 +8,11 @@ import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { Toast } from "../components";
 import zxcvbn from "zxcvbn"; // Import zxcvbn
 import "react-toastify/dist/ReactToastify.css";
+import { createAuthHeader } from "../services/authService";
+import { useNavigate } from "react-router-dom";
 
 const AddRescuer = () => {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -17,6 +20,8 @@ const AddRescuer = () => {
     score: 0,
     feedback: [],
   });
+
+  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -120,11 +125,12 @@ const AddRescuer = () => {
 
     try {
       const response = await (
-        await axios.post("/rescuers/create", formData)
+        await axios.post("/rescuers/create", formData, createAuthHeader())
       ).data;
       if (!response.success) throw new Error(response.message);
       toast.success(response.message);
       resetForm();
+      navigate("/admin/rescuers");
     } catch (error) {
       console.error(error.message);
       toast.error(error.message);
@@ -366,60 +372,50 @@ const AddRescuer = () => {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
+                  onFocus={() => setIsPasswordFocused(true)} // Set focus state to true
+                  onBlur={() => setIsPasswordFocused(false)} // Set focus state to false
                   required
-                  className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
-                  placeholder="Enter password"
+                  className="mt-1 block w-full px-2 py-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
+                  placeholder="Password"
                 />
-                <div
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                <span
+                  className="absolute inset-y-0 right-0 flex items-center pr-2 cursor-pointer"
                   onClick={togglePasswordVisibility}
                 >
                   {showPassword ? (
-                    <AiFillEyeInvisible className="text-[#557C55]" />
+                    <AiFillEye className="text-primary-medium" />
                   ) : (
-                    <AiFillEye className="text-[#557C55]" />
+                    <AiFillEyeInvisible className="text-primary-medium" />
                   )}
-                </div>
+                </span>
               </div>
-              {/* Password Strength Meter */}
-              <div className="mt-2">
-                <strong className="text-sm text-[#557C55]">
-                  Password Strength: {getStrengthLabel(passwordStrength.score)}
-                </strong>
-                <div
-                  style={{
-                    width: "100%",
-                    backgroundColor: "#e0e0e0",
-                    borderRadius: "5px",
-                    marginTop: "5px",
-                  }}
-                >
-                  <div
-                    style={{
-                      width: `${(passwordStrength.score + 1) * 20}%`,
-                      height: "5px",
-                      backgroundColor:
-                        passwordStrength.score === 4
-                          ? "green"
-                          : passwordStrength.score === 3
-                          ? "blue"
-                          : passwordStrength.score === 2
-                          ? "yellow"
+              {/* Conditionally render the password strength meter */}
+              {isPasswordFocused && formData.password && (
+                <div className="mt-2">
+                  <div className="text-xs text-gray-500">
+                    Password Strength:{" "}
+                    <strong>{getStrengthLabel(passwordStrength.score)}</strong>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
+                    <div
+                      className={`h-full rounded-full ${
+                        passwordStrength.score === 0
+                          ? "bg-red-500"
                           : passwordStrength.score === 1
-                          ? "orange"
-                          : "red",
-                      borderRadius: "3px",
-                    }}
-                  />
+                          ? "bg-orange-500"
+                          : passwordStrength.score === 2
+                          ? "bg-yellow-500"
+                          : passwordStrength.score === 3
+                          ? "bg-blue-500"
+                          : "bg-green-500"
+                      }`}
+                      style={{
+                        width: `${(passwordStrength.score / 4) * 100}%`,
+                      }}
+                    />
+                  </div>
                 </div>
-                {passwordStrength.feedback.length > 0 && (
-                  <ul className="text-sm text-red-500">
-                    {passwordStrength.feedback.map((item, index) => (
-                      <li key={index}>{item}</li>
-                    ))}
-                  </ul>
-                )}
-              </div>
+              )}
             </div>
 
             <div>
@@ -437,19 +433,19 @@ const AddRescuer = () => {
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   required
-                  className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
-                  placeholder="Confirm password"
+                  className="mt-1 block w-full px-2 py-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
+                  placeholder="Confirm Password"
                 />
-                <div
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                <span
+                  className="absolute inset-y-0 right-0 flex items-center pr-2 cursor-pointer"
                   onClick={toggleConfirmPasswordVisibility}
                 >
                   {showConfirmPassword ? (
-                    <AiFillEyeInvisible className="text-[#557C55]" />
+                    <AiFillEye className="text-primary-medium" />
                   ) : (
-                    <AiFillEye className="text-[#557C55]" />
+                    <AiFillEyeInvisible className="text-primary-medium" />
                   )}
-                </div>
+                </span>
               </div>
             </div>
           </div>
