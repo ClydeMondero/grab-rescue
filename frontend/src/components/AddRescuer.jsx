@@ -9,8 +9,10 @@ import { Toast } from "../components";
 import zxcvbn from "zxcvbn"; // Import zxcvbn
 import "react-toastify/dist/ReactToastify.css";
 import { createAuthHeader } from "../services/authService";
+import { useNavigate } from "react-router-dom";
 
 const AddRescuer = () => {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -128,6 +130,7 @@ const AddRescuer = () => {
       if (!response.success) throw new Error(response.message);
       toast.success(response.message);
       resetForm();
+      navigate("/admin/rescuers");
     } catch (error) {
       console.error(error.message);
       toast.error(error.message);
