@@ -24,8 +24,10 @@ import Header from "./Header";
 import RequestDetails from "./RequestDetails";
 import LocatingIndicator from "./LocatingIndicator";
 import RescuerMarker from "./RescuerMarker";
+import GeolocateButton from "./GeolocateButton";
 
 export {
+  GeolocateButton,
   RescuerMarker,
   LocatingIndicator,
   DistanceEta,

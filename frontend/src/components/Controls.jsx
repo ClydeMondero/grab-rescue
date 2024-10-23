@@ -1,23 +1,26 @@
-import hideRoute from "../assets/hide-route.svg";
 import { useState, forwardRef, useImperativeHandle } from "react";
 import { BiSolidAmbulance, BiSolidHide, BiSolidShow } from "react-icons/bi";
+import { FaLocationPin } from "react-icons/fa6";
 import { MdRoute } from "react-icons/md";
+import { useLocation } from "react-router-dom";
 
 const Controls = forwardRef(
-  ({ mapRef, nearestRescuer, routeData, setRouteOpacity }, ref) => {
+  ({ mapRef, otherMarker, routeData, setRouteOpacity }, ref) => {
     const [routeToggle, setRouteToggle] = useState(false);
 
-    const goToNearestRescuer = () => {
-      if (nearestRescuer) {
+    const location = useLocation();
+
+    const goToOtherMarker = () => {
+      if (otherMarker) {
         mapRef.current.flyTo({
-          center: [nearestRescuer.longitude, nearestRescuer.latitude],
+          center: [otherMarker.longitude, otherMarker.latitude],
           zoom: 15,
         });
       }
     };
 
     //hide route layer
-    const hideRouteToRescuer = () => {
+    const hideRoute = () => {
       if (mapRef) {
         routeToggle ? setRouteToggle(false) : setRouteToggle(true);
 
@@ -45,11 +48,11 @@ const Controls = forwardRef(
     };
 
     useImperativeHandle(ref, () => ({
-      goToNearestRescuer: () => {
-        goToNearestRescuer();
+      goToOtherMarker: () => {
+        goToOtherMarker();
       },
       hideRoute: () => {
-        hideRouteToRescuer();
+        hideRoute();
       },
       viewRoute: () => {
         fitBounds();
@@ -57,15 +60,19 @@ const Controls = forwardRef(
     }));
     return (
       <div className="ctrl-group">
-        <button onClick={goToNearestRescuer} className="ctrl-icon">
-          <BiSolidAmbulance className="text-xl text-primary " />
+        <button onClick={goToOtherMarker} className="ctrl-icon">
+          {location.pathname == "/" ? (
+            <BiSolidAmbulance className="text-xl text-primary " />
+          ) : (
+            <FaLocationPin className="text-xl text-secondary" />
+          )}
         </button>
         {/*zoom out route */}
         <button className="ctrl-icon" onClick={fitBounds}>
           <MdRoute className="text-xl text-highlight" />
         </button>
         {/*hide route*/}
-        <button className="ctrl-icon" onClick={hideRouteToRescuer}>
+        <button className="ctrl-icon" onClick={hideRoute}>
           {/*add route icon*/}
           {routeToggle ? (
             <BiSolidShow className="text-xl text-background-dark" />

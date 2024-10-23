@@ -28,7 +28,8 @@ import {
 } from "../components";
 import { useLocating } from "../hooks";
 import { getOnlineLocationsFromFirestore } from "../services/firestoreService";
-import { map } from "zod";
+import { useLocation } from "react-router-dom";
+import { setGeolocateIcon } from "../utils/GeolocateUtility";
 
 const CitizenMap = forwardRef((props, ref) => {
   const [citizen, setCitizen] = useState({
@@ -62,11 +63,14 @@ const CitizenMap = forwardRef((props, ref) => {
 
   const locating = useLocating(geoControlRef, onLocatingChange);
 
-  //TODO: fix geolocation so that it does not update often
+  const location = useLocation();
+
   const handleGeolocation = async (coords) => {
     if (mapRef.current.resize()) {
       mapRef.current.resize();
     }
+
+    setGeolocateIcon(location);
 
     if (rescuers == null) return;
     const cookie = getCitizenCookie();
@@ -144,7 +148,7 @@ const CitizenMap = forwardRef((props, ref) => {
       geoControlRef.current?.trigger();
     },
     goToNearestRescuer: () => {
-      buttonsRef.current.goToNearestRescuer();
+      buttonsRef.current.goToOtherMarker();
     },
     hideRoute: () => {
       buttonsRef.current.hideRoute();
@@ -163,6 +167,8 @@ const CitizenMap = forwardRef((props, ref) => {
         mapboxAccessToken={import.meta.env.VITE_MAPBOX_TOKEN}
         maxBounds={bounds}
         maxzoom={15}
+        dragRotate={false}
+        pitchWithRotate={false}
         onLoad={() => {
           geoControlRef.current?.trigger();
         }}
@@ -181,7 +187,7 @@ const CitizenMap = forwardRef((props, ref) => {
 
         <Controls
           mapRef={mapRef}
-          nearestRescuer={nearestRescuer}
+          otherMarker={nearestRescuer}
           routeData={routeData}
           setRouteOpacity={setRouteOpacity}
           ref={buttonsRef}

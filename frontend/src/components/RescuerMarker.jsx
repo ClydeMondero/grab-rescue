@@ -37,7 +37,7 @@ const Model = ({ view }) => {
     : model.rotation.set(0, Math.PI / 2, 0);
 
   view === "top-down"
-    ? model.scale.set(0.5, 0.5, 0.5)
+    ? model.scale.set(0.6, 0.6, 0.6)
     : model.scale.set(1, 1, 1);
 
   /**
