@@ -26,7 +26,7 @@ const GenerateReports = (props) => {
   });
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [selectAll, setSelectAll] = useState(false);
+  const [selectAll, setSelectAll] = useState(true);
 
   // New state for sorting
   const [sortOption, setSortOption] = useState(""); // Default sorting option
@@ -77,7 +77,7 @@ const GenerateReports = (props) => {
     });
     setStartDate("");
     setEndDate("");
-    setSelectAll(false); // Reset "Select All" state
+    setSelectAll(true); // Reset "Select All" state
     setSortOption(""); // Reset sort option
   };
 
@@ -128,11 +128,30 @@ const GenerateReports = (props) => {
         } ${log.last_name}`,
       ]);
 
-      // Generate the table
+      // Generate the table with updated styles
       doc.autoTable({
         head: [columns],
         body: rows,
         startY: 40, // Starting Y position for the table
+        theme: "grid", // Set the theme
+        styles: {
+          fontSize: 10,
+          cellPadding: 2,
+          overflow: "linebreak",
+          halign: "left",
+          valign: "middle",
+          lineColor: "#557C55", // Line color
+          lineWidth: 0.5,
+        },
+        headStyles: {
+          fillColor: "#557C55", // Header background color
+          textColor: "#FFFFFF", // Header text color
+          fontSize: 10,
+        },
+        bodyStyles: {
+          textColor: "#000000", // Body text color
+          fontSize: 10,
+        },
       });
     } else {
       doc.text("No logs found for the selected filters.", 10, 40);
@@ -221,13 +240,13 @@ const GenerateReports = (props) => {
   return (
     <div className="flex-1 p-4 sm:p-6 lg:p-8 h-full bg-gray-50 flex flex-col">
       <div className="flex items-center mb-4 sm:mb-6 pb-2 sm:pb-4 p-2 sm:p-4 rounded-lg">
-        <FaFileAlt className="text-2xl sm:text-3xl text-[#557C55] mr-2 sm:mr-3" />
-        <h4 className="text-sm sm:text-2xl font-semibold text-[#557C55]">
-          Generate Reports
+        <FaFileAlt className="text-2xl sm:text-3xl text-primary-medium mr-2 sm:mr-3" />
+        <h4 className="text-sm sm:text-2xl font-semibold text-primary-medium">
+          Generate Log Action Reports
         </h4>
       </div>
 
-      <p className="mb-4 sm:mb-6 text-md sm:text-md text-gray-600">
+      <p className="mb-4 sm:mb-6 text-md sm:text-md text-primary-medium">
         Select a report type to generate:
       </p>
 
@@ -254,40 +273,41 @@ const GenerateReports = (props) => {
         ))}
       </div>
 
-      {/* Modal */}
       {isModalOpen && (
         <Dialog
           open={isModalOpen}
           onClose={closeModal}
           className="fixed z-10 inset-0 overflow-y-auto flex justify-center items-center bg-black bg-opacity-50"
         >
-          <div className="bg-white rounded-lg w-11/12 md:w-1/2 lg:w-1/3 p-6">
-            <Dialog.Title className="text-lg font-semibold text-gray-800">
+          <div className="bg-white rounded-lg w-11/12 md:w-1/2 lg:w-1/3 max-h-[80vh] overflow-y-auto p-6">
+            {" "}
+            {/* Added max-h and overflow-y-auto */}
+            <Dialog.Title className="text-lg font-semibold text-primary-medium">
               Generate {selectedReport?.name} Report
             </Dialog.Title>
-            <Dialog.Description className="text-sm text-gray-600 mt-2 mb-4">
+            <Dialog.Description className="text-sm text-primary-mediummt-2 mb-4">
               Select the filters for the report.
             </Dialog.Description>
-
             {/* Account Type */}
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-primary-medium mb-1">
                 Account Type
               </label>
               <select
                 value={accountType}
                 onChange={handleAccountTypeChange}
-                className="block w-full border border-gray-300 rounded-md p-2"
+                className="block w-full border border-primary-medium rounded-md p-2"
               >
-                <option value="">All</option>
-                <option value="admin">Admin</option>
-                <option value="rescuer">Rescuer</option>
+                <option value="All">All</option>
+                <option value="Admin">Admin</option>
+                <option value="Rescuer">Rescuer</option>
               </select>
             </div>
-
             {/* Action Filters */}
             <div className="mb-4">
-              <p className="text-sm font-medium text-gray-700 mb-1">Actions</p>
+              <p className="text-sm font-medium text-primary-medium mb-1">
+                Actions
+              </p>
               <div className="flex flex-col">
                 <label className="inline-flex items-center">
                   <input
@@ -315,10 +335,9 @@ const GenerateReports = (props) => {
                 ))}
               </div>
             </div>
-
             {/* Sort Option */}
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-primary-medium mb-1">
                 Sort By
               </label>
               <select
@@ -331,11 +350,10 @@ const GenerateReports = (props) => {
                 <option value="desc">Descending</option>
               </select>
             </div>
-
             {/* Date Filters */}
             {selectedReport?.name === "Custom Report" && (
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-primary-medium mb-1">
                   Start Date
                 </label>
                 <input
@@ -344,7 +362,7 @@ const GenerateReports = (props) => {
                   onChange={(e) => setStartDate(e.target.value)}
                   className="block w-full border border-gray-300 rounded-md p-2"
                 />
-                <label className="block text-sm font-medium text-gray-700 mb-1 mt-2">
+                <label className="block text-sm font-medium text-primary-medium mb-1 mt-2">
                   End Date
                 </label>
                 <input
@@ -355,14 +373,19 @@ const GenerateReports = (props) => {
                 />
               </div>
             )}
-
             {/* Generate Button */}
-            <div className="flex justify-end">
+            <div className="flex justify-between">
               <button
                 className="bg-[#557C55] text-white px-4 py-2 rounded-lg text-sm hover:bg-[#6EA46E] transition"
                 onClick={handleGenerateReport}
               >
                 Generate Report
+              </button>
+              <button
+                className=" text-secondary px-4 py-2 rounded-md text-sm"
+                onClick={closeModal}
+              >
+                Cancel
               </button>
             </div>
           </div>
