@@ -18,19 +18,27 @@ router.post("/create", async (req, res) => {
 
 // Route for retrieving logs with optional action and account_type filtering
 router.get("/get", async (req, res) => {
-  const actionQuery = req.query.action; // Get action filters from the query string
-  const accountTypeQuery = req.query.account_type; // Get account_type filters from the query string
+  try {
+    const { account_type, action, start_date, end_date } = req.query;
 
-  const actionFilters = actionQuery
-    ? actionQuery.split(",").map((action) => action.trim())
-    : [];
+    // Split action filters by comma, since multiple actions might be selected
+    const actionFilters = action ? action.split(",") : [];
+    const accountTypeFilters = account_type ? [account_type] : [];
 
-  const accountTypeFilters = accountTypeQuery
-    ? accountTypeQuery.split(",").map((type) => type.trim())
-    : [];
+    const logs = await LogController.GetLogs(
+      actionFilters,
+      accountTypeFilters,
+      start_date || null,
+      end_date || null
+    );
 
-  const result = await GetLogs(actionFilters, accountTypeFilters);
-  res.status(200).json(result);
+    res.status(200).json(logs);
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while retrieving logs.",
+    });
+  }
 });
 
 module.exports = router;
