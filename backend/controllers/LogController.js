@@ -24,7 +24,8 @@ module.exports.GetLogs = async (
   actionFilters = [],
   accountTypeFilters = [],
   startDate = null,
-  endDate = null
+  endDate = null,
+  sortOrder = null // New parameter for sorting order
 ) => {
   let q = `
     SELECT 
@@ -79,15 +80,19 @@ module.exports.GetLogs = async (
     q += ` WHERE ${conditions.join(" AND ")}`;
   }
 
-  q += " ORDER BY l.date_time DESC";
+  // Set default order if sortOrder is not provided
+  const orderBy =
+    sortOrder === "asc" ? "ASC" : sortOrder === "desc" ? "DESC" : "DESC";
+  q += ` ORDER BY l.date_time ${orderBy}`;
 
   try {
     const data = await pool.query(q, values);
     return {
       success: true,
-      logs: data.rows,
+      logs: data.rows.map(({ log_id, ...rest }) => ({ id: log_id, ...rest })),
     };
   } catch (err) {
+    console.error("Error executing query:", err);
     return {
       success: false,
       message: "An error occurred while retrieving logs.",
