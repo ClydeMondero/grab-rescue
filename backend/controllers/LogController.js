@@ -20,8 +20,10 @@ module.exports.CreateLog = async ({ userId, action }) => {
   }
 };
 
-// Function to retrieve logs with optional filtering and user details
-module.exports.GetLogs = async (actionFilters = []) => {
+module.exports.GetLogs = async (
+  actionFilters = [],
+  accountTypeFilters = []
+) => {
   let q = `
     SELECT 
       l.id AS log_id,
@@ -30,7 +32,8 @@ module.exports.GetLogs = async (actionFilters = []) => {
       l.user_id,
       u.first_name,
       u.middle_initial,
-      u.last_name
+      u.last_name,
+      u.account_type
     FROM 
       logs l
     JOIN 
@@ -38,17 +41,33 @@ module.exports.GetLogs = async (actionFilters = []) => {
   `;
 
   const values = [];
+  const conditions = [];
 
   // Check if there are action filters and construct the WHERE clause
   if (actionFilters.length > 0) {
     const placeholders = actionFilters
       .map((_, index) => `$${index + 1}`)
       .join(", ");
-    q += ` WHERE l.action ILIKE ANY (ARRAY[${placeholders}])`; // Use ILIKE for case-insensitive matching
-    actionFilters.forEach((action) => values.push(`%${action}%`)); // Use wildcard for partial matching
+    conditions.push(`l.action ILIKE ANY (ARRAY[${placeholders}])`);
+    actionFilters.forEach((action) => values.push(`%${action}%`));
   }
 
-  q += " ORDER BY l.date_time DESC"; // Order by the latest logs first
+  // Check if there are account type filters and add to the WHERE clause
+  if (accountTypeFilters.length > 0) {
+    const offset = values.length; // Adjust the index for placeholders
+    const placeholders = accountTypeFilters
+      .map((_, index) => `$${offset + index + 1}`)
+      .join(", ");
+    conditions.push(`u.account_type IN (${placeholders})`);
+    accountTypeFilters.forEach((type) => values.push(type));
+  }
+
+  // Combine conditions
+  if (conditions.length > 0) {
+    q += ` WHERE ${conditions.join(" AND ")}`;
+  }
+
+  q += " ORDER BY l.date_time DESC";
 
   try {
     const data = await pool.query(q, values);
