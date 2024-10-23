@@ -1,14 +1,19 @@
 import { useContext, useState, useEffect } from "react";
-import { FaMapMarkerAlt } from "react-icons/fa";
+import { FaMapLocation } from "react-icons/fa6";
+import { FaLocationArrow } from "react-icons/fa";
 import { BiSolidHappyBeaming } from "react-icons/bi";
+import { RiPinDistanceFill } from "react-icons/ri";
+import { MdAccessTimeFilled } from "react-icons/md";
+import { IoSpeedometerSharp } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import { RescuerContext } from "../contexts/RescuerContext";
 import { getRouteData } from "../services/locationService";
+import placeholder from "../assets/placeholder.png";
+import { formatDistance, formatDuration } from "../utils/DistanceUtility";
 
 // TODO: Add Completed Button
 // TODO: Add Status in Request Card
 // TODO: Make selected request persistent using cookies
-// TODO: format request datas
 
 const Requests = ({ requests, onSelectRequest }) => {
   const navigate = useNavigate();
@@ -56,7 +61,7 @@ const Requests = ({ requests, onSelectRequest }) => {
       </div>
 
       {/* Scrollable Request Cards Section */}
-      <div className="flex-1 overflow-y-auto max-h-[calc(100vh-200px)] space-y-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 overflow-y-auto">
         {requests.length > 0 ? (
           requests.map((request) => {
             const route = routeData[request.id] || {};
@@ -69,54 +74,132 @@ const Requests = ({ requests, onSelectRequest }) => {
                 {/* Image Section */}
                 <div className="relative">
                   <img
-                    src="https://via.placeholder.com/400x200" // replace with actual image if available
-                    alt="Request Location"
+                    src={
+                      request.incidentPicture
+                        ? request.incidentPicture
+                        : placeholder
+                    }
+                    alt="Incident Picture"
                     className="w-full h-40 object-cover"
                   />
+                  <div
+                    className={`absolute top-4 left-4 text-sm font-semibold text-white py-1 px-3 rounded-lg shadow-md ${
+                      request.status === "pending"
+                        ? "bg-yellow-400"
+                        : request.status === "accepted"
+                        ? "bg-green-400 "
+                        : "bg-red-400 "
+                    }`}
+                  >
+                    {request.status.charAt(0).toUpperCase() +
+                      request.status.slice(1)}
+                  </div>
                   {/* Pin Icon for Navigation */}
-                  <FaMapMarkerAlt
-                    className="absolute top-2 right-2 text-2xl text-secondary cursor-pointer"
+                  <FaLocationArrow
+                    className="absolute top-4 right-4 text-2xl text-background-light cursor-pointer"
                     onClick={() => handleNavigate(request.id)}
                   />
                 </div>
 
                 {/* Request Info & Action */}
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4">
+                <div className="flex flex-col items-start justify-between p-4 gap-4">
                   {/* Request Info */}
                   <div className="flex-1">
-                    <p className="text-sm text-gray-600 truncate max-w-[300px] overflow-ellipsis">
-                      <strong className="text-[#557C55]">Location: </strong>
-                      {request.location && request.location.address}
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      <strong className="text-[#557C55]">Distance: </strong>
-                      {route.distance && route.distance}
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      <strong className="text-[#557C55]">ETA: </strong>
-                      {route.duration && route.duration}
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      <strong className="text-[#557C55]">Request Time: </strong>
-                      {request.timestamp &&
-                        new Intl.DateTimeFormat("en-US", {
-                          year: "numeric",
-                          month: "2-digit",
-                          day: "2-digit",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                          second: "2-digit",
-                        }).format(new Date(request.timestamp))}
-                    </p>
+                    <div className="flex items-center gap-1">
+                      <FaMapLocation className="text-background-medium" />
+                      <p className="text-sm text-text-primary">
+                        <strong className="text-[#557C55]">Location </strong>
+                        {request.location && (
+                          <>
+                            {request.location.address
+                              .split(",")
+                              .slice(0, 5) // Adjust this slice to include up to "Baliwag City"
+                              .join(", ")}
+                          </>
+                        )}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <RiPinDistanceFill className="text-background-medium" />
+                      <p className="text-sm text-text-primary">
+                        <strong className="text-[#557C55]">Distance </strong>
+                        {route.distance && formatDistance(route.distance)}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <IoSpeedometerSharp className="text-background-medium" />
+                      <p className="text-sm text-text-primary">
+                        <strong className="text-[#557C55]">ETA </strong>
+                        {route.duration && formatDuration(route.duration)}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <MdAccessTimeFilled className="text-background-medium" />
+                      <p className="text-sm text-text-primary">
+                        <strong className="text-[#557C55]">
+                          Request Time{" "}
+                        </strong>
+                        {request.timestamp &&
+                          (() => {
+                            const requestDate = new Date(request.timestamp);
+                            const now = new Date();
+
+                            // Format the request time to a more readable format
+                            const formattedTime = new Intl.DateTimeFormat(
+                              "en-US",
+                              {
+                                year: "numeric",
+                                month: "long", // Full month name for readability
+                                day: "numeric",
+                                hour: "numeric",
+                                minute: "numeric",
+                                second: "numeric",
+                                hour12: true, // To format as AM/PM
+                              }
+                            ).format(requestDate);
+
+                            // Calculate time elapsed in milliseconds
+                            const timeElapsed = now - requestDate;
+
+                            // Convert timeElapsed to minutes, hours, days, etc.
+                            const minutesElapsed = Math.floor(
+                              timeElapsed / (1000 * 60)
+                            );
+                            let timeLabel = "";
+
+                            if (minutesElapsed < 60) {
+                              timeLabel = `${minutesElapsed} minutes ago`;
+                            } else if (minutesElapsed < 1440) {
+                              // Less than a day
+                              timeLabel = `${Math.floor(
+                                minutesElapsed / 60
+                              )} hours ago`;
+                            } else {
+                              timeLabel = `${Math.floor(
+                                minutesElapsed / (60 * 24)
+                              )} days ago`;
+                            }
+
+                            return (
+                              <>
+                                {formattedTime}{" "}
+                                <span className="text-text-secondary">
+                                  ({timeLabel})
+                                </span>
+                              </>
+                            );
+                          })()}
+                      </p>
+                    </div>
                   </div>
 
                   {/* Accept Button */}
-                  <div className="flex-shrink-0 mt-4 sm:mt-0">
+                  <div className="w-full">
                     <button
                       onClick={() => handleAccept(request.id)}
-                      className="px-4 py-2 text-sm sm:text-base font-semibold text-white bg-primary hover:bg-green-600 transition-colors rounded"
+                      className="h-full w-full px-6 py-4 text-sm sm:text-base font-semibold text-white bg-primary transition-colors rounded-lg"
                     >
-                      Accept
+                      Accept Request
                     </button>
                   </div>
                 </div>
