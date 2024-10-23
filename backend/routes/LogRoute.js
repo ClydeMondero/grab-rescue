@@ -16,14 +16,20 @@ router.post("/create", async (req, res) => {
   res.status(200).json(result);
 });
 
-// Route for retrieving logs with optional action filtering
+// Route for retrieving logs with optional action and account_type filtering
 router.get("/get", async (req, res) => {
   const actionQuery = req.query.action; // Get action filters from the query string
+  const accountTypeQuery = req.query.account_type; // Get account_type filters from the query string
+
   const actionFilters = actionQuery
     ? actionQuery.split(",").map((action) => action.trim())
     : [];
 
-  const result = await GetLogs(actionFilters);
+  const accountTypeFilters = accountTypeQuery
+    ? accountTypeQuery.split(",").map((type) => type.trim())
+    : [];
+
+  const result = await GetLogs(actionFilters, accountTypeFilters);
   res.status(200).json(result);
 });
 
