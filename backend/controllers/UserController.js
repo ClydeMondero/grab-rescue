@@ -446,11 +446,23 @@ module.exports.UpdateUserPassword = async (req, res) => {
     `;
     await pool.query(updateQuery, [newHashedPassword, id]);
 
+    // Log the password update action
+    await CreateLog({
+      userId: id,
+      action: `User changed password successfully`,
+    });
+
     return res.status(200).json({
       success: true,
       message: "Password updated successfully.",
     });
   } catch (err) {
+    // Log the error
+    await CreateLog({
+      userId: id,
+      action: `Error updating password: ${err.message}`,
+    });
+
     return res.status(200).json({
       success: false,
       message: "Server error.",
