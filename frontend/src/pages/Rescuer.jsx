@@ -51,7 +51,7 @@ const Rescuer = (props) => {
         {/* Header */}
         <Header />
 
-        <div className="flex-1 bg-slate-50">
+        <div className="flex-1 overflow-y-auto bg-slate-50">
           <Routes>
             {/* Default Route to Navigate */}
             <Route
