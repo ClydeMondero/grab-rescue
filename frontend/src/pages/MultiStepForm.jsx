@@ -3,7 +3,6 @@ import placeholder from "../assets/placeholder.png";
 import { updateRequestInFirestore } from "../services/firestoreService";
 import { Loader } from "../components";
 
-//TODO: upload picture to firebase storage
 const MultiStepForm = ({ request }) => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -202,7 +201,7 @@ const MultiStepForm = ({ request }) => {
                 src={
                   formData.incidentPicture == ""
                     ? placeholder
-                    : URL.createObjectURL(formData.incidentPicture)
+                    : formData.incidentPicture
                 }
                 alt="Preview of uploaded image"
               />
@@ -254,24 +253,13 @@ const MultiStepForm = ({ request }) => {
                 style={{ resize: "none" }}
               />
             </div>
-            {/*TODO: add privacy and Terms  */}
             <p className="text-xs text-text-secondary">
               By submitting this request, you agree to our{" "}
-              <a
-                href=""
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline text-text-primary"
-              >
+              <a href="/policies" className="underline text-text-primary">
                 Privacy Policy
               </a>{" "}
               and{" "}
-              <a
-                href=""
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline text-text-primary"
-              >
+              <a href="terms" className="underline text-text-primary">
                 Terms of Service
               </a>
             </p>

@@ -10,12 +10,12 @@ import { RescuerContext } from "../contexts/RescuerContext";
 import { getRouteData } from "../services/locationService";
 import placeholder from "../assets/placeholder.png";
 import { formatDistance, formatDuration } from "../utils/DistanceUtility";
+import { setSelectedRequestCookie } from "../services/cookieService";
+import { acceptRescueRequestInFirestore } from "../services/firestoreService";
 
 // TODO: Add Completed Button
-// TODO: Add Status in Request Card
-// TODO: Make selected request persistent using cookies
 
-const Requests = ({ requests, onSelectRequest }) => {
+const Requests = ({ userId, requests, setSelectedRequest }) => {
   const navigate = useNavigate();
   const { rescuer } = useContext(RescuerContext);
 
@@ -26,13 +26,12 @@ const Requests = ({ requests, onSelectRequest }) => {
    * Handle Accept button click
    * @param {string} requestID - Request ID to accept
    */
-  const handleAccept = (requestID) => {
-    onSelectRequest(requestID);
-    navigate("/rescuer/navigate");
-  };
+  const handleAccept = async (requestID) => {
+    setSelectedRequestCookie(requestID);
+    setSelectedRequest(requestID);
 
-  const handleNavigate = (requestID) => {
-    onSelectRequest(requestID);
+    await acceptRescueRequestInFirestore(userId, requestID);
+
     navigate("/rescuer/navigate");
   };
 
@@ -45,25 +44,47 @@ const Requests = ({ requests, onSelectRequest }) => {
     setRouteData(newRouteData);
   };
 
+  let pendingRequests = [];
+
   useEffect(() => {
-    if (requests.length > 0) {
+    pendingRequests = requests.filter(
+      (request) => request.status !== "assigned"
+    );
+
+    if (pendingRequests.length > 0) {
       fetchRoutes();
     }
   }, [requests, rescuer]);
 
   return (
-    <div className="flex flex-col p-6">
+    <div
+      className={`min-h-full flex flex-col p-6  ${
+        pendingRequests.length > 0 ? "" : "justify-center"
+      }
+        
+      }`}
+    >
       {/* Header Section */}
-      <div className="hidden flex-col items-start justify-between mb-4 md:flex">
+      <div
+        className={`hidden flex-col items-start justify-between mb-4 md:flex md:${
+          pendingRequests.length > 0 ? "" : "hidden"
+        }`}
+      >
         <h2 className="text-3xl font-bold text-[#557C55] flex items-center gap-2">
           Requests
         </h2>
       </div>
 
       {/* Scrollable Request Cards Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 overflow-y-auto">
-        {requests.length > 0 ? (
-          requests.map((request) => {
+      <div
+        className={`${
+          pendingRequests.length > 0
+            ? "grid grid-cols-1 md:grid-cols-2 gap-3 overflow-y-auto"
+            : ""
+        }`}
+      >
+        {pendingRequests.length > 0 ? (
+          pendingRequests.map((request) => {
             const route = routeData[request.id] || {};
 
             return (
@@ -84,11 +105,7 @@ const Requests = ({ requests, onSelectRequest }) => {
                   />
                   <div
                     className={`absolute top-4 left-4 text-sm font-semibold text-white py-1 px-3 rounded-lg shadow-md ${
-                      request.status === "pending"
-                        ? "bg-yellow-400"
-                        : request.status === "accepted"
-                        ? "bg-green-400 "
-                        : "bg-red-400 "
+                      request.status === "pending" ? "bg-yellow-400" : ""
                     }`}
                   >
                     {request.status.charAt(0).toUpperCase() +
@@ -113,7 +130,7 @@ const Requests = ({ requests, onSelectRequest }) => {
                           <>
                             {request.location.address
                               .split(",")
-                              .slice(0, 5) // Adjust this slice to include up to "Baliwag City"
+                              .slice(0, 5)
                               .join(", ")}
                           </>
                         )}

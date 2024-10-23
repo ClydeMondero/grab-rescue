@@ -11,7 +11,7 @@ const Bottom = () => {
   };
 
   return (
-    <div className="bg-background text-white flex items-center justify-around py-4">
+    <div className="bg-background text-white flex items-center justify-around py-4 border-t-2 border-background-light">
       <Link
         to="/rescuer/requests"
         className={`flex flex-col items-center `}
