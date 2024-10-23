@@ -266,7 +266,7 @@ module.exports.CreateRescuer = async (req, res) => {
       // Log the rescuer creation
       await CreateLog({
         userId: subject,
-        action: `Rescuer with username: ${username} has been added successfully.`,
+        action: `Rescuer Created with username: ${username} and email: ${email}`,
       });
 
       // Use frontend base URL for the verification link
