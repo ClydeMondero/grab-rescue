@@ -22,7 +22,9 @@ module.exports.CreateLog = async ({ userId, action }) => {
 
 module.exports.GetLogs = async (
   actionFilters = [],
-  accountTypeFilters = []
+  accountTypeFilters = [],
+  startDate = null,
+  endDate = null
 ) => {
   let q = `
     SELECT 
@@ -54,12 +56,22 @@ module.exports.GetLogs = async (
 
   // Check if there are account type filters and add to the WHERE clause
   if (accountTypeFilters.length > 0) {
-    const offset = values.length; // Adjust the index for placeholders
+    const offset = values.length;
     const placeholders = accountTypeFilters
       .map((_, index) => `$${offset + index + 1}`)
       .join(", ");
     conditions.push(`u.account_type IN (${placeholders})`);
     accountTypeFilters.forEach((type) => values.push(type));
+  }
+
+  // Add date filters if provided
+  if (startDate) {
+    values.push(startDate);
+    conditions.push(`l.date_time >= $${values.length}`);
+  }
+  if (endDate) {
+    values.push(endDate);
+    conditions.push(`l.date_time <= $${values.length}`);
   }
 
   // Combine conditions
