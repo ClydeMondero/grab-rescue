@@ -21,17 +21,15 @@ import { FaLocationPin } from "react-icons/fa6";
 import { useLocation } from "react-router-dom";
 import { setGeolocateIcon } from "../utils/GeolocateUtility";
 
-//TODO: Show markers, controls, routes
 //TODO: show no current request
-const RescuerMap = ({ citizen }) => {
+const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
   const { rescuer, setRescuer } = useContext(RescuerContext);
   const [locations, setLocations] = useState(null);
 
   const mapRef = useRef();
   const geoControlRef = useRef();
-  const buttonsRef = useRef();
 
-  const locating = useLocating(geoControlRef);
+  const locating = useLocating(geoControlRef, onLocatingChange);
 
   const bounds = [
     [120.8585, 14.8867],
@@ -39,10 +37,6 @@ const RescuerMap = ({ citizen }) => {
   ];
 
   const [routeData, setRouteData] = useState(null);
-  const [routeOpacity, setRouteOpacity] = useState({
-    background: 0.2,
-    line: 1,
-  });
 
   const [distance, setDistance] = useState();
   const [eta, setEta] = useState();
@@ -80,6 +74,7 @@ const RescuerMap = ({ citizen }) => {
     }
 
     setRescuer({
+      ...rescuer,
       longitude: coords.longitude,
       latitude: coords.latitude,
     });
@@ -93,11 +88,56 @@ const RescuerMap = ({ citizen }) => {
     setEta(route.duration);
   };
 
+  const handleNavigating = () => {
+    mapRef.current.flyTo({
+      center: [rescuer.longitude, rescuer.latitude],
+      zoom: rescuer.zoom, // Adjust zoom as needed
+      pitch: 60, // Set the pitch here to tilt the map
+      bearing: rescuer.bearing, // Optionally, control the bearing (rotation)
+      essential: true,
+    });
+
+    setRescuer({ ...rescuer, pitch: 60 });
+  };
+
+  const handleOrientation = (event) => {
+    console.log("Device orientation event:", event);
+    const { alpha } = event;
+    console.log("Alpha:", alpha); // Check what value you receive
+    if (alpha !== null) {
+      setRescuer((prev) => ({
+        ...prev,
+        bearing: alpha,
+      }));
+    }
+  };
+
   useEffect(() => {
     if (citizen) {
       getRoute();
     }
+
+    console.log(rescuer.bearing);
   }, [citizen, rescuer]);
+
+  useEffect(() => {
+    if (navigating) {
+      handleNavigating();
+
+      if (typeof DeviceOrientationEvent.requestPermission === "function") {
+        DeviceOrientationEvent.requestPermission()
+          .then((response) => {
+            if (response === "granted") {
+              console.log("granted");
+              window.addEventListener("deviceorientation", handleOrientation);
+            }
+          })
+          .catch(console.error);
+      } else {
+        window.addEventListener("deviceorientation", handleOrientation);
+      }
+    }
+  }, [navigating]);
 
   useEffect(() => {
     const unsubscribe = getLocationsFromFirestore("rescuer", setLocations);
@@ -128,17 +168,10 @@ const RescuerMap = ({ citizen }) => {
         positionOptions={{ enableHighAccuracy: true }}
         trackUserLocation={true}
         showUserLocation={false}
+        style={{ display: "none" }}
         onGeolocate={({ coords }) => {
           handleGeolocation(coords);
         }}
-      />
-
-      <Controls
-        mapRef={mapRef}
-        otherMarker={citizen}
-        routeData={routeData}
-        setRouteOpacity={setRouteOpacity}
-        ref={buttonsRef}
       />
 
       {locating && <LocatingIndicator locating={locating} type="rescuer" />}
@@ -146,15 +179,23 @@ const RescuerMap = ({ citizen }) => {
       {!locating && (
         <>
           <Marker longitude={rescuer.longitude} latitude={rescuer.latitude}>
-            <RescuerMarker view="top-down" />
+            {!navigating ? (
+              <RescuerMarker view="top-down" />
+            ) : (
+              <RescuerMarker view="3d" />
+            )}
           </Marker>
           <Marker longitude={citizen.longitude} latitude={citizen.latitude}>
             <FaLocationPin className="text-3xl text-secondary red-pulse" />
           </Marker>
 
-          <Route routeData={routeData} routeOpacity={routeOpacity} />
-
-          {distance && eta && <DistanceEta distance={distance} eta={eta} />}
+          <Route
+            routeData={routeData}
+            routeOpacity={{
+              background: 0.2,
+              line: 1,
+            }}
+          />
         </>
       )}
     </MapGL>
