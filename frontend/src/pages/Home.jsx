@@ -98,7 +98,6 @@ const Home = () => {
     }
   }, [formVisible]);
 
-  //TODO: add site explanation
   return (
     <div className="h-dvh w-screen overflow-hidden flex flex-col">
       {/* Desktop Navbar */}
