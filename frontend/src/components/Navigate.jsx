@@ -50,10 +50,16 @@ const Navigate = ({ requestID }) => {
       )}
 
       {requestData && !locating && (
-        <div className="h-10 relative flex items-center justify-around bg-primary-medium rounded-t-2xl">
+        <div
+          className={`h-10 relative flex items-center justify-around ${
+            navigating ? "bg-primary" : "bg-primary-medium"
+          } rounded-t-2xl`}
+        >
           <div
-            onClick={() => setNavigating(true)}
-            className="bg-primary-medium rounded-full p-6 -translate-y-4 cursor-pointer"
+            onClick={() => setNavigating(!navigating)}
+            className={`${
+              navigating ? "bg-primary" : "bg-primary-medium"
+            } rounded-full p-6 -translate-y-4 cursor-pointer`}
           >
             <FaLocationArrow className="text-white text-2xl" />
           </div>
@@ -92,6 +98,7 @@ const Navigate = ({ requestID }) => {
                     : "bg-orange-400"
                 }`}
               >
+                {/*TODO: change status to in-progress if isOnRoute*/}
                 {requestData.status.charAt(0).toUpperCase() +
                   requestData.status.slice(1)}
               </div>

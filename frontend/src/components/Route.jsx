@@ -1,7 +1,6 @@
 import { Source, Layer } from "react-map-gl";
-import { useEffect, useState } from "react";
 
-const Route = ({ routeData, routeOpacity, mapLoaded }) => {
+const Route = ({ routeData, routeOpacity }) => {
   return (
     routeData && (
       <Source
@@ -25,7 +24,7 @@ const Route = ({ routeData, routeOpacity, mapLoaded }) => {
           }}
           paint={{
             "line-color": "#3B82F6", // Customize the color of the ant line
-            "line-width": 8, // Adjust the width of the line
+            "line-width": 10, // Adjust the width of the line
             "line-opacity": routeOpacity.line,
             "line-border-color": "#1350b1",
             "line-border-width": 1,

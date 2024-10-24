@@ -6,6 +6,7 @@ import {
   LocatingIndicator,
   RescuerMarker,
   DistanceEta,
+  TurnIndicator,
   Route,
   Controls,
 } from "../components";
@@ -20,6 +21,7 @@ import { RescuerContext } from "../contexts/RescuerContext";
 import { FaLocationPin } from "react-icons/fa6";
 import { useLocation } from "react-router-dom";
 import { setGeolocateIcon } from "../utils/GeolocateUtility";
+import * as turf from "@turf/turf";
 
 //TODO: show no current request
 const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
@@ -42,6 +44,8 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
   const [eta, setEta] = useState();
 
   const location = useLocation();
+
+  const [isOnRoute, setIsOnRoute] = useState(false);
 
   const handleGeolocation = async (coords) => {
     if (mapRef.current.resize()) {
@@ -78,6 +82,34 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
       longitude: coords.longitude,
       latitude: coords.latitude,
     });
+
+    const currentLocation = {
+      longitude: coords.longitude,
+      latitude: coords.latitude,
+    };
+
+    // Check if rescuer is on the route
+    if (routeData) {
+      const onRoute = checkIfOnRoute(currentLocation, routeData);
+      setIsOnRoute(onRoute);
+    }
+  };
+
+  // Helper function to check proximity to the route
+  const checkIfOnRoute = (currentLocation, route) => {
+    const currentPoint = turf.point([
+      currentLocation.longitude,
+      currentLocation.latitude,
+    ]);
+    const line = turf.lineString(route.geometry.coordinates); // Assuming geometry is a LineString
+
+    const distance = turf.pointToLineDistance(currentPoint, line, {
+      units: "meters",
+    });
+
+    // Define a threshold (e.g., 20 meters)
+    const threshold = 20;
+    return distance <= threshold;
   };
 
   const getRoute = async () => {
@@ -101,9 +133,7 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
   };
 
   const handleOrientation = (event) => {
-    console.log("Device orientation event:", event);
     const { alpha } = event;
-    console.log("Alpha:", alpha); // Check what value you receive
     if (alpha !== null) {
       setRescuer((prev) => ({
         ...prev,
@@ -116,8 +146,6 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
     if (citizen) {
       getRoute();
     }
-
-    console.log(rescuer.bearing);
   }, [citizen, rescuer]);
 
   useEffect(() => {
@@ -136,6 +164,21 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
       } else {
         window.addEventListener("deviceorientation", handleOrientation);
       }
+    } else {
+      if (!mapRef.current) return;
+      mapRef.current.flyTo({
+        center: [rescuer.longitude, rescuer.latitude],
+        zoom: 15, // Adjust zoom as needed
+        pitch: 0, // Set the pitch here to tilt the map
+        bearing: 0, // Optionally, control the bearing (rotation)
+        essential: true,
+      });
+
+      setRescuer((prev) => ({
+        ...prev,
+        pitch: 0,
+        bearing: 0,
+      }));
     }
   }, [navigating]);
 
@@ -175,6 +218,14 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
       />
 
       {locating && <LocatingIndicator locating={locating} type="rescuer" />}
+
+      {navigating && (
+        <TurnIndicator
+          routeData={routeData}
+          routeOpacity={{ background: 0.2, line: 1 }}
+          isOnRoute={isOnRoute}
+        />
+      )}
 
       {!locating && (
         <>

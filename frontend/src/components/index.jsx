@@ -25,8 +25,10 @@ import RequestDetails from "./RequestDetails";
 import LocatingIndicator from "./LocatingIndicator";
 import RescuerMarker from "./RescuerMarker";
 import GeolocateButton from "./GeolocateButton";
+import TurnIndicator from "./TurnIndicator";
 
 export {
+  TurnIndicator,
   GeolocateButton,
   RescuerMarker,
   LocatingIndicator,
