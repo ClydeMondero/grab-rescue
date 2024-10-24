@@ -1,14 +1,22 @@
 import React, { useEffect, useState, useRef } from "react";
 import { RescuerMap as Map } from "../components";
 import { BiPhoneCall } from "react-icons/bi";
+import { FaLocationArrow, FaCheck } from "react-icons/fa";
 import { getRequestFromFirestore } from "../services/firestoreService";
 import { Loader } from "../components";
+import { useLocating } from "../hooks";
 
 const Navigate = ({ requestID }) => {
   const [showDetails, setShowDetails] = useState(false);
   const [requestData, setRequestData] = useState(null);
+  const [locating, setLocating] = useState(false);
+  const [navigating, setNavigating] = useState(false);
 
   const mapRef = useRef();
+
+  const handleLocatingChange = (newLocatingState) => {
+    setLocating(newLocatingState); // Update only when locating changes
+  };
 
   const getRequestData = async () => {
     if (requestID === null) return;
@@ -28,11 +36,27 @@ const Navigate = ({ requestID }) => {
     <div className="relative flex flex-col h-full bg-background-light">
       {requestData ? (
         <div className="flex-1">
-          <Map mapRef={mapRef} citizen={requestData.location} />
+          <Map
+            mapRef={mapRef}
+            citizen={requestData.location}
+            onLocatingChange={handleLocatingChange}
+            navigating={navigating}
+          />
         </div>
       ) : (
         <div className="flex justify-center items-center h-full">
           <Loader isLoading={true} size={30} color="#FF5757" />
+        </div>
+      )}
+
+      {requestData && !locating && (
+        <div className="h-10 relative flex items-center justify-around bg-primary-medium rounded-t-2xl">
+          <div
+            onClick={() => setNavigating(true)}
+            className="bg-primary-medium rounded-full p-6 -translate-y-4 cursor-pointer"
+          >
+            <FaLocationArrow className="text-white text-2xl" />
+          </div>
         </div>
       )}
 
