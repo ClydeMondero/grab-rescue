@@ -37,7 +37,7 @@ const Admin = (props) => {
       <Sidebar />
 
       {/* Main Content */}
-      <div className="flex-1 p-6 bg-[#f5f5f5]">
+      <div className="flex-1 p-6 md:p-8 bg-[#FEF9F2]">
         <Routes>
           <Route path="/addRescuer" element={<AddRescuer user={user} />} />
           <Route
