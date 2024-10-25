@@ -1,6 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Toast } from "../components";
 import { FaChevronLeft, FaEnvelope } from "react-icons/fa";
@@ -12,6 +12,7 @@ const ForgotPassword = () => {
   const role = searchParams.get("role");
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleForgotPassword = async (event) => {
     event.preventDefault();
@@ -33,12 +34,15 @@ const ForgotPassword = () => {
 
   return (
     <div className="flex items-center justify-center h-screen bg-background-light">
-      <div className="w-full max-w-md p-6 bg-background rounded-lg shadow-sm">
-        <div className="flex justify-between mb-4">
-          <FaChevronLeft
-            className="text-xl text-background-dark cursor-pointer"
-            onClick={() => window.history.back()}
-          />
+      <div className="w-full max-w-md p-6 bg-background-light md:bg-white md:rounded-lg md:shadow-sm">
+        <div
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-2 mb-10 cursor-pointer"
+        >
+          <FaChevronLeft className="text-xl text-background-dark" />
+          <p className="text-background-dark text-lg font-semibold md:hidden">
+            Back
+          </p>
         </div>
         <div className="flex justify-center mb-4">
           <img src={logo} alt="Logo" className="h-12" />
