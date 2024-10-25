@@ -1,16 +1,19 @@
 import React, { useEffect, useState, useRef } from "react";
-import { RescuerMap as Map } from "../components";
+import { RescuerMap as Map, Toast } from "../components";
 import { BiPhoneCall } from "react-icons/bi";
 import { FaLocationArrow, FaCheck } from "react-icons/fa";
 import { getRequestFromFirestore } from "../services/firestoreService";
 import { Loader } from "../components";
 import { useLocating } from "../hooks";
+import MobileDetect from "mobile-detect";
+import { toast } from "react-toastify";
 
 const Navigate = ({ requestID }) => {
   const [showDetails, setShowDetails] = useState(false);
   const [requestData, setRequestData] = useState(null);
   const [locating, setLocating] = useState(false);
   const [navigating, setNavigating] = useState(false);
+  const [onMobile, setOnMobile] = useState(false);
 
   const mapRef = useRef();
 
@@ -28,9 +31,33 @@ const Navigate = ({ requestID }) => {
     }
   };
 
+  const handlePhone = () => {
+    if (onMobile) {
+      window.location.href = `tel:${requestData.phone}`;
+    } else {
+      navigator.clipboard
+        .writeText(requestData.phone)
+        .then(() => {
+          toast.info("Phone copied to clipboard");
+        })
+        .catch((err) => {
+          toast.error("Could not copy phone: ", err);
+        });
+    }
+  };
+
   useEffect(() => {
     getRequestData();
   }, [requestID]);
+
+  useEffect(() => {
+    const md = new MobileDetect(window.navigator.userAgent);
+
+    const isSmallScreen = window.innerWidth <= 768; // Customize width threshold
+    const isMobile = !!md.mobile() && isSmallScreen; // Refine detection with screen size
+
+    setOnMobile(isMobile);
+  }, []);
 
   return (
     <div className="relative flex flex-col h-full bg-background-light">
@@ -88,9 +115,15 @@ const Navigate = ({ requestID }) => {
             </div>
             <div className="flex flex-col items-center justify-between gap-2">
               {/* Phone Call Button */}
-              <button className="flex items-center justify-center w-12 h-12 bg-primary rounded-full text-white text-2xl ">
-                <BiPhoneCall />
-              </button>
+
+              {requestData.phone && (
+                <button
+                  onClick={handlePhone}
+                  className="flex items-center justify-center w-12 h-12 bg-primary rounded-full text-white text-2xl cursor-pointer"
+                >
+                  <BiPhoneCall />
+                </button>
+              )}
               <div
                 className={`text-sm font-semibold text-white py-2 px-5 rounded-lg shadow-md ${
                   requestData.status === "assigned"
@@ -106,6 +139,7 @@ const Navigate = ({ requestID }) => {
           </div>
         </div>
       )}
+      <Toast />
     </div>
   );
 };
