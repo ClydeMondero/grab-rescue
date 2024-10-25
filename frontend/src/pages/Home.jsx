@@ -144,7 +144,7 @@ const Home = () => {
         }`}
       >
         {/* Mobile Menu */}
-        <div className="absolute top-4 right-4 m-2 p-2 z-10 rounded-full bg-white shadow-lg md:hidden">
+        <div className="absolute top-4 right-4 m-2 p-2 z-50 rounded-full bg-white shadow-lg md:hidden">
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="text-md cursor-pointer text-gray-700 rounded-full p-2 hover:bg-gray-200"

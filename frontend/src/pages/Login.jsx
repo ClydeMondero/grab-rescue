@@ -89,12 +89,15 @@ const Login = () => {
 
   return (
     <div className="flex items-center justify-center h-screen bg-background-light">
-      <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-sm">
-        <div className="flex justify-between mb-4">
-          <FaChevronLeft
-            className="text-xl text-background-dark cursor-pointer"
-            onClick={handleBack}
-          />
+      <div className="w-full max-w-md p-6 bg-background-light md:bg-white md:rounded-lg md:shadow-sm">
+        <div
+          onClick={handleBack}
+          className="flex items-center gap-2 mb-10  cursor-pointer"
+        >
+          <FaChevronLeft className="text-xl text-background-dark" />
+          <p className="text-background-dark text-lg font-semibold md:hidden">
+            Back
+          </p>
         </div>
         <div className="flex justify-center mb-4">
           <img src={logo} alt="Logo" className="h-12" />
@@ -144,14 +147,14 @@ const Login = () => {
           >
             {loading ? <Loader isLoading={loading} size={25} /> : "Login"}
           </button>
-          <a
-            href={`/forgot-password?role=${role}`}
-            className="text-[#FA7070] hover:text-red-600 transition-colors duration-200 ease-in-out"
+          <div
+            onClick={() => navigate(`/forgot-password?role=${role}`)}
+            className="cursor-pointer"
           >
             <p className="text-center text-sm mt-2 text-text-secondary">
               Forgot your password?{" "}
             </p>
-          </a>
+          </div>
         </form>
         <Toast />
       </div>
