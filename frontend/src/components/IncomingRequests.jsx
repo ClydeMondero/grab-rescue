@@ -55,7 +55,7 @@ const IncomingRequests = ({ requests }) => {
   };
 
   return (
-    <div className="flex flex-col p-2 sm:p-4 lg:p-6 h-full bg-gray-50 rounded-lg">
+    <div className="flex flex-col p-2 sm:p-4 lg:p-6 h-full rounded-lg">
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row items-center sm:justify-between mb-3 sm:mb-4 border-b border-gray-200 pb-3">
         <div className="flex items-center">
@@ -66,8 +66,7 @@ const IncomingRequests = ({ requests }) => {
         </div>
       </div>
 
-      {/* Introductory Text */}
-      <p className="mb-3 sm:mb-4 text-xs sm:text-sm lg:text-md text-gray-700">
+      <p className="mb-3 sm:mb-4 text-xs sm:text-sm lg:text-md text-primary-medium">
         Here are the latest emergency requests:
       </p>
 
@@ -78,7 +77,7 @@ const IncomingRequests = ({ requests }) => {
             pendingRequests.map((request) => (
               <div
                 key={request.id}
-                className="flex flex-col sm:flex-row items-start sm:items-center bg-white rounded-lg p-3 sm:p-4 border-2 border-primary-medium transition duration-300 ease-in-out hover:shadow-sm cursor-pointer"
+                className="flex flex-col sm:flex-row items-start sm:items-center bg-white rounded-lg p-3 sm:p-4 border-2 border-primary-dark transition duration-300 ease-in-out hover:shadow-sm cursor-pointer"
                 onClick={() => openModal(request)} // Open modal on click
               >
                 {/* Request Details */}
@@ -117,7 +116,7 @@ const IncomingRequests = ({ requests }) => {
               </div>
             ))
           ) : (
-            <div className="text-gray-500 text-center">
+            <div className="text-secondary text-center">
               No pending requests.
             </div>
           )}
