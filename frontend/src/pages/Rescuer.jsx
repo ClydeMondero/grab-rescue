@@ -8,6 +8,7 @@ import {
   Bottom,
   ChangeEmail,
   RequestDetails,
+  Toast,
 } from "../components";
 import { useState, useEffect, useContext } from "react";
 import { getRequestsFromFirestore } from "../services/firestoreService";
@@ -88,6 +89,7 @@ const Rescuer = (props) => {
             />
             <Route path="/change-email" element={<ChangeEmail user={user} />} />
           </Routes>
+          <Toast />
         </div>
 
         {/* Bottom Navigation always visible */}

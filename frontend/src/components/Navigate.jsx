@@ -41,7 +41,7 @@ const Navigate = ({ requestID }) => {
           toast.info("Phone copied to clipboard");
         })
         .catch((err) => {
-          toast.error("Could not copy phone: ", err);
+          toast.warning("Phone didn't get copied");
         });
     }
   };
@@ -139,7 +139,6 @@ const Navigate = ({ requestID }) => {
           </div>
         </div>
       )}
-      <Toast />
     </div>
   );
 };
