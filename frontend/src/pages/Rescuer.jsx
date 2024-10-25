@@ -8,15 +8,14 @@ import {
   Bottom,
   ChangeEmail,
   RequestDetails,
+  Toast,
 } from "../components";
 import { useState, useEffect, useContext } from "react";
-import {
-  getRequestsFromFirestore,
-  acceptRescueRequestInFirestore,
-} from "../services/firestoreService";
+import { getRequestsFromFirestore } from "../services/firestoreService";
 
 import { RescuerProvider } from "../contexts/RescuerContext";
 import { StatusContext } from "../contexts/StatusContext";
+import { getSelectedRequestCookie } from "../services/cookieService";
 
 const Rescuer = (props) => {
   const { user } = props;
@@ -24,18 +23,18 @@ const Rescuer = (props) => {
   const [selectedRequest, setSelectedRequest] = useState(null);
   const { getId } = useContext(StatusContext);
 
-  const handleSelectedRequest = (request) => {
-    setSelectedRequest(request);
-  };
-  //TODO: Handle other status change
-  useEffect(() => {
-    if (selectedRequest) {
-      acceptRescueRequestInFirestore(user.id, selectedRequest);
+  const getSelectedRequest = () => {
+    const selectedRequestID = getSelectedRequestCookie();
+
+    if (selectedRequestID) {
+      setSelectedRequest(selectedRequestID);
     }
-  });
+  };
 
   useEffect(() => {
     getId();
+
+    getSelectedRequest();
 
     const unsubscribe = getRequestsFromFirestore(setRequests);
 
@@ -51,7 +50,7 @@ const Rescuer = (props) => {
         {/* Header */}
         <Header />
 
-        <div className="flex-1 bg-slate-50">
+        <div className="flex-1 overflow-y-auto bg-background-light">
           <Routes>
             {/* Default Route to Navigate */}
             <Route
@@ -63,8 +62,9 @@ const Rescuer = (props) => {
               path="/requests"
               element={
                 <Requests
+                  userId={user.id}
                   requests={requests}
-                  onSelectRequest={handleSelectedRequest}
+                  setSelectedRequest={setSelectedRequest}
                 />
               }
             />
@@ -89,6 +89,7 @@ const Rescuer = (props) => {
             />
             <Route path="/change-email" element={<ChangeEmail user={user} />} />
           </Routes>
+          <Toast />
         </div>
 
         {/* Bottom Navigation always visible */}

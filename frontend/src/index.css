@@ -45,26 +45,26 @@
 }
 
 /* Active Geolacate Icon */
-.mapboxgl-ctrl
+/* .mapboxgl-ctrl
   button.mapboxgl-ctrl-geolocate.mapboxgl-ctrl-geolocate-active
   .mapboxgl-ctrl-icon {
   background-image: url("./assets/accident.svg");
   background-size: 20px 20px;
-}
+} */
 
 /* Unfocused Geolacate Icon */
-.mapboxgl-ctrl
+/* .mapboxgl-ctrl
   button.mapboxgl-ctrl-geolocate.mapboxgl-ctrl-geolocate-background
   .mapboxgl-ctrl-icon {
   background-image: url("./assets/accident.svg");
   background-size: 20px 20px;
-}
+} */
 
 /* Inactive Geolacate Icon *.mapboxgl-ctrl */
-.mapboxgl-ctrl button.mapboxgl-ctrl-geolocate .mapboxgl-ctrl-icon {
+/* .mapboxgl-ctrl button.mapboxgl-ctrl-geolocate .mapboxgl-ctrl-icon {
   background-image: url("./assets/accident.svg");
   background-size: 20px 20px;
-}
+} */
 
 .green-pulse {
   border-radius: 100%;

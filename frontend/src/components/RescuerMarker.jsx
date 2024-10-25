@@ -17,13 +17,13 @@ const Model = ({ view }) => {
    * every frame, creating a simple animation
    */
   useFrame(() => {
-    if (view !== "top-down") {
+    if (view == "left-right") {
       model.position.x += 0.1;
 
       if (model.position.x > 100) {
         model.position.x = -100;
       }
-    } else {
+    } else if (view == "top-down") {
       model.position.set(0, 0, 0);
     }
   });
@@ -32,13 +32,16 @@ const Model = ({ view }) => {
    * This hook is used to set the rotation and scale of the model based
    * on the view prop
    */
-  view === "top-down"
-    ? model.rotation.set(Math.PI / 2, Math.PI, 0)
-    : model.rotation.set(0, Math.PI / 2, 0);
-
-  view === "top-down"
-    ? model.scale.set(0.5, 0.5, 0.5)
-    : model.scale.set(1, 1, 1);
+  if (view === "top-down") {
+    model.rotation.set(Math.PI / 2, Math.PI, 0);
+    model.scale.set(0.6, 0.6, 0.6);
+  } else if (view === "left-right") {
+    model.rotation.set(0, Math.PI / 2, 0);
+    model.scale.set(1, 1, 1);
+  } else if (view === "3d") {
+    model.rotation.set(Math.PI / 4.8, Math.PI * 1, 0); // Rotate to look from the back at an angle
+    model.scale.set(0.6, 0.6, 0.6); // Keep the scale as you had
+  }
 
   /**
    * This hook is used to set the color of the model to a bright green
@@ -69,7 +72,7 @@ const RescuerMarker = ({ view }) => {
       <PerspectiveCamera
         makeDefault
         position={[0, 0, 100]} // Fixed camera position
-        fov={100} // Field of view
+        fov={view != "3d" ? 100 : 60} // Field of view
       />
 
       {/* Adding lights */}

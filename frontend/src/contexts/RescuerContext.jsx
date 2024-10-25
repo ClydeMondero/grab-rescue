@@ -1,4 +1,5 @@
 import { createContext, useState } from "react";
+import { useLocation } from "react-router-dom";
 
 const RescuerContext = createContext();
 
@@ -7,9 +8,19 @@ const RescuerProvider = ({ children }) => {
     longitude: 120.9107,
     latitude: 14.9536,
     zoom: 18,
+    pitch: 0,
+    bearing: 0,
   });
 
-  const [page, setPage] = useState("navigate");
+  const location = useLocation();
+
+  const [page, setPage] = useState(() => {
+    if (location.pathname === "/rescuer/requests") {
+      return "requests";
+    } else if (location.pathname === "/rescuer/navigate") {
+      return "navigate";
+    }
+  });
 
   return (
     <RescuerContext.Provider value={{ rescuer, setRescuer, page, setPage }}>
