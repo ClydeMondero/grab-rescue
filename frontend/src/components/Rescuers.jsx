@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { MdAssignmentInd } from "react-icons/md";
-import { FaTrash, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
+import { FaTrash } from "react-icons/fa";
 import { AiOutlinePrinter } from "react-icons/ai";
 import { createAuthHeader } from "../services/authService";
 import axios from "axios";
@@ -26,8 +26,12 @@ const AssignRescuers = (props) => {
     const initializePage = async () => {
       try {
         const result = await axios.get("/rescuers/get", createAuthHeader());
-        setRescuers(result.data);
-        setFilteredRescuers(result.data);
+        if (Array.isArray(result.data)) {
+          setRescuers(result.data);
+          setFilteredRescuers(result.data);
+        } else {
+          console.error("Unexpected response format:", result.data);
+        }
       } catch (error) {
         console.error("Error fetching rescuers:", error);
       }
@@ -36,19 +40,25 @@ const AssignRescuers = (props) => {
     initializePage();
   }, []);
 
-  useEffect(() => {
-    if (selectedMunicipality === "All") {
+  const handleMunicipalityChange = (e) => {
+    const municipality = e.target.value;
+    setSelectedMunicipality(municipality);
+
+    if (municipality === "All") {
       setBarangays([]);
       setSelectedBarangay("All");
     } else {
-      setBarangays(barangaysData[selectedMunicipality] || []);
+      const barangaysList = barangaysData[municipality] || [];
+      setBarangays(barangaysList);
+      setSelectedBarangay("All");
     }
-  }, [selectedMunicipality]);
+  };
 
   useEffect(() => {
-    const filtered = rescuers.filter((rescue) => {
-      const fullName =
-        `${rescue.first_name} ${rescue.middle_initial} ${rescue.last_name}`.toLowerCase();
+    const filtered = (rescuers || []).filter((rescue) => {
+      const fullName = `${rescue.first_name} ${rescue.middle_initial || ""} ${
+        rescue.last_name
+      }`.toLowerCase();
       const matchesName = fullName.includes(searchName.toLowerCase());
       const matchesMunicipality =
         selectedMunicipality === "All" ||
@@ -63,6 +73,7 @@ const AssignRescuers = (props) => {
         selectedVerified === "All" ||
         (selectedVerified === "True" && rescue.verified) ||
         (selectedVerified === "False" && !rescue.verified);
+
       return (
         matchesName &&
         matchesMunicipality &&
@@ -71,6 +82,7 @@ const AssignRescuers = (props) => {
         matchesVerified
       );
     });
+
     setFilteredRescuers(filtered);
     setCurrentPage(1);
   }, [
@@ -83,7 +95,7 @@ const AssignRescuers = (props) => {
   ]);
 
   useEffect(() => {
-    const totalRows = filteredRescuers.length;
+    const totalRows = filteredRescuers.length || 0;
     const totalPages = Math.ceil(totalRows / rowsPerPage);
     const startIndex = (currentPage - 1) * rowsPerPage;
     const endIndex = startIndex + rowsPerPage;
@@ -97,31 +109,12 @@ const AssignRescuers = (props) => {
     }
   };
 
-  const totalRows = filteredRescuers.length;
-  const totalPages = Math.ceil(totalRows / rowsPerPage);
-
-  const pageNumbers = [];
-  for (let i = 1; i <= totalPages; i++) {
-    pageNumbers.push(i);
-  }
-
-  const visiblePages =
-    pageNumbers.length <= 5
-      ? pageNumbers
-      : pageNumbers.slice(
-          Math.max(0, currentPage - 2),
-          Math.min(totalPages, currentPage + 2)
-        );
-
-  // Function to handle PDF generation
   const handlePrint = () => {
     const doc = new jsPDF("landscape");
 
-    // Title
     doc.setFontSize(18);
     doc.text("Rescuers List", 14, 10);
 
-    // Table column definition
     const tableColumn = [
       { title: "#", dataKey: "id" },
       { title: "Name", dataKey: "name" },
@@ -132,25 +125,18 @@ const AssignRescuers = (props) => {
       { title: "Verified Email", dataKey: "verified" },
     ];
 
-    const tableRows = [];
+    const tableRows = paginatedRescuers.map((rescue, index) => ({
+      id: (currentPage - 1) * rowsPerPage + index + 1,
+      name: `${rescue.first_name} ${rescue.middle_initial || ""} ${
+        rescue.last_name
+      }`,
+      municipality: rescue.municipality,
+      barangay: rescue.barangay,
+      contact_number: rescue.contact_number,
+      status: rescue.is_online ? "Online" : "Offline",
+      verified: rescue.verified ? "Verified" : "Not Verified",
+    }));
 
-    // Populate table rows
-    paginatedRescuers.forEach((rescue, index) => {
-      const rescueData = {
-        id: (currentPage - 1) * rowsPerPage + index + 1,
-        name: `${rescue.first_name} ${rescue.middle_initial || ""} ${
-          rescue.last_name
-        }`,
-        municipality: rescue.municipality,
-        barangay: rescue.barangay,
-        contact_number: rescue.contact_number,
-        status: rescue.is_online ? "Online" : "Offline",
-        verified: rescue.verified ? "Verified" : "Not Verified",
-      };
-      tableRows.push(rescueData);
-    });
-
-    // Table styling to match GenerateReports
     doc.autoTable(tableColumn, tableRows, {
       startY: 35,
       theme: "grid",
@@ -174,139 +160,114 @@ const AssignRescuers = (props) => {
       },
     });
 
-    // Add footer
     const pageHeight = doc.internal.pageSize.getHeight();
     const pageWidth = doc.internal.pageSize.getWidth();
-    const footerY = pageHeight - 10; // Position 10 units from the bottom
+    const footerY = pageHeight - 10;
 
     doc.setFontSize(10);
-    // "Generated by" on the left side
-    doc.text(
-      `Generated by: ${user?.first_name} ${user?.last_name}`,
-      10,
-      footerY
-    );
-    // "Generated date" on the right side
-    doc.text(
-      `Generated date: ${new Date().toLocaleString()}`,
-      pageWidth - 70, // Adjust based on the text width to align right
-      footerY
-    );
+    doc.text("Generated by Rescuers Management System", 14, footerY);
+    const date = new Date().toLocaleString();
+    doc.text(date, pageWidth - 14 - doc.getTextWidth(date), footerY);
 
-    // Save the PDF
     doc.save("rescuers_list.pdf");
   };
 
-
-  // Function to handle deleting a rescuer
-  const handleDelete = async (id) => {
-    try {
-      await axios.delete(`/rescuers/${id}`, createAuthHeader());
-      setRescuers(rescuers.filter((rescue) => rescue.id !== id));
-    } catch (error) {
-      console.error("Error deleting rescuer:", error);
-    }
-  };
-
   return (
-    <div className="flex flex-col h-full w-full bg-gray-50">
-      <header className="p-2 sm:p-3 lg:p-4 flex items-center">
+    <div>
+      <div className="flex items-center mb-2 sm:mb-4 border-b border-gray-200 pb-3">
         <MdAssignmentInd className="text-xl sm:text-2xl lg:text-3xl text-[#557C55] mr-2" />
-        <h4 className="text-md sm:text-lg font-semibold text-[#557C55]">
+        <h4 className="text-md sm:text-xl lg:text-2xl font-semibold text-[#557C55]">
           Rescuers
         </h4>
-      </header>
-
-      <p className="px-2 mb-1 text-xs sm:text-sm text-gray-600">
-        Search and assign rescuers to the following requests:
-      </p>
-
-      {/* Search bar and filters */}
-      <div className="mb-2 px-2">
-        <label
-          htmlFor="searchName"
-          className="block text-xs sm:text-sm font-medium text-gray-700"
-        >
-          <span style={{ color: "#557C55" }}>Search Rescuer by Name:</span>
-        </label>
-        <input
-          id="searchName"
-          type="text"
-          className="form-input w-full border border-[#557C55] text-black rounded-lg p-2 mt-1 bg-gray-50 text-xs sm:text-sm"
-          placeholder="Enter rescuer's name"
-          value={searchName}
-          onChange={(e) => setSearchName(e.target.value)}
-        />
       </div>
 
-      {/* Dropdowns for filters */}
-      <div className="grid grid-cols-2 gap-4 mb-4">
-        <FilterDropdown
-          label={
-            <span style={{ color: "#557C55" }}>Filter by Municipality:</span>
-          }
-          options={["All", "San Rafael", "Bustos"]}
-          selected={selectedMunicipality}
-          setSelected={setSelectedMunicipality}
-          labelStyle="text-[#557C55]"
-          borderStyle="border-[#557C55]"
-        />
-        <FilterDropdown
-          label={<span style={{ color: "#557C55" }}>Filter by Barangay:</span>}
-          options={["All", ...barangays]}
-          selected={selectedBarangay}
-          setSelected={setSelectedBarangay}
-          labelStyle="text-[#557C55]"
-          borderStyle="border-[#557C55]"
-        />
-        <FilterDropdown
-          label={<span style={{ color: "#557C55" }}>Filter by Status:</span>}
-          options={["All", "Online", "Offline"]}
-          selected={selectedStatus}
-          setSelected={setSelectedStatus}
-          labelStyle="text-[#557C55]"
-          borderStyle="border-[#557C55]"
-        />
-        <FilterDropdown
-          label={<span style={{ color: "#557C55" }}>Filter by Verified:</span>}
-          options={["All", "True", "False"]}
-          selected={selectedVerified}
-          setSelected={setSelectedVerified}
-          labelStyle="text-[#557C55]"
-          borderStyle="border-[#557C55]"
-        />
-      </div>
-
-      {/* Rescuers table */}
-      <div className="flex-grow overflow-x-auto">
+      {/* Search, Filter, and Print Controls */}
+      <div className="mb-4 flex flex-col md:flex-row justify-between">
+        <div className="flex flex-col md:flex-row gap-2 mb-2 md:mb-0">
+          <input
+            type="text"
+            placeholder="Search by Name"
+            value={searchName}
+            onChange={(e) => setSearchName(e.target.value)}
+            className="border border-primary rounded px-2 py-1 w-full md:w-1/3"
+          />
+          <select
+            value={selectedMunicipality}
+            onChange={handleMunicipalityChange}
+            className="border border-primary rounded px-2 py-1 w-full md:w-1/3 text-primary-medium"
+          >
+            <option value="All">All Municipalities</option>
+            {Object.keys(barangaysData).map((municipality) => (
+              <option key={municipality} value={municipality}>
+                {municipality}
+              </option>
+            ))}
+          </select>
+          <select
+            value={selectedBarangay}
+            onChange={(e) => setSelectedBarangay(e.target.value)}
+            className="border border-primary rounded px-2 py-1 w-full md:w-1/3 text-primary-medium"
+          >
+            <option value="All">All Barangays</option>
+            {barangays.map((barangay) => (
+              <option key={barangay} value={barangay}>
+                {barangay}
+              </option>
+            ))}
+          </select>
+          <select
+            value={selectedStatus}
+            onChange={(e) => setSelectedStatus(e.target.value)}
+            className="border border-primary rounded px-2 py-1 w-full md:w-1/3 text-primary-medium"
+          >
+            <option value="All">All Status</option>
+            <option value="Online">Online</option>
+            <option value="Offline">Offline</option>
+          </select>
+          <select
+            value={selectedVerified}
+            onChange={(e) => setSelectedVerified(e.target.value)}
+            className="border border-primary rounded px-2 py-1 w-full md:w-1/3 text-primary-medium"
+          >
+            <option value="All">All Verification Status</option>
+            <option value="True">Verified</option>
+            <option value="False">Not Verified</option>
+          </select>
+        </div>
         <button
           onClick={handlePrint}
-          className="bg-primary-medium text-white px-2 py-1 sm:px-3 sm:py-2 rounded-lg text-xs hover:bg-[#6EA46E] transition mt-2 sm:mt-0 flex items-center"
+          className="bg-[#557C55] text-white rounded px-3 py-1 flex items-center justify-center mt-2 md:mt-0"
         >
-          <AiOutlinePrinter className="text-sm" />
-          Generate
+          <AiOutlinePrinter className="mr-1" />
+          Generate PDF
         </button>
+      </div>
+
+      {/* Rescuers Table */}
+      <div className="overflow-x-auto">
         <table className="min-w-full bg-white border border-gray-200 rounded-md overflow-hidden">
-          <thead className="bg-[#557C55] text-white">
-            <tr>
-              <th className="px-4 py-2 text-left text-xs font-medium">#</th>
-              <th className="px-4 py-2 text-left text-xs font-medium">Name</th>
-              <th className="px-4 py-2 text-left text-xs font-medium">
+          <thead className=" text-white">
+            <tr className="bg-[#557C55] text-left">
+              <th className="px-4 py-2 text-center text-xs font-medium">#</th>
+              <th className="px-4 py-2 text-center text-xs font-medium">
+                Name
+              </th>
+              <th className="px-4 py-2 text-center text-xs font-medium">
                 Municipality
               </th>
-              <th className="px-4 py-2 text-left text-xs font-medium">
-                Barangay Name
+              <th className="px-4 py-2 text-center text-xs font-medium">
+                Barangay
               </th>
-              <th className="px-4 py-2 text-left text-xs font-medium">
+              <th className="px-4 py-2 text-center text-xs font-medium">
                 Contact Number
               </th>
-              <th className="px-4 py-2 text-left text-xs font-medium">
+              <th className="px-4 py-2 text-center text-xs font-medium">
                 Status
               </th>
-              <th className="px-4 py-2 text-left text-xs font-medium">
-                Verified Email
+              <th className="px-4 py-2 text-center text-xs font-medium">
+                Verified
               </th>
-              <th className="px-4 py-2 text-left text-xs font-medium">
+              <th className="px-4 py-2 text-center text-xs font-medium">
                 Actions
               </th>
             </tr>
@@ -314,39 +275,39 @@ const AssignRescuers = (props) => {
           <tbody>
             {paginatedRescuers.map((rescue, index) => (
               <tr key={rescue.id} className="border-b hover:bg-gray-100">
-                <td className="px-4 py-2 text-xs text-secondary">
+                <td className="px-4 py-2 text-xs text-center text-secondary">
                   {(currentPage - 1) * rowsPerPage + index + 1}
                 </td>
-                <td className="px-4 py-2 text-xs">
-                  {`${rescue.first_name} ${rescue.middle_initial} ${rescue.last_name}`}
+                <td className="px-4 py-2 text-xs text-center">{`${
+                  rescue.first_name
+                } ${rescue.middle_initial || ""} ${rescue.last_name}`}</td>
+                <td className="px-4 py-2 text-xs text-center">
+                  {rescue.municipality}
                 </td>
-                <td className="px-4 py-2 text-xs">{rescue.municipality}</td>
-                <td className="px-4 py-2 text-xs">{rescue.barangay}</td>
-                <td className="px-4 py-2 text-xs">{rescue.contact_number}</td>
-                <td className="px-4 py-2 text-xs">
-                  {rescue.is_online ? (
-                    <span className="flex items-center text-primary">
-                      <FaCheckCircle className="mr-1" />
-                      Online
-                    </span>
-                  ) : (
-                    <span className="flex items-center text-secondary">
-                      <FaTimesCircle className="mr-1" />
-                      Offline
-                    </span>
-                  )}
+                <td className="px-4 py-2 text-xs text-center">
+                  {rescue.barangay}
                 </td>
-                <td className="px-4 py-2 text-xs">
-                  {rescue.verified ? (
-                    <span className="text-primary">Verified</span>
-                  ) : (
-                    <span className="text-secondary">Not Verified</span>
-                  )}
+                <td className="px-4 py-2 text-xs text-center">
+                  {rescue.contact_number}
                 </td>
-                <td className="px-4 py-2 text-xs">
+                <td
+                  className={`px-4 py-2 text-xs text-center ${
+                    rescue.is_online ? "text-green-500" : "text-red-500"
+                  }`}
+                >
+                  {rescue.is_online ? "Online" : "Offline"}
+                </td>
+                <td
+                  className={`px-4 py-2 text-xs text-center ${
+                    rescue.verified ? "text-green-500" : "text-red-500"
+                  }`}
+                >
+                  {rescue.verified ? "Verified" : "Not Verified"}
+                </td>
+                <td className="px-4 py-2 text-xs text-center">
                   <button
+                    className="text-red-500 hover:text-red-700"
                     onClick={() => handleDelete(rescue.id)}
-                    className="text-secondary hover:text-red-700"
                   >
                     <FaTrash />
                   </button>
@@ -357,65 +318,28 @@ const AssignRescuers = (props) => {
         </table>
       </div>
 
-      {/* Pagination controls */}
-      <div className="flex justify-between items-center mt-2 px-2">
-        <div>
-          <button
-            disabled={currentPage === 1}
-            onClick={() => handlePageChange(currentPage - 1)}
-            className="px-3 py-1 border border-gray-300 text-gray-600 rounded-md"
-          >
-            Previous
-          </button>
-          {visiblePages.map((page) => (
-            <button
-              key={page}
-              onClick={() => handlePageChange(page)}
-              className={`px-3 py-1 border border-gray-300 text-gray-600 rounded-md ${
-                currentPage === page ? "bg-gray-300" : ""
-              }`}
-            >
-              {page}
-            </button>
-          ))}
-          <button
-            disabled={currentPage === totalPages}
-            onClick={() => handlePageChange(currentPage + 1)}
-            className="px-3 py-1 border border-gray-300 text-gray-600 rounded-md"
-          >
-            Next
-          </button>
-        </div>
+      {/* Pagination */}
+      <div className="flex justify-center items-center mt-4">
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="bg-primary-medium px-3 py-1 rounded disabled:opacity-50"
+        >
+          Previous
+        </button>
+        <span className="text-primary">{`${currentPage} of ${Math.ceil(
+          filteredRescuers.length / rowsPerPage
+        )}`}</span>
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={
+            currentPage === Math.ceil(filteredRescuers.length / rowsPerPage)
+          }
+          className="bg-primary-medium px-3 py-1 rounded disabled:opacity-50"
+        >
+          Next
+        </button>
       </div>
-    </div>
-  );
-};
-
-// Dropdown Filter Component
-const FilterDropdown = ({
-  label,
-  options,
-  selected,
-  setSelected,
-  labelStyle,
-  borderStyle,
-}) => {
-  return (
-    <div>
-      <label className={`block text-xs sm:text-sm font-medium ${labelStyle}`}>
-        {label}
-      </label>
-      <select
-        value={selected}
-        onChange={(e) => setSelected(e.target.value)}
-        className={`form-select w-full border ${borderStyle} text-black rounded-lg p-1 mt-1 bg-gray-50 text-xs sm:text-sm`}
-      >
-        {options.map((option) => (
-          <option key={option} value={option}>
-            {option}
-          </option>
-        ))}
-      </select>
     </div>
   );
 };
