@@ -157,321 +157,325 @@ const AddRescuer = () => {
   };
 
   return (
-    <div className="flex-1 p-2 sm:p-4 lg:p-6 h-full bg-gray-50 flex flex-col">
-      {/* Header Section */}
-      <div className="flex items-center mb-2 sm:mb-4">
-        <MdPersonAdd className="text-xl sm:text-2xl lg:text-3xl text-[#557C55] mr-2" />
-        <h4 className="text-sm sm:text-md lg:text-lg font-semibold text-[#557C55]">
-          Add Rescuer
-        </h4>
-      </div>
-      {/* Add Rescuer Form */}
-      <div className="flex-1 bg-white rounded-md p-4 sm:p-6 lg:p-8">
-        <form className="space-y-4 sm:space-y-6" onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-            {/* Form Fields */}
-            <div>
-              <label
-                htmlFor="firstName"
-                className="block text-sm font-medium text-[#557C55]"
-              >
-                First Name:
-              </label>
-              <input
-                type="text"
-                id="firstName"
-                name="firstName"
-                value={formData.firstName}
-                onChange={handleChange}
-                required
-                className="mt-1 block w-full px-2 py-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
-                placeholder="First name"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="middleInitial"
-                className="block text-sm font-medium text-[#557C55]"
-              >
-                Middle Initial:
-              </label>
-              <input
-                type="text"
-                id="middleInitial"
-                name="middleInitial"
-                value={formData.middleInitial}
-                onChange={handleChange}
-                required
-                className="mt-1 block w-full px-2 py-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
-                placeholder="Middle Initial"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="lastName"
-                className="block text-sm font-medium text-[#557C55]"
-              >
-                Last Name:
-              </label>
-              <input
-                type="text"
-                id="lastName"
-                name="lastName"
-                value={formData.lastName}
-                onChange={handleChange}
-                required
-                className="mt-1 block w-full px-2 py-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
-                placeholder="Last name"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="birthday"
-                className="block text-sm font-medium text-[#557C55]"
-              >
-                Birthday:
-              </label>
-              <input
-                type="date"
-                id="birthday"
-                name="birthday"
-                value={formData.birthday}
-                onChange={handleChange}
-                required
-                className="mt-1 block w-full px-2 py-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="age"
-                className="block text-sm font-medium text-[#557C55]"
-              >
-                Age:
-              </label>
-              <input
-                type="text"
-                id="age"
-                name="age"
-                value={formData.age}
-                readOnly
-                className="mt-1 block w-full px-2 py-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
-                placeholder="Age"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="municipality"
-                className="block text-sm font-semibold text-[#557C55]"
-              >
-                Municipality:
-              </label>
-              <select
-                id="municipality"
-                name="municipality"
-                value={formData.municipality}
-                onChange={handleChange}
-                required
-                className="w-full p-2 border rounded-lg bg-gray-100 border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
-              >
-                <option value="">Select Municipality</option>
-                {Object.keys(barangaysData).map((municipality) => (
-                  <option key={municipality} value={municipality}>
-                    {municipality}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label
-                htmlFor="barangay"
-                className="block text-sm font-semibold text-[#557C55]"
-              >
-                Barangay:
-              </label>
-              <select
-                id="barangay"
-                name="barangay"
-                value={formData.barangay}
-                onChange={handleChange}
-                required
-                className="w-full p-2 border rounded-lg bg-gray-100 border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
-              >
-                <option value="">Select Barangay</option>
-                {barangaysData[formData.municipality]?.map((barangay) => (
-                  <option key={barangay} value={barangay}>
-                    {barangay}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label
-                htmlFor="contactNumber"
-                className="block text-sm font-medium text-[#557C55]"
-              >
-                Contact Number:
-              </label>
-              <input
-                type="text"
-                id="contactNumber"
-                name="contactNumber"
-                value={formData.contactNumber}
-                onChange={handleChange}
-                required
-                className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
-                placeholder="Enter contact number"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-[#557C55]"
-              >
-                Email:
-              </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-                className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
-                placeholder="Enter email"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="username"
-                className="block text-sm font-medium text-[#557C55]"
-              >
-                Username:
-              </label>
-              <input
-                type="text"
-                id="username"
-                name="username"
-                value={formData.username}
-                onChange={handleChange}
-                required
-                className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
-                placeholder="Enter username"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-[#557C55]"
-              >
-                Password:
-              </label>
-              <div className="relative">
+    <>
+      <div className="flex-1 p-2 sm:p-4 lg:p-6 h-fullflex flex-col">
+        {/* Header Section */}
+        <div className="flex items-center mb-2 sm:mb-4 border-b border-gray-200 pb-3">
+          <MdPersonAdd className="text-xl sm:text-2xl lg:text-3xl text-[#557C55] mr-2" />
+          <h4 className="text-md sm:text-xl lg:text-2xl font-semibold text-[#557C55]">
+            Add Rescuer
+          </h4>
+        </div>
+        {/* Add Rescuer Form */}
+        <div className="flex-1  p-4 sm:p-6 lg:p-8">
+          <form className="space-y-4 sm:space-y-6" onSubmit={handleSubmit}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              {/* Form Fields */}
+              <div>
+                <label
+                  htmlFor="firstName"
+                  className="block text-sm font-medium text-[#557C55]"
+                >
+                  First Name:
+                </label>
                 <input
-                  type={showPassword ? "text" : "password"}
-                  id="password"
-                  name="password"
-                  value={formData.password}
+                  type="text"
+                  id="firstName"
+                  name="firstName"
+                  value={formData.firstName}
                   onChange={handleChange}
-                  onFocus={() => setIsPasswordFocused(true)} // Set focus state to true
-                  onBlur={() => setIsPasswordFocused(false)} // Set focus state to false
                   required
                   className="mt-1 block w-full px-2 py-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
-                  placeholder="Password"
+                  placeholder="First name"
                 />
-                <span
-                  className="absolute inset-y-0 right-0 flex items-center pr-2 cursor-pointer"
-                  onClick={togglePasswordVisibility}
-                >
-                  {showPassword ? (
-                    <AiFillEye className="text-primary-medium" />
-                  ) : (
-                    <AiFillEyeInvisible className="text-primary-medium" />
-                  )}
-                </span>
               </div>
-              {/* Conditionally render the password strength meter */}
-              {isPasswordFocused && formData.password && (
-                <div className="mt-2">
-                  <div className="text-xs text-gray-500">
-                    Password Strength:{" "}
-                    <strong>{getStrengthLabel(passwordStrength.score)}</strong>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
-                    <div
-                      className={`h-full rounded-full ${
-                        passwordStrength.score === 0
-                          ? "bg-red-500"
-                          : passwordStrength.score === 1
-                          ? "bg-orange-500"
-                          : passwordStrength.score === 2
-                          ? "bg-yellow-500"
-                          : passwordStrength.score === 3
-                          ? "bg-blue-500"
-                          : "bg-green-500"
-                      }`}
-                      style={{
-                        width: `${(passwordStrength.score / 4) * 100}%`,
-                      }}
-                    />
-                  </div>
+              <div>
+                <label
+                  htmlFor="middleInitial"
+                  className="block text-sm font-medium text-[#557C55]"
+                >
+                  Middle Initial:
+                </label>
+                <input
+                  type="text"
+                  id="middleInitial"
+                  name="middleInitial"
+                  value={formData.middleInitial}
+                  onChange={handleChange}
+                  required
+                  className="mt-1 block w-full px-2 py-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
+                  placeholder="Middle Initial"
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="lastName"
+                  className="block text-sm font-medium text-[#557C55]"
+                >
+                  Last Name:
+                </label>
+                <input
+                  type="text"
+                  id="lastName"
+                  name="lastName"
+                  value={formData.lastName}
+                  onChange={handleChange}
+                  required
+                  className="mt-1 block w-full px-2 py-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
+                  placeholder="Last name"
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="birthday"
+                  className="block text-sm font-medium text-[#557C55]"
+                >
+                  Birthday:
+                </label>
+                <input
+                  type="date"
+                  id="birthday"
+                  name="birthday"
+                  value={formData.birthday}
+                  onChange={handleChange}
+                  required
+                  className="mt-1 block w-full px-2 py-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="age"
+                  className="block text-sm font-medium text-[#557C55]"
+                >
+                  Age:
+                </label>
+                <input
+                  type="text"
+                  id="age"
+                  name="age"
+                  value={formData.age}
+                  readOnly
+                  className="mt-1 block w-full px-2 py-1 bg-gray-100 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
+                  placeholder="Age"
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="municipality"
+                  className="block text-sm font-semibold text-[#557C55]"
+                >
+                  Municipality:
+                </label>
+                <select
+                  id="municipality"
+                  name="municipality"
+                  value={formData.municipality}
+                  onChange={handleChange}
+                  required
+                  className="w-full p-2 border rounded-lg bg-gray-100 border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
+                >
+                  <option value="">Select Municipality</option>
+                  {Object.keys(barangaysData).map((municipality) => (
+                    <option key={municipality} value={municipality}>
+                      {municipality}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label
+                  htmlFor="barangay"
+                  className="block text-sm font-semibold text-[#557C55]"
+                >
+                  Barangay:
+                </label>
+                <select
+                  id="barangay"
+                  name="barangay"
+                  value={formData.barangay}
+                  onChange={handleChange}
+                  required
+                  className="w-full p-2 border rounded-lg bg-gray-100 border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
+                >
+                  <option value="">Select Barangay</option>
+                  {barangaysData[formData.municipality]?.map((barangay) => (
+                    <option key={barangay} value={barangay}>
+                      {barangay}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label
+                  htmlFor="contactNumber"
+                  className="block text-sm font-medium text-[#557C55]"
+                >
+                  Contact Number:
+                </label>
+                <input
+                  type="text"
+                  id="contactNumber"
+                  name="contactNumber"
+                  value={formData.contactNumber}
+                  onChange={handleChange}
+                  required
+                  className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
+                  placeholder="Enter contact number"
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-[#557C55]"
+                >
+                  Email:
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                  className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
+                  placeholder="Enter email"
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="username"
+                  className="block text-sm font-medium text-[#557C55]"
+                >
+                  Username:
+                </label>
+                <input
+                  type="text"
+                  id="username"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleChange}
+                  required
+                  className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
+                  placeholder="Enter username"
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-[#557C55]"
+                >
+                  Password:
+                </label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    id="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    onFocus={() => setIsPasswordFocused(true)} // Set focus state to true
+                    onBlur={() => setIsPasswordFocused(false)} // Set focus state to false
+                    required
+                    className="mt-1 block w-full px-2 py-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
+                    placeholder="Password"
+                  />
+                  <span
+                    className="absolute inset-y-0 right-0 flex items-center pr-2 cursor-pointer"
+                    onClick={togglePasswordVisibility}
+                  >
+                    {showPassword ? (
+                      <AiFillEye className="text-primary-medium" />
+                    ) : (
+                      <AiFillEyeInvisible className="text-primary-medium" />
+                    )}
+                  </span>
                 </div>
-              )}
-            </div>
+                {/* Conditionally render the password strength meter */}
+                {isPasswordFocused && formData.password && (
+                  <div className="mt-2">
+                    <div className="text-xs text-gray-500">
+                      Password Strength:{" "}
+                      <strong>
+                        {getStrengthLabel(passwordStrength.score)}
+                      </strong>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
+                      <div
+                        className={`h-full rounded-full ${
+                          passwordStrength.score === 0
+                            ? "bg-red-500"
+                            : passwordStrength.score === 1
+                            ? "bg-orange-500"
+                            : passwordStrength.score === 2
+                            ? "bg-yellow-500"
+                            : passwordStrength.score === 3
+                            ? "bg-blue-500"
+                            : "bg-green-500"
+                        }`}
+                        style={{
+                          width: `${(passwordStrength.score / 4) * 100}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
 
-            <div>
-              <label
-                htmlFor="confirmPassword"
-                className="block text-sm font-medium text-[#557C55]"
-              >
-                Confirm Password:
-              </label>
-              <div className="relative">
-                <input
-                  type={showConfirmPassword ? "text" : "password"}
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  required
-                  className="mt-1 block w-full px-2 py-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
-                  placeholder="Confirm Password"
-                />
-                <span
-                  className="absolute inset-y-0 right-0 flex items-center pr-2 cursor-pointer"
-                  onClick={toggleConfirmPasswordVisibility}
+              <div>
+                <label
+                  htmlFor="confirmPassword"
+                  className="block text-sm font-medium text-[#557C55]"
                 >
-                  {showConfirmPassword ? (
-                    <AiFillEye className="text-primary-medium" />
-                  ) : (
-                    <AiFillEyeInvisible className="text-primary-medium" />
-                  )}
-                </span>
+                  Confirm Password:
+                </label>
+                <div className="relative">
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    required
+                    className="mt-1 block w-full px-2 py-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
+                    placeholder="Confirm Password"
+                  />
+                  <span
+                    className="absolute inset-y-0 right-0 flex items-center pr-2 cursor-pointer"
+                    onClick={toggleConfirmPasswordVisibility}
+                  >
+                    {showConfirmPassword ? (
+                      <AiFillEye className="text-primary-medium" />
+                    ) : (
+                      <AiFillEyeInvisible className="text-primary-medium" />
+                    )}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
-          {/* Submit Button */}
-          <div className="flex justify-end">
-            <button
-              type="submit"
-              className={`flex items-center justify-center px-3 py-1 sm:px-4 sm:py-2 text-white bg-[#557C55] rounded-md focus:outline-none focus:ring-2 focus:ring-[#2e5f2e] transition ${
-                loading ? "opacity-50 cursor-not-allowed" : ""
-              }`}
-              disabled={loading}
-            >
-              {loading ? (
-                <span>Loading...</span>
-              ) : (
-                <>
-                  <FaSave className="mr-2" />
-                  Save Rescuer
-                </>
-              )}
-            </button>
-          </div>
-        </form>
+            {/* Submit Button */}
+            <div className="flex justify-end">
+              <button
+                type="submit"
+                className={`flex items-center justify-center px-3 py-1 sm:px-4 sm:py-2 text-white bg-[#557C55] rounded-md focus:outline-none focus:ring-2 focus:ring-[#2e5f2e] transition ${
+                  loading ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+                disabled={loading}
+              >
+                {loading ? (
+                  <span>Loading...</span>
+                ) : (
+                  <>
+                    <FaSave className="mr-2" />
+                    Save Rescuer
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
       <Toast />
-    </div>
+    </>
   );
 };
 

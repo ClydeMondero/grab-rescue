@@ -238,7 +238,7 @@ const GenerateReports = (props) => {
   ];
 
   return (
-    <div className="flex-1 p-4 sm:p-6 lg:p-8 h-full bg-gray-50 flex flex-col">
+    <div className="flex-1 p-4 sm:p-6 lg:p-8 h-full  flex flex-col">
       <div className="flex items-center mb-4 sm:mb-6 pb-2 sm:pb-4 p-2 sm:p-4 rounded-lg">
         <FaFileAlt className="text-2xl sm:text-3xl text-primary-medium mr-2 sm:mr-3" />
         <h4 className="text-sm sm:text-2xl font-semibold text-primary-medium">

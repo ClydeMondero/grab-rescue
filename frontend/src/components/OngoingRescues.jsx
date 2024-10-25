@@ -123,9 +123,9 @@ const OngoingRescues = ({ requests, user }) => {
   };
 
   return (
-    <div className="flex flex-col p-4 lg:p-6 h-full">
+    <div className="flex flex-col p-4 lg:p-6 h-full ">
       {/* Header */}
-      <div className="flex items-center mb-4 pb-2 border-b border-gray-200">
+      <div className="flex items-center mb-2 sm:mb-4 border-b border-gray-200 pb-3">
         <FaAmbulance className="text-xl sm:text-2xl lg:text-3xl text-[#557C55] mr-2" />
         <h4 className="text-md sm:text-xl lg:text-2xl font-semibold text-[#557C55]">
           Ongoing Rescue Operations
@@ -177,43 +177,45 @@ const OngoingRescues = ({ requests, user }) => {
           {paginatedRescues.map((rescue) => (
             <div
               key={rescue.id}
-              className="bg-white border border-primary-medium rounded-md p-3 mb-3 shadow-sm"
+              className="bg-white border border-primary rounded-xl p-3 mb-3 shadow-sm"
             >
-              <h5 className="font-bold text-md truncate">
+              <h5 className="text-md truncate">
                 <span className="text-primary-dark">Rescue ID: </span>
-                <span className="text-primary">{rescue.rescuer}</span>
+                <span className="text-gray-500">{rescue.rescuer}</span>
               </h5>
-              <h5 className=" font-bold truncate">
-                <span className="text-primary-dark">Location:</span>
-                <span className="text-primary">{rescue.location}</span>
+              <h5 className="truncate">
+                <span className="text-primary-dark">Location: </span>
+                <span className="text-gray-500">{rescue.location}</span>
               </h5>
-              <h5 className="font-bold truncate">
-                <span className="text-primary-dark">Accepted:</span>
-                <span className="text-primary">{rescue.acceptedTimestamp}</span>
+              <h5 className="truncate">
+                <span className="text-primary-dark">Accepted: </span>
+                <span className="text-gray-500">
+                  {rescue.acceptedTimestamp}
+                </span>
               </h5>
-              <h5 className="font-bold truncate">
-                <span className="text-primary-dark">ETA:</span>
-                <span className="text-primary">
+              <h5 className="truncate">
+                <span className="text-primary-dark">ETA: </span>
+                <span className="text-gray-500">
                   {rescue.estimatedArrivalTime}
                 </span>
               </h5>
-              <h5 className="font-bold truncate">
-                <span className="text-primary-dark">Departure:</span>
-                <span className="text-primary">
+              <h5 className="truncate">
+                <span className="text-primary-dark">Departure: </span>
+                <span className="text-gray-500">
                   {rescue.estimatedDepartureTime}
                 </span>
               </h5>
-              <h5 className=" font-bold truncate">
-                <span className="text-primary-dark">Status:</span>
+              <h5 className="truncate">
+                <span className="text-primary-dark">Status: </span>
                 <span
                   className={
                     rescue.status === "pending"
-                      ? "text-yellow-500"
+                      ? "text-warning"
                       : rescue.status === "assigned"
-                      ? "text-blue-500"
+                      ? "text-info"
                       : rescue.status === "in-progress"
                       ? "text-orange-500"
-                      : "text-green-500"
+                      : "text-primary-medium"
                   }
                 >
                   {rescue.status}
@@ -221,7 +223,7 @@ const OngoingRescues = ({ requests, user }) => {
               </h5>
               <button
                 onClick={() => handleShowMap(rescue.location)}
-                className="mt-2 bg-secondary text-white px-4 py-2 rounded-full hover:bg-red-700 transition"
+                className="mt-2 bg-secondary text-white px-2 py-2 rounded-md hover:bg-red-700 transition"
               >
                 View Map
               </button>

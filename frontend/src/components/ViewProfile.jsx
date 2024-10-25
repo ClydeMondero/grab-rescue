@@ -88,36 +88,42 @@ const ViewProfile = (props) => {
               Profile Details
             </h2>
             <div className="grid grid-cols-1 gap-4 text-base">
-              <div className="flex justify-between border-b border-warning">
-                <span className="font-semibold text-primary">Username:</span>
+              <div className="flex justify-between border-b border-primary-medium">
+                <span className="font-semibold text-primary-medium">
+                  Username:
+                </span>
                 <p className="text-right font-semibold text-primary-dark">
                   {profile.username}
                 </p>
               </div>
-              <div className="flex justify-between border-b border-warning">
-                <span className="font-semibold text-primary">First Name:</span>
+              <div className="flex justify-between border-b border-primary-medium">
+                <span className="font-semibold text-primary-medium">
+                  First Name:
+                </span>
                 <p className="text-right font-semibold text-primary-dark">
                   {profile.first_name}
                 </p>
               </div>
-              <div className="flex justify-between border-b border-warning">
-                <span className="font-semibold text-primary">Last Name:</span>
+              <div className="flex justify-between border-b border-primary-medium">
+                <span className="font-semibold text-primary-medium">
+                  Last Name:
+                </span>
                 <p className="text-right font-semibold text-primary-dark">
                   {profile.last_name}
                 </p>
               </div>
               {user.account_type === "Admin" && (
                 <>
-                  <div className="flex justify-between border-b border-warning">
-                    <span className="font-semibold text-primary">
+                  <div className="flex justify-between border-b border-primary-medium">
+                    <span className="font-semibold text-primary-medium">
                       Municipality:
                     </span>
                     <p className="text-right font-semibold text-primary-dark">
                       {profile.municipality}
                     </p>
                   </div>
-                  <div className="flex justify-between border-b border-warning">
-                    <span className="font-semibold text-primary">
+                  <div className="flex justify-between border-b border-primary-medium">
+                    <span className="font-semibold text-primary-medium">
                       Barangay:
                     </span>
                     <p className="text-right font-semibold text-primary-dark">
@@ -126,24 +132,26 @@ const ViewProfile = (props) => {
                   </div>
                 </>
               )}
-              <div className="flex justify-between border-b border-warning">
-                <span className="font-semibold text-primary">
+              <div className="flex justify-between border-b border-primary-medium">
+                <span className="font-semibold text-primary-medium">
                   Contact Number:
                 </span>
                 <p className="text-right font-semibold text-primary-dark">
                   {profile.contact_number}
                 </p>
               </div>
-              <div className="flex justify-between border-b border-warning">
-                <span className="font-semibold text-primary">Birthday:</span>
+              <div className="flex justify-between border-b border-primary-medium">
+                <span className="font-semibold text-primary-medium">
+                  Birthday:
+                </span>
                 <p className="text-right font-semibold text-primary-dark">
                   {profile.birthday
                     ? new Date(profile.birthday).toLocaleDateString()
                     : ""}
                 </p>
               </div>
-              <div className="flex justify-between border-b border-warning">
-                <span className="font-semibold text-primary">Age:</span>
+              <div className="flex justify-between border-b border-primary-medium">
+                <span className="font-semibold text-primary-medium">Age:</span>
                 <p className="text-right font-semibold text-primary-dark">
                   {profile.age || "N/A"}
                 </p>
