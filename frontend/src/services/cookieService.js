@@ -50,6 +50,25 @@ export const setRequestCookie = (id) => {
   });
 };
 
+export const setSelectedRequestCookie = (selectedRequest) => {
+  const encryptedID = encryptID(selectedRequest);
+
+  Cookies.set("selected_request", encryptedID, {
+    expires: 14,
+    secure: true,
+    sameSite: "Lax",
+  });
+};
+
+export const getSelectedRequestCookie = () => {
+  const selectedRequest = Cookies.get("selected_request");
+  if (!selectedRequest) {
+    return null;
+  }
+
+  return decryptID(selectedRequest);
+};
+
 export const setLocationCookie = ({ latitude, longitude }) => {
   Cookies.set("location", JSON.stringify({ latitude, longitude }), {
     expires: 14,

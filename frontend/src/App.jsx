@@ -10,7 +10,7 @@ import {
   VerifyEmail,
 } from "./pages";
 import axios from "axios";
-import { PrivateRoute } from "./components";
+import { PrivateRoute, GeolocateButton } from "./components";
 import { StatusProvider } from "./contexts/StatusContext";
 
 axios.defaults.baseURL =
@@ -22,6 +22,7 @@ const App = () => {
   return (
     <StatusProvider>
       <Router>
+        <GeolocateButton />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />

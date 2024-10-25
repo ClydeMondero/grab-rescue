@@ -1,9 +1,9 @@
-import "ldrs/cardio";
+import { cardio } from "ldrs";
+cardio.register();
 
 const Loader = ({ isLoading, color, size = 50 }) => {
   const loaderColor = color ? color : "#fff";
 
-  //FIXME: loader not showing in production
   return (
     <div aria-live="polite" aria-busy={isLoading}>
       {isLoading && (

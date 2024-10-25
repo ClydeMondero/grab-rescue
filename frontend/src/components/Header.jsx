@@ -12,7 +12,7 @@ const Header = () => {
   const { page } = useContext(RescuerContext);
 
   return (
-    <div className="bg-background text-white flex items-center justify-between p-6">
+    <div className="bg-background text-white flex items-center justify-between p-6 sticky top-0 left-0 right-0 z-50">
       <div className="text-xl font-bold">
         <img src={logo} alt="" className="hidden h-10 md:block" />
         <p className="text-3xl text-primary-dark md:hidden">

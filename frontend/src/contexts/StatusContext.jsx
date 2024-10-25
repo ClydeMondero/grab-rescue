@@ -60,8 +60,6 @@ const StatusProvider = ({ children }) => {
           setStatusCookie("offline");
 
           updateLocationStatus(id, "offline");
-
-          console.log("Setting user's status to offline");
         }, 60000);
       }
     } else if (isOnline) {
@@ -70,10 +68,6 @@ const StatusProvider = ({ children }) => {
 
         updateLocationStatus(id, "online");
         clearTimeout(timeoutRef.current);
-
-        console.log("Setting user's status to online");
-      } else {
-        console.log("User is already online");
       }
     }
 
