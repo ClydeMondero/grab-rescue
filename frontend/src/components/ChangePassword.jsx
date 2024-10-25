@@ -118,24 +118,20 @@ const ChangePassword = (props) => {
   };
 
   return (
-    <div className="flex-1 p-3 h-full  flex flex-col">
+    <div className="flex-1 p-3 h-full flex flex-col">
       <div className="flex items-center mb-2 max-w-md">
-        <FaArrowLeft
-          className="text-lg sm:text-xl text-[#557C55] cursor-pointer"
-          onClick={() => navigate(-1)}
-        />
         <FaKey className="text-2xl sm:text-3xl text-[#557C55] mr-2" />
-        <h4 className="text-lg sm:text-xl font-semibold ml-2 text-[#557C55]">
+        <h4 className="text-md sm:text-xl lg:text-2xl font-semibold text-[#557C55]">
           Change Password
         </h4>
       </div>
-      <div className="flex-1 bg-white rounded-lg p-3">
-        <p className="text-sm sm:text-md mb-3 font-semibold text-[#557C55]">
-          Update your password:
-        </p>
-        <form className="space-y-2" onSubmit={handleSubmit}>
+      <div className="flex-1 bg-white rounded-lg p-3 overflow-hidden">
+        <h2 className="block text-xs sm:text-sm font-semibold text-[#557C55]">
+          Update your Password
+        </h2>
+        <form className="space-y-2 " onSubmit={handleSubmit}>
           {/* Current Password Field */}
-          <div className="relative">
+          <div className="relative ">
             <FaLock className="absolute left-3 top-3 text-gray-600" />
             <input
               type={showPasswords.currentPassword ? "text" : "password"}
@@ -252,9 +248,8 @@ const ChangePassword = (props) => {
 
           <button
             type="submit"
-            className="bg-[#557C55] text-white px-2 py-1 rounded text-xs sm:text-sm hover:bg-[#6EA46E] transition flex items-center justify-center"
+            className="bg-primary-medium text-white px-4 py-2 rounded-full text-xs sm:text-sm hover:bg-primary transition flex items-center justify-center"
           >
-            <FaSync className="mr-1" />
             Update Password
           </button>
         </form>

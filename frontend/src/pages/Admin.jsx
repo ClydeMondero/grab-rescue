@@ -26,18 +26,17 @@ const Admin = (props) => {
     };
   }, []);
 
-  // Log the requests whenever they are updated
   useEffect(() => {
     console.log("Updated requests:", requests);
   }, [requests]);
 
   return (
-    <div className="flex">
+    <div className="flex flex-col md:flex-row">
       {/* Sidebar */}
       <Sidebar />
 
       {/* Main Content */}
-      <div className="flex-1 p-6 md:p-8 bg-[#FEF9F2]">
+      <div className="flex-1 p-6 md:p-8 md:mt-0 mt-16">
         <Routes>
           <Route path="/addRescuer" element={<AddRescuer user={user} />} />
           <Route
