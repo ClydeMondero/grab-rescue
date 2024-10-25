@@ -19,7 +19,7 @@ const Sidebar = () => {
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
     if (isOpen) {
-      setIsDropdownOpen(false); 
+      setIsDropdownOpen(false);
     }
   };
 
@@ -36,11 +36,11 @@ const Sidebar = () => {
 
     if (pageWidth <= 768 && isOpen) {
       setIsOpen(false);
-      setIsDropdownOpen(false); 
+      setIsDropdownOpen(false);
     } else {
       if (!isOpen) {
         setIsOpen(true);
-        setIsDropdownOpen(false); 
+        setIsDropdownOpen(false);
       }
     }
   };
@@ -208,7 +208,7 @@ const Sidebar = () => {
 
       {/* Mobile Sidebar */}
       <div
-        style={{ height: "100vh" }}
+        style={{ height: "100vh", zIndex: 1 }}
         className={`md:hidden fixed top-0 left-0 h-full ${
           isOpen ? "w-64" : "w-0"
         } bg-[#557C55] text-white flex-col transition-all duration-300`}

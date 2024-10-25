@@ -6,24 +6,22 @@ import { createAuthHeader } from "../services/authService";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Toast } from "../components";
-import { barangaysData } from "../constants/Barangays"; // Imported barangaysData
+import { barangaysData } from "../constants/Barangays";
 
 const ViewProfile = (props) => {
   const navigate = useNavigate();
   const { user } = props;
   const [profile, setProfile] = useState(user);
-  const [age, setAge] = useState(null); // Added state for age
+  const [age, setAge] = useState(null);
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
-  // Extract municipalities from barangaysData
   const municipalities = Object.keys(barangaysData);
 
   useEffect(() => {
     calculateAge(profile.birthday);
   }, [profile]);
 
-  // Function to calculate age based on birthday
   const calculateAge = (birthday) => {
     if (!birthday) return;
     const birthDate = new Date(birthday);
@@ -45,7 +43,7 @@ const ViewProfile = (props) => {
       ...prevProfile,
       [name]: value,
     }));
-    if (name === "birthday") calculateAge(value); // Update age on birthday change
+    if (name === "birthday") calculateAge(value);
   };
 
   const handleSubmit = async (e) => {
@@ -75,131 +73,112 @@ const ViewProfile = (props) => {
   };
 
   return (
-    <>
-      <div className="flex-1 p-2 md:p-4 h-full">
-        {/* Back button and header */}
-        <div className="flex items-center mb-4">
-          <FaArrowLeft
-            className="text-base md:text-lg text-[#557C55] cursor-pointer"
-            onClick={() => {
-              navigate(user.account_type === "Admin" ? "/admin" : "/rescuer");
-            }}
-          />
-          <FaUser className="text-xl md:text-2xl text-[#557C55] mr-1" />
-          <h4 className="text-sm md:text-lg font-semibold ml-1 text-[#557C55]">
-            View Profile
+    <div className="flex flex-col h-full">
+      <div className="flex-1 p-4 overflow-y-auto max-h-full">
+        <div className="flex items-center mb-8">
+          <FaUser className="text-xl md:text-2xl text-[#557C55] mr-3" />
+          <h4 className="text-md sm:text-xl lg:text-2xl font-semibold text-[#557C55]">
+            Profile Overview
           </h4>
         </div>
 
-        {/* Main Profile Container */}
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          {/* Profile Picture Section */}
-          <div className="bg-white rounded-lg p-4 shadow-md">
-            <h2 className="text-sm font-semibold text-[#557C55] mb-1">
-              Profile Picture
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="bg-white rounded-md p-4 col-span-full">
+            <h2 className="block text-xs sm:text-xl font-semibold text-[#557C55]pb-2">
+              Profile Details
             </h2>
-            <div className="flex justify-center mb-2">
-              <div className="relative">
-                <img
-                  src={profile.profile_image}
-                  alt="Profile"
-                  className="rounded-full w-24 h-24 object-cover border border-gray-300 shadow-md"
-                />
-                {/* Upload new picture */}
-                <button className="absolute bottom-0 right-0 bg-[#557C55] text-white p-1 rounded-full hover:bg-[#6EA46E] transition shadow-md">
-                  <FaEdit className="text-xs" />
-                </button>
+            <div className="grid grid-cols-1 gap-4 text-base">
+              <div className="flex justify-between border-b border-warning">
+                <span className="font-semibold text-primary">Username:</span>
+                <p className="text-right font-semibold text-primary-dark">
+                  {profile.username}
+                </p>
               </div>
-            </div>
-          </div>
-
-          {/* Profile Information Card */}
-          <div className="bg-white rounded-lg p-4 shadow-md">
-            <h2 className="text-sm font-semibold text-[#557C55] mb-3">
-              Profile Information
-            </h2>
-            <div className="grid grid-cols-2 gap-1 text-xs text-gray-700">
-              <div>
-                <span className="font-semibold text-[#557C55]">Username:</span>
-                <p>{profile.username}</p>
+              <div className="flex justify-between border-b border-warning">
+                <span className="font-semibold text-primary">First Name:</span>
+                <p className="text-right font-semibold text-primary-dark">
+                  {profile.first_name}
+                </p>
               </div>
-              <div>
-                <span className="font-semibold text-[#557C55]">
-                  First Name:
-                </span>
-                <p>{profile.first_name}</p>
-              </div>
-              <div>
-                <span className="font-semibold text-[#557C55]">Last Name:</span>
-                <p>{profile.last_name}</p>
+              <div className="flex justify-between border-b border-warning">
+                <span className="font-semibold text-primary">Last Name:</span>
+                <p className="text-right font-semibold text-primary-dark">
+                  {profile.last_name}
+                </p>
               </div>
               {user.account_type === "Admin" && (
                 <>
-                  <div>
-                    <span className="font-semibold text-[#557C55]">
+                  <div className="flex justify-between border-b border-warning">
+                    <span className="font-semibold text-primary">
                       Municipality:
                     </span>
-                    <p>{profile.municipality}</p>
+                    <p className="text-right font-semibold text-primary-dark">
+                      {profile.municipality}
+                    </p>
                   </div>
-                  <div>
-                    <span className="font-semibold text-[#557C55]">
+                  <div className="flex justify-between border-b border-warning">
+                    <span className="font-semibold text-primary">
                       Barangay:
                     </span>
-                    <p>{profile.barangay}</p>
+                    <p className="text-right font-semibold text-primary-dark">
+                      {profile.barangay}
+                    </p>
                   </div>
                 </>
               )}
-              <div>
-                <span className="font-semibold text-[#557C55]">
+              <div className="flex justify-between border-b border-warning">
+                <span className="font-semibold text-primary">
                   Contact Number:
                 </span>
-                <p>{profile.contact_number}</p>
+                <p className="text-right font-semibold text-primary-dark">
+                  {profile.contact_number}
+                </p>
               </div>
-              <div>
-                <span className="font-semibold text-[#557C55]">Birthday:</span>
-                <p>
+              <div className="flex justify-between border-b border-warning">
+                <span className="font-semibold text-primary">Birthday:</span>
+                <p className="text-right font-semibold text-primary-dark">
                   {profile.birthday
                     ? new Date(profile.birthday).toLocaleDateString()
                     : ""}
                 </p>
               </div>
-              <div>
-                <span className="font-semibold text-[#557C55]">Age:</span>
-                <p>{age || "N/A"}</p>
+              <div className="flex justify-between border-b border-warning">
+                <span className="font-semibold text-primary">Age:</span>
+                <p className="text-right font-semibold text-primary-dark">
+                  {profile.age || "N/A"}
+                </p>
               </div>
             </div>
 
-            {/* Edit Profile Button */}
-            <div className="mt-4">
+            <div className="mt-6 text-center">
               <button
                 onClick={() => setIsEditing(true)}
-                className="bg-[#557C55] text-white px-4 py-2 rounded-md text-xs font-semibold hover:bg-[#6EA46E] transition flex items-center shadow-md"
+                className="bg-primary-medium text-white px-4 py-2 rounded-full text-xs sm:text-sm hover:bg-primary transition flex items-center justify-center"
               >
-                <FaEdit className="mr-1 text-xs" /> Edit Profile
+                <FaEdit className="mr-2 text-lg" /> Edit Profile
               </button>
             </div>
           </div>
         </div>
 
-        {/* Edit Profile Modal */}
         {isEditing && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="relative bg-white p-4 w-full md:w-2/3 lg:w-1/2 max-h-[500px] overflow-y-auto rounded-lg shadow-lg">
+            <div className="relative bg-white p-6 w-full md:w-2/3 lg:w-1/2 max-h-[600px] overflow-y-auto rounded-lg shadow-xl">
               <FaTimes
-                className="absolute top-2 right-2 text-[#557C55] hover:text-gray-700 cursor-pointer"
+                className="absolute top-3 right-3 text-[#557C55] hover:text-gray-700 cursor-pointer"
                 onClick={() => setIsEditing(false)}
               />
-              <div className="flex items-center mb-4">
-                <FaUser className="mr-1 text-[#557C55]" />
-                <h4 className="text-lg font-bold text-[#557C55]">
+              <div className="flex items-center mb-6">
+                <FaUser className="mr-2 text-[#557C55]" />
+                <h4 className="text-xl font-bold text-[#557C55]">
                   Edit Profile
                 </h4>
               </div>
-              <form className="space-y-4" onSubmit={handleSubmit}>
+              <form className="space-y-5" onSubmit={handleSubmit}>
                 <div>
                   <label
                     htmlFor="username"
-                    className="block text-xs font-semibold text-[#557C55]"
+                    className="block text-sm font-semibold text-[#557C55]"
                   >
                     Username:
                   </label>
@@ -209,7 +188,7 @@ const ViewProfile = (props) => {
                     name="username"
                     value={profile.username}
                     onChange={handleProfileChange}
-                    className="w-full p-2 border rounded-lg bg-gray-100 border-gray-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
+                    className="w-full p-3 border rounded-lg bg-gray-100 border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
                   />
                 </div>
 
@@ -217,7 +196,7 @@ const ViewProfile = (props) => {
                   <div>
                     <label
                       htmlFor="first_name"
-                      className="block text-xs font-semibold text-[#557C55]"
+                      className="block text-sm font-semibold text-[#557C55]"
                     >
                       First Name:
                     </label>
@@ -227,13 +206,14 @@ const ViewProfile = (props) => {
                       name="first_name"
                       value={profile.first_name}
                       onChange={handleProfileChange}
-                      className="w-full p-2 border rounded-lg bg-gray-100 border-gray-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
+                      className="w-full p-3 border rounded-lg bg-gray-100 border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
                     />
                   </div>
+
                   <div>
                     <label
                       htmlFor="last_name"
-                      className="block text-xs font-semibold text-[#557C55]"
+                      className="block text-sm font-semibold text-[#557C55]"
                     >
                       Last Name:
                     </label>
@@ -243,7 +223,7 @@ const ViewProfile = (props) => {
                       name="last_name"
                       value={profile.last_name}
                       onChange={handleProfileChange}
-                      className="w-full p-2 border rounded-lg bg-gray-100 border-gray-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
+                      className="w-full p-3 border rounded-lg bg-gray-100 border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
                     />
                   </div>
                 </div>
@@ -253,7 +233,7 @@ const ViewProfile = (props) => {
                     <div>
                       <label
                         htmlFor="municipality"
-                        className="block text-xs font-semibold text-[#557C55]"
+                        className="block text-sm font-semibold text-[#557C55]"
                       >
                         Municipality:
                       </label>
@@ -262,20 +242,21 @@ const ViewProfile = (props) => {
                         name="municipality"
                         value={profile.municipality}
                         onChange={handleProfileChange}
-                        className="w-full p-2 border rounded-lg bg-gray-100 border-gray-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
+                        className="w-full p-3 border rounded-lg bg-gray-100 border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
                       >
                         <option value="">Select Municipality</option>
-                        {municipalities.map((municipality) => (
-                          <option key={municipality} value={municipality}>
+                        {municipalities.map((municipality, index) => (
+                          <option key={index} value={municipality}>
                             {municipality}
                           </option>
                         ))}
                       </select>
                     </div>
+
                     <div>
                       <label
                         htmlFor="barangay"
-                        className="block text-xs font-semibold text-[#557C55]"
+                        className="block text-sm font-semibold text-[#557C55]"
                       >
                         Barangay:
                       </label>
@@ -284,16 +265,17 @@ const ViewProfile = (props) => {
                         name="barangay"
                         value={profile.barangay}
                         onChange={handleProfileChange}
-                        className="w-full p-2 border rounded-lg bg-gray-100 border-gray-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
+                        className="w-full p-3 border rounded-lg bg-gray-100 border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
                       >
                         <option value="">Select Barangay</option>
-                        {barangaysData[profile.municipality]?.map(
-                          (barangay) => (
-                            <option key={barangay} value={barangay}>
-                              {barangay}
-                            </option>
-                          )
-                        )}
+                        {profile.municipality &&
+                          barangaysData[profile.municipality].map(
+                            (barangay, index) => (
+                              <option key={index} value={barangay}>
+                                {barangay}
+                              </option>
+                            )
+                          )}
                       </select>
                     </div>
                   </div>
@@ -302,7 +284,7 @@ const ViewProfile = (props) => {
                 <div>
                   <label
                     htmlFor="contact_number"
-                    className="block text-xs font-semibold text-[#557C55]"
+                    className="block text-sm font-semibold text-[#557C55]"
                   >
                     Contact Number:
                   </label>
@@ -312,14 +294,14 @@ const ViewProfile = (props) => {
                     name="contact_number"
                     value={profile.contact_number}
                     onChange={handleProfileChange}
-                    className="w-full p-2 border rounded-lg bg-gray-100 border-gray-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
+                    className="w-full p-3 border rounded-lg bg-gray-100 border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
                   />
                 </div>
 
                 <div>
                   <label
                     htmlFor="birthday"
-                    className="block text-xs font-semibold text-[#557C55]"
+                    className="block text-sm font-semibold text-[#557C55]"
                   >
                     Birthday:
                   </label>
@@ -327,31 +309,35 @@ const ViewProfile = (props) => {
                     type="date"
                     id="birthday"
                     name="birthday"
-                    value={profile.birthday}
+                    value={profile.birthday || ""}
                     onChange={handleProfileChange}
-                    className="w-full p-2 border rounded-lg bg-gray-100 border-gray-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
+                    className="w-full p-3 border rounded-lg bg-gray-100 border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
                   />
                 </div>
 
-                <button
-                  type="submit"
-                  className="bg-[#557C55] text-white px-4 py-2 rounded-md text-xs font-semibold hover:bg-[#6EA46E] transition"
-                >
-                  {loading ? (
-                    "Saving..."
-                  ) : (
-                    <>
-                      <FaSave className="mr-1" /> Save Changes
-                    </>
-                  )}
-                </button>
+                <div className="flex justify-center mt-6">
+                  <button
+                    type="submit"
+                    className="bg-primary text-white px-6 py-2 rounded-full text-sm font-semibold hover:bg-[#6EA46E] transition flex items-center shadow-md"
+                  >
+                    {loading ? (
+                      <>
+                        <span className="loader"></span> Saving...
+                      </>
+                    ) : (
+                      <>
+                        <FaSave className="mr-2 text-xs" /> Save Changes
+                      </>
+                    )}
+                  </button>
+                </div>
               </form>
             </div>
           </div>
         )}
       </div>
       <Toast />
-    </>
+    </div>
   );
 };
 

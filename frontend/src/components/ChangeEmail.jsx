@@ -60,14 +60,10 @@ const ChangeEmail = (props) => {
   return (
     <>
       <Toast />
-      <div className="flex-1 p-3 h-100 bg-gray-50 flex flex-col">
+      <div className="flex-1 p-3 h-full flex flex-col">
         <div className="flex items-center mb-2">
-          <FaArrowLeft
-            className="text-lg sm:text-xl text-[#557C55] cursor-pointer"
-            onClick={() => navigate(-1)}
-          />
           <MdMarkEmailRead className="text-2xl sm:text-3xl text-[#557C55] mr-2" />
-          <h4 className="text-xl sm:text-2xl font-semibold ml-2 text-[#557C55]">
+          <h4 className="text-md sm:text-xl lg:text-2xl font-semibold text-[#557C55]">
             Change Email
           </h4>
         </div>
@@ -125,7 +121,7 @@ const ChangeEmail = (props) => {
 
             <button
               type="submit"
-              className="bg-[#557C55] text-white px-2 py-1 rounded text-xs sm:text-sm hover:bg-[#6EA46E] transition flex items-center justify-center"
+              className="bg-primary-medium text-white px-4 py-2 rounded-full text-xs sm:text-sm hover:bg-primary transition flex items-center justify-center"
               disabled={isLoading}
             >
               {isLoading ? (
