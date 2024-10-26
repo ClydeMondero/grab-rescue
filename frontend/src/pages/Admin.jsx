@@ -26,6 +26,10 @@ const Admin = (props) => {
     };
   }, []);
 
+  if (user.account_type !== "Admin") {
+    return <Navigate to="/not-found" replace />;
+  }
+
   return (
     <div className="flex flex-col md:flex-row">
       {/* Sidebar */}
@@ -34,7 +38,11 @@ const Admin = (props) => {
       {/* Main Content */}
       <div className="flex-1 p-6 md:p-8 md:mt-0 mt-16">
         <Routes>
-          <Route path="/" element={<Navigate to="admin/incomingRequests" />} />
+          <Route
+            path="/"
+            element={<Navigate to="/admin/incomingRequests" replace />}
+          />
+
           <Route path="/addRescuer" element={<AddRescuer user={user} />} />
           <Route
             path="/incomingRequests"
