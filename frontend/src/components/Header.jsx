@@ -1,18 +1,40 @@
-import { useState } from "react";
-import { FaUserCircle, FaChevronDown } from "react-icons/fa";
+import { useState, useContext } from "react";
+import { FaUserCircle, FaChevronDown, FaChevronLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { handleLogout } from "../services/authService";
 import logo from "../assets/logo.png";
+import { RescuerContext } from "../contexts/RescuerContext";
 
 const Header = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const navigate = useNavigate();
+  const { page, setPage } = useContext(RescuerContext);
 
   return (
-    <div className="bg-background text-white flex items-center justify-between p-4">
-      <div className="text-xl font-bold">
-        <img src={logo} alt="" className="h-8" />
+    <div className="bg-background text-white flex items-center justify-between p-6 sticky top-0 left-0 right-0 z-50">
+      <div className="text-xl font-bold flex items-center">
+        <img src={logo} alt="" className="hidden h-10 md:block" />
+        <div className="flex items-center gap-4 md:hidden">
+          {page != "Navigate" && page != "Requests" && (
+            <FaChevronLeft
+              className="text-background-dark text-2xl cursor-pointer"
+              onClick={() => {
+                navigate("/rescuer/navigate");
+                setPage("Navigate");
+              }}
+            />
+          )}
+          <p
+            className={`text-primary-dark ${
+              page === "Change Password" || page === "Change Email"
+                ? "text-2xl"
+                : "text-3xl"
+            }`}
+          >
+            {page}
+          </p>
+        </div>
       </div>
 
       {/* Profile Section */}
@@ -21,33 +43,46 @@ const Header = () => {
           onClick={() => setShowDropdown(!showDropdown)}
           className="flex items-center text-white"
         >
-          <FaUserCircle className="text-2xl mr-2 text-primary" />
-          <span className="text-sm text-primary">Profile</span>
-          <FaChevronDown className="text-xl ml-2 text-primary" />
+          <div className="flex items-center gap-2">
+            <FaUserCircle className="text-3xl text-primary-medium" />
+            <FaChevronDown className="text-lg text-text-secondary" />
+          </div>
         </button>
         {showDropdown && (
-          <div className="absolute right-0 mt-2 bg-white text-[#557C55] rounded-lg shadow-lg w-40 cursor-pointer">
+          <div
+            onClick={() => setShowDropdown(!showDropdown)}
+            className="absolute right-0 mt-2 bg-background text-primary-medium rounded-md shadow-lg w-40 cursor-pointer"
+          >
             <Link
               to="/rescuer/profile"
-              className="block px-4 py-2 text-primary hover:bg-gray-200"
+              className="block px-4 py-2 hover:bg-background-light"
+              onClick={() => {
+                setPage("Profile");
+              }}
             >
               My Profile
             </Link>
             <Link
               to="/rescuer/change-password"
-              className="block px-4 py-2 text-primary hover:bg-gray-200"
+              className="block px-4 py-2 hover:bg-background-light"
+              onClick={() => {
+                setPage("Change Password");
+              }}
             >
               Change Password
             </Link>
             <Link
               to="/rescuer/change-email"
-              className="block px-4 py-2 text-primary hover:bg-gray-200"
+              className="block px-4 py-2 hover:bg-background-light"
+              onClick={() => {
+                setPage("Change Email");
+              }}
             >
               Change Email
             </Link>
             <Link
               onClick={() => handleLogout(navigate)}
-              className="block px-4 py-2 text-primary hover:bg-gray-200"
+              className="block px-4 py-2 hover:bg-background-light"
             >
               Logout
             </Link>

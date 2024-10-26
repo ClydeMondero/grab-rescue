@@ -12,4 +12,6 @@ module.exports = {
   DATABASE_URL: process.env.DATABASE_URL,
   PORT: process.env.PORT,
   TOKEN_KEY: process.env.TOKEN_KEY,
+  EMAIL_USER: process.env.EMAIL_USER,
+  EMAIL_PASS: process.env.EMAIL_PASS,
 };

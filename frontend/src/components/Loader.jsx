@@ -1,6 +1,7 @@
-import "ldrs/cardio";
+import { cardio } from "ldrs";
+cardio.register();
 
-const Loader = ({ isLoading, color, size = 25 }) => {
+const Loader = ({ isLoading, color, size = 50 }) => {
   const loaderColor = color ? color : "#fff";
 
   return (

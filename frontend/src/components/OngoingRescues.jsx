@@ -1,25 +1,33 @@
 import { useState } from "react";
 import { FaAmbulance } from "react-icons/fa";
+import { AiOutlinePrinter } from "react-icons/ai";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 
-const OngoingRescues = () => {
-  const [ongoingRescues] = useState([
-    { id: 1, location: 'San Rafael, Bulacan', rescuer: 'John Doe', status: 'In Progress', date: '2024-08-23', estimatedArrivalTime: '10:00 AM', estimatedDepartureTime: '11:30 AM' },
-    { id: 2, location: 'Bustos, Bulacan', rescuer: 'Jane Smith', status: 'In Progress', date: '2024-08-23', estimatedArrivalTime: '10:30 AM', estimatedDepartureTime: '12:00 PM' },
-    { id: 3, location: 'San Ildefonso, Bulacan', rescuer: 'Mike Johnson', status: 'In Progress', date: '2024-08-23', estimatedArrivalTime: '11:00 AM', estimatedDepartureTime: '01:00 PM' },
-    { id: 4, location: 'Angat, Bulacan', rescuer: 'Sarah Brown', status: 'In Progress', date: '2024-08-23', estimatedArrivalTime: '11:30 AM', estimatedDepartureTime: '02:30 PM' },
-    { id: 5, location: 'Pandi, Bulacan', rescuer: 'David Lee', status: 'In Progress', date: '2024-08-23', estimatedArrivalTime: '12:00 PM', estimatedDepartureTime: '03:00 PM' },
-    { id: 6, location: 'Bulakan, Bulacan', rescuer: 'Emily Chen', status: 'In Progress', date: '2024-08-23', estimatedArrivalTime: '12:30 PM', estimatedDepartureTime: '04:30 PM' },
-    { id: 7, location: 'Obando, Bulacan', rescuer: 'Michael Kim', status: 'In Progress', date: '2024-08-23', estimatedArrivalTime: '01:00 PM', estimatedDepartureTime: '05:00 PM' },
-    { id: 8, location: 'Marilao, Bulacan', rescuer: 'Karen Davis', status: 'In Progress', date: '2024-08-23', estimatedArrivalTime: '01:30 PM', estimatedDepartureTime: '06:30 PM' },
-    { id: 9, location: 'Cawayan, Bulacan', rescuer: 'Linda Johnson', status: 'In Progress', date: '2024-08-23', estimatedArrivalTime: '02:00 PM', estimatedDepartureTime: '07:00 PM' },
-    { id: 10, location: 'Poblacion, Bulacan', rescuer: 'David Lee', status: 'In Progress', date: '2024-08-23', estimatedArrivalTime: '02:30 PM', estimatedDepartureTime: '08:30 PM' },
-  ]);
+const OngoingRescues = ({ requests, user }) => {
+  const ongoingRescues = requests
+    .filter((request) => request.status === "assigned")
+    .map((request, index) => ({
+      id: index + 1,
+      location: request.location.address,
+      rescuer: `${request.rescuerId}`,
+      status: request.status,
+      acceptedTimestamp: new Intl.DateTimeFormat("en-US", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      }).format(new Date(request.acceptedTimestamp)),
+      estimatedArrivalTime: "TBD",
+      estimatedDepartureTime: "TBD",
+    }));
 
   const [showMap, setShowMap] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 5;
 
-  // Paginate data
   const totalRows = ongoingRescues.length;
   const totalPages = Math.ceil(totalRows / rowsPerPage);
   const startIndex = (currentPage - 1) * rowsPerPage;
@@ -32,85 +40,268 @@ const OngoingRescues = () => {
     }
   };
 
-  // Generate page numbers
-  const pageNumbers = [];
-  for (let i = 1; i <= totalPages; i++) {
-    pageNumbers.push(i);
-  }
-
-  // Determine which page numbers to show
-  const visiblePages = pageNumbers.length <= 5
-    ? pageNumbers
-    : pageNumbers.slice(
-        Math.max(0, currentPage - 2),
-        Math.min(totalPages, currentPage + 2)
-      );
+  const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
+  const visiblePages = pageNumbers.slice(
+    Math.max(0, currentPage - 2),
+    Math.min(totalPages, currentPage + 3)
+  );
 
   const handleShowMap = (location) => {
     setShowMap(location);
   };
 
+  const handlePrint = () => {
+    const doc = new jsPDF("landscape");
+
+    doc.setFontSize(18);
+    doc.text(
+      "Ongoing Rescues Report",
+      doc.internal.pageSize.getWidth() / 2,
+      10,
+      {
+        align: "center",
+      }
+    );
+
+    const tableColumn = [
+      { title: "#", dataKey: "id" },
+      { title: "Rescuer ID", dataKey: "rescuer" },
+      { title: "Location", dataKey: "location" },
+      { title: "Accepted Timestamp", dataKey: "acceptedTimestamp" },
+      { title: "Estimated Arrival", dataKey: "estimatedArrivalTime" },
+      { title: "Estimated Departure", dataKey: "estimatedDepartureTime" },
+      { title: "Status", dataKey: "status" },
+    ];
+
+    const tableRows = ongoingRescues.map((rescue) => ({
+      id: rescue.id,
+      rescuer: rescue.rescuer,
+      location: rescue.location,
+      acceptedTimestamp: rescue.acceptedTimestamp,
+      estimatedArrivalTime: rescue.estimatedArrivalTime,
+      estimatedDepartureTime: rescue.estimatedDepartureTime,
+      status: rescue.status,
+    }));
+
+    doc.autoTable({
+      head: [tableColumn.map((col) => col.title)],
+      body: tableRows.map((row) => Object.values(row)),
+      startY: 40,
+      theme: "grid",
+      styles: {
+        fontSize: 10,
+        cellPadding: 2,
+        halign: "center",
+        valign: "middle",
+        lineColor: "#557C55",
+        lineWidth: 0.5,
+      },
+      headStyles: {
+        fillColor: "#557C55",
+        textColor: "#FFFFFF",
+        fontSize: 10,
+      },
+    });
+
+    // Add footer
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const footerY = pageHeight - 10;
+
+    doc.setFontSize(10);
+    doc.text(
+      `Generated by: ${user?.first_name} ${user?.last_name}`,
+      10,
+      footerY
+    );
+    doc.text(
+      `Generated date: ${new Date().toLocaleString()}`,
+      pageWidth - 70,
+      footerY
+    );
+
+    doc.save("ongoing_rescue_operations.pdf");
+  };
+
   return (
-    <div className="flex-1 p-2 sm:p-3 lg:p-4 h-full bg-gray-50 flex flex-col">
-      <div className="flex items-center mb-4 sm:mb-6 pb-2 sm:pb-4">
-        <FaAmbulance className="text-xl sm:text-3xl text-[#557C55] mr-2 sm:mr-3" />
-        <h4 className="text-md sm:text-2xl font-semibold text-[#557C55]">Ongoing Rescues</h4>
+    <div className="flex flex-col p-4 lg:p-6 h-full ">
+      {/* Header */}
+      <div className="flex items-center mb-2 sm:mb-4 border-b border-gray-200 pb-3">
+        <FaAmbulance className="text-xl sm:text-2xl lg:text-3xl text-[#557C55] mr-2" />
+        <h4 className="text-md sm:text-xl lg:text-2xl font-semibold text-[#557C55]">
+          Ongoing Rescue Operations
+        </h4>
       </div>
 
-      <p className="mb-4 text-sm sm:text-md text-gray-600">Track the status of ongoing rescue operations:</p>
+      <p className="mb-4 text-md text-gray-600">
+        Monitoring the status and progress of active rescue efforts.
+      </p>
 
-      <div className="bg-white rounded-lg p-2 sm:p-4 flex flex-col flex-1">
-        {showMap && (
-          <div className="mb-4 sm:mb-6">
-            <h5 className="text-lg sm:text-2xl font-semibold mb-2">Map for {showMap}</h5>
-            <div className="map-placeholder bg-[#eaeaea] rounded-lg" style={{ height: '200px' }}>
-              {/* Replace with your map component */}
-              <p className="text-center pt-4 text-sm sm:text-base">Map showing location: {showMap}</p>
-            </div>
-            <button 
-              className="bg-[#FA7070] text-white px-3 py-1 sm:px-4 sm:py-2 rounded-md mt-2 hover:bg-[#ff4444] transition text-xs sm:text-sm"
-              onClick={() => setShowMap(false)}
-            >
-              Hide Map
-            </button>
+      {/* Map Toggle */}
+      {showMap && (
+        <div className="mb-6">
+          <h5 className="text-xl font-semibold mb-2 text-primary">
+            Location Map: {showMap}
+          </h5>
+          <div
+            className="map-placeholder bg-[#eaeaea] rounded-lg"
+            style={{ height: "200px" }}
+          >
+            <p className="text-center pt-4 text-md">
+              Map displaying location: {showMap}
+            </p>
           </div>
-        )}
+          <button
+            className="bg-[#FA7070] text-white px-4 py-2 rounded-md mt-2 hover:bg-[#ff4444] transition"
+            onClick={() => setShowMap(false)}
+          >
+            Hide Map
+          </button>
+        </div>
+      )}
 
-        <div className="overflow-x-auto">
-          <table className="min-w-full text-xs sm:text-sm rounded-lg border border-gray-200">
-            <thead className="bg-[#557C55] text-white text-left">
+      {/* Rescue Data Table */}
+      <div className="flex flex-col flex-1">
+        {/* Print Button */}
+        <div className="flex justify-end mb-2">
+          <button
+            onClick={handlePrint}
+            className="bg-primary-medium text-white px-3 py-1 rounded-md hover:bg-[#6EA46E] transition flex items-center text-sm"
+          >
+            <AiOutlinePrinter className="text-base mr-1" />
+            Generate PDF
+          </button>
+        </div>
+
+        {/* Responsive Card Container */}
+        <div className="overflow-x-auto lg:hidden">
+          {paginatedRescues.map((rescue) => (
+            <div
+              key={rescue.id}
+              className="bg-white border border-primary rounded-xl p-3 mb-3 shadow-sm"
+            >
+              <h5 className="text-md truncate">
+                <span className="text-primary-dark">Rescue ID: </span>
+                <span className="text-gray-500">{rescue.rescuer}</span>
+              </h5>
+              <h5 className="truncate">
+                <span className="text-primary-dark">Location: </span>
+                <span className="text-gray-500">{rescue.location}</span>
+              </h5>
+              <h5 className="truncate">
+                <span className="text-primary-dark">Accepted: </span>
+                <span className="text-gray-500">
+                  {rescue.acceptedTimestamp}
+                </span>
+              </h5>
+              <h5 className="truncate">
+                <span className="text-primary-dark">ETA: </span>
+                <span className="text-gray-500">
+                  {rescue.estimatedArrivalTime}
+                </span>
+              </h5>
+              <h5 className="truncate">
+                <span className="text-primary-dark">Departure: </span>
+                <span className="text-gray-500">
+                  {rescue.estimatedDepartureTime}
+                </span>
+              </h5>
+              <h5 className="truncate">
+                <span className="text-primary-dark">Status: </span>
+                <span
+                  className={
+                    rescue.status === "pending"
+                      ? "text-warning"
+                      : rescue.status === "assigned"
+                      ? "text-info"
+                      : rescue.status === "in-progress"
+                      ? "text-orange-500"
+                      : "text-primary-medium"
+                  }
+                >
+                  {rescue.status}
+                </span>
+              </h5>
+              <button
+                onClick={() => handleShowMap(rescue.location)}
+                className="mt-2 bg-secondary text-white px-2 py-2 rounded-md hover:bg-red-700 transition"
+              >
+                View Map
+              </button>
+            </div>
+          ))}
+        </div>
+
+        {/* Table for larger screens */}
+        <div className="hidden lg:block overflow-x-auto">
+          <table className="min-w-full bg-white border border-gray-200 rounded-md overflow-hidden">
+            <thead className="bg-[#557C55] text-white">
               <tr>
-                <th className="px-2 sm:px-4 py-1 sm:py-3">#</th>
-                <th className="px-2 sm:px-4 py-1 sm:py-3">Location</th>
-                <th className="px-2 sm:px-4 py-1 sm:py-3">Rescuer</th>
-                <th className="px-2 sm:px-4 py-1 sm:py-3">Date</th>
-                <th className="px-2 sm:px-4 py-1 sm:py-3">Arrival</th>
-                <th className="px-2 sm:px-4 py-1 sm:py-3">Departed</th>
-                <th className="px-2 sm:px-4 py-1 sm:py-3">Status</th>
-                <th className="px-2 sm:px-4 py-1 sm:py-3">Map</th>
+                <th className="px-4 py-2 text-center text-xs font-medium">#</th>
+                <th className="px-4 py-2 text-center text-xs font-medium">
+                  Rescuer ID
+                </th>
+                <th className="px-4 py-2 text-center text-xs font-medium">
+                  Location
+                </th>
+                <th className="px-4 py-2 text-center text-xs font-medium">
+                  Accepted Timestamp
+                </th>
+                <th className="px-4 py-2 text-center text-xs font-medium">
+                  Estimated Arrival
+                </th>
+                <th className="px-4 py-2 text-center text-xs font-medium">
+                  Estimated Departure
+                </th>
+                <th className="px-4 py-2 text-center text-xs font-medium">
+                  Status
+                </th>
+                <th className="px-4 py-2 text-center text-xs font-medium">
+                  Map
+                </th>
               </tr>
             </thead>
             <tbody>
-              {paginatedRescues.map((rescue, index) => (
-                <tr 
-                  key={rescue.id} 
-                  className={`border-b ${index % 2 === 0 ? 'bg-white' : 'bg-[#F0F0F0]'}`}
-                >
-                  <td className="px-2 sm:px-4 py-1 sm:py-2">{rescue.id}</td>
-                  <td className="px-2 sm:px-4 py-1 sm:py-2">{rescue.location}</td>
-                  <td className="px-2 sm:px-4 py-1 sm:py-2">{rescue.rescuer}</td>
-                  <td className="px-2 sm:px-4 py-1 sm:py-2">{rescue.date}</td>
-                  <td className="px-2 sm:px-4 py-1 sm:py-2">{rescue.estimatedArrivalTime}</td>
-                  <td className="px-2 sm:px-4 py-1 sm:py-2">{rescue.estimatedDepartureTime}</td>
-                  <td className={`px-2 sm:px-4 py-1 sm:py-2 ${rescue.status === 'In Progress' ? 'text-[#4158A6]' : 'text-black'}`}>
-                    {rescue.status}
+              {paginatedRescues.map((rescue) => (
+                <tr key={rescue.id} className="border-b hover:bg-gray-100">
+                  <td className="px-4 py-2 text-xs text-center text-secondary">
+                    {rescue.id}
                   </td>
-                  <td className="px-2 sm:px-4 py-1 sm:py-2">
-                    <button
-                      className="bg-[#6EA46E] text-white px-2 sm:px-3 py-1 sm:py-1 rounded-md text-xs sm:text-sm hover:bg-[#557C55] transition"
-                      onClick={() => handleShowMap(rescue.location)}
+                  <td className="px-4 py-2 text-xs text-center">
+                    {rescue.rescuer}
+                  </td>
+                  <td className="px-4 py-2 text-xs text-center">
+                    {rescue.location}
+                  </td>
+                  <td className="px-4 py-2 text-xs text-center">
+                    {rescue.acceptedTimestamp}
+                  </td>
+                  <td className="px-4 py-2 text-xs text-center">
+                    {rescue.estimatedArrivalTime}
+                  </td>
+                  <td className="px-4 py-2 text-xs text-center">
+                    {rescue.estimatedDepartureTime}
+                  </td>
+                  <td className="px-4 py-2 text-xs text-center ">
+                    <span
+                      className={
+                        {
+                          pending: "text-warning",
+                          assigned: "text-info",
+                          "in-progress": "text-secondary",
+                          completed: "text-primary-medium",
+                        }[rescue.status]
+                      }
                     >
-                      Show Map
+                      {rescue.status}
+                    </span>
+                  </td>
+                  <td className="px-4 py-2 text-xs text-center">
+                    <button
+                      onClick={() => handleShowMap(rescue.location)}
+                      className="bg-[#557C55] text-white px-2 py-1 rounded-md hover:bg-[#6EA46E] transition"
+                    >
+                      View Map
                     </button>
                   </td>
                 </tr>
@@ -118,42 +309,38 @@ const OngoingRescues = () => {
             </tbody>
           </table>
         </div>
+      </div>
 
-        {/* Pagination Controls */}
-        <div className="flex flex-col items-center justify-between p-2 bg-gray-100 sm:flex-row">
-          {/* Conditionally render the Previous button */}
-          {currentPage > 1 && (
-            <button 
-              className="w-full mb-1 px-2 py-1 text-xs bg-[#557C55] text-white rounded-md hover:bg-[#4a6b4a] sm:w-auto sm:mb-0"
-              onClick={() => handlePageChange(currentPage - 1)}
-            >
-              &lt; Previous
-            </button>
-          )}
-          <div className="flex flex-wrap items-center justify-center space-x-1 mt-1 sm:mt-0">
-            {visiblePages.map((pageNumber) => (
-              <button 
-                key={pageNumber}
-                className={`px-2 py-1 text-xs border rounded-md ${currentPage === pageNumber ? 'bg-[#557C55] text-white' : 'bg-white text-[#557C55] border-[#557C55]'} hover:bg-[#4a6b4a]`}
-                onClick={() => handlePageChange(pageNumber)}
-              >
-                {pageNumber}
-              </button>
-            ))}
-          </div>
-          {/* Conditionally render the Next button */}
-          {currentPage < totalPages && (
-            <button 
-              className="w-full mt-1 px-2 py-1 text-xs bg-[#557C55] text-white rounded-md hover:bg-[#4a6b4a] sm:w-auto sm:mt-0"
-              onClick={() => handlePageChange(currentPage + 1)}
-            >
-              Next &gt;
-            </button>
-           )}
-           </div>
-         </div>
-       </div>
-     );
-   };
-   
-   export default OngoingRescues;
+      {/* Pagination */}
+      <div className="flex justify-center mt-4">
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="px-3 py-1 bg-[#557C55] text-white rounded-l-md"
+        >
+          Prev
+        </button>
+        {visiblePages.map((page) => (
+          <button
+            key={page}
+            onClick={() => handlePageChange(page)}
+            className={`px-3 py-1 ${
+              currentPage === page ? "bg-[#6EA46E]" : "bg-[#557C55]"
+            } text-white`}
+          >
+            {page}
+          </button>
+        ))}
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className="px-3 py-1 bg-[#557C55] text-white rounded-r-md"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default OngoingRescues;

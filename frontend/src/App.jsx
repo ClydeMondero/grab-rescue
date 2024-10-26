@@ -10,7 +10,8 @@ import {
   VerifyEmail,
 } from "./pages";
 import axios from "axios";
-import { PrivateRoute } from "./components";
+import { PrivateRoute, GeolocateButton } from "./components";
+import { StatusProvider } from "./contexts/StatusContext";
 
 axios.defaults.baseURL =
   process.env.NODE_ENV === "production"
@@ -19,22 +20,25 @@ axios.defaults.baseURL =
 
 const App = () => {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password/:token" element={<ResetPassword />} />
-        {/* Email Verification Route */}
-        <Route path="/verify/:token" element={<VerifyEmail />} />
-        <Route path="/admin/*" element={<PrivateRoute Component={Admin} />} />
-        <Route
-          path="/rescuer/*"
-          element={<PrivateRoute Component={Rescuer} />}
-        />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </Router>
+    <StatusProvider>
+      <Router>
+        <GeolocateButton />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
+          {/* Email Verification Route */}
+          <Route path="/verify/:token" element={<VerifyEmail />} />
+          <Route path="/admin/*" element={<PrivateRoute Component={Admin} />} />
+          <Route
+            path="/rescuer/*"
+            element={<PrivateRoute Component={Rescuer} />}
+          />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Router>
+    </StatusProvider>
   );
 };
 

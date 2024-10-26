@@ -39,6 +39,79 @@ export const setCitizenCookie = (id) => {
     sameSite: "Lax",
   });
 };
+
+export const setRequestCookie = (id) => {
+  const encryptedID = encryptID(id);
+
+  Cookies.set("request_token", encryptedID, {
+    expires: 14,
+    secure: true,
+    sameSite: "Lax",
+  });
+};
+
+export const setSelectedRequestCookie = (selectedRequest) => {
+  const encryptedID = encryptID(selectedRequest);
+
+  Cookies.set("selected_request", encryptedID, {
+    expires: 14,
+    secure: true,
+    sameSite: "Lax",
+  });
+};
+
+export const getSelectedRequestCookie = () => {
+  const selectedRequest = Cookies.get("selected_request");
+  if (!selectedRequest) {
+    return null;
+  }
+
+  return decryptID(selectedRequest);
+};
+
+export const setLocationCookie = ({ latitude, longitude }) => {
+  Cookies.set("location", JSON.stringify({ latitude, longitude }), {
+    expires: 14,
+    secure: true,
+    sameSite: "Lax",
+  });
+};
+
+export const getLocationCookie = () => {
+  const location = Cookies.get("location");
+  if (location) {
+    return JSON.parse(location);
+  } else {
+    return null;
+  }
+};
+
+export const setStatusCookie = (status) => {
+  Cookies.set("status", status, {
+    expires: 14,
+    secure: true,
+    sameSite: "Lax",
+  });
+};
+
+export const getStatusCookie = () => {
+  const status = Cookies.get("status");
+  if (!status) {
+    return null;
+  }
+
+  return status;
+};
+
+export const getRequestCookie = () => {
+  const requestCookie = Cookies.get("request_token");
+  if (!requestCookie) {
+    return null;
+  }
+
+  return decryptID(requestCookie);
+};
+
 export const getCitizenCookie = () => {
   const citizenCookie = Cookies.get("citizen_token");
   if (!citizenCookie) {
@@ -46,4 +119,21 @@ export const getCitizenCookie = () => {
   }
 
   return decryptID(citizenCookie);
+};
+
+export const getUserCookie = () => {
+  const userCookie = Cookies.get("token");
+  if (!userCookie) {
+    return null;
+  }
+
+  return userCookie;
+};
+
+// generate an id with the same id in firebase
+export const generateID = () => {
+  return (
+    Math.random().toString(36).substring(2, 15) +
+    Math.random().toString(36).substring(2, 15)
+  );
 };
