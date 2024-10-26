@@ -2,8 +2,8 @@ import logo from "../../public/logo.png";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { userLoginSchema } from "../models/Users";
-import { useState } from "react";
+import { userLoginSchema } from "../models/Users"; // Ensure this handles email/username properly
+import { useContext, useState } from "react";
 import {
   FaEnvelope,
   FaLock,
@@ -14,28 +14,31 @@ import {
 import { Loader, Toast } from "../components";
 import axios from "axios";
 import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { StatusContext } from "../contexts/StatusContext";
+import { updateLocationStatus } from "../services/firestoreService";
 
 const Login = () => {
-  //get query params
+  // Get query params
   const [searchParams] = useSearchParams();
   const role = searchParams.get("role");
 
-  //show password
+  // Show password state
   const [showPassword, setShowPassword] = useState(false);
 
-  //loading
+  // Loading state
   const [loading, setLoading] = useState(false);
 
-  //navigate
+  const { id } = useContext(StatusContext);
+
+  // Navigation
   const navigate = useNavigate();
 
-  //back button function
+  // Back button function
   const handleBack = () => {
     navigate("/", { replace: true });
   };
 
-  //form validation
+  // Form validation
   const {
     register,
     handleSubmit,
@@ -45,12 +48,12 @@ const Login = () => {
     resolver: zodResolver(userLoginSchema),
   });
 
-  //handle form submission
+  // Handle form submission
   const onSubmit = (data) => {
     login(data);
   };
 
-  //handle login
+  // Handle login
   const login = async ({ email, password }) => {
     try {
       setLoading(true);
@@ -58,7 +61,7 @@ const Login = () => {
       const { data } = await axios.post(
         "/auth/login",
         {
-          email: email,
+          email: email, // Use the email/username input here
           password: password,
           role: role,
         },
@@ -69,34 +72,32 @@ const Login = () => {
 
       if (data.success) {
         toast.success(data.message);
+        updateLocationStatus(id, "offline");
         setTimeout(() => {
           navigate("/" + role.toLowerCase(), { replace: true });
         }, 1500);
       } else {
-        if (data.error) {
-          toast.error(data.message);
-          console.error(data.error);
-        } else {
-          toast.warning(data.message);
-        }
+        toast[data.error ? "error" : "warning"](data.message);
       }
-
-      setLoading(false);
 
       reset();
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      toast.error("An error occurred. Please try again.");
     }
   };
 
   return (
     <div className="flex items-center justify-center h-screen bg-background-light">
-      <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-sm">
-        <div className="flex justify-between mb-4">
-          <FaChevronLeft
-            className="text-xl text-background-dark cursor-pointer"
-            onClick={handleBack}
-          />
+      <div className="w-full max-w-md p-6 bg-background-light md:bg-white md:rounded-lg md:shadow-sm">
+        <div
+          onClick={handleBack}
+          className="flex items-center gap-2 mb-10  cursor-pointer"
+        >
+          <FaChevronLeft className="text-xl text-background-dark" />
+          <p className="text-background-dark text-lg font-semibold md:hidden">
+            Back
+          </p>
         </div>
         <div className="flex justify-center mb-4">
           <img src={logo} alt="Logo" className="h-12" />
@@ -109,10 +110,10 @@ const Login = () => {
             <FaEnvelope className="h-6 w-6 ml-2 mr-1 text-primary-dark" />
             <input
               {...register("email")}
-              type="email"
+              type="text"
               id="email"
               name="email"
-              placeholder="Enter your email"
+              placeholder="Enter your email or username"
               className="w-full px-3 py-2 bg-background focus:outline-none"
             />
           </div>
@@ -144,16 +145,16 @@ const Login = () => {
             type="submit"
             className="w-full bg-primary-medium text-white font-bold py-2 rounded-md hover:opacity-80 focus:outline-none"
           >
-            {loading ? <Loader {...{ isLoading: loading }} /> : "Login"}
+            {loading ? <Loader isLoading={loading} size={25} /> : "Login"}
           </button>
-          <a
-            href={`/forgot-password?role=${role}`}
-            className="text-[#FA7070] hover:text-red-600 transition-colors duration-200 ease-in-out"
+          <div
+            onClick={() => navigate(`/forgot-password?role=${role}`)}
+            className="cursor-pointer"
           >
             <p className="text-center text-sm mt-2 text-text-secondary">
               Forgot your password?{" "}
             </p>
-          </a>
+          </div>
         </form>
         <Toast />
       </div>

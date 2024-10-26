@@ -38,7 +38,12 @@ export const getRouteData = async (rescuer, citizen) => {
 };
 
 //add user location to firestore and set cookie
-export const addCitizenLocation = async (longitude, latitude) => {
+export const addUserLocation = async (
+  longitude,
+  latitude,
+  role,
+  userId = null
+) => {
   const address = await getAddress(longitude, latitude);
 
   //add user location to firestore
@@ -46,14 +51,18 @@ export const addCitizenLocation = async (longitude, latitude) => {
     longitude,
     latitude,
     address,
-    "citizen"
+    role,
+    userId
   );
 
   //adds citizen id to cookies
-  setCitizenCookie(id);
+  if (role === "citizen") {
+    setCitizenCookie(id);
+  }
 };
 
-const getAddress = async (longitude, latitude) => {
+//FIXME: not accurate address
+export const getAddress = async (longitude, latitude) => {
   const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${
     import.meta.env.VITE_MAPBOX_TOKEN
   }`;
@@ -90,8 +99,8 @@ export const getNearestRescuer = (citizen, rescuers) => {
 };
 
 // update location if moved
-export const updateCitizenLocation = async (
-  id,
+export const updateUserLocation = async (
+  locationId,
   prevLon,
   prevLat,
   longitude,
@@ -102,13 +111,6 @@ export const updateCitizenLocation = async (
   const address = await getAddress(longitude, latitude);
 
   if (moved) {
-    updateLocationInFirestore(id, longitude, latitude, address);
+    updateLocationInFirestore(locationId, longitude, latitude, address);
   }
-};
-
-//get locations from firestore
-export const getRescuerLocations = async (setRescuers) => {
-  const locations = await getLocationsFromFirestore("rescuer");
-
-  setRescuers(locations);
 };

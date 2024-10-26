@@ -22,7 +22,18 @@ import Navigate from "./Navigate";
 import Requests from "./Requests";
 import Header from "./Header";
 import RequestDetails from "./RequestDetails";
+import LocatingIndicator from "./LocatingIndicator";
+import RescuerMarker from "./RescuerMarker";
+import GeolocateButton from "./GeolocateButton";
+import TurnIndicator from "./TurnIndicator";
+import RequestModal from "./RequestModal";
+
 export {
+  RequestModal,
+  TurnIndicator,
+  GeolocateButton,
+  RescuerMarker,
+  LocatingIndicator,
   DistanceEta,
   Markers,
   Route,

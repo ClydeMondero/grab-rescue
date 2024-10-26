@@ -4,12 +4,12 @@ const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const zxcvbn = require("zxcvbn");
+const { CreateLog } = require("./LogController");
 
 // Get Users with Filtering and Name Search (Rescuers and Admins)
 module.exports.GetUsers = async (req, res) => {
   let q = `
-    SELECT id, first_name, middle_initial, last_name, to_char(birthday, 'YYYY-MM-DD') AS birthday, municipality, barangay, contact_number, username,
-    is_online, verified, account_type FROM users WHERE 1=1
+    SELECT * FROM users WHERE 1=1
   `;
 
   const queryParams = [];
@@ -50,10 +50,11 @@ module.exports.GetUsers = async (req, res) => {
   }
 };
 
+// Get User
 module.exports.GetUser = async (req, res) => {
   try {
     const { rows } = await pool.query(
-      "SELECT id, first_name, middle_initial, last_name, to_char(birthday, 'YYYY-MM-DD') AS birthday, municipality, barangay, contact_number, username, is_online, verified, account_type FROM users WHERE id = $1",
+      "SELECT id, first_name, middle_initial, last_name, to_char(birthday, 'YYYY-MM-DD') AS birthday, municipality, barangay, profile_image, contact_number, email, username, is_online, verified, account_type, status FROM users WHERE id = $1",
       [req.params.id]
     );
     if (rows.length === 0) {
@@ -65,6 +66,7 @@ module.exports.GetUser = async (req, res) => {
   }
 };
 
+// Update User
 module.exports.UpdateUser = async (req, res) => {
   const {
     first_name: firstName,
@@ -95,6 +97,24 @@ module.exports.UpdateUser = async (req, res) => {
     });
   }
 
+  // Username length validation
+  const MIN_USERNAME_LENGTH = 6;
+  const MAX_USERNAME_LENGTH = 15;
+
+  if (newUsername.length < MIN_USERNAME_LENGTH) {
+    return res.status(200).json({
+      success: false,
+      message: `Username must be at least ${MIN_USERNAME_LENGTH} characters long.`,
+    });
+  }
+
+  if (newUsername.length > MAX_USERNAME_LENGTH) {
+    return res.status(200).json({
+      success: false,
+      message: `Username must be no more than ${MAX_USERNAME_LENGTH} characters long.`,
+    });
+  }
+
   const age = Math.floor(
     (new Date() - new Date(birthday).getTime()) / 3.15576e10
   );
@@ -109,7 +129,7 @@ module.exports.UpdateUser = async (req, res) => {
 
   try {
     // Check if the user exists
-    const userQuery = `SELECT username FROM users WHERE id = $1`;
+    const userQuery = `SELECT * FROM users WHERE id = $1`;
     const { rows: existingUsers } = await pool.query(userQuery, [
       req.params.id,
     ]);
@@ -121,26 +141,53 @@ module.exports.UpdateUser = async (req, res) => {
       });
     }
 
-    const oldUsername = existingUsers[0].username;
+    const oldUserData = existingUsers[0];
+    const updates = [];
+    const newUserData = {
+      first_name: firstName,
+      middle_initial: middleInitial,
+      last_name: lastName,
+      birthday,
+      municipality,
+      barangay,
+      contact_number: contactNumber,
+      username: newUsername,
+      age, // Include age for update
+    };
 
-    if (newUsername && newUsername !== oldUsername) {
-      // Check if new username is already taken
-      const usernameQuery =
-        "SELECT * FROM users WHERE username = $1 AND username != $2";
-      const { rows: usernameRows } = await pool.query(usernameQuery, [
-        newUsername,
-        oldUsername,
-      ]);
+    // Check for changes
+    for (const [key, newValue] of Object.entries(newUserData)) {
+      const oldValue = oldUserData[key];
 
-      if (usernameRows.length > 0) {
-        return res.status(200).json({
-          success: false,
-          message: "Username is already taken.",
-        });
+      if (key === "birthday" && newValue !== oldValue) {
+        // Format the old and new birthdays to include month, day, and year
+        const oldBirthdayFormatted = new Date(oldValue).toLocaleDateString(
+          "en-US",
+          { month: "2-digit", day: "2-digit", year: "numeric" }
+        );
+        const newBirthdayFormatted = new Date(newValue).toLocaleDateString(
+          "en-US",
+          { month: "2-digit", day: "2-digit", year: "numeric" }
+        );
+        updates.push(
+          `Birthday changed from ${oldBirthdayFormatted} to ${newBirthdayFormatted}`
+        );
+      } else if (newValue && newValue !== oldValue) {
+        updates.push(
+          `${key.replace(/_/g, " ")} changed from ${oldValue} to ${newValue}`
+        );
       }
     }
 
-    // Update the user in the database without email and password, including age
+    // If there are no updates, return a message
+    if (updates.length === 0) {
+      return res.status(200).json({
+        success: false,
+        message: "No changes detected.",
+      });
+    }
+
+    // Update the user in the database
     const updateQuery = `
       UPDATE users SET first_name = $1, middle_initial = $2, last_name = $3, birthday = $4, age = $5,
       municipality = $6, barangay = $7, contact_number = $8, username = $9 WHERE id = $10
@@ -159,6 +206,13 @@ module.exports.UpdateUser = async (req, res) => {
     ];
 
     await pool.query(updateQuery, values);
+
+    // Log the changes
+    await CreateLog({
+      userId: req.params.id,
+      action: `User updated: ${updates.join(", ")}.`,
+    });
+
     return res.status(200).json({
       success: true,
       message: "User updated successfully.",
@@ -238,6 +292,12 @@ module.exports.UpdateUserEmail = async (req, res) => {
     `;
     await pool.query(updateQuery, [email, verificationToken, id]);
 
+    // Log the email update action
+    await CreateLog({
+      userId: id,
+      action: `User changed email from ${oldEmail} to ${email}.`,
+    });
+
     // Use frontend base URL for the verification link
     const verificationLink = `${process.env.SITE_URL}/verify/${verificationToken}`;
 
@@ -245,13 +305,13 @@ module.exports.UpdateUserEmail = async (req, res) => {
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: "bhenzmharlbartolome012603@gmail.com",
-        pass: "owvb wzni fhxu cvbz",
+        user: env.EMAIL_USER,
+        pass: env.EMAIL_PASS,
       },
     });
 
     const mailOptions = {
-      from: "bhenzmharlbartolome012603@gmail.com",
+      from: "GrabRescue <grabrescue.ph@gmail.com>",
       to: email,
       subject: "Email Verification",
       text: `Please click the following link to verify your new email: ${verificationLink}`,
@@ -273,6 +333,12 @@ module.exports.UpdateUserEmail = async (req, res) => {
       }
     });
   } catch (err) {
+    // Log the error
+    await CreateLog({
+      userId: id,
+      action: `Error updating email: ${err.message}`,
+    });
+
     return res.status(200).json({
       success: false,
       message: "Server error.",
@@ -379,11 +445,73 @@ module.exports.UpdateUserPassword = async (req, res) => {
     `;
     await pool.query(updateQuery, [newHashedPassword, id]);
 
+    // Log the password update action
+    await CreateLog({
+      userId: id,
+      action: `User changed password successfully`,
+    });
+
     return res.status(200).json({
       success: true,
       message: "Password updated successfully.",
     });
   } catch (err) {
+    // Log the error
+    await CreateLog({
+      userId: id,
+      action: `Error updating password: ${err.message}`,
+    });
+
+    return res.status(200).json({
+      success: false,
+      message: "Server error.",
+      error: err.message,
+    });
+  }
+};
+
+// Update User Status (Toggle)
+module.exports.UpdateUserStatus = async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    // Get the current status of the user
+    const currentStatusQuery = "SELECT status FROM users WHERE id = $1";
+    const currentStatusResult = await pool.query(currentStatusQuery, [id]);
+
+    if (currentStatusResult.rows.length === 0) {
+      return res.status(200).json({
+        success: false,
+        message: "User not found.",
+      });
+    }
+
+    const currentStatus = currentStatusResult.rows[0].status;
+
+    // Determine new status by toggling
+    const newStatus = currentStatus === "Active" ? "Inactive" : "Active";
+
+    // Update the user's status
+    const q = "UPDATE users SET status = $1 WHERE id = $2";
+    await pool.query(q, [newStatus, id]);
+
+    // Log the status update action
+    await CreateLog({
+      userId: id,
+      action: `User status updated from ${currentStatus} to ${newStatus}`,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: `User status updated to ${newStatus} successfully.`,
+    });
+  } catch (err) {
+    // Log the error
+    await CreateLog({
+      userId: id,
+      action: `Error updating user status: ${err.message}`,
+    });
+
     return res.status(200).json({
       success: false,
       message: "Server error.",
@@ -420,6 +548,12 @@ module.exports.VerifyEmail = async (req, res) => {
       `;
       await pool.query(updateQuery, [id]);
 
+      // Log successful verification for a new user
+      await CreateLog({
+        userId: id,
+        action: "New user email verified successfully.",
+      });
+
       return res.status(200).json({
         success: true,
         message: "New user email verified successfully.",
@@ -435,6 +569,12 @@ module.exports.VerifyEmail = async (req, res) => {
       `;
       await pool.query(updateQuery, [newEmail, id]);
 
+      // Log successful email change verification
+      await CreateLog({
+        userId: id,
+        action: `Email change verified and updated from ${rows[0].email} to ${newEmail}.`,
+      });
+
       return res.status(200).json({
         success: true,
         message: "Email change verified and updated successfully.",
@@ -447,6 +587,12 @@ module.exports.VerifyEmail = async (req, res) => {
       message: "No email change pending or invalid verification request.",
     });
   } catch (err) {
+    // Log the error
+    await CreateLog({
+      userId: null,
+      action: `Error verifying email: ${err.message}`,
+    }); // User ID can be null since it might not be valid in case of error
+
     return res.status(200).json({
       success: false,
       message: "Server error.",
@@ -500,9 +646,19 @@ module.exports.RequestPasswordReset = async (req, res) => {
 
     const resetLink = `${process.env.SITE_URL}/reset-password/${resetPasswordToken}`;
 
+    // Log the password reset request with user ID
+    const logResult = await CreateLog({
+      userId: user.id, // Use user.id here
+      action: "Requested password reset",
+    });
+
+    if (!logResult.success) {
+      console.error("Failed to create log:", logResult.message);
+    }
+
     // Email options
     const mailOptions = {
-      from: "bhenzmharlbartolome012603@gmail.com",
+      from: "GrabRescue <grabrescue.ph@gmail.com>",
       to: email,
       subject: "Password Reset Request",
       text: `Please click the following link to reset your password: ${resetLink}`,
@@ -513,14 +669,19 @@ module.exports.RequestPasswordReset = async (req, res) => {
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: "bhenzmharlbartolome012603@gmail.com",
-        pass: "owvb wzni fhxu cvbz",
+        user: env.EMAIL_USER,
+        pass: env.EMAIL_PASS,
       },
     });
 
     // Send the email
     transporter.sendMail(mailOptions, (err) => {
       if (err) {
+        // Log the error
+        CreateLog({
+          userId: user.id,
+          action: `Failed to send reset password email: ${err.message}`,
+        });
         return res.status(200).json({
           success: false,
           message: "Failed to send reset password email.",
@@ -532,6 +693,12 @@ module.exports.RequestPasswordReset = async (req, res) => {
       });
     });
   } catch (err) {
+    // Log the server error
+    await CreateLog({
+      userId: null,
+      action: `Error in password reset request: ${err.message}`,
+    });
+
     return res.status(200).json({
       success: false,
       message: "Server error.",
@@ -616,11 +783,27 @@ module.exports.ResetPassword = async (req, res) => {
       "UPDATE users SET password = $1, reset_password_token = NULL, reset_password_expires = NULL WHERE id = $2";
     await pool.query(updateQuery, [hashedPassword, user.id]);
 
+    // Log the password reset action
+    const logResult = await CreateLog({
+      userId: user.id, // Use user.id here
+      action: "Password reset successful",
+    });
+
+    if (!logResult.success) {
+      console.error("Failed to create log:", logResult.message);
+    }
+
     return res.status(200).json({
       success: true,
       message: "Password has been reset successfully.",
     });
   } catch (err) {
+    // Log the server error
+    await CreateLog({
+      userId: null,
+      action: `Error in password reset: ${err.message}`,
+    });
+
     return res.status(200).json({
       success: false,
       message: "Server error.",

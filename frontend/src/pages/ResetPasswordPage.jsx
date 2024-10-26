@@ -66,19 +66,16 @@ const ResetPassword = () => {
 
   return (
     <div className="flex items-center justify-center h-screen bg-[#f5f5f5]">
-      <div className="w-full max-w-md p-6 bg-white rounded-lg">
+      <div className="w-full max-w-md p-6 bg-background-light md:bg-white md:rounded-lg md:shadow-sm">
         {/* Back button */}
-        <div className="flex justify-between mb-4">
-          <button
-            type="button"
-            className="text-[#557C55] hover:text-red-600 transition-colors duration-200 ease-in-out flex items-center"
-            onClick={() => navigate("/", { replace: true })}
-          >
-            <FaChevronLeft
-              className="text-xl text-background-dark cursor-pointer"
-              onClick={() => window.history.back()}
-            />
-          </button>
+        <div
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-2 mb-10 cursor-pointer"
+        >
+          <FaChevronLeft className="text-xl text-background-dark cursor-pointer" />
+          <p className="text-background-dark text-lg font-semibold md:hidden">
+            Back
+          </p>
         </div>
 
         {/* Logo */}

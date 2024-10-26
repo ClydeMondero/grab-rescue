@@ -1,87 +1,256 @@
-import React from "react";
-import { FaExclamationTriangle } from "react-icons/fa";
-import { Link } from "react-router-dom";
-import { getRequestsFromFirestore } from "../services/firestoreService";
-import { useState, useEffect } from "react";
+import { useContext, useState, useEffect } from "react";
+import { FaMapLocation } from "react-icons/fa6";
+import { FaLocationArrow } from "react-icons/fa";
+import { BiSolidHappyBeaming } from "react-icons/bi";
+import { RiPinDistanceFill } from "react-icons/ri";
+import { MdAccessTimeFilled } from "react-icons/md";
+import { IoSpeedometerSharp } from "react-icons/io5";
+import { useNavigate } from "react-router-dom";
+import { RescuerContext } from "../contexts/RescuerContext";
+import { getRouteData } from "../services/locationService";
+import placeholder from "../assets/placeholder.png";
+import { formatDistance, formatDuration } from "../utils/DistanceUtility";
+import { setSelectedRequestCookie } from "../services/cookieService";
+import { acceptRescueRequestInFirestore } from "../services/firestoreService";
 
-const Requests = () => {
-  const [requests, setRequests] = useState([]);
+// TODO: Add Completed Button
 
-  const getRequests = async () => {
-    const requests = await getRequestsFromFirestore();
+const Requests = ({
+  userId,
+  requests,
+  selectedRequest,
+  setSelectedRequest,
+}) => {
+  const navigate = useNavigate();
+  const { rescuer } = useContext(RescuerContext);
 
-    setRequests(requests);
+  // State to store routes data for requests
+  const [routeData, setRouteData] = useState({});
 
-    requests.map((request) => {
-      console.log(request);
-    });
+  const [pendingRequests, setPendingRequests] = useState([]);
+
+  /**
+   * Handle Accept button click
+   * @param {string} requestID - Request ID to accept
+   */
+  const handleAccept = async (requestID) => {
+    setSelectedRequestCookie(requestID);
+    setSelectedRequest(requestID);
+
+    await acceptRescueRequestInFirestore(userId, requestID);
+
+    navigate("/rescuer/navigate");
+  };
+
+  const fetchRoutes = async () => {
+    const newRouteData = {};
+    for (const request of requests) {
+      const route = await getRouteData(rescuer, request.location);
+      newRouteData[request.id] = route;
+    }
+    setRouteData(newRouteData);
   };
 
   useEffect(() => {
-    getRequests();
-  }, []);
+    setPendingRequests(
+      requests.filter((request) => request.status !== "assigned")
+    );
+
+    if (pendingRequests.length > 0) {
+      fetchRoutes();
+    }
+  }, [requests, rescuer]);
 
   return (
-    <div className=" flex flex-col p-4 sm:p-6 md:p-8 lg:p-10 max-w-7xl w-full mx-auto h-[calc(100vh-160px)]">
+    <div
+      className={`min-h-full flex flex-col p-6  ${
+        pendingRequests.length > 0 ? "" : "justify-center"
+      }
+        
+      }`}
+    >
       {/* Header Section */}
-      <div className="flex flex-col sm:flex-row items-center justify-between mb-4">
-        <h2 className="text-2xl sm:text-3xl font-bold text-[#557C55] flex items-center space-x-2">
-          <FaExclamationTriangle className="text-secondary" />
-          <span className="text-primary-dark">Emergency Requests</span>
+      <div
+        className={`hidden flex-col items-start justify-between mb-4 md:flex md:${
+          pendingRequests.length > 0 ? "" : "hidden"
+        }`}
+      >
+        <h2 className="text-3xl font-bold text-[#557C55] flex items-center gap-2">
+          Requests
         </h2>
       </div>
 
       {/* Scrollable Request Cards Section */}
-      <div className="flex-1 overflow-y-auto max-h-[calc(100vh-200px)] space-y-3">
-        {requests.map((request) => (
-          <div
-            key={request}
-            className="block p-4 bg-white border border-gray-300 rounded-md hover:bg-gray-100 transition-colors"
-          >
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between w-full">
-              {/* Request Info */}
-              <div className="mb-4 sm:mb-0">
-                <h3 className="text-lg font-bold text-[#557C55] mb-2 flex items-center space-x-2">
-                  <FaExclamationTriangle className="text-red-500" />
-                </h3>
-                <p className="text-sm text-gray-600">
-                  <strong className="text-[#557C55]">Location: </strong>
-                  {request.address}
-                </p>
-                <p className="text-sm text-gray-600">
-                  <strong className="text-[#557C55]">Distance: </strong>
-                  {request.distance}m
-                </p>
-                <p className="text-sm text-gray-600">
-                  <strong className="text-[#557C55]">ETA: </strong>{" "}
-                  {request.eta}
-                </p>
-                <p className="text-sm text-gray-600">
-                  <strong className="text-[#557C55]">Request Time: </strong>
-                  {new Intl.DateTimeFormat("en-US", {
-                    year: "numeric",
-                    month: "2-digit",
-                    day: "2-digit",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    second: "2-digit",
-                  }).format(new Date(request.timestamp))}
-                </p>
-              </div>
+      <div
+        className={`${
+          pendingRequests.length > 0
+            ? "grid grid-cols-1 md:grid-cols-2 gap-3 overflow-y-auto"
+            : ""
+        }`}
+      >
+        {pendingRequests.length > 0 ? (
+          pendingRequests.map((request) => {
+            const route = routeData[request.id] || {};
 
-              {/* Action Section */}
-              <div className="flex items-center">
-                <Link
-                  to="/rescuer/navigate"
-                  className="px-4 py-2 text-sm sm:text-base font-semibold text-white bg-primary hover:bg-green-600 transition-colors rounded"
-                >
-                  Accept
-                </Link>
+            return (
+              <div
+                key={request.id}
+                className="block bg-white border border-gray-300 rounded-md overflow-hidden"
+              >
+                {/* Image Section */}
+                <div className="relative">
+                  <img
+                    src={
+                      request.incidentPicture
+                        ? request.incidentPicture
+                        : placeholder
+                    }
+                    alt="Incident Picture"
+                    className="w-full h-40 object-cover"
+                  />
+                  <div
+                    className={`absolute top-4 left-4 text-sm font-semibold text-white py-1 px-3 rounded-lg shadow-md ${
+                      request.status === "pending" ? "bg-yellow-500" : ""
+                    }`}
+                  >
+                    {request.status.charAt(0).toUpperCase() +
+                      request.status.slice(1)}
+                  </div>
+                  {/* Pin Icon for Navigation */}
+                  <FaLocationArrow
+                    className="absolute top-4 right-4 text-2xl text-background-light cursor-pointer"
+                    onClick={() => handleNavigate(request.id)}
+                  />
+                </div>
+
+                {/* Request Info & Action */}
+                <div className="flex flex-col items-start justify-between p-4 gap-4">
+                  {/* Request Info */}
+                  <div className="flex-1">
+                    <div className="flex items-center gap-1">
+                      <FaMapLocation className="text-background-medium" />
+                      <p className="text-sm text-text-primary">
+                        <strong className="text-[#557C55]">Location </strong>
+                        {request.location && (
+                          <>
+                            {request.location.address
+                              .split(",")
+                              .slice(0, 5)
+                              .join(", ")}
+                          </>
+                        )}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <RiPinDistanceFill className="text-background-medium" />
+                      <p className="text-sm text-text-primary">
+                        <strong className="text-[#557C55]">Distance </strong>
+                        {route.distance && formatDistance(route.distance)}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <IoSpeedometerSharp className="text-background-medium" />
+                      <p className="text-sm text-text-primary">
+                        <strong className="text-[#557C55]">ETA </strong>
+                        {route.duration && formatDuration(route.duration)}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <MdAccessTimeFilled className="text-background-medium" />
+                      <p className="text-sm text-text-primary">
+                        <strong className="text-[#557C55]">
+                          Request Time{" "}
+                        </strong>
+                        {request.timestamp &&
+                          (() => {
+                            const requestDate = new Date(request.timestamp);
+                            const now = new Date();
+
+                            // Format the request time to a more readable format
+                            const formattedTime = new Intl.DateTimeFormat(
+                              "en-US",
+                              {
+                                year: "numeric",
+                                month: "long", // Full month name for readability
+                                day: "numeric",
+                                hour: "numeric",
+                                minute: "numeric",
+                                second: "numeric",
+                                hour12: true, // To format as AM/PM
+                              }
+                            ).format(requestDate);
+
+                            // Calculate time elapsed in milliseconds
+                            const timeElapsed = now - requestDate;
+
+                            // Convert timeElapsed to minutes, hours, days, etc.
+                            const minutesElapsed = Math.floor(
+                              timeElapsed / (1000 * 60)
+                            );
+                            let timeLabel = "";
+
+                            if (minutesElapsed < 60) {
+                              timeLabel = `${minutesElapsed} minutes ago`;
+                            } else if (minutesElapsed < 1440) {
+                              // Less than a day
+                              timeLabel = `${Math.floor(
+                                minutesElapsed / 60
+                              )} hours ago`;
+                            } else {
+                              timeLabel = `${Math.floor(
+                                minutesElapsed / (60 * 24)
+                              )} days ago`;
+                            }
+
+                            return (
+                              <>
+                                {formattedTime}{" "}
+                                <span className="text-text-secondary">
+                                  ({timeLabel})
+                                </span>
+                              </>
+                            );
+                          })()}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Accept Button */}
+                  <div className="w-full">
+                    {!selectedRequest && (
+                      <button
+                        onClick={() => handleAccept(request.id)}
+                        className="h-full w-full px-6 py-4 text-sm sm:text-base font-semibold text-white bg-primary-medium transition-colors rounded-lg hover:opacity-[80%]"
+                      >
+                        Accept Request
+                      </button>
+                    )}
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-        ))}
+            );
+          })
+        ) : (
+          <NoRequests />
+        )}
       </div>
+    </div>
+  );
+};
+
+/**
+ * Display message when there are no emergency requests
+ */
+const NoRequests = () => {
+  return (
+    <div className="flex flex-col items-center justify-center h-full">
+      <BiSolidHappyBeaming className="text-8xl text-background-medium" />
+      <h2 className="text-2xl font-bold text-primary-medium mb-4">
+        No Emergency Requests
+      </h2>
+      <p className="text-center text-sm sm:text-base text-text-secondary">
+        There are currently no emergency requests. Please check again later.
+      </p>
     </div>
   );
 };

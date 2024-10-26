@@ -8,6 +8,7 @@ const {
   UpdateUser,
   UpdateUserEmail,
   UpdateUserPassword,
+  UpdateUserStatus,
 } = require("../controllers/UserController");
 
 // Get users route
@@ -33,5 +34,8 @@ router.put("/updateEmail/:id", UpdateUserEmail);
 
 // Update user password route
 router.put("/updatePassword/:id", UpdateUserPassword);
+
+// Update user status route
+router.put("/updateStatus/:id", UpdateUserStatus);
 
 module.exports = router;

@@ -1,15 +1,7 @@
 const RequestModal = ({ onConfirm, onCancel }) => {
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-4 w-11/12 max-w-md md:w-1/3 relative">
-        {/* Close button */}
-        <button
-          onClick={onCancel}
-          className="text-2xl absolute top-1 right-2 text-primary-dark hover:text-gray-800"
-        >
-          &times;
-        </button>
-
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-6 z-50">
+      <div className="bg-white rounded-lg p-4 relative md:w-1/2 lg:w-1/3">
         {/* Success message */}
         <p className="mb-6 text-2xl md:text-2xl text-primary text-center font-bold">
           Before sending Request:

@@ -1,20 +1,19 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import {
-  FaArrowLeft,
-  FaSync,
+  FaSave,
   FaEye,
   FaEyeSlash,
-  FaKey,
   FaLock,
-  FaLockOpen,
+  FaChevronLeft,
 } from "react-icons/fa"; // Import icons for password fields
 import { useNavigate } from "react-router-dom";
 import { createAuthHeader } from "../services/authService";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { Toast } from "../components";
+import { Toast, Loader } from "../components";
 import zxcvbn from "zxcvbn"; // Import zxcvbn for password strength
+import { RescuerContext } from "../contexts/RescuerContext";
 
 const ChangePassword = (props) => {
   const navigate = useNavigate();
@@ -35,6 +34,11 @@ const ChangePassword = (props) => {
     score: 0,
     feedback: [],
   });
+  const [showPasswordMeter, setShowPasswordMeter] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const setPage =
+    user.account_type === "Rescuer" ? useContext(RescuerContext).setPage : null;
 
   const handlePasswordChange = (e) => {
     const { name, value } = e.target;
@@ -42,6 +46,13 @@ const ChangePassword = (props) => {
       ...prevPasswords,
       [name]: value,
     }));
+
+    // Show password meter only when user starts typing in the field
+    if (name === "newPassword" && value.length > 0) {
+      setShowPasswordMeter(true);
+    } else {
+      setShowPasswordMeter(false);
+    }
 
     // Update password strength for new password
     if (name === "newPassword") {
@@ -59,9 +70,7 @@ const ChangePassword = (props) => {
       confirmPassword: passwords.confirmPassword,
     };
 
-    console.log("User Id:", userId);
-    console.log("Data being sent:", data);
-
+    setIsLoading(true);
     try {
       // Sending PUT request to update password
       const response = await (
@@ -80,9 +89,12 @@ const ChangePassword = (props) => {
         newPassword: "",
         confirmPassword: "",
       });
+      setShowPasswordMeter(false);
     } catch (error) {
       console.error(error.message);
       toast.error(error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -111,24 +123,24 @@ const ChangePassword = (props) => {
   };
 
   return (
-    <div className="flex-1 p-3 h-full  flex flex-col">
-      <div className="flex items-center mb-2 max-w-md">
-        <FaArrowLeft
-          className="text-lg sm:text-xl text-[#557C55] cursor-pointer"
-          onClick={() => navigate(-1)}
+    <div className="flex-1 p-6 h-full flex flex-col items-center">
+      <div className="w-full items-center gap-4 mb-6 hidden md:flex">
+        <FaChevronLeft
+          className="text-background-dark text-2xl cursor-pointer "
+          onClick={() => {
+            navigate(`/${user.account_type.toLowerCase()}`);
+            setPage("Navigate");
+          }}
         />
-        <FaKey className="text-2xl sm:text-3xl text-[#557C55] mr-2" />
-        <h4 className="text-lg sm:text-xl font-semibold ml-2 text-[#557C55]">
-          Change Password
-        </h4>
+        <p className="text-3xl text-primary-dark font-bold">Change Password</p>
       </div>
-      <div className="flex-1 bg-white rounded-lg p-3">
-        <p className="text-sm sm:text-md mb-3 font-semibold text-[#557C55]">
-          Update your password:
+      <div className="w-full bg-white rounded-lg p-4 md:w-1/2">
+        <p className="text-lg mb-3 font-semibold text-[#557C55]">
+          Update your password
         </p>
-        <form className="space-y-2" onSubmit={handleSubmit}>
+        <form className="space-y-4" onSubmit={handleSubmit}>
           {/* Current Password Field */}
-          <div className="relative">
+          <div className="relative ">
             <FaLock className="absolute left-3 top-3 text-gray-600" />
             <input
               type={showPasswords.currentPassword ? "text" : "password"}
@@ -136,7 +148,7 @@ const ChangePassword = (props) => {
               name="currentPassword"
               value={passwords.currentPassword}
               onChange={handlePasswordChange}
-              className="w-full p-2 pl-10 pr-12 border rounded bg-[#F9F9F9] border-gray-300 text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-[#557C55] transition"
+              className="w-full p-2 pl-10 pr-12 border rounded bg-[#F9F9F9] border-gray-300 text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-primary transition"
               placeholder="Enter your current password"
             />
             <button
@@ -145,38 +157,41 @@ const ChangePassword = (props) => {
               onClick={() => togglePasswordVisibility("currentPassword")}
             >
               {showPasswords.currentPassword ? (
-                <FaEyeSlash size={20} color="#557C55" />
+                <FaEyeSlash className="text-lg text-background-medium" />
               ) : (
-                <FaEye size={20} color="#557C55" />
+                <FaEye className="text-lg text-background-medium" />
               )}
             </button>
           </div>
 
           {/* New Password Field */}
           <div className="relative">
-            <FaLockOpen className="absolute left-3 top-3 text-gray-600" />
+            <FaLock className="absolute left-3 top-3 text-gray-600" />
             <input
               type={showPasswords.newPassword ? "text" : "password"}
               id="new-password"
               name="newPassword"
               value={passwords.newPassword}
               onChange={handlePasswordChange}
-              className="w-full p-2 pl-10 pr-12 border rounded bg-[#F9F9F9] border-gray-300 text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-[#557C55] transition"
+              className="w-full p-2 pl-10 pr-12 border rounded bg-[#F9F9F9] border-gray-300 text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-primary transition"
               placeholder="Enter a new password"
             />
             <button
               type="button"
-              className="absolute right-3 top-2 sm:top-5 sm:transform sm:-translate-y-1/2 flex items-center justify-center"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center justify-center"
               onClick={() => togglePasswordVisibility("newPassword")}
             >
               {showPasswords.newPassword ? (
-                <FaEyeSlash size={20} color="#557C55" />
+                <FaEyeSlash className="text-lg text-background-medium" />
               ) : (
-                <FaEye size={20} color="#557C55" />
+                <FaEye className="text-lg text-background-medium" />
               )}
             </button>
-            {/* Password Strength Meter */}
-            <div className="mt-2">
+          </div>
+
+          {/* Password Strength Meter */}
+          {showPasswordMeter && (
+            <div className="mt-3">
               <strong className="block text-xs sm:text-sm font-semibold text-[#557C55]">
                 Password Strength: {getStrengthLabel(passwordStrength.score)}
               </strong>
@@ -186,6 +201,7 @@ const ChangePassword = (props) => {
                   backgroundColor: "#e0e0e0",
                   borderRadius: "5px",
                   marginTop: "5px",
+                  height: "3px",
                 }}
               >
                 <div
@@ -207,47 +223,56 @@ const ChangePassword = (props) => {
                 />
               </div>
               {passwordStrength.feedback.length > 0 && (
-                <ul className="text-xs text-red-500">
+                <ul className="text-xs text-red-500 mt-2">
                   {passwordStrength.feedback.map((item, index) => (
                     <li key={index}>{item}</li>
                   ))}
                 </ul>
               )}
             </div>
-          </div>
+          )}
 
           {/* Confirm Password Field */}
           <div className="relative">
-            <FaLockOpen className="absolute left-3 top-3 text-gray-600" />
+            <FaLock className="absolute left-3 top-3 text-gray-600" />
             <input
               type={showPasswords.confirmPassword ? "text" : "password"}
               id="confirm-password"
               name="confirmPassword"
               value={passwords.confirmPassword}
               onChange={handlePasswordChange}
-              className="w-full p-2 pl-10 pr-12 border rounded bg-[#F9F9F9] border-gray-300 text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-[#557C55] transition"
+              className="w-full p-2 pl-10 pr-12 border rounded bg-[#F9F9F9] border-gray-300 text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-primary transition"
               placeholder="Confirm your new password"
             />
             <button
               type="button"
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center justify-center"
+              className="absolute right-3 bottom-3 flex items-center justify-center"
               onClick={() => togglePasswordVisibility("confirmPassword")}
             >
               {showPasswords.confirmPassword ? (
-                <FaEyeSlash size={20} color="#557C55" />
+                <FaEyeSlash className="text-lg text-background-medium" />
               ) : (
-                <FaEye size={20} color="#557C55" />
+                <FaEye className="text-lg text-background-medium" />
               )}
             </button>
           </div>
 
-          <button
-            type="submit"
-            className="bg-[#557C55] text-white px-2 py-1 rounded text-xs sm:text-sm hover:bg-[#6EA46E] transition flex items-center justify-center"
-          >
-            <FaSync className="mr-1" />
-            Update Password
-          </button>
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              className="bg-[#557C55] text-white px-6 py-4 rounded-md text-sm font-semibold hover:bg-[#6EA46E] transition"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <Loader isLoading={isLoading} />
+              ) : (
+                <div className="flex items-center gap-2 font-bold">
+                  <FaSave />
+                  Save
+                </div>
+              )}
+            </button>
+          </div>
         </form>
       </div>
       <Toast />

@@ -1,32 +1,48 @@
+import { useContext } from "react";
 import { Link } from "react-router-dom";
-import { FaTasks, FaLocationArrow } from "react-icons/fa";
+import { FaLocationArrow, FaExclamation } from "react-icons/fa";
+import { RescuerContext } from "../contexts/RescuerContext";
 
 const Bottom = () => {
+  const { page, setPage } = useContext(RescuerContext);
+
+  const updatePage = (pageName) => {
+    setPage(pageName);
+  };
+
   return (
-    <div className="bg-background text-white flex justify-around py-3">
-      <Link
-        to="/rescuer/requests"
-        className={`flex flex-col items-center ${
-          window.location.pathname === "/rescuer/requests"
-            ? "text-[#A5CE97]"
-            : ""
-        }`}
-      >
-        <FaTasks className="text-xl text-primary" />
-        <span className="text-xs text-primary">Requests</span>
-      </Link>
-      <Link
-        to="/rescuer/navigate"
-        className={`flex flex-col items-center ${
-          window.location.pathname === "/rescuer/navigate"
-            ? "text-[#A5CE97]"
-            : ""
-        }`}
-      >
-        <FaLocationArrow className="text-xl text-primary" />
-        <span className="text-xs text-primary">Navigate</span>
-      </Link>
-    </div>
+    (page === "Requests" || page === "Navigate") && (
+      <div className="bg-background text-white flex items-center justify-around py-4 border-t-2 border-background-light">
+        <Link
+          to="/rescuer/requests"
+          className="flex flex-col items-center"
+          onClick={() => updatePage("Requests")}
+        >
+          <FaExclamation
+            className={`text-xl ${
+              page === "Requests" ? "text-primary" : "text-background-medium"
+            }`}
+          />
+          <span className="text-sm font-semibold text-primary-dark">
+            Requests
+          </span>
+        </Link>
+        <Link
+          to="/rescuer/navigate"
+          className="flex flex-col items-center"
+          onClick={() => updatePage("Navigate")}
+        >
+          <FaLocationArrow
+            className={`text-xl ${
+              page === "Navigate" ? "text-primary" : "text-background-medium"
+            }`}
+          />
+          <span className="text-sm font-semibold text-primary-dark">
+            Navigate
+          </span>
+        </Link>
+      </div>
+    )
   );
 };
 

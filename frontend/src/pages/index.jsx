@@ -6,8 +6,10 @@ import ForgotPassword from "./ForgotPassword";
 import ResetPassword from "./ResetPasswordPage";
 import VerifyEmail from "./VerifyEmail";
 import NotFound from "./NotFound";
+import MultiStepForm from "./MultiStepForm";
 
 export {
+  MultiStepForm,
   Login,
   Admin,
   Home,
