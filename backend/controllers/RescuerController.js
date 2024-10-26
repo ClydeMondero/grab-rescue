@@ -287,13 +287,13 @@ module.exports.CreateRescuer = async (req, res) => {
       const transporter = nodemailer.createTransport({
         service: "gmail",
         auth: {
-          user: "bhenzmharlbartolome012603@gmail.com",
-          pass: "owvb wzni fhxu cvbz",
+          user: env.EMAIL_USER,
+          pass: env.EMAIL_PASS,
         },
       });
 
       const mailOptions = {
-        from: "bhenzmharlbartolome012603@gmail.com",
+        from: "GrabRescue <grabrescue.ph@gmail.com>",
         to: email,
         subject: "Email Verification",
         text: `Please click the following link to verify your new email: ${verificationLink}`,
