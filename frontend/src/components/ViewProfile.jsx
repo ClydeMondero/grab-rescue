@@ -200,8 +200,8 @@ const ViewProfile = (props) => {
                 className="text-lg absolute top-4 right-4 text-[#557C55] hover:text-gray-700 cursor-pointer"
                 onClick={() => setIsEditing(false)}
               />
-              <div className="flex items-center mb-4">
-                <FaUser className="mr-1 text-[#557C55]" />
+              <div className="flex items-center gap-2 mb-4">
+                <FaUser className="text-[#557C55]" />
                 <h4 className="text-lg font-bold text-[#557C55]">
                   Edit Profile
                 </h4>
@@ -220,7 +220,7 @@ const ViewProfile = (props) => {
                     name="username"
                     value={profile?.username || ""}
                     onChange={handleProfileChange}
-                    className="w-full p-2 border rounded-lg bg-gray-100 border-gray-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
+                    className="w-full p-3 border rounded-md bg-gray-100 border-gray-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
                   />
                 </div>
 
@@ -238,7 +238,7 @@ const ViewProfile = (props) => {
                       name="first_name"
                       value={profile?.first_name || ""}
                       onChange={handleProfileChange}
-                      className="w-full p-2 border rounded-lg bg-gray-100 border-gray-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
+                      className="w-full p-3 border rounded-md bg-gray-100 border-gray-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
                     />
                   </div>
                   <div>
@@ -254,7 +254,7 @@ const ViewProfile = (props) => {
                       name="last_name"
                       value={profile?.last_name || ""}
                       onChange={handleProfileChange}
-                      className="w-full p-2 border rounded-lg bg-gray-100 border-gray-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
+                      className="w-full p-3 border rounded-md bg-gray-100 border-gray-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
                     />
                   </div>
                 </div>
@@ -273,7 +273,7 @@ const ViewProfile = (props) => {
                         name="municipality"
                         value={profile?.municipality || ""}
                         onChange={handleProfileChange}
-                        className="w-full p-2 border rounded-lg bg-gray-100 border-gray-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
+                        className="w-full p-3 border rounded-md bg-gray-100 border-gray-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
                       >
                         <option value="">Select Municipality</option>
                         {municipalities.map((municipality) => (
@@ -295,7 +295,7 @@ const ViewProfile = (props) => {
                         name="barangay"
                         value={profile?.barangay || ""}
                         onChange={handleProfileChange}
-                        className="w-full p-2 border rounded-lg bg-gray-100 border-gray-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
+                        className="w-full p-3 border rounded-md bg-gray-100 border-gray-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
                       >
                         <option value="">Select Barangay</option>
                         {barangaysData[profile?.municipality || ""]?.map(
@@ -323,7 +323,7 @@ const ViewProfile = (props) => {
                     name="contact_number"
                     value={profile?.contact_number || ""}
                     onChange={handleProfileChange}
-                    className="w-full p-2 border rounded-lg bg-gray-100 border-gray-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
+                    className="w-full p-3 border rounded-md bg-gray-100 border-gray-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
                   />
                 </div>
 
@@ -340,7 +340,7 @@ const ViewProfile = (props) => {
                     name="birthday"
                     value={profile?.birthday || ""}
                     onChange={handleProfileChange}
-                    className="w-full p-2 border rounded-lg bg-gray-100 border-gray-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
+                    className="w-full p-3 border rounded-md bg-gray-100 border-gray-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
                   />
                 </div>
 
