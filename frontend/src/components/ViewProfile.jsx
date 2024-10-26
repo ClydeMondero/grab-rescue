@@ -178,12 +178,15 @@ const ViewProfile = (props) => {
             </div>
 
             {/* Edit Profile Button */}
-            <div className="mt-4">
+            <div className="mt-4 flex justify-end">
               <button
                 onClick={() => setIsEditing(true)}
-                className="bg-[#557C55] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-[#6EA46E] transition flex items-center shadow-md"
+                className="bg-[#557C55] text-white px-6 py-4 rounded-md text-xs font-semibold hover:bg-[#6EA46E] transition"
               >
-                <FaEdit className="mr-1 text-sm" /> Edit Profile
+                <div className="flex items-center gap-2">
+                  <FaEdit className="mr-1 text-sm" />
+                  Edit Profile
+                </div>
               </button>
             </div>
           </div>
@@ -344,7 +347,7 @@ const ViewProfile = (props) => {
                 <div className="flex justify-end">
                   <button
                     type="submit"
-                    className="bg-[#557C55] text-white px-4 py-2 rounded-md text-xs font-semibold hover:bg-[#6EA46E] transition"
+                    className="bg-[#557C55] text-white px-6 py-4 rounded-md text-xs font-semibold hover:bg-[#6EA46E] transition"
                   >
                     {loading ? (
                       <Loader isLoading={loading} size={20} color="#fff" />
