@@ -139,7 +139,7 @@ const ChangePassword = (props) => {
         </p>
         <form className="space-y-4" onSubmit={handleSubmit}>
           {/* Current Password Field */}
-          <div className="relative">
+          <div className="relative ">
             <FaLock className="absolute left-3 top-3 text-gray-600" />
             <input
               type={showPasswords.currentPassword ? "text" : "password"}
