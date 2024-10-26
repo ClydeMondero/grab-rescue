@@ -9,8 +9,7 @@ const { CreateLog } = require("./LogController");
 // Get Users with Filtering and Name Search (Rescuers and Admins)
 module.exports.GetUsers = async (req, res) => {
   let q = `
-    SELECT id, first_name, middle_initial, last_name, to_char(birthday, 'YYYY-MM-DD') AS birthday, municipality, barangay, profile_image, contact_number, username,
-    is_online, verified, account_type, status FROM users WHERE 1=1
+    SELECT * FROM users WHERE 1=1
   `;
 
   const queryParams = [];
@@ -55,7 +54,7 @@ module.exports.GetUsers = async (req, res) => {
 module.exports.GetUser = async (req, res) => {
   try {
     const { rows } = await pool.query(
-      "SELECT id, first_name, middle_initial, last_name, to_char(birthday, 'YYYY-MM-DD') AS birthday, municipality, barangay, profile_image, contact_number, username, is_online, verified, account_type, status FROM users WHERE id = $1",
+      "SELECT id, first_name, middle_initial, last_name, to_char(birthday, 'YYYY-MM-DD') AS birthday, municipality, barangay, profile_image, contact_number, email, username, is_online, verified, account_type, status FROM users WHERE id = $1",
       [req.params.id]
     );
     if (rows.length === 0) {
