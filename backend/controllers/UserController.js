@@ -10,7 +10,7 @@ const { CreateLog } = require("./LogController");
 module.exports.GetUsers = async (req, res) => {
   let q = `
     SELECT id, first_name, middle_initial, last_name, to_char(birthday, 'YYYY-MM-DD') AS birthday, municipality, barangay, profile_image, contact_number, username,
-    is_online, verified, account_type FROM users WHERE 1=1
+    is_online, verified, account_type, status FROM users WHERE 1=1
   `;
 
   const queryParams = [];
@@ -55,7 +55,7 @@ module.exports.GetUsers = async (req, res) => {
 module.exports.GetUser = async (req, res) => {
   try {
     const { rows } = await pool.query(
-      "SELECT id, first_name, middle_initial, last_name, to_char(birthday, 'YYYY-MM-DD') AS birthday, municipality, barangay, profile_image, contact_number, username, is_online, verified, account_type FROM users WHERE id = $1",
+      "SELECT id, first_name, middle_initial, last_name, to_char(birthday, 'YYYY-MM-DD') AS birthday, municipality, barangay, profile_image, contact_number, username, is_online, verified, account_type, status FROM users WHERE id = $1",
       [req.params.id]
     );
     if (rows.length === 0) {
@@ -464,6 +464,56 @@ module.exports.UpdateUserPassword = async (req, res) => {
     });
 
     return res.status(200).json({
+      success: false,
+      message: "Server error.",
+      error: err.message,
+    });
+  }
+};
+
+// Update User Status (Toggle)
+module.exports.UpdateUserStatus = async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    // Get the current status of the user
+    const currentStatusQuery = "SELECT status FROM users WHERE id = $1";
+    const currentStatusResult = await pool.query(currentStatusQuery, [id]);
+
+    if (currentStatusResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found.",
+      });
+    }
+
+    const currentStatus = currentStatusResult.rows[0].status;
+
+    // Determine new status by toggling
+    const newStatus = currentStatus === "Active" ? "Inactive" : "Active";
+
+    // Update the user's status
+    const q = "UPDATE users SET status = $1 WHERE id = $2";
+    await pool.query(q, [newStatus, id]);
+
+    // Log the status update action
+    await CreateLog({
+      userId: id,
+      action: `User status updated from ${currentStatus} to ${newStatus}`,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: `User status updated to ${newStatus} successfully.`,
+    });
+  } catch (err) {
+    // Log the error
+    await CreateLog({
+      userId: id,
+      action: `Error updating user status: ${err.message}`,
+    });
+
+    return res.status(500).json({
       success: false,
       message: "Server error.",
       error: err.message,

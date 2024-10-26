@@ -28,6 +28,14 @@ module.exports.Login = async (req, res) => {
 
     const [userData] = data.rows;
 
+    // Check if the user is inactive
+    if (userData.status === "Inactive") {
+      return res.status(200).json({
+        success: false,
+        message: "Your account is inactive. Please contact support.",
+      });
+    }
+
     if (userData.is_online) {
       return res
         .status(200)
@@ -74,7 +82,7 @@ module.exports.Login = async (req, res) => {
         httpOnly: false,
       });
 
-      delete userData.password;
+      delete userData.password; // Remove password from userData
       return res.status(200).json({
         success: true,
         message: "Logged In Success!",
