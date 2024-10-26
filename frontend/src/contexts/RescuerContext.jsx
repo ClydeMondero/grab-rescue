@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 
 const RescuerContext = createContext();
@@ -25,6 +25,8 @@ const RescuerProvider = ({ children }) => {
       return "Change Password";
     } else if (location.pathname === "/rescuer/change-email") {
       return "Change Email";
+    } else {
+      return "Navigate";
     }
   });
 

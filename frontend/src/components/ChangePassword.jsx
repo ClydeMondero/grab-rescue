@@ -11,7 +11,7 @@ import { createAuthHeader } from "../services/authService";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { Toast } from "../components";
+import { Toast, Loader } from "../components";
 import zxcvbn from "zxcvbn"; // Import zxcvbn for password strength
 import { RescuerContext } from "../contexts/RescuerContext";
 
@@ -37,7 +37,8 @@ const ChangePassword = (props) => {
   const [showPasswordMeter, setShowPasswordMeter] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const { setPage } = useContext(RescuerContext);
+  const setPage =
+    user.account_type === "Rescuer" ? useContext(RescuerContext).setPage : null;
 
   const handlePasswordChange = (e) => {
     const { name, value } = e.target;
@@ -127,7 +128,7 @@ const ChangePassword = (props) => {
         <FaChevronLeft
           className="text-background-dark text-2xl cursor-pointer "
           onClick={() => {
-            navigate("/rescuer/navigate");
+            navigate(`/${user.account_type.toLowerCase()}`);
             setPage("Navigate");
           }}
         />

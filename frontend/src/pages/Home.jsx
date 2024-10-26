@@ -155,36 +155,36 @@ const Home = () => {
             <div className="absolute top-14 right-0 w-56 bg-background text-primary-medium rounded-md shadow-lg py-2 flex items-center justify-center">
               <ul className="space-y-2 flex flex-col items-center w-full">
                 <li className="py-2 border-b w-full justify-center">
-                  <a
-                    href="/login?role=Rescuer"
+                  <button
+                    onClick={() => navigate("/login?role=Rescuer")}
                     className="flex items-center justify-center w-full text-lg font-semibold "
                   >
                     Login as Rescuer
-                  </a>
+                  </button>
                 </li>
                 <li className="py-2 border-b w-full justify-center">
-                  <a
-                    href="/login?role=Admin"
+                  <button
+                    onClick={() => navigate("/login?role=Admin")}
                     className="flex items-center justify-center w-full text-lg font-semibold "
                   >
                     Login as Admin
-                  </a>
+                  </button>
                 </li>
                 <li className="py-2 border-b w-full">
-                  <a
-                    href="/register"
+                  <button
+                    onClick={() => navigate("/register")}
                     className="flex items-center justify-center w-full text-lg font-semibold "
                   >
                     Be a Rescuer
-                  </a>
+                  </button>
                 </li>
                 <li className="py-2">
-                  <a
-                    href="/about"
+                  <button
+                    onClick={() => navigate("/about")}
                     className="flex items-center w-full text-lg font-semibold hover:underline"
                   >
                     About
-                  </a>
+                  </button>
                 </li>
               </ul>
             </div>
