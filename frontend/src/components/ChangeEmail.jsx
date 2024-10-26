@@ -1,20 +1,23 @@
-import React, { useState } from "react";
-import { FaArrowLeft, FaEnvelope } from "react-icons/fa";
-import { MdMarkEmailRead } from "react-icons/md";
+import React, { useContext, useState } from "react";
+import { FaSave, FaEnvelope, FaChevronLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Toast } from "../components";
 import { createAuthHeader } from "../services/authService";
+import { RescuerContext } from "../contexts/RescuerContext";
 
 const ChangeEmail = (props) => {
   const navigate = useNavigate();
   const { user } = props;
   const userId = user.id;
+
   const [newEmail, setNewEmail] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const { setPage } = useContext(RescuerContext);
 
   const handleEmailChange = (e) => {
     setNewEmail(e.target.value);
@@ -60,22 +63,22 @@ const ChangeEmail = (props) => {
   return (
     <>
       <Toast />
-      <div className="flex-1 p-3 h-100 bg-gray-50 flex flex-col">
-        <div className="flex items-center mb-2">
-          <FaArrowLeft
-            className="text-lg sm:text-xl text-[#557C55] cursor-pointer"
+      <div className="flex-1 p-6 h-100 bg-light flex flex-col items-center justify-center">
+        <div className="w-full items-center gap-4 mb-6 hidden md:flex">
+          <FaChevronLeft
+            className="text-background-dark text-2xl cursor-pointer "
             onClick={() => {
-              navigate(user.account_type === "Admin" ? "/admin" : "/rescuer");
+              navigate("/rescuer/navigate");
+              setPage("Navigate");
             }}
           />
-          <MdMarkEmailRead className="text-2xl sm:text-3xl text-[#557C55] mr-2" />
-          <h4 className="text-xl sm:text-2xl font-semibold ml-2 text-[#557C55]">
-            Change Email
-          </h4>
+          <p className="text-3xl text-primary-dark font-bold">Change Email</p>
         </div>
-        <div className="flex-1 bg-white rounded-lg p-3">
+        <div className="w-full max-w-md mx-auto bg-white rounded-lg p-4">
+          <h2 className="text-lg font-semibold text-[#557C55] self-start mb-2">
+            New Email
+          </h2>
           <form className="space-y-2" onSubmit={handleSubmit}>
-            {/* Show current email only if the role is not rescuer */}
             {user.account_type !== "Rescuer" && (
               <div className="relative">
                 <label
@@ -125,17 +128,22 @@ const ChangeEmail = (props) => {
               <p className="text-red-500 text-xs sm:text-sm">{error}</p>
             )}
 
-            <button
-              type="submit"
-              className="bg-[#557C55] text-white px-2 py-1 rounded text-xs sm:text-sm hover:bg-[#6EA46E] transition flex items-center justify-center"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-[#FFFFFF] mr-2"></div>
-              ) : (
-                "Change Email"
-              )}
-            </button>
+            <div className="flex justify-end">
+              <button
+                type="submit"
+                className="bg-[#557C55] text-white px-6 py-4 rounded-md text-sm font-semibold hover:bg-[#6EA46E] transition"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <Loader isLoading={isLoading} />
+                ) : (
+                  <div className="flex items-center gap-2 font-bold">
+                    <FaSave />
+                    Save
+                  </div>
+                )}
+              </button>
+            </div>
           </form>
         </div>
       </div>
