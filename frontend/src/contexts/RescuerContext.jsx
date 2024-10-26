@@ -16,9 +16,15 @@ const RescuerProvider = ({ children }) => {
 
   const [page, setPage] = useState(() => {
     if (location.pathname === "/rescuer/requests") {
-      return "requests";
+      return "Requests";
     } else if (location.pathname === "/rescuer/navigate") {
-      return "navigate";
+      return "Navigate";
+    } else if (location.pathname === "/rescuer/profile") {
+      return "Profile";
+    } else if (location.pathname === "/rescuer/change-password") {
+      return "Change Password";
+    } else if (location.pathname === "/rescuer/change-email") {
+      return "Change Email";
     }
   });
 

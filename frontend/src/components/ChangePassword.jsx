@@ -118,11 +118,13 @@ const ChangePassword = (props) => {
   };
 
   return (
-    <div className="flex-1 p-3 h-full  flex flex-col">
+    <div className="flex-1 p-3 h-full flex flex-col">
       <div className="flex items-center mb-2 max-w-md">
         <FaArrowLeft
           className="text-lg sm:text-xl text-[#557C55] cursor-pointer"
-          onClick={() => navigate(-1)}
+          onClick={() => {
+            navigate(user.account_type === "Admin" ? "/admin" : "/rescuer");
+          }}
         />
         <FaKey className="text-2xl sm:text-3xl text-[#557C55] mr-2" />
         <h4 className="text-lg sm:text-xl font-semibold ml-2 text-[#557C55]">
