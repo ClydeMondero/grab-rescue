@@ -1,13 +1,5 @@
 import { useState } from "react";
-import {
-  FaArrowLeft,
-  FaSync,
-  FaEye,
-  FaEyeSlash,
-  FaKey,
-  FaLock,
-  FaLockOpen,
-} from "react-icons/fa"; // Import icons for password fields
+import { FaSave, FaEye, FaEyeSlash, FaLock } from "react-icons/fa"; // Import icons for password fields
 import { useNavigate } from "react-router-dom";
 import { createAuthHeader } from "../services/authService";
 import axios from "axios";
@@ -118,24 +110,12 @@ const ChangePassword = (props) => {
   };
 
   return (
-    <div className="flex-1 p-3 h-full flex flex-col">
-      <div className="flex items-center mb-2 max-w-md">
-        <FaArrowLeft
-          className="text-lg sm:text-xl text-[#557C55] cursor-pointer"
-          onClick={() => {
-            navigate(user.account_type === "Admin" ? "/admin" : "/rescuer");
-          }}
-        />
-        <FaKey className="text-2xl sm:text-3xl text-[#557C55] mr-2" />
-        <h4 className="text-lg sm:text-xl font-semibold ml-2 text-[#557C55]">
-          Change Password
-        </h4>
-      </div>
-      <div className="flex-1 bg-white rounded-lg p-3">
-        <p className="text-sm sm:text-md mb-3 font-semibold text-[#557C55]">
-          Update your password:
+    <div className="flex-1 p-6 h-full flex flex-col">
+      <div className="bg-white rounded-lg p-4">
+        <p className="text-lg mb-3 font-semibold text-[#557C55]">
+          Update your password
         </p>
-        <form className="space-y-2" onSubmit={handleSubmit}>
+        <form className="space-y-4" onSubmit={handleSubmit}>
           {/* Current Password Field */}
           <div className="relative">
             <FaLock className="absolute left-3 top-3 text-gray-600" />
@@ -154,16 +134,16 @@ const ChangePassword = (props) => {
               onClick={() => togglePasswordVisibility("currentPassword")}
             >
               {showPasswords.currentPassword ? (
-                <FaEyeSlash size={20} color="#557C55" />
+                <FaEyeSlash className="text-lg text-background-medium" />
               ) : (
-                <FaEye size={20} color="#557C55" />
+                <FaEye className="text-lg text-background-medium" />
               )}
             </button>
           </div>
 
           {/* New Password Field */}
           <div className="relative">
-            <FaLockOpen className="absolute left-3 top-3 text-gray-600" />
+            <FaLock className="absolute left-3 top-3 text-gray-600" />
             <input
               type={showPasswords.newPassword ? "text" : "password"}
               id="new-password"
@@ -179,9 +159,9 @@ const ChangePassword = (props) => {
               onClick={() => togglePasswordVisibility("newPassword")}
             >
               {showPasswords.newPassword ? (
-                <FaEyeSlash size={20} color="#557C55" />
+                <FaEyeSlash className="text-lg text-background-medium" />
               ) : (
-                <FaEye size={20} color="#557C55" />
+                <FaEye className="text-lg text-background-medium" />
               )}
             </button>
             {/* Password Strength Meter */}
@@ -229,7 +209,7 @@ const ChangePassword = (props) => {
 
           {/* Confirm Password Field */}
           <div className="relative">
-            <FaLockOpen className="absolute left-3 top-3 text-gray-600" />
+            <FaLock className="absolute left-3 top-3 text-gray-600" />
             <input
               type={showPasswords.confirmPassword ? "text" : "password"}
               id="confirm-password"
@@ -245,20 +225,65 @@ const ChangePassword = (props) => {
               onClick={() => togglePasswordVisibility("confirmPassword")}
             >
               {showPasswords.confirmPassword ? (
-                <FaEyeSlash size={20} color="#557C55" />
+                <FaEyeSlash className="text-lg text-background-medium" />
               ) : (
-                <FaEye size={20} color="#557C55" />
+                <FaEye className="text-lg text-background-medium" />
               )}
             </button>
+            {/* Password Strength Meter */}
+            {showPasswordMeter && (
+              <div className="mt-2">
+                <strong className="block text-xs sm:text-sm font-semibold text-[#557C55]">
+                  Password Strength: {getStrengthLabel(passwordStrength.score)}
+                </strong>
+                <div
+                  style={{
+                    width: "100%",
+                    backgroundColor: "#e0e0e0",
+                    borderRadius: "5px",
+                    marginTop: "5px",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: `${(passwordStrength.score + 1) * 20}%`,
+                      height: "3px",
+                      backgroundColor:
+                        passwordStrength.score === 4
+                          ? "green"
+                          : passwordStrength.score === 3
+                          ? "blue"
+                          : passwordStrength.score === 2
+                          ? "yellow"
+                          : passwordStrength.score === 1
+                          ? "orange"
+                          : "red",
+                      borderRadius: "3px",
+                    }}
+                  />
+                </div>
+                {passwordStrength.feedback.length > 0 && (
+                  <ul className="text-xs text-red-500">
+                    {passwordStrength.feedback.map((item, index) => (
+                      <li key={index}>{item}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
           </div>
 
-          <button
-            type="submit"
-            className="bg-[#557C55] text-white px-2 py-1 rounded text-xs sm:text-sm hover:bg-[#6EA46E] transition flex items-center justify-center"
-          >
-            <FaSync className="mr-1" />
-            Update Password
-          </button>
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              className="bg-[#557C55] text-white px-6 py-4 rounded-md text-xs font-semibold hover:bg-[#6EA46E] transition"
+            >
+              <div className="flex items-center gap-2">
+                <FaSave className="mr-1" />
+                Update Password
+              </div>
+            </button>
+          </div>
         </form>
       </div>
       <Toast />
