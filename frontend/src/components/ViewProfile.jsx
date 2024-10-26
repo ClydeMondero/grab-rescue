@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { FaArrowLeft, FaSave, FaEdit, FaTimes, FaUser } from "react-icons/fa";
+import { FaChevronLeft, FaSave, FaEdit, FaTimes, FaUser } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { createAuthHeader } from "../services/authService";
@@ -76,96 +76,99 @@ const ViewProfile = (props) => {
 
   return (
     <>
-      <div className="flex-1 p-2 md:p-4 h-full">
-        {/* Back button and header */}
-        <div className="flex items-center mb-4">
-          <FaArrowLeft
-            className="text-base md:text-lg text-[#557C55] cursor-pointer"
+      <div className="flex-1 p-6 h-full to-background-light">
+        <div className="w-full items-center gap-4 mb-6 hidden md:flex">
+          <FaChevronLeft
+            className="text-background-dark text-2xl cursor-pointer "
             onClick={() => {
-              navigate(user.account_type === "Admin" ? "/admin" : "/rescuer");
+              navigate("/rescuer");
             }}
           />
-          <FaUser className="text-xl md:text-2xl text-[#557C55] mr-1" />
-          <h4 className="text-sm md:text-lg font-semibold ml-1 text-[#557C55]">
-            View Profile
-          </h4>
+          <p className="text-3xl text-primary-dark font-bold">Your Profile</p>
         </div>
 
         {/* Main Profile Container */}
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          {/*TODO: upload profile picture  */}
           {/* Profile Picture Section */}
-          <div className="bg-white rounded-lg p-4 shadow-md">
-            <h2 className="text-sm font-semibold text-[#557C55] mb-1">
+          <div className="flex flex-col gap-2 bg-white rounded-lg p-4 shadow-sm">
+            <h2 className="text-lg font-semibold text-[#557C55] self-start">
               Profile Picture
             </h2>
-            <div className="flex justify-center mb-2">
+            <div className="flex-1 flex items-center justify-center mb-2 md:mb-4">
               <div className="relative">
                 <img
                   src={profile.profile_image}
                   alt="Profile"
-                  className="rounded-full w-24 h-24 object-cover border border-gray-300 shadow-md"
+                  className="rounded-full w-24 h-24 md:w-36 md:h-36 object-cover border border-gray-300 shadow-md"
                 />
                 {/* Upload new picture */}
-                <button className="absolute bottom-0 right-0 bg-[#557C55] text-white p-1 rounded-full hover:bg-[#6EA46E] transition shadow-md">
-                  <FaEdit className="text-xs" />
+                <button className="absolute bottom-0 right-0 bg-[#557C55] text-white p-2 md:p-3 rounded-full hover:bg-[#6EA46E] transition shadow-md flex items-center justify-center">
+                  <FaEdit className="text-xs md:text-base" />
                 </button>
               </div>
             </div>
           </div>
 
           {/* Profile Information Card */}
-          <div className="bg-white rounded-lg p-4 shadow-md">
-            <h2 className="text-sm font-semibold text-[#557C55] mb-3">
+          <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-300">
+            <h2 className="text-lg font-semibold text-[#557C55] mb-2">
               Profile Information
             </h2>
-            <div className="grid grid-cols-2 gap-1 text-xs text-gray-700">
-              <div>
-                <span className="font-semibold text-[#557C55]">Username:</span>
-                <p>{profile.username}</p>
+            <div className="grid grid-cols-1 gap-2 text-sm text-primary-dark mt-3">
+              <div className="flex items-center py-1 border-b border-gray-300">
+                <span className="font-semibold text-primary-dark">
+                  Username:
+                </span>
+                <p className="ml-2">{profile.username}</p>
               </div>
-              <div>
-                <span className="font-semibold text-[#557C55]">
+              <div className="flex items-center py-1 border-b border-gray-300">
+                <span className="font-semibold text-primary-dark">
                   First Name:
                 </span>
-                <p>{profile.first_name}</p>
+                <p className="ml-2">{profile.first_name}</p>
               </div>
-              <div>
-                <span className="font-semibold text-[#557C55]">Last Name:</span>
-                <p>{profile.last_name}</p>
+              <div className="flex items-center py-1 border-b border-gray-300">
+                <span className="font-semibold text-primary-dark">
+                  Last Name:
+                </span>
+                <p className="ml-2">{profile.last_name}</p>
               </div>
               {user.account_type === "Admin" && (
                 <>
-                  <div>
-                    <span className="font-semibold text-[#557C55]">
+                  <div className="flex items-center py-1 border-b border-gray-300">
+                    <span className="font-semibold text-primary-dark">
                       Municipality:
                     </span>
-                    <p>{profile.municipality}</p>
+                    <p className="ml-2">{profile.municipality}</p>
                   </div>
-                  <div>
-                    <span className="font-semibold text-[#557C55]">
+                  <div className="flex items-center py-1 border-b border-gray-300">
+                    <span className="font-semibold text-primary-dark">
                       Barangay:
                     </span>
-                    <p>{profile.barangay}</p>
+                    <p className="ml-2">{profile.barangay}</p>
                   </div>
                 </>
               )}
-              <div>
-                <span className="font-semibold text-[#557C55]">
+              <div className="flex items-center py-1 border-b border-gray-300">
+                <span className="font-semibold text-primary-dark">
                   Contact Number:
                 </span>
-                <p>{profile.contact_number}</p>
+                <p className="ml-2">{profile.contact_number}</p>
               </div>
-              <div>
-                <span className="font-semibold text-[#557C55]">Birthday:</span>
-                <p>
+              <div className="flex items-center py-1 border-b border-gray-300">
+                <span className="font-semibold text-primary-dark">
+                  Birthday:
+                </span>
+                <p className="ml-2">
                   {profile.birthday
                     ? new Date(profile.birthday).toLocaleDateString()
                     : ""}
                 </p>
               </div>
-              <div>
-                <span className="font-semibold text-[#557C55]">Age:</span>
-                <p>{age || "N/A"}</p>
+              <div className="flex items-center py-1 border-b border-gray-300">
+                <span className="font-semibold text-primary-dark">Age:</span>
+                <p className="ml-2">{age || "N/A"}</p>
               </div>
             </div>
 
@@ -173,9 +176,9 @@ const ViewProfile = (props) => {
             <div className="mt-4">
               <button
                 onClick={() => setIsEditing(true)}
-                className="bg-[#557C55] text-white px-4 py-2 rounded-md text-xs font-semibold hover:bg-[#6EA46E] transition flex items-center shadow-md"
+                className="bg-[#557C55] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-[#6EA46E] transition flex items-center shadow-md"
               >
-                <FaEdit className="mr-1 text-xs" /> Edit Profile
+                <FaEdit className="mr-1 text-sm" /> Edit Profile
               </button>
             </div>
           </div>

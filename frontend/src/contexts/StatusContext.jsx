@@ -21,6 +21,7 @@ const StatusProvider = ({ children }) => {
 
   const getId = async () => {
     const userCookie = getUserCookie();
+
     if (userCookie) {
       const userId = await getIDFromCookie();
       setId(userId);
