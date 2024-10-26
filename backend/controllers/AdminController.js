@@ -8,7 +8,7 @@ const zxcvbn = require("zxcvbn");
 module.exports.GetAdmins = async (req, res) => {
   const queryParams = [];
   let q =
-    "SELECT id, first_name, middle_initial, last_name, municipality, barangay, profile_image, contact_number, is_online, verified FROM users WHERE account_type = 'Admin'";
+    "SELECT id, first_name, middle_initial, last_name, municipality, barangay, profile_image, contact_number, is_online, verified, status FROM users WHERE account_type = 'Admin'";
 
   let paramCounter = 1; // To dynamically number the query parameters
 
@@ -48,6 +48,16 @@ module.exports.GetAdmins = async (req, res) => {
     paramCounter++;
   }
 
+  // Add filter for active and inactive status
+  if (req.query.status) {
+    q += ` AND status = $${paramCounter}`;
+    queryParams.push(req.query.status);
+    paramCounter++;
+  }
+
+  q +=
+    " ORDER BY (CASE status WHEN 'Active' THEN 1 WHEN 'Inactive' THEN 2 END)";
+
   try {
     const { rows } = await pool.query(q, queryParams);
     res.status(200).json(rows);
@@ -59,7 +69,7 @@ module.exports.GetAdmins = async (req, res) => {
 // Get Specific Admin
 module.exports.GetAdmin = async (req, res) => {
   const q =
-    "SELECT id, first_name, middle_initial, last_name, municipality, barangay, profile_image, contact_number, is_online, verified FROM users WHERE id = $1";
+    "SELECT id, first_name, middle_initial, last_name, municipality, barangay, profile_image, contact_number, is_online, verified, status FROM users WHERE id = $1";
   try {
     const { rows } = await pool.query(q, [req.params.id]);
     res.status(200).json(rows);
@@ -225,8 +235,8 @@ module.exports.CreateAdmin = async (req, res) => {
       INSERT INTO users (
         first_name, middle_initial, last_name, birthday, age, municipality, 
         barangay, contact_number, email, username, password, account_type, 
-        verified, is_online, verification_token
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+        verified, is_online, verification_token, status
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
       RETURNING id
     `;
       const values = [
@@ -245,10 +255,27 @@ module.exports.CreateAdmin = async (req, res) => {
         false,
         false,
         verificationToken,
+        "Active",
       ];
 
+      // extracts the "Authorization Header" from request
+      const auth = req.headers.authorization;
+
+      // extracts the ACTUAL token from the string "Bearer ....token"
+      const token = auth.substring(7, auth.length);
+
+      // extracts the content of the token used upon token creation (i.e. user_id)
+      // in this case, it extracts the user id of the request sender
+      const subject = await getTokenSubject(token);
+
       const insertResult = await pool.query(insertQuery, values);
-      const userId = insertResult.rows[0].id;
+      //const userId = insertResult.rows[0].id;
+
+      // Log the rescuer creation
+      await CreateLog({
+        userId: subject,
+        action: `Rescuer Created with username: ${username} and email: ${email}`,
+      });
 
       // Use frontend base URL for the verification link
       const verificationLink = `${process.env.SITE_URL}/verify/${verificationToken}`;
