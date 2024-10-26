@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { Toast } from "../components";
+import { Toast, Loader } from "../components";
 import { createAuthHeader } from "../services/authService";
 import { RescuerContext } from "../contexts/RescuerContext";
 
@@ -17,7 +17,8 @@ const ChangeEmail = (props) => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const { setPage } = useContext(RescuerContext);
+  const setPage =
+    user.account_type === "Rescuer" ? useContext(RescuerContext).setPage : null;
 
   const handleEmailChange = (e) => {
     setNewEmail(e.target.value);
@@ -68,7 +69,7 @@ const ChangeEmail = (props) => {
           <FaChevronLeft
             className="text-background-dark text-2xl cursor-pointer "
             onClick={() => {
-              navigate("/rescuer/navigate");
+              navigate(`/${user.account_type.toLowerCase()}`);
               setPage("Navigate");
             }}
           />

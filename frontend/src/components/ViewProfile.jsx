@@ -14,11 +14,12 @@ const ViewProfile = (props) => {
   const navigate = useNavigate();
   const { user } = props;
   const [profile, setProfile] = useState(user);
-  const [age, setAge] = useState(""); // Added state for age
+  const [age, setAge] = useState("");
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
-  const { setPage } = useContext(RescuerContext);
+  const setPage =
+    user.account_type === "Rescuer" ? useContext(RescuerContext).setPage : null;
 
   // Extract municipalities from barangaysData
   const municipalities = Object.keys(barangaysData);
@@ -85,7 +86,7 @@ const ViewProfile = (props) => {
           <FaChevronLeft
             className="text-background-dark text-2xl cursor-pointer "
             onClick={() => {
-              navigate("/rescuer/navigate");
+              navigate(`/${user.account_type.toLowerCase()}`);
               setPage("Navigate");
             }}
           />

@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import {
   Sidebar,
   AddRescuer,
@@ -26,10 +26,6 @@ const Admin = (props) => {
     };
   }, []);
 
-  useEffect(() => {
-    console.log("Updated requests:", requests);
-  }, [requests]);
-
   return (
     <div className="flex flex-col md:flex-row">
       {/* Sidebar */}
@@ -38,6 +34,7 @@ const Admin = (props) => {
       {/* Main Content */}
       <div className="flex-1 p-6 md:p-8 md:mt-0 mt-16">
         <Routes>
+          <Route path="/" element={<Navigate to="admin/incomingRequests" />} />
           <Route path="/addRescuer" element={<AddRescuer user={user} />} />
           <Route
             path="/incomingRequests"
