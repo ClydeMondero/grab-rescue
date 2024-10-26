@@ -20,7 +20,8 @@ const Header = () => {
             <FaChevronLeft
               className="text-background-dark text-2xl cursor-pointer"
               onClick={() => {
-                navigate("/rescuer");
+                navigate("/rescuer/navigate");
+                setPage("Navigate");
               }}
             />
           )}

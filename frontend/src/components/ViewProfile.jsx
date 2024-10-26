@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { FaChevronLeft, FaSave, FaEdit, FaTimes, FaUser } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -7,14 +7,18 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Toast } from "../components";
 import { barangaysData } from "../constants/Barangays"; // Imported barangaysData
+import { Loader } from "../components";
+import { RescuerContext } from "../contexts/RescuerContext";
 
 const ViewProfile = (props) => {
   const navigate = useNavigate();
   const { user } = props;
   const [profile, setProfile] = useState(user);
-  const [age, setAge] = useState(null); // Added state for age
+  const [age, setAge] = useState(""); // Added state for age
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+
+  const { setPage } = useContext(RescuerContext);
 
   // Extract municipalities from barangaysData
   const municipalities = Object.keys(barangaysData);
@@ -81,7 +85,8 @@ const ViewProfile = (props) => {
           <FaChevronLeft
             className="text-background-dark text-2xl cursor-pointer "
             onClick={() => {
-              navigate("/rescuer");
+              navigate("/rescuer/navigate");
+              setPage("Navigate");
             }}
           />
           <p className="text-3xl text-primary-dark font-bold">Your Profile</p>
@@ -186,10 +191,10 @@ const ViewProfile = (props) => {
 
         {/* Edit Profile Modal */}
         {isEditing && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-6">
             <div className="relative bg-white p-4 w-full md:w-2/3 lg:w-1/2 max-h-[500px] overflow-y-auto rounded-lg shadow-lg">
               <FaTimes
-                className="absolute top-2 right-2 text-[#557C55] hover:text-gray-700 cursor-pointer"
+                className="text-lg absolute top-4 right-4 text-[#557C55] hover:text-gray-700 cursor-pointer"
                 onClick={() => setIsEditing(false)}
               />
               <div className="flex items-center mb-4">
@@ -204,13 +209,13 @@ const ViewProfile = (props) => {
                     htmlFor="username"
                     className="block text-xs font-semibold text-[#557C55]"
                   >
-                    Username:
+                    Username
                   </label>
                   <input
                     type="text"
                     id="username"
                     name="username"
-                    value={profile.username}
+                    value={profile?.username || ""}
                     onChange={handleProfileChange}
                     className="w-full p-2 border rounded-lg bg-gray-100 border-gray-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
                   />
@@ -222,13 +227,13 @@ const ViewProfile = (props) => {
                       htmlFor="first_name"
                       className="block text-xs font-semibold text-[#557C55]"
                     >
-                      First Name:
+                      First Name
                     </label>
                     <input
                       type="text"
                       id="first_name"
                       name="first_name"
-                      value={profile.first_name}
+                      value={profile?.first_name || ""}
                       onChange={handleProfileChange}
                       className="w-full p-2 border rounded-lg bg-gray-100 border-gray-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
                     />
@@ -238,13 +243,13 @@ const ViewProfile = (props) => {
                       htmlFor="last_name"
                       className="block text-xs font-semibold text-[#557C55]"
                     >
-                      Last Name:
+                      Last Name
                     </label>
                     <input
                       type="text"
                       id="last_name"
                       name="last_name"
-                      value={profile.last_name}
+                      value={profile?.last_name || ""}
                       onChange={handleProfileChange}
                       className="w-full p-2 border rounded-lg bg-gray-100 border-gray-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
                     />
@@ -258,12 +263,12 @@ const ViewProfile = (props) => {
                         htmlFor="municipality"
                         className="block text-xs font-semibold text-[#557C55]"
                       >
-                        Municipality:
+                        Municipality
                       </label>
                       <select
                         id="municipality"
                         name="municipality"
-                        value={profile.municipality}
+                        value={profile?.municipality || ""}
                         onChange={handleProfileChange}
                         className="w-full p-2 border rounded-lg bg-gray-100 border-gray-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
                       >
@@ -280,17 +285,17 @@ const ViewProfile = (props) => {
                         htmlFor="barangay"
                         className="block text-xs font-semibold text-[#557C55]"
                       >
-                        Barangay:
+                        Barangay
                       </label>
                       <select
                         id="barangay"
                         name="barangay"
-                        value={profile.barangay}
+                        value={profile?.barangay || ""}
                         onChange={handleProfileChange}
                         className="w-full p-2 border rounded-lg bg-gray-100 border-gray-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
                       >
                         <option value="">Select Barangay</option>
-                        {barangaysData[profile.municipality]?.map(
+                        {barangaysData[profile?.municipality || ""]?.map(
                           (barangay) => (
                             <option key={barangay} value={barangay}>
                               {barangay}
@@ -307,13 +312,13 @@ const ViewProfile = (props) => {
                     htmlFor="contact_number"
                     className="block text-xs font-semibold text-[#557C55]"
                   >
-                    Contact Number:
+                    Contact Number
                   </label>
                   <input
                     type="text"
                     id="contact_number"
                     name="contact_number"
-                    value={profile.contact_number}
+                    value={profile?.contact_number || ""}
                     onChange={handleProfileChange}
                     className="w-full p-2 border rounded-lg bg-gray-100 border-gray-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
                   />
@@ -330,24 +335,26 @@ const ViewProfile = (props) => {
                     type="date"
                     id="birthday"
                     name="birthday"
-                    value={profile.birthday}
+                    value={profile?.birthday || ""}
                     onChange={handleProfileChange}
                     className="w-full p-2 border rounded-lg bg-gray-100 border-gray-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
                   />
                 </div>
 
-                <button
-                  type="submit"
-                  className="bg-[#557C55] text-white px-4 py-2 rounded-md text-xs font-semibold hover:bg-[#6EA46E] transition"
-                >
-                  {loading ? (
-                    "Saving..."
-                  ) : (
-                    <>
-                      <FaSave className="mr-1" /> Save Changes
-                    </>
-                  )}
-                </button>
+                <div className="flex justify-end">
+                  <button
+                    type="submit"
+                    className="bg-[#557C55] text-white px-4 py-2 rounded-md text-xs font-semibold hover:bg-[#6EA46E] transition"
+                  >
+                    {loading ? (
+                      <Loader isLoading={loading} size={20} color="#fff" />
+                    ) : (
+                      <div className="flex items-center gap-1">
+                        <FaSave className="mr-1" /> Save
+                      </div>
+                    )}
+                  </button>
+                </div>
               </form>
             </div>
           </div>
