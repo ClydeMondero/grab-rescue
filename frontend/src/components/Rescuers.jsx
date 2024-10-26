@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { MdAssignmentInd } from "react-icons/md";
-import { FaTrash } from "react-icons/fa";
+import { FaCircle, FaSearch } from "react-icons/fa";
 import { AiOutlinePrinter } from "react-icons/ai";
 import { createAuthHeader } from "../services/authService";
 import axios from "axios";
@@ -20,6 +20,9 @@ const AssignRescuers = (props) => {
   const [selectedStatus, setSelectedStatus] = useState("All");
   const [selectedVerified, setSelectedVerified] = useState("All");
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedRescuerId, setSelectedRescuerId] = useState(null);
+  const [currentStatus, setCurrentStatus] = useState("All");
   const rowsPerPage = 10;
 
   useEffect(() => {
@@ -73,13 +76,18 @@ const AssignRescuers = (props) => {
         selectedVerified === "All" ||
         (selectedVerified === "True" && rescue.verified) ||
         (selectedVerified === "False" && !rescue.verified);
+      const matchesAction =
+        currentStatus === "All" ||
+        (currentStatus === "Active" && rescue.status === "Active") ||
+        (currentStatus === "Inactive" && rescue.status === "Inactive");
 
       return (
         matchesName &&
         matchesMunicipality &&
         matchesBarangay &&
         matchesStatus &&
-        matchesVerified
+        matchesVerified &&
+        matchesAction
       );
     });
 
@@ -91,6 +99,7 @@ const AssignRescuers = (props) => {
     selectedBarangay,
     selectedStatus,
     selectedVerified,
+    currentStatus,
     rescuers,
   ]);
 
@@ -109,6 +118,37 @@ const AssignRescuers = (props) => {
     }
   };
 
+  const handleToggleModalOpen = (id, status) => {
+    setSelectedRescuerId(id);
+    setCurrentStatus(status);
+    setIsModalOpen(true);
+  };
+
+  const handleToggleStatus = async (id, currentStatus) => {
+    const newStatus = currentStatus === "Active" ? "Inactive" : "Active";
+
+    try {
+      const response = await axios.put(
+        `/users/updateStatus/${id}`,
+        { status: newStatus },
+        createAuthHeader()
+      );
+
+      console.log("Response from server:", response.data);
+
+      setRescuers((prevRescuers) =>
+        prevRescuers.map((rescuer) =>
+          rescuer.id === id ? { ...rescuer, status: newStatus } : rescuer
+        )
+      );
+
+      setIsModalOpen(false); // Close the modal after successful status change
+    } catch (error) {
+      console.error("Error updating status:", error);
+      setIsModalOpen(false); // Close the modal in case of error too
+    }
+  };
+
   const handlePrint = () => {
     const doc = new jsPDF("landscape");
 
@@ -121,7 +161,7 @@ const AssignRescuers = (props) => {
       { title: "Municipality", dataKey: "municipality" },
       { title: "Barangay Name", dataKey: "barangay" },
       { title: "Contact Number", dataKey: "contact_number" },
-      { title: "Status", dataKey: "status" },
+      { title: "Status", dataKey: "status_mode" },
       { title: "Verified Email", dataKey: "verified" },
     ];
 
@@ -133,7 +173,7 @@ const AssignRescuers = (props) => {
       municipality: rescue.municipality,
       barangay: rescue.barangay,
       contact_number: rescue.contact_number,
-      status: rescue.is_online ? "Online" : "Offline",
+      status_mode: rescue.is_online ? "Online" : "Offline",
       verified: rescue.verified ? "Verified" : "Not Verified",
     }));
 
@@ -183,18 +223,21 @@ const AssignRescuers = (props) => {
 
       {/* Search, Filter, and Print Controls */}
       <div className="mb-4 flex flex-col md:flex-row justify-between">
-        <div className="flex flex-col md:flex-row gap-2 mb-2 md:mb-0">
-          <input
-            type="text"
-            placeholder="Search by Name"
-            value={searchName}
-            onChange={(e) => setSearchName(e.target.value)}
-            className="border border-primary rounded px-2 py-1 w-full md:w-1/3"
-          />
+        <div className="flex flex-col md:flex-row gap-1 mb-2 md:mb-0">
+          <div className="relative w-full md:w-1/5">
+            <input
+              type="text"
+              placeholder="Search by Name"
+              value={searchName}
+              onChange={(e) => setSearchName(e.target.value)}
+              className="rounded-full border border-primary-medium px-3 py-1 w-full text-sm"
+            />
+            <FaSearch className="absolute right-2 top-1/2 transform -translate-y-1/2 text-primary-medium" />
+          </div>
           <select
             value={selectedMunicipality}
             onChange={handleMunicipalityChange}
-            className="border border-primary rounded px-2 py-1 w-full md:w-1/3 text-primary-medium"
+            className="rounded-full border border-primary-medium  px-2 py-1 text-sm max-w-full md:max-w-[9rem]"
           >
             <option value="All">All Municipalities</option>
             {Object.keys(barangaysData).map((municipality) => (
@@ -206,7 +249,7 @@ const AssignRescuers = (props) => {
           <select
             value={selectedBarangay}
             onChange={(e) => setSelectedBarangay(e.target.value)}
-            className="border border-primary rounded px-2 py-1 w-full md:w-1/3 text-primary-medium"
+            className="rounded-full border border-primary-medium  px-2 py-1 text-sm max-w-full md:max-w-[8rem]"
           >
             <option value="All">All Barangays</option>
             {barangays.map((barangay) => (
@@ -216,22 +259,32 @@ const AssignRescuers = (props) => {
             ))}
           </select>
           <select
-            value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
-            className="border border-primary rounded px-2 py-1 w-full md:w-1/3 text-primary-medium"
-          >
-            <option value="All">All Status</option>
-            <option value="Online">Online</option>
-            <option value="Offline">Offline</option>
-          </select>
-          <select
             value={selectedVerified}
             onChange={(e) => setSelectedVerified(e.target.value)}
-            className="border border-primary rounded px-2 py-1 w-full md:w-1/3 text-primary-medium"
+            className="rounded-full border border-primary-medium  px-2 py-1 text-sm max-w-full md:max-w-[11rem]"
           >
             <option value="All">All Verification Status</option>
             <option value="True">Verified</option>
             <option value="False">Not Verified</option>
+          </select>
+          <select
+            value={selectedStatus}
+            onChange={(e) => setSelectedStatus(e.target.value)}
+            className="rounded-full border border-primary-medium  px-2 py-1 text-sm max-w-full md:max-w-[8rem]"
+          >
+            <option value="All">Online/Offline</option>
+            <option value="Online">Online</option>
+            <option value="Offline">Offline</option>
+          </select>
+
+          <select
+            value={currentStatus}
+            onChange={(e) => setCurrentStatus(e.target.value)}
+            className="rounded-full border border-primary-medium  px-2 py-1 text-sm max-w-full md:max-w-[5rem]"
+          >
+            <option value="All">Status</option>
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
           </select>
         </div>
         <button
@@ -262,19 +315,19 @@ const AssignRescuers = (props) => {
                 Contact Number
               </th>
               <th className="px-4 py-2 text-center text-xs font-medium">
-                Status
+                Online/Offline
               </th>
               <th className="px-4 py-2 text-center text-xs font-medium">
                 Verified
               </th>
               <th className="px-4 py-2 text-center text-xs font-medium">
-                Actions
+                Status
               </th>
             </tr>
           </thead>
           <tbody>
             {paginatedRescuers.map((rescue, index) => (
-              <tr key={rescue.id} className="border-b hover:bg-gray-100">
+              <tr key={rescue.id} className="border-b">
                 <td className="px-4 py-2 text-xs text-center text-secondary">
                   {(currentPage - 1) * rowsPerPage + index + 1}
                 </td>
@@ -292,24 +345,38 @@ const AssignRescuers = (props) => {
                 </td>
                 <td
                   className={`px-4 py-2 text-xs text-center ${
-                    rescue.is_online ? "text-green-500" : "text-red-500"
+                    rescue.is_online ? "text-primary" : "text-secondary"
                   }`}
                 >
-                  {rescue.is_online ? "Online" : "Offline"}
+                  {rescue.is_online ? (
+                    <span className="flex items-center justify-center text-primary-medium">
+                      <FaCircle className="text-primary-medium mr-1" />
+                      Online
+                    </span>
+                  ) : (
+                    <span className="flex items-center justify-center">
+                      <FaCircle className="text-secondary mr-1" />
+                      Offline
+                    </span>
+                  )}
                 </td>
                 <td
                   className={`px-4 py-2 text-xs text-center ${
-                    rescue.verified ? "text-green-500" : "text-red-500"
+                    rescue.verified ? "text-primary-medium" : "text-secondary"
                   }`}
                 >
                   {rescue.verified ? "Verified" : "Not Verified"}
                 </td>
                 <td className="px-4 py-2 text-xs text-center">
                   <button
-                    className="text-red-500 hover:text-red-700"
-                    onClick={() => handleDelete(rescue.id)}
+                    onClick={() =>
+                      handleToggleModalOpen(rescue.id, rescue.status)
+                    }
+                    className={`rounded-full px-4 py-1 ${
+                      rescue.status === "Active" ? "bg-primary-medium" : "bg-secondary"
+                    } text-white`}
                   >
-                    <FaTrash />
+                    {rescue.status === "Active" ? "Active" : "Inactive"}
                   </button>
                 </td>
               </tr>
@@ -317,6 +384,36 @@ const AssignRescuers = (props) => {
           </tbody>
         </table>
       </div>
+      {/* Modal Confirmation */}
+      {isModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded shadow-lg">
+            <h2 className="text-lg font-semibold mb-4 text-[#557C55]">
+              Confirm Status Change
+            </h2>
+            <p>
+              Are you sure you want to mark this rescuer as{" "}
+              {currentStatus === "Active" ? "Inactive" : "Active"}?
+            </p>
+            <div className="mt-4 flex justify-end">
+              <button
+                onClick={() =>
+                  handleToggleStatus(selectedRescuerId, currentStatus)
+                }
+                className=" text-primary px-4 py-2 rounded mr-2"
+              >
+                Yes
+              </button>
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className=" text-secondary px-4 py-2 rounded"
+              >
+                No
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Pagination */}
       <div className="flex justify-center items-center mt-4">
@@ -327,7 +424,7 @@ const AssignRescuers = (props) => {
         >
           Previous
         </button>
-        <span className="text-primary">{`${currentPage} of ${Math.ceil(
+        <span className="text-primary-medium">{`${currentPage} of ${Math.ceil(
           filteredRescuers.length / rowsPerPage
         )}`}</span>
         <button
