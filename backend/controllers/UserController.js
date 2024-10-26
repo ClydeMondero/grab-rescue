@@ -9,8 +9,7 @@ const { CreateLog } = require("./LogController");
 // Get Users with Filtering and Name Search (Rescuers and Admins)
 module.exports.GetUsers = async (req, res) => {
   let q = `
-    SELECT id, first_name, middle_initial, last_name, to_char(birthday, 'YYYY-MM-DD') AS birthday, municipality, barangay, profile_image, contact_number, username,
-    is_online, verified, account_type, status FROM users WHERE 1=1
+    SELECT * FROM users WHERE 1=1
   `;
 
   const queryParams = [];
@@ -55,7 +54,7 @@ module.exports.GetUsers = async (req, res) => {
 module.exports.GetUser = async (req, res) => {
   try {
     const { rows } = await pool.query(
-      "SELECT id, first_name, middle_initial, last_name, to_char(birthday, 'YYYY-MM-DD') AS birthday, municipality, barangay, profile_image, contact_number, username, is_online, verified, account_type, status FROM users WHERE id = $1",
+      "SELECT id, first_name, middle_initial, last_name, to_char(birthday, 'YYYY-MM-DD') AS birthday, municipality, barangay, profile_image, contact_number, email, username, is_online, verified, account_type, status FROM users WHERE id = $1",
       [req.params.id]
     );
     if (rows.length === 0) {
@@ -306,13 +305,13 @@ module.exports.UpdateUserEmail = async (req, res) => {
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: "bhenzmharlbartolome012603@gmail.com",
-        pass: "owvb wzni fhxu cvbz",
+        user: env.EMAIL_USER,
+        pass: env.EMAIL_PASS,
       },
     });
 
     const mailOptions = {
-      from: "bhenzmharlbartolome012603@gmail.com",
+      from: "GrabRescue <grabrescue.ph@gmail.com>",
       to: email,
       subject: "Email Verification",
       text: `Please click the following link to verify your new email: ${verificationLink}`,
@@ -659,7 +658,7 @@ module.exports.RequestPasswordReset = async (req, res) => {
 
     // Email options
     const mailOptions = {
-      from: "bhenzmharlbartolome012603@gmail.com",
+      from: "GrabRescue <grabrescue.ph@gmail.com>",
       to: email,
       subject: "Password Reset Request",
       text: `Please click the following link to reset your password: ${resetLink}`,
@@ -670,8 +669,8 @@ module.exports.RequestPasswordReset = async (req, res) => {
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: "bhenzmharlbartolome012603@gmail.com",
-        pass: "owvb wzni fhxu cvbz",
+        user: env.EMAIL_USER,
+        pass: env.EMAIL_PASS,
       },
     });
 

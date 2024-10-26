@@ -15,12 +15,19 @@ import { acceptRescueRequestInFirestore } from "../services/firestoreService";
 
 // TODO: Add Completed Button
 
-const Requests = ({ userId, requests, setSelectedRequest }) => {
+const Requests = ({
+  userId,
+  requests,
+  selectedRequest,
+  setSelectedRequest,
+}) => {
   const navigate = useNavigate();
   const { rescuer } = useContext(RescuerContext);
 
   // State to store routes data for requests
   const [routeData, setRouteData] = useState({});
+
+  const [pendingRequests, setPendingRequests] = useState([]);
 
   /**
    * Handle Accept button click
@@ -44,11 +51,9 @@ const Requests = ({ userId, requests, setSelectedRequest }) => {
     setRouteData(newRouteData);
   };
 
-  let pendingRequests = [];
-
   useEffect(() => {
-    pendingRequests = requests.filter(
-      (request) => request.status !== "assigned"
+    setPendingRequests(
+      requests.filter((request) => request.status !== "assigned")
     );
 
     if (pendingRequests.length > 0) {
@@ -105,7 +110,7 @@ const Requests = ({ userId, requests, setSelectedRequest }) => {
                   />
                   <div
                     className={`absolute top-4 left-4 text-sm font-semibold text-white py-1 px-3 rounded-lg shadow-md ${
-                      request.status === "pending" ? "bg-yellow-400" : ""
+                      request.status === "pending" ? "bg-yellow-500" : ""
                     }`}
                   >
                     {request.status.charAt(0).toUpperCase() +
@@ -212,12 +217,14 @@ const Requests = ({ userId, requests, setSelectedRequest }) => {
 
                   {/* Accept Button */}
                   <div className="w-full">
-                    <button
-                      onClick={() => handleAccept(request.id)}
-                      className="h-full w-full px-6 py-4 text-sm sm:text-base font-semibold text-white bg-primary transition-colors rounded-lg"
-                    >
-                      Accept Request
-                    </button>
+                    {!selectedRequest && (
+                      <button
+                        onClick={() => handleAccept(request.id)}
+                        className="h-full w-full px-6 py-4 text-sm sm:text-base font-semibold text-white bg-primary-medium transition-colors rounded-lg hover:opacity-[80%]"
+                      >
+                        Accept Request
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
