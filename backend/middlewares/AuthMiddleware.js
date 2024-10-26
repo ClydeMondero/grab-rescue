@@ -11,12 +11,13 @@ module.exports.UserVerification = async (req, res) => {
   if (!token) {
     return res.json({
       success: false,
+      message: "Cookie not found",
     });
   }
 
   jwt.verify(token, TOKEN_KEY, (err, data) => {
     if (err) {
-      return res.json({ success: false });
+      return res.json({ success: false, message: "Token not verified" });
     } else {
       const q = "SELECT * FROM users WHERE id = $1";
 

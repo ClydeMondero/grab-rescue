@@ -64,6 +64,7 @@ const Rescuer = (props) => {
                 <Requests
                   userId={user.id}
                   requests={requests}
+                  selectedRequest={selectedRequest}
                   setSelectedRequest={setSelectedRequest}
                 />
               }
