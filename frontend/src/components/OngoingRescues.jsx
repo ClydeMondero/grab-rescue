@@ -28,7 +28,6 @@ const OngoingRescues = ({ requests, user }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 5;
 
-  // Paginate data
   const totalRows = ongoingRescues.length;
   const totalPages = Math.ceil(totalRows / rowsPerPage);
   const startIndex = (currentPage - 1) * rowsPerPage;
@@ -51,15 +50,19 @@ const OngoingRescues = ({ requests, user }) => {
     setShowMap(location);
   };
 
-  // Print report function
   const handlePrint = () => {
     const doc = new jsPDF("landscape");
 
-    // Title
     doc.setFontSize(18);
-    doc.text("Ongoing Rescues Report", 10, 10);
+    doc.text(
+      "Ongoing Rescues Report",
+      doc.internal.pageSize.getWidth() / 2,
+      10,
+      {
+        align: "center",
+      }
+    );
 
-    // Define the columns and rows for the table
     const tableColumn = [
       { title: "#", dataKey: "id" },
       { title: "Rescuer ID", dataKey: "rescuer" },
@@ -80,7 +83,6 @@ const OngoingRescues = ({ requests, user }) => {
       status: rescue.status,
     }));
 
-    // Table styling and rendering
     doc.autoTable({
       head: [tableColumn.map((col) => col.title)],
       body: tableRows.map((row) => Object.values(row)),
@@ -118,7 +120,6 @@ const OngoingRescues = ({ requests, user }) => {
       footerY
     );
 
-    // Save the PDF
     doc.save("ongoing_rescue_operations.pdf");
   };
 
@@ -285,10 +286,10 @@ const OngoingRescues = ({ requests, user }) => {
                     <span
                       className={
                         {
-                          pending: "text-yellow-500",
-                          assigned: "text-blue-500",
-                          "in-progress": "text-green-500",
-                          completed: "text-gray-500",
+                          pending: "text-warning",
+                          assigned: "text-info",
+                          "in-progress": "text-secondary",
+                          completed: "text-primary-medium",
                         }[rescue.status]
                       }
                     >
