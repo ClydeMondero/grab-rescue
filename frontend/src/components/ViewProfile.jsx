@@ -27,7 +27,6 @@ const ViewProfile = (props) => {
     calculateAge(profile.birthday);
   }, [profile]);
 
-  // Function to calculate age based on birthday
   const calculateAge = (birthday) => {
     if (!birthday) return;
     const birthDate = new Date(birthday);
@@ -49,7 +48,7 @@ const ViewProfile = (props) => {
       ...prevProfile,
       [name]: value,
     }));
-    if (name === "birthday") calculateAge(value); // Update age on birthday change
+    if (name === "birthday") calculateAge(value);
   };
 
   const handleSubmit = async (e) => {
@@ -192,7 +191,6 @@ const ViewProfile = (props) => {
           </div>
         </div>
 
-        {/* Edit Profile Modal */}
         {isEditing && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-6">
             <div className="relative bg-white p-4 w-full md:w-2/3 lg:w-1/2 max-h-[500px] overflow-y-auto rounded-lg shadow-lg">
@@ -206,11 +204,11 @@ const ViewProfile = (props) => {
                   Edit Profile
                 </h4>
               </div>
-              <form className="space-y-4" onSubmit={handleSubmit}>
+              <form className="space-y-5" onSubmit={handleSubmit}>
                 <div>
                   <label
                     htmlFor="username"
-                    className="block text-xs font-semibold text-[#557C55]"
+                    className="block text-sm font-semibold text-[#557C55]"
                   >
                     Username
                   </label>
@@ -228,7 +226,7 @@ const ViewProfile = (props) => {
                   <div>
                     <label
                       htmlFor="first_name"
-                      className="block text-xs font-semibold text-[#557C55]"
+                      className="block text-sm font-semibold text-[#557C55]"
                     >
                       First Name
                     </label>
@@ -241,10 +239,11 @@ const ViewProfile = (props) => {
                       className="w-full p-3 border rounded-md bg-gray-100 border-gray-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
                     />
                   </div>
+
                   <div>
                     <label
                       htmlFor="last_name"
-                      className="block text-xs font-semibold text-[#557C55]"
+                      className="block text-sm font-semibold text-[#557C55]"
                     >
                       Last Name
                     </label>
@@ -264,7 +263,7 @@ const ViewProfile = (props) => {
                     <div>
                       <label
                         htmlFor="municipality"
-                        className="block text-xs font-semibold text-[#557C55]"
+                        className="block text-sm font-semibold text-[#557C55]"
                       >
                         Municipality
                       </label>
@@ -276,17 +275,18 @@ const ViewProfile = (props) => {
                         className="w-full p-3 border rounded-md bg-gray-100 border-gray-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
                       >
                         <option value="">Select Municipality</option>
-                        {municipalities.map((municipality) => (
-                          <option key={municipality} value={municipality}>
+                        {municipalities.map((municipality, index) => (
+                          <option key={index} value={municipality}>
                             {municipality}
                           </option>
                         ))}
                       </select>
                     </div>
+
                     <div>
                       <label
                         htmlFor="barangay"
-                        className="block text-xs font-semibold text-[#557C55]"
+                        className="block text-sm font-semibold text-[#557C55]"
                       >
                         Barangay
                       </label>
@@ -313,7 +313,7 @@ const ViewProfile = (props) => {
                 <div>
                   <label
                     htmlFor="contact_number"
-                    className="block text-xs font-semibold text-[#557C55]"
+                    className="block text-sm font-semibold text-[#557C55]"
                   >
                     Contact Number
                   </label>
@@ -330,7 +330,7 @@ const ViewProfile = (props) => {
                 <div>
                   <label
                     htmlFor="birthday"
-                    className="block text-xs font-semibold text-[#557C55]"
+                    className="block text-sm font-semibold text-[#557C55]"
                   >
                     Birthday:
                   </label>
@@ -364,7 +364,7 @@ const ViewProfile = (props) => {
         )}
       </div>
       <Toast />
-    </>
+    </div>
   );
 };
 
