@@ -190,7 +190,7 @@ export const addRequestToFirestore = async (
   citizenId,
   location,
   timestamp = new Date().toISOString(),
-  status = "pending" //pending, assigned, in-progress, completed
+  status = "pending" //pending, assigned, in-transit, en route, rescued
 ) => {
   const request = {
     citizenId,

@@ -2,14 +2,13 @@ import { useState, useEffect, useRef, useContext } from "react";
 import logo from "../assets/logo.png";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { CitizenMap as Map } from "../components";
+import { CitizenMap as Map, Loader, Toast, RequestModal } from "../components";
 import { FaChevronDown } from "react-icons/fa";
 import { FaLocationPin } from "react-icons/fa6";
 import { BiSolidHide, BiSolidAmbulance } from "react-icons/bi";
 import { MdDragHandle } from "react-icons/md";
 import { MdRoute } from "react-icons/md";
-import RequestModal from "../components/RequestModal";
-import MultiStepForm from "./MultiStepForm";
+import { MultiStepForm } from "../pages";
 import {
   addRequestToFirestore,
   getLocationFromFirestore,
@@ -21,6 +20,9 @@ import {
   setRequestCookie,
 } from "../services/cookieService";
 import { StatusContext } from "../contexts/StatusContext";
+import MobileDetect from "mobile-detect";
+import { toast } from "react-toastify";
+import { BiPhoneCall } from "react-icons/bi";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -30,6 +32,8 @@ const Home = () => {
   const [locating, setLocating] = useState(true);
   const [requesting, setRequesting] = useState(false);
   const [request, setRequest] = useState(null);
+  const [rescuer, setRescuer] = useState(null);
+  const [onMobile, setOnMobile] = useState(false);
 
   const { getId } = useContext(StatusContext);
 
@@ -45,6 +49,23 @@ const Home = () => {
     }
   };
 
+  const getRescuer = async () => {
+    if (!request || !request.rescuerId) return null;
+
+    try {
+      const response = await axios.get(`/rescuers/get/${request.rescuerId}`);
+      if (response.data) {
+        return response.data;
+      } else {
+        console.error("Rescuer not found.");
+        return null;
+      }
+    } catch (error) {
+      console.error("Error fetching rescuer: ", error);
+      return null;
+    }
+  };
+
   const checkRequest = async () => {
     const requestId = getRequestCookie();
 
@@ -56,6 +77,21 @@ const Home = () => {
 
     const onGoingRequest = await getRequestFromFirestore(requestId);
     setRequest(onGoingRequest);
+  };
+
+  const handlePhone = () => {
+    if (onMobile) {
+      window.location.href = `tel:${request.phone}`;
+    } else {
+      navigator.clipboard
+        .writeText(request.phone)
+        .then(() => {
+          toast.info("Phone copied to clipboard");
+        })
+        .catch((err) => {
+          toast.warning("Phone didn't get copied");
+        });
+    }
   };
 
   const handleModalConfirm = async () => {
@@ -90,6 +126,13 @@ const Home = () => {
     getId();
     verifyToken();
     checkRequest();
+
+    const md = new MobileDetect(window.navigator.userAgent);
+
+    const isSmallScreen = window.innerWidth <= 768; // Customize width threshold
+    const isMobile = !!md.mobile() && isSmallScreen; // Refine detection with screen size
+
+    setOnMobile(isMobile);
   }, []);
 
   useEffect(() => {
@@ -97,6 +140,20 @@ const Home = () => {
       mapRef.current.resize();
     }
   }, [formVisible]);
+
+  useEffect(() => {
+    const getRequestDetails = async () => {
+      if (!request) return;
+
+      if (request.status == "assigned") {
+        const rescuer = await getRescuer();
+
+        setRescuer(rescuer[0]);
+      }
+    };
+
+    getRequestDetails();
+  }, [request]);
 
   return (
     <div className="h-dvh w-screen overflow-hidden flex flex-col">
@@ -128,12 +185,12 @@ const Home = () => {
           >
             <p className="text-primary text-md font-semibold">Login as Admin</p>
           </li>
-          <li
+          {/* <li
             onClick={() => navigate("/register")}
             className="bg-primary text-white border-[2px] border-primary px-4 py-2 cursor-pointer rounded-md hover:opacity-80"
           >
             <p className="text-md font-semibold">Be a Rescuer</p>
-          </li>
+          </li> */}
         </ul>
       </div>
 
@@ -170,14 +227,14 @@ const Home = () => {
                     Login as Admin
                   </button>
                 </li>
-                <li className="py-2 border-b w-full">
+                {/* <li className="py-2 border-b w-full">
                   <button
                     onClick={() => navigate("/register")}
                     className="flex items-center justify-center w-full text-lg font-semibold "
                   >
                     Be a Rescuer
                   </button>
-                </li>
+                </li> */}
                 <li className="py-2">
                   <button
                     onClick={() => navigate("/about")}
@@ -194,17 +251,52 @@ const Home = () => {
         {/* Map Component */}
         <Map ref={mapRef} onLocatingChange={handleLocatingChange} />
 
-        {/* Sliding Pane */}
         {requesting && (
           <div
             className={`
-              ${
-                formVisible
-                  ? "bg-white border-x-background-medium border-t-2"
-                  : "bg-primary-medium"
-              } p-2 w-full flex flex-col items-center transition-all duration-300 ease-in-out rounded-t-2xl ${
-              formVisible ? "h-[100%]" : "h-[10%]"
-            } `}
+            bg-white p-4 rounded-lg shadow-lg transition-all duration-300 ease-in-out
+          `}
+          >
+            {request && request.status == "pending" ? (
+              <p>Waiting for rescuer acceptance...</p>
+            ) : rescuer ? (
+              <div className="flex items-center justify-between w-full">
+                <div>
+                  <p className="text-xs text-primary-medium">
+                    Assigned Rescuer
+                  </p>
+                  <p className="text-primary-dark font-semibold text-xl">
+                    {`${rescuer.first_name} ${rescuer.middle_name || ""} ${
+                      rescuer.last_name
+                    }`.trim()}
+                  </p>
+                  <p className="text-background-dark text-sm font-semibold">
+                    {rescuer.municipality}
+                  </p>
+                </div>
+                <button
+                  onClick={handlePhone}
+                  className="flex items-center justify-center w-12 h-12 bg-primary rounded-full text-white text-2xl cursor-pointer"
+                >
+                  <BiPhoneCall />
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center">
+                <Loader isLoading={true} color={"#557C55"} size={25} />
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Sliding Pane */}
+        {requesting && (
+          // Add Request Details
+          <div
+            className={`
+              border-x-background-medium border-t-2 p-2 w-full flex flex-col items-center transition-all duration-300 ease-in-out rounded-t-2xl ${
+                formVisible ? "h-[100%] bg-white" : "h-[10%] bg-primary-medium "
+              } `}
           >
             <MdDragHandle
               onClick={() => setFormVisible(!formVisible)}
@@ -304,6 +396,7 @@ const Home = () => {
           onCancel={handleModalCancel} // Handle modal cancellation to simply close the modal
         />
       )}
+      <Toast />
     </div>
   );
 };
