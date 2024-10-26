@@ -481,7 +481,7 @@ module.exports.UpdateUserStatus = async (req, res) => {
     const currentStatusResult = await pool.query(currentStatusQuery, [id]);
 
     if (currentStatusResult.rows.length === 0) {
-      return res.status(404).json({
+      return res.status(200).json({
         success: false,
         message: "User not found.",
       });
@@ -513,7 +513,7 @@ module.exports.UpdateUserStatus = async (req, res) => {
       action: `Error updating user status: ${err.message}`,
     });
 
-    return res.status(500).json({
+    return res.status(200).json({
       success: false,
       message: "Server error.",
       error: err.message,
