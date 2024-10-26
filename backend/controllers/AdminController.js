@@ -8,7 +8,7 @@ const zxcvbn = require("zxcvbn");
 module.exports.GetAdmins = async (req, res) => {
   const queryParams = [];
   let q =
-    "SELECT id, first_name, middle_initial, last_name, municipality, barangay, profile_image, contact_number, is_online, verified, status FROM users WHERE account_type = 'Admin'";
+    "SELECT id, first_name, middle_initial, last_name, municipality, barangay, profile_image, contact_number, email, is_online, verified, status FROM users WHERE account_type = 'Admin'";
 
   let paramCounter = 1; // To dynamically number the query parameters
 
@@ -69,7 +69,7 @@ module.exports.GetAdmins = async (req, res) => {
 // Get Specific Admin
 module.exports.GetAdmin = async (req, res) => {
   const q =
-    "SELECT id, first_name, middle_initial, last_name, municipality, barangay, profile_image, contact_number, is_online, verified, status FROM users WHERE id = $1";
+    "SELECT id, first_name, middle_initial, last_name, municipality, barangay, profile_image, contact_number, email, is_online, verified, status FROM users WHERE id = $1";
   try {
     const { rows } = await pool.query(q, [req.params.id]);
     res.status(200).json(rows);
