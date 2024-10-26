@@ -12,7 +12,6 @@ import {
 } from "../components";
 import { useState, useEffect, useContext } from "react";
 import { getRequestsFromFirestore } from "../services/firestoreService";
-
 import { RescuerProvider } from "../contexts/RescuerContext";
 import { StatusContext } from "../contexts/StatusContext";
 import { getSelectedRequestCookie } from "../services/cookieService";
@@ -43,6 +42,10 @@ const Rescuer = (props) => {
       unsubscribe();
     };
   }, []);
+
+  if (user.account_type !== "Rescuer") {
+    return <RouterNavigate to="/not-found" replace />;
+  }
 
   return (
     <div className="h-dvh flex flex-col">

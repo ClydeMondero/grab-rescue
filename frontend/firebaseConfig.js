@@ -2,6 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
+import { getMessaging } from "firebase/messaging";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -21,3 +22,6 @@ export const store = getFirestore(app);
 
 //Initialize Firebase Storage
 export const storage = getStorage(app);
+
+// Initialize Firebase Cloud Messaging
+export const messaging = getMessaging(app);
