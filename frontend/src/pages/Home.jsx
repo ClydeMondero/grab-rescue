@@ -309,7 +309,9 @@ const Home = () => {
               Provide Information
             </p>
 
-            {formVisible && <MultiStepForm request={request} />}
+            {formVisible && (
+              <MultiStepForm request={request} setRequest={setRequest} />
+            )}
           </div>
         )}
       </div>
