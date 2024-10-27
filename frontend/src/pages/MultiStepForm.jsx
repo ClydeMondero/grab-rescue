@@ -120,6 +120,7 @@ const MultiStepForm = ({ request }) => {
                 name="phone"
                 required
                 value={formData.phone}
+                disabled={!!formData.phone} // Disable if there's existing data
                 onChange={handleChange}
                 autoComplete="tel"
                 minLength={11}
@@ -154,6 +155,7 @@ const MultiStepForm = ({ request }) => {
               <input
                 type="text"
                 name="citizenName"
+                disabled={!!formData.citizenName} // Disable if there's existing data
                 value={formData.citizenName}
                 onChange={handleChange}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -187,6 +189,7 @@ const MultiStepForm = ({ request }) => {
               <input
                 type="text"
                 name="citizenRelation"
+                disabled={!!formData.citizenRelation} // Disable if there's existing data
                 value={formData.citizenRelation}
                 onChange={handleChange}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -222,18 +225,20 @@ const MultiStepForm = ({ request }) => {
                 src={formData.previewImage}
                 alt="Preview of uploaded image"
               />
-              <input
-                type="file"
-                name="incidentPicture"
-                accept="image/*"
-                onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500
-                file:mr-4 file:py-2 file:px-4
-                file:rounded-full file:border-0
-                file:text-sm file:font-semibold
-                file:bg-gray-50 file:text-gray-700
-                hover:file:bg-gray-100 focus:file:bg-gray-50"
-              />
+              {!formData.incidentPicture && (
+                <input
+                  type="file"
+                  name="incidentPicture"
+                  accept="image/*"
+                  onChange={handleChange}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500
+                  file:mr-4 file:py-2 file:px-4
+                  file:rounded-full file:border-0
+                  file:text-sm file:font-semibold
+                  file:bg-gray-50 file:text-gray-700
+                  hover:file:bg-gray-100 focus:file:bg-gray-50"
+                />
+              )}
             </div>
             <div className="flex flex-col space-y-2">
               <div className="flex justify-between space-x-4">
@@ -263,6 +268,7 @@ const MultiStepForm = ({ request }) => {
               <textarea
                 name="incidentDescription"
                 value={formData.incidentDescription}
+                disabled={!!formData.incidentDescription} // Disable if there's existing data
                 onChange={handleChange}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                 rows={4}
