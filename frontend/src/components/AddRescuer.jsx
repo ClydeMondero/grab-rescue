@@ -103,7 +103,7 @@ const AddRescuer = () => {
       confirmPassword: "",
       age: "",
     });
-    setPasswordStrength({ score: 0, feedback: [] }); // Reset password strength
+    setPasswordStrength({ score: 0, feedback: [] }); 
   };
 
   const handleSubmit = async (e) => {
