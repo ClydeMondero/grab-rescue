@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const zxcvbn = require("zxcvbn");
 const { CreateLog } = require("./LogController");
+const { getTokenSubject } = require("../utils/SecretToken");
 
 // Get Users with Filtering and Name Search (Rescuers and Admins)
 module.exports.GetUsers = async (req, res) => {
@@ -472,6 +473,12 @@ module.exports.UpdateUserPassword = async (req, res) => {
 
 // Update User Status (Toggle)
 module.exports.UpdateUserStatus = async (req, res) => {
+  const auth = req.headers.authorization;
+
+  const token = auth.substring(7, auth.length);
+
+  const subject = await getTokenSubject(token);
+
   const id = req.params.id;
 
   try {
@@ -497,8 +504,8 @@ module.exports.UpdateUserStatus = async (req, res) => {
 
     // Log the status update action
     await CreateLog({
-      userId: id,
-      action: `User status updated from ${currentStatus} to ${newStatus}`,
+      userId: subject,
+      action: `User status update: Rescuer with ID: ${id} changed from ${currentStatus} to ${newStatus}`,
     });
 
     return res.status(200).json({
