@@ -174,7 +174,7 @@ const AssignRescuers = (props) => {
     ];
 
     const tableRows = paginatedRescuers.map((rescue, index) => ({
-      id: (currentPage - 1) * rowsPerPage + index + 1,
+      id: rescue.id,
       name: `${rescue.first_name} ${rescue.middle_initial || ""} ${
         rescue.last_name
       }`,
@@ -346,7 +346,7 @@ const AssignRescuers = (props) => {
             {paginatedRescuers.map((rescue, index) => (
               <tr key={rescue.id} className="border-b">
                 <td className="px-4 py-2 text-xs text-center text-secondary">
-                  {(currentPage - 1) * rowsPerPage + index + 1}
+                  {rescue.id}
                 </td>
                 <td className="px-4 py-2 text-xs text-center">{`${
                   rescue.first_name
