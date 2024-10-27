@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { FaAmbulance } from "react-icons/fa";
-import { AiOutlinePrinter } from "react-icons/ai";
+import { FaAmbulance, FaMapMarkerAlt } from "react-icons/fa";
+import { AiFillPrinter } from "react-icons/ai";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 
@@ -127,13 +127,13 @@ const OngoingRescues = ({ requests, user }) => {
     <div className="flex flex-col p-4 lg:p-6 h-full ">
       {/* Header */}
       <div className="flex items-center mb-2 sm:mb-4 border-b border-gray-200 pb-3">
-        <FaAmbulance className="text-xl sm:text-2xl lg:text-3xl text-[#557C55] mr-2" />
-        <h4 className="text-md sm:text-xl lg:text-2xl font-semibold text-[#557C55]">
+        <FaAmbulance className="text-3xl sm:text-2xl lg:text-3xl text-primary-dark mr-2 fill-current" />
+        <h4 className="text-xl sm:text-md lg:text-3xl text-primary-dark font-bold">
           Ongoing Rescue Operations
         </h4>
       </div>
 
-      <p className="mb-4 text-md text-gray-600">
+      <p className="text-lg font-semibold text-[#557C55] self-start">
         Monitoring the status and progress of active rescue efforts.
       </p>
 
@@ -152,7 +152,7 @@ const OngoingRescues = ({ requests, user }) => {
             </p>
           </div>
           <button
-            className="bg-[#FA7070] text-white px-4 py-2 rounded-md mt-2 hover:bg-[#ff4444] transition"
+            className="bg-secondary text-white mt-3 px-4 py-1 rounded-full hover:bg-primary-medium transition flex items-center justify-center"
             onClick={() => setShowMap(false)}
           >
             Hide Map
@@ -166,9 +166,9 @@ const OngoingRescues = ({ requests, user }) => {
         <div className="flex justify-end mb-2">
           <button
             onClick={handlePrint}
-            className="bg-primary-medium text-white px-3 py-1 rounded-md hover:bg-[#6EA46E] transition flex items-center text-sm"
+            className="bg-primary-medium text-white px-4 py-2 rounded-md hover:bg-[#6EA46E] transition flex items-center text-sm"
           >
-            <AiOutlinePrinter className="text-base mr-1" />
+            <AiFillPrinter className="text-base mr-1" />
             Generate PDF
           </button>
         </div>
@@ -178,36 +178,46 @@ const OngoingRescues = ({ requests, user }) => {
           {paginatedRescues.map((rescue) => (
             <div
               key={rescue.id}
-              className="bg-white border border-primary rounded-xl p-3 mb-3 shadow-sm"
+              className="bg-gray-200 rounded-xl p-3 mb-3 shadow-sm"
             >
               <h5 className="text-md truncate">
-                <span className="text-primary-dark">Rescue ID: </span>
+                <span className="text-primary-dark font-semibold">
+                  Rescue ID:{" "}
+                </span>
                 <span className="text-gray-500">{rescue.rescuer}</span>
               </h5>
               <h5 className="truncate">
-                <span className="text-primary-dark">Location: </span>
+                <span className="text-primary-dark font-semibold">
+                  Location:{" "}
+                </span>
                 <span className="text-gray-500">{rescue.location}</span>
               </h5>
               <h5 className="truncate">
-                <span className="text-primary-dark">Accepted: </span>
+                <span className="text-primary-dark font-semibold">
+                  Accepted:{" "}
+                </span>
                 <span className="text-gray-500">
                   {rescue.acceptedTimestamp}
                 </span>
               </h5>
               <h5 className="truncate">
-                <span className="text-primary-dark">ETA: </span>
+                <span className="text-primary-dark font-semibold">ETA: </span>
                 <span className="text-gray-500">
                   {rescue.estimatedArrivalTime}
                 </span>
               </h5>
               <h5 className="truncate">
-                <span className="text-primary-dark">Departure: </span>
+                <span className="text-primary-dark font-semibold">
+                  Departure:{" "}
+                </span>
                 <span className="text-gray-500">
                   {rescue.estimatedDepartureTime}
                 </span>
               </h5>
               <h5 className="truncate">
-                <span className="text-primary-dark">Status: </span>
+                <span className="text-primary-dark font-semibold">
+                  Status:{" "}
+                </span>
                 <span
                   className={
                     rescue.status === "pending"
@@ -224,9 +234,10 @@ const OngoingRescues = ({ requests, user }) => {
               </h5>
               <button
                 onClick={() => handleShowMap(rescue.location)}
-                className="mt-2 bg-secondary text-white px-2 py-2 rounded-md hover:bg-red-700 transition"
+                className="bg-secondary mt-3 text-white px-4 py-1 rounded-full hover:bg-primary-medium transition flex items-center justify-center"
               >
-                View Map
+                <FaMapMarkerAlt className="text-xl" />
+                Show Map
               </button>
             </div>
           ))}
@@ -234,7 +245,7 @@ const OngoingRescues = ({ requests, user }) => {
 
         {/* Table for larger screens */}
         <div className="hidden lg:block overflow-x-auto">
-          <table className="min-w-full bg-white border border-gray-200 rounded-md overflow-hidden">
+          <table className="min-w-full bg-gray-200 border border-gray-200 rounded-md overflow-hidden">
             <thead className="bg-[#557C55] text-white">
               <tr>
                 <th className="px-4 py-2 text-center text-xs font-medium">#</th>
@@ -262,9 +273,14 @@ const OngoingRescues = ({ requests, user }) => {
               </tr>
             </thead>
             <tbody>
-              {paginatedRescues.map((rescue) => (
-                <tr key={rescue.id} className="border-b hover:bg-gray-100">
-                  <td className="px-4 py-2 text-xs text-center text-secondary">
+              {paginatedRescues.map((rescue, index) => (
+                <tr
+                  key={rescue.id}
+                  className={`border-b ${
+                    index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                  }`}
+                >
+                  <td className="px-4 py-2 text-xs text-center font-semibold text-warning">
                     {rescue.id}
                   </td>
                   <td className="px-4 py-2 text-xs text-center">
@@ -286,10 +302,14 @@ const OngoingRescues = ({ requests, user }) => {
                     <span
                       className={
                         {
-                          pending: "text-warning",
-                          assigned: "text-info",
-                          "in-progress": "text-secondary",
-                          completed: "text-primary-medium",
+                          pending:
+                            "bg-white py-1 px-3rounded-full shadow-sm text-warning",
+                          assigned:
+                            "bg-white py-1 px-3 rounded-full shadow-sm text-info",
+                          "in-progress":
+                            "bg-white py-1 px-3 rounded-full shadow-sm text-secondary",
+                          completed:
+                            "bg-white py-1 px-3 rounded-full shadow-sm text-primary-medium",
                         }[rescue.status]
                       }
                     >
@@ -299,9 +319,9 @@ const OngoingRescues = ({ requests, user }) => {
                   <td className="px-4 py-2 text-xs text-center">
                     <button
                       onClick={() => handleShowMap(rescue.location)}
-                      className="bg-[#557C55] text-white px-2 py-1 rounded-md hover:bg-[#6EA46E] transition"
+                      className="bg-secondary text-white p-2 rounded-full hover:bg-primary-medium transition flex items-center justify-center"
                     >
-                      View Map
+                      <FaMapMarkerAlt className="text-xl" />
                     </button>
                   </td>
                 </tr>
