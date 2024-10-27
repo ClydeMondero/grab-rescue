@@ -11,9 +11,14 @@ const MultiStepForm = ({ request }) => {
     citizenRelation: "",
     incidentPicture: "",
     incidentDescription: "",
+    previewImage: placeholder, // Initialize with Firebase URL or placeholder
   });
   const [required, setRequired] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    console.log(request);
+  }, [request]);
 
   const nextStep = () => {
     if (step === 1) {
@@ -38,20 +43,28 @@ const MultiStepForm = ({ request }) => {
   const handleChange = (e) => {
     const { name, value, files } = e.target;
 
-    if (name == "phone") {
+    if (name === "phone") {
       const onlyNumbers = value.replace(/\D/g, "");
-      setFormData({
-        ...formData,
+      setFormData((prevData) => ({
+        ...prevData,
         phone: onlyNumbers,
-      });
+      }));
       setRequired(false);
+    } else if (name === "incidentPicture" && files && files[0]) {
+      const file = files[0];
+      setFormData((prevData) => ({
+        ...prevData,
+        incidentPicture: file,
+        previewImage: URL.createObjectURL(file), // Update preview URL with uploaded file
+      }));
     } else {
-      setFormData({
-        ...formData,
-        [name]: files ? files[0] : value, // Handle file input separately
-      });
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
     }
   };
+
   const handleSubmit = async () => {
     setIsLoading(true);
 
@@ -82,6 +95,14 @@ const MultiStepForm = ({ request }) => {
     }, 2000);
   };
 
+  useEffect(() => {
+    return () => {
+      if (formData.previewImage && formData.previewImage !== placeholder) {
+        URL.revokeObjectURL(formData.previewImage);
+      }
+    };
+  }, [formData.previewImage]);
+
   const renderStep = () => {
     switch (step) {
       case 1:
@@ -92,7 +113,7 @@ const MultiStepForm = ({ request }) => {
                 className="text-md font-semibold text-text-secondary"
                 htmlFor="phone"
               >
-                Phone Number<span className="text-red-500">*</span>
+                Phone Number (required)
               </label>
               <input
                 type="tel"
@@ -128,7 +149,7 @@ const MultiStepForm = ({ request }) => {
           <div className="h-full flex flex-col justify-center gap-4">
             <div className="flex flex-col gap-4">
               <h2 className="text-md font-semibold text-text-secondary">
-                Your Name
+                Your Name (optional)
               </h2>
               <input
                 type="text"
@@ -161,7 +182,7 @@ const MultiStepForm = ({ request }) => {
           <div className="h-full flex flex-col justify-center gap-4">
             <div className="flex flex-col gap-4">
               <h2 className="text-md font-semibold text-text-secondary">
-                Relation to the Victim
+                Relation to the Victim (optional)
               </h2>
               <input
                 type="text"
@@ -194,15 +215,11 @@ const MultiStepForm = ({ request }) => {
           <div className="h-full flex flex-col justify-center gap-4">
             <div className="flex flex-col gap-4">
               <h2 className="text-md font-semibold text-text-secondary">
-                Upload Proof of Incident
+                Upload Proof of Incident (optional)
               </h2>
               <img
                 className="w-full h-48 object-cover rounded-lg mt-2"
-                src={
-                  formData.incidentPicture == ""
-                    ? placeholder
-                    : formData.incidentPicture
-                }
+                src={formData.previewImage}
                 alt="Preview of uploaded image"
               />
               <input
@@ -298,6 +315,7 @@ const MultiStepForm = ({ request }) => {
         citizenRelation: request.citizenRelation ?? "",
         incidentPicture: request.incidentPicture ?? "",
         incidentDescription: request.incidentDescription ?? "",
+        previewImage: request.incidentPicture ?? placeholder,
       });
     }
   }, [request]);
