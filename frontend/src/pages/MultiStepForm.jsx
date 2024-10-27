@@ -116,7 +116,6 @@ const MultiStepForm = ({ request }) => {
                 name="phone"
                 required
                 value={formData.phone}
-                disabled={!!formData.phone} // Disable if there's existing data
                 onChange={handleChange}
                 autoComplete="tel"
                 minLength={11}
@@ -126,6 +125,7 @@ const MultiStepForm = ({ request }) => {
                     ? "border-secondary focus:ring-secondary "
                     : "border-background-medium focus:ring-primary "
                 }`}
+                disabled={request && request.phone ? true : false}
               />
               {required && (
                 <p className="text-secondary font-semibold">
@@ -151,10 +151,10 @@ const MultiStepForm = ({ request }) => {
               <input
                 type="text"
                 name="citizenName"
-                disabled={!!request?.citizenName} // Disable if there's existing data in request
                 value={formData.citizenName}
                 onChange={handleChange}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                disabled={request && request.citizenName ? true : false}
               />
             </div>
             <div className="flex flex-col space-y-4">
@@ -185,10 +185,10 @@ const MultiStepForm = ({ request }) => {
               <input
                 type="text"
                 name="citizenRelation"
-                disabled={!!request?.citizenRelation} // Disable if there's existing data in request
                 value={formData.citizenRelation}
                 onChange={handleChange}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                disabled={request && request.citizenRelation ? true : false}
               />
             </div>
             <div className="flex flex-col space-y-4">
@@ -221,18 +221,18 @@ const MultiStepForm = ({ request }) => {
                 src={formData.previewImage}
                 alt="Preview of uploaded image"
               />
-              {!request?.incidentPicture && (
+              {request && !request.incidentPicture && (
                 <input
                   type="file"
                   name="incidentPicture"
                   accept="image/*"
                   onChange={handleChange}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500
-                  file:mr-4 file:py-2 file:px-4
-                  file:rounded-full file:border-0
-                  file:text-sm file:font-semibold
-                  file:bg-gray-50 file:text-gray-700
-                  hover:file:bg-gray-100 focus:file:bg-gray-50"
+                file:mr-4 file:py-2 file:px-4
+                file:rounded-full file:border-0
+                file:text-sm file:font-semibold
+                file:bg-gray-50 file:text-gray-700
+                hover:file:bg-gray-100 focus:file:bg-gray-50"
                 />
               )}
             </div>
@@ -264,12 +264,12 @@ const MultiStepForm = ({ request }) => {
               <textarea
                 name="incidentDescription"
                 value={formData.incidentDescription}
-                disabled={!!request?.incidentDescription} // Disable if there's existing data in request
                 onChange={handleChange}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                 rows={4}
                 placeholder="Provide a brief description of the situation"
                 style={{ resize: "none" }}
+                disabled={request && request.incidentDescription ? true : false}
               />
             </div>
             <p className="text-xs text-text-secondary">
