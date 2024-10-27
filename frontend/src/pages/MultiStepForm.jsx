@@ -107,11 +107,6 @@ const MultiStepForm = ({ request, setRequest }) => {
   };
 
   useEffect(() => {
-    if (!request) return;
-    console.log("request", request);
-  }, [request]);
-
-  useEffect(() => {
     return () => {
       if (formData.previewImage && formData.previewImage !== placeholder) {
         URL.revokeObjectURL(formData.previewImage);
