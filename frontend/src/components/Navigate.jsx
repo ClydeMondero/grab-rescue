@@ -62,12 +62,18 @@ const Navigate = ({ requestID }) => {
   return (
     <div className="relative flex flex-col h-full bg-background-light">
       <div className="flex-1">
-        <Map
-          mapRef={mapRef}
-          citizen={requestData.location}
-          onLocatingChange={handleLocatingChange}
-          navigating={navigating}
-        />
+        {requestData ? (
+          <Map
+            mapRef={mapRef}
+            citizen={requestData.location}
+            onLocatingChange={handleLocatingChange}
+            navigating={navigating}
+          />
+        ) : (
+          <div className="h-full flex items-center justify-center">
+            <Loader isLoading={true} color={"#FF5757"} size={25} />
+          </div>
+        )}
       </div>
 
       {requestData && !locating && (
