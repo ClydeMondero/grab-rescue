@@ -103,7 +103,7 @@ const AddRescuer = () => {
       confirmPassword: "",
       age: "",
     });
-    setPasswordStrength({ score: 0, feedback: [] }); // Reset password strength
+    setPasswordStrength({ score: 0, feedback: [] }); 
   };
 
   const handleSubmit = async (e) => {
@@ -158,18 +158,18 @@ const AddRescuer = () => {
 
   return (
     <>
-      <div className="flex-1 p-2 sm:p-4 lg:p-6 h-fullflex flex-col">
+      <div className="flex-1 p-2 sm:p-4 lg:h-fullflex flex-col">
         {/* Header Section */}
         <div className="flex items-center mb-2 sm:mb-4 border-b border-gray-200 pb-3">
-          <MdPersonAdd className="text-xl sm:text-2xl lg:text-3xl text-[#557C55] mr-2" />
-          <h4 className="text-md sm:text-xl lg:text-2xl font-semibold text-[#557C55]">
+          <MdPersonAdd className="text-3xl sm:text-2xl lg:text-3xl text-primary-dark mr-2 fill-current" />
+          <h4 className="text-xl sm:text-md lg:text-3xl text-primary-dark font-bold">
             Add Rescuer
           </h4>
         </div>
         {/* Add Rescuer Form */}
-        <div className="flex-1  p-4 sm:p-6 lg:p-8">
-          <form className="space-y-4 sm:space-y-6" onSubmit={handleSubmit}>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+        <div className="p-2 sm:p-6 lg:p-2 max-h-[70vh] overflow-y-auto">
+          <form className="space-y-2 sm:space-y-4" onSubmit={handleSubmit}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
               {/* Form Fields */}
               <div>
                 <label
@@ -321,6 +321,7 @@ const AddRescuer = () => {
                   required
                   className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
                   placeholder="Enter contact number"
+                  maxLength={11}
                 />
               </div>
               <div>
@@ -373,8 +374,8 @@ const AddRescuer = () => {
                     name="password"
                     value={formData.password}
                     onChange={handleChange}
-                    onFocus={() => setIsPasswordFocused(true)} // Set focus state to true
-                    onBlur={() => setIsPasswordFocused(false)} // Set focus state to false
+                    onFocus={() => setIsPasswordFocused(true)}
+                    onBlur={() => setIsPasswordFocused(false)}
                     required
                     className="mt-1 block w-full px-2 py-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
                     placeholder="Password"

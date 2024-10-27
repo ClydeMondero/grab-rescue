@@ -59,14 +59,14 @@ const IncomingRequests = ({ requests }) => {
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row items-center sm:justify-between mb-3 sm:mb-4 border-b border-gray-200 pb-3">
         <div className="flex items-center">
-          <MdMail className="text-xl sm:text-2xl lg:text-3xl text-[#557C55] mr-2" />
-          <h4 className="text-md sm:text-xl lg:text-2xl font-semibold text-[#557C55]">
+          <MdMail className="text-3xl sm:text-2xl lg:text-3xl text-primary-dark mr-2" />
+          <h4 className="text-xl sm:text-md lg:text-3xl text-primary-dark font-bold">
             Incoming Requests
           </h4>
         </div>
       </div>
 
-      <p className="mb-3 sm:mb-4 text-xs sm:text-sm lg:text-md text-primary-medium">
+      <p className="text-lg font-semibold text-[#557C55] self-start">
         Here are the latest emergency requests:
       </p>
 
@@ -77,16 +77,16 @@ const IncomingRequests = ({ requests }) => {
             pendingRequests.map((request) => (
               <div
                 key={request.id}
-                className="flex flex-col sm:flex-row items-start sm:items-center bg-white rounded-lg p-3 sm:p-4 border-2 border-primary-dark transition duration-300 ease-in-out hover:shadow-sm cursor-pointer"
-                onClick={() => openModal(request)} // Open modal on click
+                className="shadow-md flex flex-col sm:flex-row items-start sm:items-center bg-gray-200 rounded-lg p-3 sm:p-4 transition duration-300 ease-in-out hover:shadow-sm cursor-pointer"
+                onClick={() => openModal(request)}
               >
                 {/* Request Details */}
                 <div className="w-full flex flex-col sm:flex-row justify-between items-start sm:items-center">
                   <div className="flex-1 mb-2 sm:mb-0">
-                    <div className="text-base sm:text-lg font-semibold text-primary">
+                    <div className="text-base sm:text-lg font-semibold text-info">
                       {request.location.address}
                     </div>
-                    <div className="text-sm font-medium text-primary-medium">
+                    <div className="text-sm font-medium text-gray-600">
                       {new Intl.DateTimeFormat("en-US", {
                         year: "numeric",
                         month: "2-digit",
@@ -101,7 +101,7 @@ const IncomingRequests = ({ requests }) => {
                   {/* Request Status */}
                   <div className="mt-2 sm:mt-0">
                     <div
-                      className={`text-sm sm:text-md font-semibold ${
+                      className={`text-sm sm:text-md font-semibold shadow-sm bg-white py-2 px-4 rounded-full ${
                         request.status === "pending"
                           ? "text-warning"
                           : request.status === "in progress"

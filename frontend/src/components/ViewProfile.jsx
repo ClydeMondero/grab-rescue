@@ -6,7 +6,7 @@ import { createAuthHeader } from "../services/authService";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Toast } from "../components";
-import { barangaysData } from "../constants/Barangays"; // Imported barangaysData
+import { barangaysData } from "../constants/Barangays";
 import { Loader } from "../components";
 import { RescuerContext } from "../contexts/RescuerContext";
 

@@ -78,9 +78,8 @@ module.exports.Login = async (req, res) => {
       res.cookie("token", token, {
         withCredentials: true,
         secure: true,
-        sameSite: "Lax",
-        httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
+        sameSite: "none",
+        httpOnly: false,
       });
 
       delete userData.password; // Remove password from userData
@@ -116,11 +115,7 @@ module.exports.Logout = async (req, res) => {
     }
 
     // Clear the cookie after updating the user's online status
-    res.clearCookie("token", {
-      secure: true,
-      sameSite: "Lax",
-      httpOnly: true,
-    });
+    res.clearCookie("token");
 
     return res
       .status(200)
