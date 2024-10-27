@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from "react";
 import placeholder from "../assets/placeholder.png";
-import { updateRequestInFirestore } from "../services/firestoreService";
+import {
+  updateRequestInFirestore,
+  getRequestFromFirestore,
+} from "../services/firestoreService";
 import { Loader } from "../components";
+import { getRequestCookie } from "../services/cookieService";
 
-const MultiStepForm = ({ request }) => {
+const MultiStepForm = ({ request, setRequest }) => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     phone: "",
@@ -81,6 +85,8 @@ const MultiStepForm = ({ request }) => {
         incidentPicture,
         incidentDescription,
       });
+
+      checkRequest();
     } catch (error) {
       console.error("Error submitting the form:", error);
     }
@@ -90,6 +96,20 @@ const MultiStepForm = ({ request }) => {
       setStep(1);
     }, 2000);
   };
+
+  const checkRequest = async () => {
+    const requestId = getRequestCookie();
+
+    console.log(requestId);
+
+    const onGoingRequest = await getRequestFromFirestore(requestId);
+    setRequest(onGoingRequest);
+  };
+
+  useEffect(() => {
+    if (!request) return;
+    console.log("request", request);
+  }, [request]);
 
   useEffect(() => {
     return () => {
@@ -114,8 +134,8 @@ const MultiStepForm = ({ request }) => {
               <input
                 type="tel"
                 name="phone"
-                required
                 value={formData.phone}
+                required
                 onChange={handleChange}
                 autoComplete="tel"
                 minLength={11}
@@ -125,7 +145,7 @@ const MultiStepForm = ({ request }) => {
                     ? "border-secondary focus:ring-secondary "
                     : "border-background-medium focus:ring-primary "
                 }`}
-                disabled={request && request.phone ? true : false}
+                disabled={request?.phone ? true : false}
               />
               {required && (
                 <p className="text-secondary font-semibold">
@@ -153,8 +173,8 @@ const MultiStepForm = ({ request }) => {
                 name="citizenName"
                 value={formData.citizenName}
                 onChange={handleChange}
+                disabled={request?.citizenName ? true : false}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                disabled={request && request.citizenName ? true : false}
               />
             </div>
             <div className="flex flex-col space-y-4">
@@ -187,8 +207,8 @@ const MultiStepForm = ({ request }) => {
                 name="citizenRelation"
                 value={formData.citizenRelation}
                 onChange={handleChange}
+                disabled={request?.citizenRelation ? true : false}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                disabled={request && request.citizenRelation ? true : false}
               />
             </div>
             <div className="flex flex-col space-y-4">
@@ -221,18 +241,18 @@ const MultiStepForm = ({ request }) => {
                 src={formData.previewImage}
                 alt="Preview of uploaded image"
               />
-              {request && !request.incidentPicture && (
+              {!request?.incidentPicture && (
                 <input
                   type="file"
                   name="incidentPicture"
                   accept="image/*"
                   onChange={handleChange}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500
-                file:mr-4 file:py-2 file:px-4
-                file:rounded-full file:border-0
-                file:text-sm file:font-semibold
-                file:bg-gray-50 file:text-gray-700
-                hover:file:bg-gray-100 focus:file:bg-gray-50"
+                  file:mr-4 file:py-2 file:px-4
+                  file:rounded-full file:border-0
+                  file:text-sm file:font-semibold
+                  file:bg-gray-50 file:text-gray-700
+                  hover:file:bg-gray-100 focus:file:bg-gray-50"
                 />
               )}
             </div>
@@ -269,7 +289,7 @@ const MultiStepForm = ({ request }) => {
                 rows={4}
                 placeholder="Provide a brief description of the situation"
                 style={{ resize: "none" }}
-                disabled={request && request.incidentDescription ? true : false}
+                disabled={request?.incidentDescription ? true : false}
               />
             </div>
             <p className="text-xs text-text-secondary">
