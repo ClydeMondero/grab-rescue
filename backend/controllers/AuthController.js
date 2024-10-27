@@ -79,6 +79,7 @@ module.exports.Login = async (req, res) => {
         withCredentials: true,
         secure: true,
         sameSite: "Lax",
+        maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
       });
 
       delete userData.password; // Remove password from userData
