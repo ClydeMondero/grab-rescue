@@ -27,10 +27,10 @@ const Settings = () => {
         isDarkMode ? "bg-gray-900 text-white" : "bg-white text-gray-800"
       } flex flex-col`}
     >
-      <div className="flex items-center mb-4 sm:mb-6 pb-2 sm:pb-4 p-2 border-b border-gray-200 pb-3">
-        <AiFillSetting className="text-xl sm:text-2xl lg:text-3xl text-[#557C55] mr-2" />
+      <div className="flex items-center mb-4 sm:mb-6 sm:pb-4 p-2 border-b border-gray-200 pb-3">
+        <AiFillSetting className="text-3xl sm:text-2xl lg:text-3xl text-primary-dark mr-2 fill-current" />
         <h4
-          className={`className="text-md sm:text-xl lg:text-2xl font-semibold text-[#557C55]" ${
+          className={`text-xl sm:text-md lg:text-3xl text-primary-dark font-bold ${
             isDarkMode ? "text-[#A0D9A4]" : "text-[#557C55]"
           }`}
         >
@@ -38,9 +38,9 @@ const Settings = () => {
         </h4>
       </div>
 
-      <div className="rounded-md p-2 sm:p-4 flex flex-col space-y-4">
+      <div className="rounded-md p-2 sm:p-4 flex flex-col space-y-4 ">
         {/* Dark Mode Toggle */}
-        <div className="flex items-center justify-between p-2 sm:p-4">
+        <div className="flex items-center justify-between p-2 sm:p-4 border-b-2 border-primary-medium">
           <label
             className={`text-sm sm:text-lg font-medium ${
               isDarkMode ? "text-white" : "text-[#557C55]"
@@ -61,7 +61,7 @@ const Settings = () => {
         </div>
 
         {/* Font Size Selector */}
-        <div className="flex items-center justify-between p-2 sm:p-4 ">
+        <div className="flex items-center justify-between p-2 sm:p-4 border-b-2 border-primary-medium">
           <label
             className={`text-sm sm:text-lg font-medium ${
               isDarkMode ? "text-white" : "text-[#557C55]"
@@ -81,7 +81,7 @@ const Settings = () => {
         </div>
 
         {/* Change Color Picker */}
-        <div className="flex items-center justify-between p-2 sm:p-4 ">
+        <div className="flex items-center justify-between p-2 sm:p-4 border-b-2 border-primary-medium">
           <label
             className={`text-sm sm:text-lg font-medium ${
               isDarkMode ? "text-white" : "text-[#557C55]"

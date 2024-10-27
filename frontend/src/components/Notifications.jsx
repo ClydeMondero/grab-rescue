@@ -9,14 +9,14 @@ const Notifications = () => {
     <div className="flex flex-col p-2 sm:p-4 lg:p-6 h-full rounded-lg">
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row items-center sm:justify-between mb-3 sm:mb-4 border-b border-gray-200 pb-3">
-        <div className="flex items-center">
-          <FaBell className="text-xl sm:text-2xl lg:text-3xl text-[#557C55] mr-2" />
-          <h4 className="text-md sm:text-xl lg:text-2xl font-semibold text-[#557C55]">
+        <div className="flex items-center ">
+          <FaBell className="text-3xl sm:text-2xl lg:text-3xl text-primary-dark mr-2 fill-current" />
+          <h4 className="text-xl sm:text-md lg:text-3xl text-primary-dark font-bold">
             Notifications
           </h4>
         </div>
       </div>
-      <p className="mb-3 sm:mb-4 text-xs sm:text-sm lg:text-md text-primary-medium">
+      <p className="text-lg font-semibold text-[#557C55] self-start">
         Notifications will appear here:
       </p>
 

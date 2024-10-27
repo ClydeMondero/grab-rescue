@@ -227,18 +227,18 @@ const AssignRescuers = (props) => {
   };
 
   return (
-    <div>
+    <div className="h-full">
       <div className="flex items-center mb-2 sm:mb-4 border-b border-gray-200 pb-3">
-        <MdAssignmentInd className="text-xl sm:text-2xl lg:text-3xl text-[#557C55] mr-2" />
-        <h4 className="text-md sm:text-xl lg:text-2xl font-semibold text-[#557C55]">
+        <MdAssignmentInd className="text-3xl sm:text-2xl lg:text-3xl text-primary-dark mr-2 fill-current" />
+        <h4 className="text-xl sm:text-md lg:text-3xl text-primary-dark font-bold">
           Rescuers
         </h4>
       </div>
 
       {/* Search, Filter, and Print Controls */}
       <div className="mb-4 flex flex-col md:flex-row justify-between">
-        <div className="flex flex-col md:flex-row gap-1 mb-2 md:mb-0">
-          <div className="relative w-full md:w-1/5">
+        <div className="flex flex-col md:flex-row gap-2 mb-2 md:mb-0">
+          <div className="relative w-full md:w-[30rem]">
             <input
               type="text"
               placeholder="Search by Name"
@@ -251,7 +251,7 @@ const AssignRescuers = (props) => {
           <select
             value={selectedMunicipality}
             onChange={handleMunicipalityChange}
-            className="rounded-full border border-primary-medium  px-2 py-1 text-sm max-w-full md:max-w-[9rem]"
+            className="rounded-md bg-primary-medium text-white px-2 py-1 text-sm max-w-full md:max-w-[9rem]"
           >
             <option value="All">All Municipalities</option>
             {Object.keys(barangaysData).map((municipality) => (
@@ -263,7 +263,7 @@ const AssignRescuers = (props) => {
           <select
             value={selectedBarangay}
             onChange={(e) => setSelectedBarangay(e.target.value)}
-            className="rounded-full border border-primary-medium  px-2 py-1 text-sm max-w-full md:max-w-[8rem]"
+            className="rounded-md bg-primary-medium text-white px-2 py-1 text-sm max-w-full md:max-w-[8rem]"
           >
             <option value="All">All Barangays</option>
             {barangays.map((barangay) => (
@@ -275,7 +275,7 @@ const AssignRescuers = (props) => {
           <select
             value={selectedVerified}
             onChange={(e) => setSelectedVerified(e.target.value)}
-            className="rounded-full border border-primary-medium  px-2 py-1 text-sm max-w-full md:max-w-[11rem]"
+            className="rounded-md bg-primary-medium text-white  px-2 py-1 text-sm max-w-full md:max-w-[11rem]"
           >
             <option value="All">All Verification Status</option>
             <option value="True">Verified</option>
@@ -284,7 +284,7 @@ const AssignRescuers = (props) => {
           <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
-            className="rounded-full border border-primary-medium  px-2 py-1 text-sm max-w-full md:max-w-[8rem]"
+            className="rounded-md bg-primary-medium text-white  px-2 py-1 text-sm max-w-full md:max-w-[8rem]"
           >
             <option value="All">Online/Offline</option>
             <option value="Online">Online</option>
@@ -294,7 +294,7 @@ const AssignRescuers = (props) => {
           <select
             value={currentStatus}
             onChange={(e) => setCurrentStatus(e.target.value)}
-            className="rounded-full border border-primary-medium  px-2 py-1 text-sm max-w-full md:max-w-[5rem]"
+            className="rounded-md bg-primary-medium text-white  px-2 py-1 text-sm max-w-full md:max-w-[5rem]"
           >
             <option value="All">Status</option>
             <option value="Active">Active</option>
@@ -311,8 +311,8 @@ const AssignRescuers = (props) => {
       </div>
 
       {/* Rescuers Table */}
-      <div className="overflow-x-auto">
-        <table className="min-w-full bg-white border border-gray-200 rounded-md overflow-hidden">
+      <div className="overflow-x-auto max-h-[calc(100vh-28rem)]">
+        <table className="min-w-full bg-gray-200 border border-gray-200 rounded-md overflow-hidden">
           <thead className=" text-white">
             <tr className="bg-[#557C55] text-left">
               <th className="px-4 py-2 text-center text-xs font-medium">#</th>
@@ -344,7 +344,12 @@ const AssignRescuers = (props) => {
           </thead>
           <tbody>
             {paginatedRescuers.map((rescue, index) => (
-              <tr key={rescue.id} className="border-b">
+              <tr
+                key={rescue.id}
+                className={`  border-b ${
+                  index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                }`}
+              >
                 <td className="px-4 py-2 text-xs text-center text-secondary">
                   {(currentPage - 1) * rowsPerPage + index + 1}
                 </td>
@@ -369,23 +374,33 @@ const AssignRescuers = (props) => {
                   }`}
                 >
                   {rescue.is_online ? (
-                    <span className="flex items-center justify-center text-primary-medium">
-                      <FaCircle className="text-primary-medium mr-1" />
+                    <span className="flex items-center justify-center rounded-full font-semibold py-2 text-green-500">
+                      <FaCircle className="text-green-500 mr-1" />
                       Online
                     </span>
                   ) : (
-                    <span className="flex items-center justify-center">
-                      <FaCircle className="text-secondary mr-1" />
+                    <span className="flex items-center justify-center rounded-full font-semibold py-2 text-red-400">
+                      <FaCircle className="text-red-500 mr-1" />
                       Offline
                     </span>
                   )}
                 </td>
                 <td
-                  className={`px-4 py-2 text-xs text-center ${
+                  className={`px-4 py-2 text-center ${
                     rescue.verified ? "text-primary-medium" : "text-secondary"
-                  }`}
+                  } text-xs md:text-sm`}
                 >
-                  {rescue.verified ? "Verified" : "Not Verified"}
+                  {rescue.verified ? (
+                    <span className="flex items-center justify-center rounded-full font-semibold py-2 text-blue-400">
+                      <FaCircle className="text-white mr-1" />
+                      Verified
+                    </span>
+                  ) : (
+                    <span className="flex items-center justify-center rounded-full font-semibold py-2 text-orange-400">
+                      <FaCircle className="text-white mr-1" />
+                      Not Verified
+                    </span>
+                  )}
                 </td>
                 <td className="px-4 py-2 text-xs text-center">
                   <button
@@ -394,8 +409,8 @@ const AssignRescuers = (props) => {
                     }
                     className={`rounded-full px-4 py-1 ${
                       rescue.status === "Active"
-                        ? "bg-primary-medium"
-                        : "bg-secondary"
+                        ? "bg-green-500"
+                        : "bg-slate-500"
                     } text-white`}
                   >
                     {rescue.status === "Active" ? "Active" : "Inactive"}
@@ -438,7 +453,7 @@ const AssignRescuers = (props) => {
       )}
 
       {/* Pagination */}
-      <div className="flex justify-center items-center mt-4">
+      <div className="flex justify-center items-center mt-60">
         <button
           onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 1}
