@@ -1,10 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
-import { RescuerMap as Map, Toast } from "../components";
-import { BiPhoneCall } from "react-icons/bi";
-import { FaLocationArrow, FaCheck } from "react-icons/fa";
+import { RescuerMap as Map } from "../components";
+import { FaLocationArrow, FaPhone } from "react-icons/fa";
 import { getRequestFromFirestore } from "../services/firestoreService";
 import { Loader } from "../components";
-import { useLocating } from "../hooks";
 import MobileDetect from "mobile-detect";
 import { toast } from "react-toastify";
 
@@ -120,7 +118,7 @@ const Navigate = ({ requestID }) => {
                   onClick={handlePhone}
                   className="flex items-center justify-center w-12 h-12 bg-primary rounded-full text-white text-2xl cursor-pointer"
                 >
-                  <BiPhoneCall />
+                  <FaPhone />
                 </button>
               )}
               <div
