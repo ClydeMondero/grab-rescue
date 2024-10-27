@@ -27,6 +27,7 @@ import RescuerMarker from "./RescuerMarker";
 import GeolocateButton from "./GeolocateButton";
 import TurnIndicator from "./TurnIndicator";
 import RequestModal from "./RequestModal";
+import Notifications from "./Notifications";
 
 export {
   RequestModal,
@@ -58,4 +59,5 @@ export {
   Bottom,
   Navigate,
   Requests,
+  Notifications,
 };
