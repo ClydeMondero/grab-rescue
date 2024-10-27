@@ -79,7 +79,6 @@ module.exports.Login = async (req, res) => {
         withCredentials: true,
         secure: true,
         sameSite: "Lax",
-        httpOnly: true,
       });
 
       delete userData.password; // Remove password from userData
@@ -118,7 +117,6 @@ module.exports.Logout = async (req, res) => {
     res.clearCookie("token", {
       secure: true,
       sameSite: "Lax",
-      httpOnly: true,
     });
 
     return res
