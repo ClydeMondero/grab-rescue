@@ -59,7 +59,7 @@ module.exports.GetRescuers = async (req, res) => {
   }
 
   q +=
-    " ORDER BY (CASE status WHEN 'Active' THEN 1 WHEN 'Inactive' THEN 2 END)";
+    " ORDER BY (CASE status WHEN 'Active' THEN 1 WHEN 'Inactive' THEN 2 END), id";
 
   try {
     const { rows } = await pool.query(q, queryParams);

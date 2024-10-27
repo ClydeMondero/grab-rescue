@@ -14,15 +14,16 @@ const GenerateReports = (props) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [accountType, setAccountType] = useState("");
   const [actionFilters, setActionFilters] = useState({
-    "Logged In": false,
-    "Logged Out": false,
-    "User changed password successfully": false,
-    "Email change verified and updated": false,
-    "User changed email": false,
-    "Rescuer created": false,
-    "User updated": false,
-    "Requested password reset": false,
-    "Password reset successful": false,
+    "Logged In": true,
+    "Logged Out": true,
+    "User changed password successfully": true,
+    "Email change verified and updated": true,
+    "User changed email": true,
+    "Rescuer created": true,
+    "User updated": true,
+    "User status update": true,
+    "Requested password reset": true,
+    "Password reset successful": true,
   });
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -65,15 +66,16 @@ const GenerateReports = (props) => {
   const resetFilters = () => {
     setAccountType(""); // Reset to default
     setActionFilters({
-      "Logged In": false,
-      "Logged Out": false,
-      "User changed password successfully": false,
-      "Email change verified and updated": false,
-      "User changed email": false,
-      "Rescuer created": false,
-      "User updated": false,
-      "Requested password reset": false,
-      "Password reset successful": false,
+      "Logged In": true,
+      "Logged Out": true,
+      "User changed password successfully": true,
+      "Email change verified and updated": true,
+      "User changed email": true,
+      "Rescuer created": true,
+      "User updated": true,
+      "User status update": true,
+      "Requested password reset": true,
+      "Password reset successful": true,
     });
     setStartDate("");
     setEndDate("");
@@ -196,7 +198,7 @@ const GenerateReports = (props) => {
     setSelectAll((prev) => !prev);
     const updatedFilters = Object.keys(actionFilters).reduce((acc, filter) => {
       // Disable "Rescuer Created" if account type is rescuer
-      if (filter === "Rescuer created" && accountType === "rescuer") {
+      if (filter === "Rescuer created" && accountType === "Rescuer") {
         acc[filter] = false;
       } else {
         acc[filter] = !selectAll;
@@ -327,7 +329,7 @@ const GenerateReports = (props) => {
                       onChange={() => handleCheckboxChange(filter)}
                       disabled={
                         filter === "Rescuer created" &&
-                        accountType === "rescuer"
+                        accountType === "Rescuer"
                       }
                     />
                     <span className="ml-2">{filter}</span>
