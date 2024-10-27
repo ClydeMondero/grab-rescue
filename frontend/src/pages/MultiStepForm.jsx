@@ -16,10 +16,6 @@ const MultiStepForm = ({ request }) => {
   const [required, setRequired] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    console.log(request);
-  }, [request]);
-
   const nextStep = () => {
     if (step === 1) {
       if (!formData.phone) {
@@ -155,7 +151,7 @@ const MultiStepForm = ({ request }) => {
               <input
                 type="text"
                 name="citizenName"
-                disabled={!!formData.citizenName} // Disable if there's existing data
+                disabled={!!request?.citizenName} // Disable if there's existing data in request
                 value={formData.citizenName}
                 onChange={handleChange}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -189,7 +185,7 @@ const MultiStepForm = ({ request }) => {
               <input
                 type="text"
                 name="citizenRelation"
-                disabled={!!formData.citizenRelation} // Disable if there's existing data
+                disabled={!!request?.citizenRelation} // Disable if there's existing data in request
                 value={formData.citizenRelation}
                 onChange={handleChange}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -225,7 +221,7 @@ const MultiStepForm = ({ request }) => {
                 src={formData.previewImage}
                 alt="Preview of uploaded image"
               />
-              {!formData.incidentPicture && (
+              {!request?.incidentPicture && (
                 <input
                   type="file"
                   name="incidentPicture"
@@ -268,7 +264,7 @@ const MultiStepForm = ({ request }) => {
               <textarea
                 name="incidentDescription"
                 value={formData.incidentDescription}
-                disabled={!!formData.incidentDescription} // Disable if there's existing data
+                disabled={!!request?.incidentDescription} // Disable if there's existing data in request
                 onChange={handleChange}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                 rows={4}
