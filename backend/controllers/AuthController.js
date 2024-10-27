@@ -81,6 +81,7 @@ module.exports.Login = async (req, res) => {
         sameSite: "Lax",
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
+        domain: "grab-rescue.onrender.com",
       });
 
       delete userData.password; // Remove password from userData
