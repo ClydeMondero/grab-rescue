@@ -79,6 +79,7 @@ module.exports.Login = async (req, res) => {
         withCredentials: true,
         secure: true,
         sameSite: "Lax",
+        htppOnly: true,
         maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
       });
 
@@ -118,6 +119,7 @@ module.exports.Logout = async (req, res) => {
     res.clearCookie("token", {
       secure: true,
       sameSite: "Lax",
+      htppOnly: true,
     });
 
     return res
