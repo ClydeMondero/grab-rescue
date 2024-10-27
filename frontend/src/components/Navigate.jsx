@@ -60,17 +60,25 @@ const Navigate = ({ requestID }) => {
   return (
     <div className="relative flex flex-col h-full bg-background-light">
       <div className="flex-1">
-        {requestData ? (
+        {requestID ? (
+          requestData ? (
+            <Map
+              mapRef={mapRef}
+              citizen={requestData.location}
+              onLocatingChange={handleLocatingChange}
+              navigating={navigating}
+            />
+          ) : (
+            <div className="h-full flex items-center justify-center">
+              <Loader isLoading={true} color={"#FF5757"} size={25} />
+            </div>
+          )
+        ) : (
           <Map
             mapRef={mapRef}
-            citizen={requestData.location}
             onLocatingChange={handleLocatingChange}
             navigating={navigating}
           />
-        ) : (
-          <div className="h-full flex items-center justify-center">
-            <Loader isLoading={true} color={"#FF5757"} size={25} />
-          </div>
         )}
       </div>
 
@@ -87,6 +95,15 @@ const Navigate = ({ requestID }) => {
             } rounded-full p-6 -translate-y-4 cursor-pointer`}
           >
             <FaLocationArrow className="text-white text-2xl" />
+          </div>
+        </div>
+      )}
+      {!requestData && (
+        <div className="flex-none h-auto bg-background rounded-t-2xl p-4 shadow-lg border-x-background-medium border-t-2">
+          <div className="flex items-center justify-center">
+            <p className="text-primary-medium font-semibold text-xl text-center">
+              You're not assigned to any request.
+            </p>
           </div>
         </div>
       )}
