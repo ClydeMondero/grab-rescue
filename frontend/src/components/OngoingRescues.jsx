@@ -20,8 +20,6 @@ const OngoingRescues = ({ requests, user }) => {
         minute: "2-digit",
         second: "2-digit",
       }).format(new Date(request.acceptedTimestamp)),
-      estimatedArrivalTime: "TBD",
-      estimatedDepartureTime: "TBD",
     }));
 
   const [showMap, setShowMap] = useState(false);
@@ -68,8 +66,6 @@ const OngoingRescues = ({ requests, user }) => {
       { title: "Rescuer ID", dataKey: "rescuer" },
       { title: "Location", dataKey: "location" },
       { title: "Accepted Timestamp", dataKey: "acceptedTimestamp" },
-      { title: "Estimated Arrival", dataKey: "estimatedArrivalTime" },
-      { title: "Estimated Departure", dataKey: "estimatedDepartureTime" },
       { title: "Status", dataKey: "status" },
     ];
 
@@ -201,20 +197,6 @@ const OngoingRescues = ({ requests, user }) => {
                 </span>
               </h5>
               <h5 className="truncate">
-                <span className="text-primary-dark font-semibold">ETA: </span>
-                <span className="text-gray-500">
-                  {rescue.estimatedArrivalTime}
-                </span>
-              </h5>
-              <h5 className="truncate">
-                <span className="text-primary-dark font-semibold">
-                  Departure:{" "}
-                </span>
-                <span className="text-gray-500">
-                  {rescue.estimatedDepartureTime}
-                </span>
-              </h5>
-              <h5 className="truncate">
                 <span className="text-primary-dark font-semibold">
                   Status:{" "}
                 </span>
@@ -259,12 +241,6 @@ const OngoingRescues = ({ requests, user }) => {
                   Accepted Timestamp
                 </th>
                 <th className="px-4 py-2 text-center text-xs font-medium">
-                  Estimated Arrival
-                </th>
-                <th className="px-4 py-2 text-center text-xs font-medium">
-                  Estimated Departure
-                </th>
-                <th className="px-4 py-2 text-center text-xs font-medium">
                   Status
                 </th>
                 <th className="px-4 py-2 text-center text-xs font-medium">
@@ -291,12 +267,6 @@ const OngoingRescues = ({ requests, user }) => {
                   </td>
                   <td className="px-4 py-2 text-xs text-center">
                     {rescue.acceptedTimestamp}
-                  </td>
-                  <td className="px-4 py-2 text-xs text-center">
-                    {rescue.estimatedArrivalTime}
-                  </td>
-                  <td className="px-4 py-2 text-xs text-center">
-                    {rescue.estimatedDepartureTime}
                   </td>
                   <td className="px-4 py-2 text-xs text-center ">
                     <span

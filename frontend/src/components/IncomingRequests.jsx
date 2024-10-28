@@ -23,7 +23,9 @@ const RequestDetailsModal = ({ request, isOpen, onClose }) => {
         </p>
         <p className="mb-4">
           <strong className="text-primary-medium">Location:</strong>{" "}
-          {request.location.address}
+          {request.location && request.location.address
+            ? request.location.address
+            : "Address not available"}
         </p>
         <button
           onClick={onClose}
@@ -84,7 +86,10 @@ const IncomingRequests = ({ requests }) => {
                 <div className="w-full flex flex-col sm:flex-row justify-between items-start sm:items-center">
                   <div className="flex-1 mb-2 sm:mb-0">
                     <div className="text-base sm:text-lg font-semibold text-info">
-                      {request.location.address}
+                      {/* Safely access request.location.address */}
+                      {request.location && request.location.address
+                        ? request.location.address
+                        : "Address not available"}
                     </div>
                     <div className="text-sm font-medium text-gray-600">
                       {new Intl.DateTimeFormat("en-US", {
