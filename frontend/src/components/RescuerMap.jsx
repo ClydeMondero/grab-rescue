@@ -236,9 +236,11 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
               <RescuerMarker view="3d" />
             )}
           </Marker>
-          <Marker longitude={citizen.longitude} latitude={citizen.latitude}>
-            <FaLocationPin className="text-3xl text-secondary red-pulse" />
-          </Marker>
+          {citizen && (
+            <Marker longitude={citizen.longitude} latitude={citizen.latitude}>
+              <FaLocationPin className="text-3xl text-secondary red-pulse" />
+            </Marker>
+          )}
 
           <Route
             routeData={routeData}

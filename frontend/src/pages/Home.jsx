@@ -3,7 +3,7 @@ import logo from "../assets/logo.png";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { CitizenMap as Map, Loader, Toast, RequestModal } from "../components";
-import { FaChevronDown } from "react-icons/fa";
+import { FaChevronDown, FaPhone } from "react-icons/fa";
 import { FaLocationPin } from "react-icons/fa6";
 import { BiSolidHide, BiSolidAmbulance } from "react-icons/bi";
 import { MdDragHandle } from "react-icons/md";
@@ -22,7 +22,6 @@ import {
 import { StatusContext } from "../contexts/StatusContext";
 import MobileDetect from "mobile-detect";
 import { toast } from "react-toastify";
-import { BiPhoneCall } from "react-icons/bi";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -278,7 +277,7 @@ const Home = () => {
                   onClick={handlePhone}
                   className="flex items-center justify-center w-12 h-12 bg-primary rounded-full text-white text-2xl cursor-pointer"
                 >
-                  <BiPhoneCall />
+                  <FaPhone />
                 </button>
               </div>
             ) : (
@@ -310,7 +309,9 @@ const Home = () => {
               Provide Information
             </p>
 
-            {formVisible && <MultiStepForm request={request} />}
+            {formVisible && (
+              <MultiStepForm request={request} setRequest={setRequest} />
+            )}
           </div>
         )}
       </div>

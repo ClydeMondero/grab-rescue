@@ -1,10 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
-import { RescuerMap as Map, Toast } from "../components";
-import { BiPhoneCall } from "react-icons/bi";
-import { FaLocationArrow, FaCheck } from "react-icons/fa";
+import { RescuerMap as Map } from "../components";
+import { FaLocationArrow, FaPhone } from "react-icons/fa";
 import { getRequestFromFirestore } from "../services/firestoreService";
 import { Loader } from "../components";
-import { useLocating } from "../hooks";
 import MobileDetect from "mobile-detect";
 import { toast } from "react-toastify";
 
@@ -62,12 +60,26 @@ const Navigate = ({ requestID }) => {
   return (
     <div className="relative flex flex-col h-full bg-background-light">
       <div className="flex-1">
-        <Map
-          mapRef={mapRef}
-          citizen={requestData.location}
-          onLocatingChange={handleLocatingChange}
-          navigating={navigating}
-        />
+        {requestID ? (
+          requestData ? (
+            <Map
+              mapRef={mapRef}
+              citizen={requestData.location}
+              onLocatingChange={handleLocatingChange}
+              navigating={navigating}
+            />
+          ) : (
+            <div className="h-full flex items-center justify-center">
+              <Loader isLoading={true} color={"#FF5757"} size={25} />
+            </div>
+          )
+        ) : (
+          <Map
+            mapRef={mapRef}
+            onLocatingChange={handleLocatingChange}
+            navigating={navigating}
+          />
+        )}
       </div>
 
       {requestData && !locating && (
@@ -83,6 +95,15 @@ const Navigate = ({ requestID }) => {
             } rounded-full p-6 -translate-y-4 cursor-pointer`}
           >
             <FaLocationArrow className="text-white text-2xl" />
+          </div>
+        </div>
+      )}
+      {!requestData && (
+        <div className="flex-none h-auto bg-background rounded-t-2xl p-4 shadow-lg border-x-background-medium border-t-2">
+          <div className="flex items-center justify-center">
+            <p className="text-primary-medium font-semibold text-xl text-center">
+              You're not assigned to any request.
+            </p>
           </div>
         </div>
       )}
@@ -114,7 +135,7 @@ const Navigate = ({ requestID }) => {
                   onClick={handlePhone}
                   className="flex items-center justify-center w-12 h-12 bg-primary rounded-full text-white text-2xl cursor-pointer"
                 >
-                  <BiPhoneCall />
+                  <FaPhone />
                 </button>
               )}
               <div
