@@ -19,15 +19,19 @@ const Navigate = ({ requestID }) => {
     setLocating(newLocatingState); // Update only when locating changes
   };
 
-  const getRequestData = async () => {
+  useEffect(() => {
     if (requestID === null) return;
 
-    const requestData = await getRequestFromFirestore(requestID);
+    const unsubscribe = getRequestFromFirestore(requestID, (requestData) => {
+      if (requestData) {
+        setRequestData(requestData);
+      }
+    });
 
-    if (requestData) {
-      setRequestData(requestData);
-    }
-  };
+    return () => {
+      unsubscribe();
+    };
+  }, [requestID]);
 
   const handlePhone = () => {
     if (onMobile) {
@@ -43,10 +47,6 @@ const Navigate = ({ requestID }) => {
         });
     }
   };
-
-  useEffect(() => {
-    getRequestData();
-  }, [requestID]);
 
   useEffect(() => {
     const md = new MobileDetect(window.navigator.userAgent);

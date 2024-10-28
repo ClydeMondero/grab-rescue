@@ -65,7 +65,7 @@ const Home = () => {
     }
   };
 
-  const checkRequest = async () => {
+  const checkRequest = () => {
     const requestId = getRequestCookie();
 
     if (requestId) {
@@ -74,8 +74,13 @@ const Home = () => {
       return;
     }
 
-    const onGoingRequest = await getRequestFromFirestore(requestId);
-    setRequest(onGoingRequest);
+    const unsubscribe = getRequestFromFirestore(requestId, (onGoingRequest) => {
+      setRequest(onGoingRequest);
+    });
+
+    return () => {
+      unsubscribe();
+    };
   };
 
   const handlePhone = () => {
@@ -102,6 +107,8 @@ const Home = () => {
       const { id } = await addRequestToFirestore(citizenId, location);
 
       setRequestCookie(id);
+
+      checkRequest();
     }
 
     handleRequesting();
@@ -141,18 +148,18 @@ const Home = () => {
   }, [formVisible]);
 
   useEffect(() => {
-    const getRequestDetails = async () => {
+    const getRescuerDetails = async () => {
       if (!request) return;
 
-      if (request.status == "assigned") {
-        const rescuer = await getRescuer();
+      const rescuer = await getRescuer();
 
+      if (rescuer) {
         setRescuer(rescuer[0]);
       }
     };
 
-    getRequestDetails();
-  }, [request]);
+    getRescuerDetails();
+  }, [request]); // Empty dependency array to run only once on mount.
 
   return (
     <div className="h-dvh w-screen overflow-hidden flex flex-col">
