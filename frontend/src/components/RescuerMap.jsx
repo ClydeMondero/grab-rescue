@@ -23,7 +23,6 @@ import { useLocation } from "react-router-dom";
 import { setGeolocateIcon } from "../utils/GeolocateUtility";
 import * as turf from "@turf/turf";
 
-//TODO: show no current request
 const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
   const { rescuer, setRescuer } = useContext(RescuerContext);
   const [locations, setLocations] = useState(null);
@@ -58,13 +57,11 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
 
     const id = await getIDFromCookie();
 
-    // Use some to check if the location already exists
     const existingLocation = locations.find(
       (location) => location.userId === id
     );
 
     if (existingLocation) {
-      // If location exists, update it
       updateUserLocation(
         existingLocation.id,
         rescuer.longitude,
@@ -73,7 +70,6 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
         coords.latitude
       );
     } else {
-      // If location does not exist, add a new one
       addUserLocation(coords.longitude, coords.latitude, "rescuer", id);
     }
 
@@ -88,26 +84,23 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
       latitude: coords.latitude,
     };
 
-    // Check if rescuer is on the route
     if (routeData) {
       const onRoute = checkIfOnRoute(currentLocation, routeData);
       setIsOnRoute(onRoute);
     }
   };
 
-  // Helper function to check proximity to the route
   const checkIfOnRoute = (currentLocation, route) => {
     const currentPoint = turf.point([
       currentLocation.longitude,
       currentLocation.latitude,
     ]);
-    const line = turf.lineString(route.geometry.coordinates); // Assuming geometry is a LineString
+    const line = turf.lineString(route.geometry.coordinates);
 
     const distance = turf.pointToLineDistance(currentPoint, line, {
       units: "meters",
     });
 
-    // Define a threshold (e.g., 20 meters)
     const threshold = 20;
     return distance <= threshold;
   };
@@ -123,9 +116,9 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
   const handleNavigating = () => {
     mapRef.current.flyTo({
       center: [rescuer.longitude, rescuer.latitude],
-      zoom: rescuer.zoom, // Adjust zoom as needed
-      pitch: 60, // Set the pitch here to tilt the map
-      bearing: rescuer.bearing, // Optionally, control the bearing (rotation)
+      zoom: rescuer.zoom,
+      pitch: 60,
+      bearing: rescuer.bearing,
       essential: true,
     });
 
@@ -134,11 +127,26 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
 
   const handleOrientation = (event) => {
     const { alpha } = event;
+
     if (alpha !== null) {
+      const bearing = alpha;
+      const zoom = 18; // Set desired zoom level
+
       setRescuer((prev) => ({
         ...prev,
-        bearing: alpha,
+        bearing,
+        zoom,
       }));
+
+      if (mapRef.current) {
+        mapRef.current.flyTo({
+          center: [rescuer.longitude, rescuer.latitude],
+          zoom: zoom,
+          bearing: bearing,
+          pitch: 60, // Optional: set a pitch for a 3D effect
+          essential: true,
+        });
+      }
     }
   };
 
@@ -168,9 +176,9 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
       if (!mapRef.current) return;
       mapRef.current.flyTo({
         center: [rescuer.longitude, rescuer.latitude],
-        zoom: 15, // Adjust zoom as needed
-        pitch: 0, // Set the pitch here to tilt the map
-        bearing: 0, // Optionally, control the bearing (rotation)
+        zoom: 15,
+        pitch: 0,
+        bearing: 0,
         essential: true,
       });
 
@@ -180,13 +188,16 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
         bearing: 0,
       }));
     }
+
+    return () => {
+      window.removeEventListener("deviceorientation", handleOrientation);
+    };
   }, [navigating]);
 
   useEffect(() => {
     const unsubscribe = getLocationsFromFirestore("rescuer", setLocations);
 
     return () => {
-      // Unsubscribe from the listener when the component unmounts
       unsubscribe();
     };
   }, []);
