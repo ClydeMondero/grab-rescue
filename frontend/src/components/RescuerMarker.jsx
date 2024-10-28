@@ -1,6 +1,6 @@
 import { Canvas } from "@react-three/fiber";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
-import ambulanceModel from "../assets/ambulance/scene.gltf";
+import ambulanceModel from "/assets/ambulance/scene.gltf";
 import { useLoader, useFrame } from "@react-three/fiber";
 import { PerspectiveCamera } from "@react-three/drei";
 
