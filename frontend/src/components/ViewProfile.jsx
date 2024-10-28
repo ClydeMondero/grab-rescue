@@ -363,8 +363,8 @@ const ViewProfile = (props) => {
             </div>
           </div>
         )}
+        <Toast />
       </div>
-      <Toast />
     </>
   );
 };
