@@ -43,16 +43,18 @@ const ChangeEmail = (props) => {
 
       if (!response.success) throw new Error(response.message);
       toast.success(response.message);
-      console.log("Response message:", response.message);
 
       // Clear the email fields
       setNewEmail("");
       setError("");
-      navigate(
-        user.account_type === "Admin"
-          ? "/admin/viewProfile"
-          : "/rescuer/profile"
-      );
+
+      setTimeout(() => {
+        navigate(
+          user.account_type === "Admin"
+            ? "/admin/viewProfile"
+            : "/rescuer/profile"
+        );
+      }, 1500);
     } catch (error) {
       console.error(error.message);
       toast.error(error.message);

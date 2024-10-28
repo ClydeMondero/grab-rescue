@@ -169,15 +169,18 @@ export const getRequestsFromFirestore = (setRequests) => {
 };
 
 //get request from firestore
-export const getRequestFromFirestore = async (id) => {
+export const getRequestFromFirestore = (id, callback) => {
   try {
     const docRef = doc(store, "requests", id);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      return { id: docSnap.id, ...docSnap.data() };
-    } else {
-      return null;
-    }
+    const unsubscribe = onSnapshot(docRef, (doc) => {
+      if (doc.exists()) {
+        callback({ id: doc.id, ...doc.data() });
+      } else {
+        callback(null);
+      }
+    });
+
+    return unsubscribe; // To stop listening when needed
   } catch (error) {
     console.error("Error getting document: ", error);
     return null;
