@@ -57,25 +57,17 @@ const StatusProvider = ({ children }) => {
 
     if (!isOnline) {
       if (!statusCookie || statusCookie == "online") {
-        timeoutRef.current = setTimeout(() => {
-          setStatusCookie("offline");
+        setStatusCookie("offline");
 
-          updateLocationStatus(id, "offline");
-        }, 60000);
+        updateLocationStatus(id, "offline");
       }
     } else if (isOnline) {
       if (!statusCookie || statusCookie == "offline") {
         setStatusCookie("online");
 
         updateLocationStatus(id, "online");
-        clearTimeout(timeoutRef.current);
       }
     }
-
-    return () => {
-      // Clear timeout on component unmount
-      clearTimeout(timeoutRef.current);
-    };
   }, [isOnline]);
 
   return (
