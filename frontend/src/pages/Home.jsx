@@ -148,8 +148,6 @@ const Home = () => {
   }, [formVisible]);
 
   useEffect(() => {
-    console.log("request", request);
-
     const getRescuerDetails = async () => {
       if (!request) return;
 
@@ -162,10 +160,6 @@ const Home = () => {
 
     getRescuerDetails();
   }, [request]); // Empty dependency array to run only once on mount.
-
-  useEffect(() => {
-    console.log("rescuer", rescuer);
-  }, [rescuer]);
 
   return (
     <div className="h-dvh w-screen overflow-hidden flex flex-col">
