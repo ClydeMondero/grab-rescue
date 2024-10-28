@@ -12,6 +12,7 @@ import {
   ChangeEmail,
   Toast,
   Notifications,
+  Loader,
 } from "../components";
 import { useState, useEffect } from "react";
 import { getRequestsFromFirestore } from "../services/firestoreService";
@@ -19,7 +20,7 @@ import { NotificationsProvider } from "../components/NotificationContext";
 
 const Admin = (props) => {
   const { user } = props;
-  const [requests, setRequests] = useState([]);
+  const [requests, setRequests] = useState(null); // Initialize as null
 
   useEffect(() => {
     const unsubscribe = getRequestsFromFirestore(setRequests);
@@ -30,6 +31,11 @@ const Admin = (props) => {
 
   if (user.account_type !== "Admin") {
     return <Navigate to="/not-found" replace />;
+  }
+
+  // Check if requests are null, show a loading state if so
+  if (requests === null) {
+    return <Loader isLoading={true} />;
   }
 
   return (
