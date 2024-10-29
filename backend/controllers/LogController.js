@@ -34,7 +34,7 @@ module.exports.GetLogs = async (
       l.action,
       l.user_id,
       u.first_name,
-      u.middle_initial,
+      u.middle_name,
       u.last_name,
       u.account_type
     FROM 

@@ -35,6 +35,14 @@ const Rescuer = (props) => {
     }
   };
 
+  useEffect(() => {
+    console.log("user", user);
+  }, [user]);
+
+  useEffect(() => {
+    console.log("id", id);
+  }, [id]);
+
   const requestNotificationPermission = async () => {
     if (!("Notification" in window)) {
       console.log("This browser does not support notifications.");
@@ -94,7 +102,7 @@ const Rescuer = (props) => {
     <div className="h-dvh flex flex-col">
       <RescuerProvider>
         {/* Header */}
-        <Header />
+        <Header user={user} />
 
         <div className="flex-1 overflow-y-auto bg-background-light">
           <Routes>
@@ -140,7 +148,7 @@ const Rescuer = (props) => {
         </div>
 
         {/* Bottom Navigation always visible */}
-        <Bottom />
+        <Bottom user={user} />
       </RescuerProvider>
     </div>
   );

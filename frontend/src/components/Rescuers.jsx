@@ -61,7 +61,7 @@ const AssignRescuers = (props) => {
 
   useEffect(() => {
     const filtered = (rescuers || []).filter((rescue) => {
-      const fullName = `${rescue.first_name} ${rescue.middle_initial || ""} ${
+      const fullName = `${rescue.first_name} ${rescue.middle_name || ""} ${
         rescue.last_name
       }`.toLowerCase();
       const matchesName = fullName.includes(searchName.toLowerCase());
@@ -175,7 +175,7 @@ const AssignRescuers = (props) => {
 
     const tableRows = paginatedRescuers.map((rescue, index) => ({
       id: rescue.id,
-      name: `${rescue.first_name} ${rescue.middle_initial || ""} ${
+      name: `${rescue.first_name} ${rescue.middle_name || ""} ${
         rescue.last_name
       }`,
       municipality: rescue.municipality,
@@ -311,8 +311,8 @@ const AssignRescuers = (props) => {
       </div>
 
       {/* Rescuers Table */}
-      <div className="overflow-x-auto max-h-[calc(100vh-28rem)]">
-        <table className="min-w-full bg-gray-200 border border-gray-200 rounded-md overflow-hidden">
+      <div className="overflow-x-auto max-h-[calc(100vh-20rem)]">
+        <table className="min-w-full bg-gray-200 border border-gray-200 rounded-md overflow-hidden h-full">
           <thead className=" text-white">
             <tr className="bg-[#557C55] text-left">
               <th className="px-4 py-2 text-center text-xs font-medium">#</th>
@@ -355,7 +355,7 @@ const AssignRescuers = (props) => {
                 </td>
                 <td className="px-4 py-2 text-xs text-center">{`${
                   rescue.first_name
-                } ${rescue.middle_initial || ""} ${rescue.last_name}`}</td>
+                } ${rescue.middle_name || ""} ${rescue.last_name}`}</td>
                 <td className="px-4 py-2 text-xs text-center">
                   {rescue.municipality}
                 </td>
@@ -453,7 +453,7 @@ const AssignRescuers = (props) => {
       )}
 
       {/* Pagination */}
-      <div className="flex justify-center items-center mt-60">
+      <div className="flex justify-center items-center mt-32">
         <button
           onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 1}
