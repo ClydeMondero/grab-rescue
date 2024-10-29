@@ -1,17 +1,19 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useContext } from "react";
 import { RescuerMap as Map } from "../components";
 import { FaLocationArrow, FaPhone } from "react-icons/fa";
 import { getRequestFromFirestore } from "../services/firestoreService";
 import { Loader } from "../components";
 import MobileDetect from "mobile-detect";
 import { toast } from "react-toastify";
+import { RescuerContext } from "../contexts/RescuerContext";
 
 const Navigate = ({ requestID }) => {
   const [showDetails, setShowDetails] = useState(false);
   const [requestData, setRequestData] = useState(null);
   const [locating, setLocating] = useState(false);
-  const [navigating, setNavigating] = useState(false);
   const [onMobile, setOnMobile] = useState(false);
+
+  const { navigating, setNavigating } = useContext(RescuerContext);
 
   const mapRef = useRef();
 
