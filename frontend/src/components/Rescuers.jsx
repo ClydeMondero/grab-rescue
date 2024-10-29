@@ -312,7 +312,7 @@ const AssignRescuers = (props) => {
 
       {/* Rescuers Table */}
       <div className="overflow-x-auto max-h-[calc(100vh-28rem)]">
-        <table className="min-w-full bg-gray-200 border border-gray-200 rounded-md overflow-hidden">
+        <table className="min-w-full bg-gray-200 border border-gray-200 rounded-md overflow-hidden h-full">
           <thead className=" text-white">
             <tr className="bg-[#557C55] text-left">
               <th className="px-4 py-2 text-center text-xs font-medium">#</th>
