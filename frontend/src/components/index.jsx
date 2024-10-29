@@ -28,8 +28,10 @@ import GeolocateButton from "./GeolocateButton";
 import TurnIndicator from "./TurnIndicator";
 import RequestModal from "./RequestModal";
 import Notifications from "./Notifications";
+import LocationPrompt from "./LocationPrompt";
 
 export {
+  LocationPrompt,
   RequestModal,
   TurnIndicator,
   GeolocateButton,
