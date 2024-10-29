@@ -93,7 +93,6 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
       currentLocation.latitude,
     ]);
     const line = turf.lineString(route.geometry.coordinates);
-    const line = turf.lineString(route.geometry.coordinates);
 
     const distance = turf.pointToLineDistance(currentPoint, line, {
       units: "meters",
