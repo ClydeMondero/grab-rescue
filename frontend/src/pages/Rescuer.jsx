@@ -94,7 +94,7 @@ const Rescuer = (props) => {
     <div className="h-dvh flex flex-col">
       <RescuerProvider>
         {/* Header */}
-        <Header />
+        <Header user={user} />
 
         <div className="flex-1 overflow-y-auto bg-background-light">
           <Routes>
@@ -140,7 +140,7 @@ const Rescuer = (props) => {
         </div>
 
         {/* Bottom Navigation always visible */}
-        <Bottom />
+        <Bottom user={user} />
       </RescuerProvider>
     </div>
   );
