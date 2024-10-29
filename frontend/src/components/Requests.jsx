@@ -22,7 +22,7 @@ const Requests = ({
   setSelectedRequest,
 }) => {
   const navigate = useNavigate();
-  const { rescuer } = useContext(RescuerContext);
+  const { rescuer, setPage } = useContext(RescuerContext);
 
   // State to store routes data for requests
   const [routeData, setRouteData] = useState({});
@@ -38,6 +38,8 @@ const Requests = ({
     setSelectedRequest(requestID);
 
     await acceptRescueRequestInFirestore(userId, requestID);
+
+    setPage("Navigate");
 
     navigate("/rescuer/navigate");
   };
