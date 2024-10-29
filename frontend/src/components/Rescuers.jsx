@@ -311,7 +311,7 @@ const AssignRescuers = (props) => {
       </div>
 
       {/* Rescuers Table */}
-      <div className="overflow-x-auto max-h-[calc(100vh-28rem)]">
+      <div className="overflow-x-auto max-h-[calc(100vh-20rem)]">
         <table className="min-w-full bg-gray-200 border border-gray-200 rounded-md overflow-hidden h-full">
           <thead className=" text-white">
             <tr className="bg-[#557C55] text-left">
@@ -453,7 +453,7 @@ const AssignRescuers = (props) => {
       )}
 
       {/* Pagination */}
-      <div className="flex justify-center items-center mt-60">
+      <div className="flex justify-center items-center mt-32">
         <button
           onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 1}
