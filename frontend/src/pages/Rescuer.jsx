@@ -35,6 +35,14 @@ const Rescuer = (props) => {
     }
   };
 
+  useEffect(() => {
+    console.log("user", user);
+  }, [user]);
+
+  useEffect(() => {
+    console.log("id", id);
+  }, [id]);
+
   const requestNotificationPermission = async () => {
     if (!("Notification" in window)) {
       console.log("This browser does not support notifications.");
