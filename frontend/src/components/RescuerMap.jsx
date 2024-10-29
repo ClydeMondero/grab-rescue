@@ -38,13 +38,10 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
   ];
 
   const [routeData, setRouteData] = useState(null);
-
   const [distance, setDistance] = useState();
   const [eta, setEta] = useState();
-
-  const location = useLocation();
-
   const [isOnRoute, setIsOnRoute] = useState(false);
+  const location = useLocation();
 
   const handleGeolocation = async (coords) => {
     if (mapRef.current.resize()) {
@@ -96,6 +93,7 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
       currentLocation.latitude,
     ]);
     const line = turf.lineString(route.geometry.coordinates);
+    const line = turf.lineString(route.geometry.coordinates);
 
     const distance = turf.pointToLineDistance(currentPoint, line, {
       units: "meters",
@@ -116,6 +114,9 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
   const handleNavigating = () => {
     mapRef.current.flyTo({
       center: [rescuer.longitude, rescuer.latitude],
+      zoom: rescuer.zoom,
+      pitch: 60,
+      bearing: rescuer.bearing,
       zoom: rescuer.zoom,
       pitch: 60,
       bearing: rescuer.bearing,
@@ -164,7 +165,6 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
         DeviceOrientationEvent.requestPermission()
           .then((response) => {
             if (response === "granted") {
-              console.log("granted");
               window.addEventListener("deviceorientation", handleOrientation);
             }
           })
@@ -179,6 +179,9 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
         zoom: 15,
         pitch: 0,
         bearing: 0,
+        zoom: 15,
+        pitch: 0,
+        bearing: 0,
         essential: true,
       });
 
@@ -188,6 +191,10 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
         bearing: 0,
       }));
     }
+
+    return () => {
+      window.removeEventListener("deviceorientation", handleOrientation);
+    };
 
     return () => {
       window.removeEventListener("deviceorientation", handleOrientation);
