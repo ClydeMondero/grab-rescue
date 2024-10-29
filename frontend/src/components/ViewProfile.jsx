@@ -136,6 +136,12 @@ const ViewProfile = (props) => {
               </div>
               <div className="flex items-center py-1 border-b border-gray-300">
                 <span className="font-semibold text-primary-dark">
+                  Middle Name:
+                </span>
+                <p className="ml-2">{profile.middle_name}</p>
+              </div>
+              <div className="flex items-center py-1 border-b border-gray-300">
+                <span className="font-semibold text-primary-dark">
                   Last Name:
                 </span>
                 <p className="ml-2">{profile.last_name}</p>
@@ -226,90 +232,107 @@ const ViewProfile = (props) => {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label
-                      htmlFor="first_name"
-                      className="block text-xs font-semibold text-[#557C55]"
-                    >
-                      First Name
-                    </label>
-                    <input
-                      type="text"
-                      id="first_name"
-                      name="first_name"
-                      value={profile?.first_name || ""}
-                      onChange={handleProfileChange}
-                      className="w-full p-3 border rounded-md bg-gray-100 border-gray-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
-                    />
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="last_name"
-                      className="block text-xs font-semibold text-[#557C55]"
-                    >
-                      Last Name
-                    </label>
-                    <input
-                      type="text"
-                      id="last_name"
-                      name="last_name"
-                      value={profile?.last_name || ""}
-                      onChange={handleProfileChange}
-                      className="w-full p-3 border rounded-md bg-gray-100 border-gray-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
-                    />
-                  </div>
-                </div>
-
-                {user.account_type === "Admin" && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                       <label
-                        htmlFor="municipality"
+                        htmlFor="first_name"
                         className="block text-xs font-semibold text-[#557C55]"
                       >
-                        Municipality
+                        First Name
                       </label>
-                      <select
-                        id="municipality"
-                        name="municipality"
-                        value={profile?.municipality || ""}
+                      <input
+                        type="text"
+                        id="first_name"
+                        name="first_name"
+                        value={profile?.first_name || ""}
                         onChange={handleProfileChange}
                         className="w-full p-3 border rounded-md bg-gray-100 border-gray-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
-                      >
-                        <option value="">Select Municipality</option>
-                        {municipalities.map((municipality) => (
-                          <option key={municipality} value={municipality}>
-                            {municipality}
-                          </option>
-                        ))}
-                      </select>
+                      />
                     </div>
                     <div>
                       <label
-                        htmlFor="barangay"
+                        htmlFor="middle_name"
                         className="block text-xs font-semibold text-[#557C55]"
                       >
-                        Barangay
+                        Middle Name
                       </label>
-                      <select
-                        id="barangay"
-                        name="barangay"
-                        value={profile?.barangay || ""}
+                      <input
+                        type="text"
+                        id="middle_name"
+                        name="middle_name"
+                        value={profile?.middle_name || ""}
                         onChange={handleProfileChange}
                         className="w-full p-3 border rounded-md bg-gray-100 border-gray-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
+                      />
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="last_name"
+                        className="block text-xs font-semibold text-[#557C55]"
                       >
-                        <option value="">Select Barangay</option>
-                        {barangaysData[profile?.municipality || ""]?.map(
-                          (barangay) => (
-                            <option key={barangay} value={barangay}>
-                              {barangay}
+                        Last Name
+                      </label>
+                      <input
+                        type="text"
+                        id="last_name"
+                        name="last_name"
+                        value={profile?.last_name || ""}
+                        onChange={handleProfileChange}
+                        className="w-full p-3 border rounded-md bg-gray-100 border-gray-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
+                      />
+                    </div>
+                  </div>
+                  {user.account_type === "Admin" && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label
+                          htmlFor="municipality"
+                          className="block text-xs font-semibold text-[#557C55]"
+                        >
+                          Municipality
+                        </label>
+                        <select
+                          id="municipality"
+                          name="municipality"
+                          value={profile?.municipality || ""}
+                          onChange={handleProfileChange}
+                          className="w-full p-3 border rounded-md bg-gray-100 border-gray-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
+                        >
+                          <option value="">Select Municipality</option>
+                          {municipalities.map((municipality) => (
+                            <option key={municipality} value={municipality}>
+                              {municipality}
                             </option>
-                          )
-                        )}
-                      </select>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label
+                          htmlFor="barangay"
+                          className="block text-xs font-semibold text-[#557C55]"
+                        >
+                          Barangay
+                        </label>
+                        <select
+                          id="barangay"
+                          name="barangay"
+                          value={profile?.barangay || ""}
+                          onChange={handleProfileChange}
+                          className="w-full p-3 border rounded-md bg-gray-100 border-gray-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#557C55] transition"
+                        >
+                          <option value="">Select Barangay</option>
+                          {barangaysData[profile?.municipality || ""]?.map(
+                            (barangay) => (
+                              <option key={barangay} value={barangay}>
+                                {barangay}
+                              </option>
+                            )
+                          )}
+                        </select>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
 
                 <div>
                   <label
