@@ -116,6 +116,9 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
       zoom: rescuer.zoom,
       pitch: 60,
       bearing: rescuer.bearing,
+      zoom: rescuer.zoom,
+      pitch: 60,
+      bearing: rescuer.bearing,
       essential: true,
     });
 
@@ -124,12 +127,26 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
 
   const handleOrientation = (event) => {
     const { alpha } = event;
-    if (alpha !== null && mapRef.current) {
-      mapRef.current.setBearing(alpha);
+
+    if (alpha !== null) {
+      const bearing = alpha;
+      const zoom = 18; // Set desired zoom level
+
       setRescuer((prev) => ({
         ...prev,
-        bearing: alpha,
+        bearing,
+        zoom,
       }));
+
+      if (mapRef.current) {
+        mapRef.current.flyTo({
+          center: [rescuer.longitude, rescuer.latitude],
+          zoom: zoom,
+          bearing: bearing,
+          pitch: 60, // Optional: set a pitch for a 3D effect
+          essential: true,
+        });
+      }
     }
   };
 
@@ -161,6 +178,9 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
         zoom: 15,
         pitch: 0,
         bearing: 0,
+        zoom: 15,
+        pitch: 0,
+        bearing: 0,
         essential: true,
       });
 
@@ -170,6 +190,10 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
         bearing: 0,
       }));
     }
+
+    return () => {
+      window.removeEventListener("deviceorientation", handleOrientation);
+    };
 
     return () => {
       window.removeEventListener("deviceorientation", handleOrientation);

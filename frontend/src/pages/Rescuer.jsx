@@ -11,7 +11,12 @@ import {
   Toast,
 } from "../components";
 import { useState, useEffect, useContext } from "react";
-import { getRequestsFromFirestore } from "../services/firestoreService";
+import {
+  addMessagingTokenToLocation,
+  getLocationIDFromFirestore,
+  getRequestsFromFirestore,
+  setMessagingToken,
+} from "../services/firestoreService";
 import { RescuerProvider } from "../contexts/RescuerContext";
 import { StatusContext } from "../contexts/StatusContext";
 import { getSelectedRequestCookie } from "../services/cookieService";
@@ -20,7 +25,7 @@ const Rescuer = (props) => {
   const { user } = props;
   const [requests, setRequests] = useState([]);
   const [selectedRequest, setSelectedRequest] = useState(null);
-  const { getId } = useContext(StatusContext);
+  const { id, getId } = useContext(StatusContext);
 
   const getSelectedRequest = () => {
     const selectedRequestID = getSelectedRequestCookie();
@@ -30,15 +35,53 @@ const Rescuer = (props) => {
     }
   };
 
+  const requestNotificationPermission = async () => {
+    if (!("Notification" in window)) {
+      console.log("This browser does not support notifications.");
+      return;
+    }
+
+    if (Notification.permission === "granted") {
+      console.log("Notification permission is already granted.");
+
+      const token = await setMessagingToken();
+
+      if (token) {
+        // const locationId = await getLocationIDFromFirestore(id);
+        // addMessagingTokenToLocation(locationId, token);
+      }
+      return;
+    }
+
+    try {
+      const permission = await Notification.requestPermission();
+      if (permission === "granted") {
+        console.log("Notification permission granted.");
+
+        const token = await setMessagingToken();
+
+        if (token) {
+          // const locationId = await getLocationIDFromFirestore(id);
+          // addMessagingTokenToLocation(locationId, token);
+        }
+      } else {
+        console.log("Notification permission denied.");
+      }
+    } catch (error) {
+      console.error("Error requesting notification permission:", error);
+    }
+  };
+
   useEffect(() => {
     getId();
+
+    requestNotificationPermission();
 
     getSelectedRequest();
 
     const unsubscribe = getRequestsFromFirestore(setRequests);
 
     return () => {
-      // Unsubscribe from the listener when the component unmounts
       unsubscribe();
     };
   }, []);
