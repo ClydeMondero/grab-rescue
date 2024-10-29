@@ -2,7 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
-import { getMessaging } from "firebase/messaging";
+import { getMessaging, getToken, onMessage } from "firebase/messaging";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -25,3 +25,14 @@ export const storage = getStorage(app);
 
 // Initialize Firebase Cloud Messaging
 export const messaging = getMessaging(app);
+
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker
+    .register("/firebase-messaging-sw.js")
+    .then((registration) => {
+      console.log("Service Worker registered successfully.", registration);
+    })
+    .catch((error) => {
+      console.error("Service Worker registration failed:", error);
+    });
+}

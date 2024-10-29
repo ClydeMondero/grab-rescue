@@ -17,8 +17,6 @@ const StatusProvider = ({ children }) => {
   const [isOnline, setIsOnline] = useState(true);
   const [id, setId] = useState(null);
 
-  const timeoutRef = useRef(null);
-
   const getId = async () => {
     const userCookie = getUserCookie();
 

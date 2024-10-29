@@ -9,8 +9,9 @@ import {
   onSnapshot,
   where,
 } from "firebase/firestore";
+import { getToken } from "firebase/messaging";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { store, storage } from "../../firebaseConfig";
+import { store, storage, messaging } from "../../firebaseConfig";
 
 //add location to firestore
 export const addLocationToFirestore = async (
@@ -37,6 +38,36 @@ export const addLocationToFirestore = async (
     return { id: docRef.id };
   } catch (error) {
     console.log("Error adding document: ", error);
+  }
+};
+
+// get FCM token
+export const setMessagingToken = async () => {
+  try {
+    const token = await getToken(messaging, {
+      vapidKey: import.meta.env.VITE_FIREBASE_MESSAGING_VAPID_KEY,
+    });
+    if (token) {
+      return token;
+    } else {
+      console.log(
+        "No registration token available. Request permission to generate one."
+      );
+      return null;
+    }
+  } catch (error) {
+    console.error("An error occurred while retrieving token. ", error);
+    return null;
+  }
+};
+
+export const addMessagingTokenToLocation = async (userId, fcmToken) => {
+  try {
+    const locationRef = doc(store, "locations", userId);
+    await updateDoc(locationRef, { fcmToken });
+    console.log("FCM token added to location document.");
+  } catch (error) {
+    console.error("Error updating location document with FCM token:", error);
   }
 };
 
@@ -68,6 +99,27 @@ export const getIDFromLocation = async (id) => {
 
   if (docSnap.exists()) {
     return docSnap.data().userId;
+  } else {
+    return null;
+  }
+};
+
+//get location reference id by finding the same userId property in a location document
+export const getLocationIDFromFirestore = async (userId) => {
+  const q = query(
+    collection(store, "locations"),
+    where("userId", "==", userId)
+  );
+
+  const querySnapshot = await getDocs(q);
+
+  const location = querySnapshot.docs.map((doc) => ({
+    ...doc.data(),
+    id: doc.id,
+  }))[0];
+
+  if (location) {
+    return location.id;
   } else {
     return null;
   }
