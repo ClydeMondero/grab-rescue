@@ -14,6 +14,8 @@ const RescuerProvider = ({ children }) => {
 
   const location = useLocation();
 
+  const [navigating, setNavigating] = useState(false);
+
   const [page, setPage] = useState(() => {
     if (location.pathname === "/rescuer/requests") {
       return "Requests";
@@ -31,7 +33,9 @@ const RescuerProvider = ({ children }) => {
   });
 
   return (
-    <RescuerContext.Provider value={{ rescuer, setRescuer, page, setPage }}>
+    <RescuerContext.Provider
+      value={{ rescuer, setRescuer, page, setPage, navigating, setNavigating }}
+    >
       {children}
     </RescuerContext.Provider>
   );

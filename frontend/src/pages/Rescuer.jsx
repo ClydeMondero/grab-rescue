@@ -17,9 +17,9 @@ import {
   getRequestsFromFirestore,
   setMessagingToken,
 } from "../services/firestoreService";
-import { RescuerProvider } from "../contexts/RescuerContext";
 import { StatusContext } from "../contexts/StatusContext";
 import { getSelectedRequestCookie } from "../services/cookieService";
+import { RescuerProvider } from "../contexts/RescuerContext";
 
 const Rescuer = (props) => {
   const { user } = props;
@@ -102,6 +102,7 @@ const Rescuer = (props) => {
     <div className="h-dvh flex flex-col">
       <RescuerProvider>
         {/* Header */}
+
         <Header user={user} />
 
         <div className="flex-1 overflow-y-auto bg-background-light">
@@ -148,6 +149,7 @@ const Rescuer = (props) => {
         </div>
 
         {/* Bottom Navigation always visible */}
+
         <Bottom user={user} />
       </RescuerProvider>
     </div>

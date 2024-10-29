@@ -10,6 +10,8 @@ const Bottom = ({ user }) => {
   const [requests, setRequests] = useState([]);
   const [isAssigned, setIsAssigned] = useState(false);
 
+  const { navigating } = useContext(RescuerContext);
+
   const updatePage = (pageName) => {
     setPage(pageName);
   };
@@ -29,6 +31,7 @@ const Bottom = ({ user }) => {
   }, [user]);
 
   return (
+    !navigating &&
     (page === "Requests" || page === "Navigate") && (
       <div className="bg-background text-white flex items-center justify-around py-4 border-t-2 border-background-light">
         <Link
