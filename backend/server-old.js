@@ -71,7 +71,7 @@ app.put("/users/:id", (req, res) => {
   const id = req.params.id;
   const {
     first_name: firstName,
-    middle_initial: middleInitial,
+    middle_name: middleName,
     last_name: lastName,
     birthday,
     municipality,
@@ -83,7 +83,7 @@ app.put("/users/:id", (req, res) => {
   //Validation
   if (
     !firstName ||
-    !middleInitial ||
+    !middleName ||
     !lastName ||
     !birthday ||
     !municipality ||
@@ -120,12 +120,12 @@ app.put("/users/:id", (req, res) => {
           // Update the user
           const q = `
             UPDATE users 
-            SET first_name = ?, middle_initial = ?, last_name = ?, birthday = ?, municipality = ?, barangay = ?, username = ?, account_type = ?, age = ?
+            SET first_name = ?, middle_name = ?, last_name = ?, birthday = ?, municipality = ?, barangay = ?, username = ?, account_type = ?, age = ?
             WHERE id = ?
           `;
           const values = [
             firstName,
-            middleInitial,
+            middleName,
             lastName,
             birthday,
             municipality,
@@ -147,12 +147,12 @@ app.put("/users/:id", (req, res) => {
         // Update the user
         const q = `
           UPDATE users 
-          SET first_name = ?, middle_initial = ?, last_name = ?, birthday = ?, municipality = ?, barangay = ?, account_type = ?, age = ?
+          SET first_name = ?, middle_name = ?, last_name = ?, birthday = ?, municipality = ?, barangay = ?, account_type = ?, age = ?
           WHERE id = ?
         `;
         const values = [
           firstName,
-          middleInitial,
+          middleName,
           lastName,
           birthday,
           municipality,

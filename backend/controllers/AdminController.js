@@ -8,7 +8,7 @@ const zxcvbn = require("zxcvbn");
 module.exports.GetAdmins = async (req, res) => {
   const queryParams = [];
   let q =
-    "SELECT id, first_name, middle_initial, last_name, municipality, barangay, profile_image, contact_number, email, is_online, verified, status FROM users WHERE account_type = 'Admin'";
+    "SELECT id, first_name, middle_name, last_name, municipality, barangay, profile_image, contact_number, email, is_online, verified, status FROM users WHERE account_type = 'Admin'";
 
   let paramCounter = 1; // To dynamically number the query parameters
 
@@ -69,7 +69,7 @@ module.exports.GetAdmins = async (req, res) => {
 // Get Specific Admin
 module.exports.GetAdmin = async (req, res) => {
   const q =
-    "SELECT id, first_name, middle_initial, last_name, municipality, barangay, profile_image, contact_number, email, is_online, verified, status FROM users WHERE id = $1";
+    "SELECT id, first_name, middle_name, last_name, municipality, barangay, profile_image, contact_number, email, is_online, verified, status FROM users WHERE id = $1";
   try {
     const { rows } = await pool.query(q, [req.params.id]);
     res.status(200).json(rows);
@@ -82,7 +82,7 @@ module.exports.GetAdmin = async (req, res) => {
 module.exports.CreateAdmin = async (req, res) => {
   const {
     firstName,
-    middleInitial,
+    middleName,
     lastName,
     birthday,
     municipality,
@@ -233,7 +233,7 @@ module.exports.CreateAdmin = async (req, res) => {
       // Insert the new rescuer into the database
       const insertQuery = `
       INSERT INTO users (
-        first_name, middle_initial, last_name, birthday, age, municipality, 
+        first_name, middle_name, last_name, birthday, age, municipality, 
         barangay, contact_number, email, username, password, account_type, 
         verified, is_online, verification_token, status
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
@@ -241,7 +241,7 @@ module.exports.CreateAdmin = async (req, res) => {
     `;
       const values = [
         firstName,
-        middleInitial,
+        middleName,
         lastName,
         birthday,
         age,
