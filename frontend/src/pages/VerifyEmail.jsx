@@ -35,16 +35,12 @@ const VerifyEmail = () => {
           setVerified(true);
           setRole(userRole);
 
-          // Navigate based on the role after the toast
-          setTimeout(() => {
-            if (userRole === "admin") {
-              nav("/"); // Navigate to home
-            } else if (userRole === "rescuer") {
-              nav("/"); // Navigate to  home
-            } else {
-              nav("/"); // Default home
-            }
-          }, 2000);
+          if (role === "Admin" || role === "Rescuer") {
+            // Close the tab and exit the page after the toast
+            setTimeout(() => {
+              window.close();
+            }, 2000);
+          }
         }
       } catch (error) {
         console.error("Error during verification:", error);
