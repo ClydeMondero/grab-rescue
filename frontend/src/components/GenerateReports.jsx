@@ -127,9 +127,9 @@ const GenerateReports = (props) => {
         log.action,
         new Date(log.date_time).toLocaleString(), // Format date
         log.user_id,
-        `${log.first_name} ${
-          log.middle_initial ? log.middle_initial.trim() : ""
-        } ${log.last_name}`,
+        `${log.first_name} ${log.middle_name ? log.middle_name.trim() : ""} ${
+          log.last_name
+        }`,
       ]);
 
       // Generate the table with updated styles

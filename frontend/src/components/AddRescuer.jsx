@@ -33,7 +33,7 @@ const AddRescuer = () => {
 
   const [formData, setFormData] = useState({
     firstName: "",
-    middleInitial: "",
+    middleName: "",
     lastName: "",
     birthday: "",
     municipality: "",
@@ -91,7 +91,7 @@ const AddRescuer = () => {
   const resetForm = () => {
     setFormData({
       firstName: "",
-      middleInitial: "",
+      middleName: "",
       lastName: "",
       birthday: "",
       municipality: "",
@@ -103,7 +103,7 @@ const AddRescuer = () => {
       confirmPassword: "",
       age: "",
     });
-    setPasswordStrength({ score: 0, feedback: [] }); 
+    setPasswordStrength({ score: 0, feedback: [] });
   };
 
   const handleSubmit = async (e) => {
@@ -191,16 +191,16 @@ const AddRescuer = () => {
               </div>
               <div>
                 <label
-                  htmlFor="middleInitial"
+                  htmlFor="middleName"
                   className="block text-sm font-medium text-[#557C55]"
                 >
                   Middle Initial:
                 </label>
                 <input
                   type="text"
-                  id="middleInitial"
-                  name="middleInitial"
-                  value={formData.middleInitial}
+                  id="middleName"
+                  name="middleName"
+                  value={formData.middleName}
                   onChange={handleChange}
                   required
                   className="mt-1 block w-full px-2 py-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"

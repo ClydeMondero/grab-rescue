@@ -61,7 +61,7 @@ const AssignRescuers = (props) => {
 
   useEffect(() => {
     const filtered = (rescuers || []).filter((rescue) => {
-      const fullName = `${rescue.first_name} ${rescue.middle_initial || ""} ${
+      const fullName = `${rescue.first_name} ${rescue.middle_name || ""} ${
         rescue.last_name
       }`.toLowerCase();
       const matchesName = fullName.includes(searchName.toLowerCase());
@@ -175,7 +175,7 @@ const AssignRescuers = (props) => {
 
     const tableRows = paginatedRescuers.map((rescue, index) => ({
       id: rescue.id,
-      name: `${rescue.first_name} ${rescue.middle_initial || ""} ${
+      name: `${rescue.first_name} ${rescue.middle_name || ""} ${
         rescue.last_name
       }`,
       municipality: rescue.municipality,
@@ -355,7 +355,7 @@ const AssignRescuers = (props) => {
                 </td>
                 <td className="px-4 py-2 text-xs text-center">{`${
                   rescue.first_name
-                } ${rescue.middle_initial || ""} ${rescue.last_name}`}</td>
+                } ${rescue.middle_name || ""} ${rescue.last_name}`}</td>
                 <td className="px-4 py-2 text-xs text-center">
                   {rescue.municipality}
                 </td>
