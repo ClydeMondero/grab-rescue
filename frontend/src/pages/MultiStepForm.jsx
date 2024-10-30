@@ -6,7 +6,7 @@ import {
 } from "../services/firestoreService";
 import { Loader } from "../components";
 import { getRequestCookie } from "../services/cookieService";
-
+import { Link } from "react-router-dom";
 const MultiStepForm = ({ request, setRequest }) => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -289,13 +289,19 @@ const MultiStepForm = ({ request, setRequest }) => {
             </div>
             <p className="text-xs text-text-secondary">
               By submitting this request, you agree to our{" "}
-              <a href="/policies" className="underline text-text-primary">
+              <Link
+                to="/privacy-policy"
+                className="underline text-text-primary"
+              >
                 Privacy Policy
-              </a>{" "}
+              </Link>{" "}
               and{" "}
-              <a href="terms" className="underline text-text-primary">
+              <Link
+                to="/terms-of-service"
+                className="underline text-text-primary"
+              >
                 Terms of Service
-              </a>
+              </Link>
             </p>
             <div className="flex justify-between space-x-4">
               <button

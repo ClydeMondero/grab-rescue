@@ -8,6 +8,8 @@ import {
   ForgotPassword,
   ResetPassword,
   VerifyEmail,
+  PrivacyPolicy,
+  TermsOfService,
 } from "./pages";
 import axios from "axios";
 import { PrivateRoute, GeolocateButton, LocationPrompt } from "./components";
@@ -33,6 +35,8 @@ const App = () => {
           {/* Email Verification Route */}
           <Route path="/verify/:token" element={<VerifyEmail />} />
           <Route path="/admin/*" element={<PrivateRoute Component={Admin} />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/terms-of-service" element={<TermsOfService />} />
           <Route
             path="/rescuer/*"
             element={<PrivateRoute Component={Rescuer} />}
