@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FaArrowUp, FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
-const PrivacyPolicy = () => {
+const Policy = () => {
   const [showScrollUp, setShowScrollUp] = useState(false);
   const navigate = useNavigate();
 
@@ -126,4 +126,4 @@ const PrivacyPolicy = () => {
   );
 };
 
-export default PrivacyPolicy;
+export default Policy;
