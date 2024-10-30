@@ -260,23 +260,79 @@ module.exports.CreateRescuer = async (req, res) => {
         verificationToken,
         "Active",
       ];
+      // Log headers for debugging
+      console.log("Request Headers:", req.headers);
 
       const auth = req.headers.authorization;
 
-      const token = auth.substring(7, auth.length);
+      if (!auth) {
+        console.error("No Authorization header provided"); // Log if Authorization header is missing
+        return res
+          .status(401)
+          .json({ success: false, message: "JWT must be provided" });
+      }
 
-      const subject = await getTokenSubject(token);
+      const token = auth.split(" ")[1]; // assuming "Bearer token"
+      if (!token) {
+        console.error("No token found in Authorization header"); // Log if token is missing in the header
+        return res
+          .status(401)
+          .json({ success: false, message: "JWT must be provided" });
+      }
 
-      const insertResult = await pool.query(insertQuery, values);
-      //const userId = insertResult.rows[0].id;
+      console.log("Authorization Token:", token);
 
-      // Log the rescuer creation
-      await CreateLog({
-        userId: subject,
-        action: `Rescuer Created with username: ${username} and email: ${email}`,
-      });
+      // Create Rescuer
+      module.exports.CreateRescuer = async (req, res) => {
+        console.log("Starting CreateRescuer function"); // Debugging log
 
-      // Use frontend base URL for the verification link
+        // Log headers for debugging
+        console.log("Request Headers:", req.headers);
+
+        // extracts the "Authorization Header" from request
+        const auth = req.headers.authorization;
+        if (!auth) {
+          console.error("No Authorization header provided"); // Log if Authorization header is missing
+          return res
+            .status(401)
+            .json({ success: false, message: "JWT must be provided" });
+        }
+
+        // extracts the ACTUAL token from the string "Bearer ....token"
+        const token = auth.split(" ")[1]; // assuming "Bearer token"
+        if (!token) {
+          console.error("No token found in Authorization header"); // Log if token is missing in the header
+          return res
+            .status(401)
+            .json({ success: false, message: "JWT must be provided" });
+        }
+
+        console.log("Authorization Token:", token); // Log the token for debugging
+
+        try {
+          // extracts the content of the token used upon token creation (i.e. user_id)
+          const subject = await getTokenSubject(token);
+          console.log("Extracted subject from token:", subject); // Log the subject extracted from token
+
+          // Remaining code for user creation...
+          // Log the rescuer creation
+          await CreateLog({
+            userId: subject,
+            action: `Rescuer Created with username: ${req.body.username} and email: ${req.body.email}`,
+          });
+
+          return res.status(200).json({
+            success: true,
+            message: "User created successfully. Verification email sent.",
+          });
+        } catch (err) {
+          console.error("Error in CreateRescuer:", err.message); // Log server error
+          return res
+            .status(500)
+            .json({ success: false, message: `Server error: ${err.message}` });
+        }
+      };
+
       const verificationLink = `${process.env.SITE_URL}/verify/${verificationToken}`;
 
       // Send a verification email to the new email
