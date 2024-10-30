@@ -473,6 +473,12 @@ module.exports.UpdateUserPassword = async (req, res) => {
 
 // Update User Status (Toggle)
 module.exports.UpdateUserStatus = async (req, res) => {
+  const auth = req.headers.authorization;
+
+  const token = auth.substring(7, auth.length);
+
+  const subject = await getTokenSubject(token);
+
   const id = req.params.id;
 
   try {
@@ -498,7 +504,7 @@ module.exports.UpdateUserStatus = async (req, res) => {
 
     // Log the status update action
     await CreateLog({
-      userId: id,
+      userId: subject,
       action: `User status update: Rescuer with ID: ${id} changed from ${currentStatus} to ${newStatus}`,
     });
 
