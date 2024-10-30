@@ -13,8 +13,6 @@ import { formatDistance, formatDuration } from "../utils/DistanceUtility";
 import { setSelectedRequestCookie } from "../services/cookieService";
 import { acceptRescueRequestInFirestore } from "../services/firestoreService";
 
-// TODO: Add Completed Button
-
 const Requests = ({
   userId,
   requests,
@@ -24,23 +22,17 @@ const Requests = ({
   const navigate = useNavigate();
   const { rescuer, setPage } = useContext(RescuerContext);
 
-  // State to store routes data for requests
   const [routeData, setRouteData] = useState({});
-
   const [pendingRequests, setPendingRequests] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedRequestData, setSelectedRequestData] = useState(null);
 
-  /**
-   * Handle Accept button click
-   * @param {string} requestID - Request ID to accept
-   */
   const handleAccept = async (requestID) => {
     setSelectedRequestCookie(requestID);
     setSelectedRequest(requestID);
 
     await acceptRescueRequestInFirestore(userId, requestID);
-
     setPage("Navigate");
-
     navigate("/rescuer/navigate");
   };
 
@@ -63,17 +55,19 @@ const Requests = ({
     }
   }, [requests, rescuer]);
 
+  const handleCardClick = (request) => {
+    setSelectedRequestData(request);
+    setIsModalOpen(true);
+  };
+
   return (
     <div
-      className={`min-h-full flex flex-col p-6  ${
+      className={`min-h-full flex flex-col p-6 ${
         pendingRequests.length > 0 ? "" : "justify-center"
-      }
-        
       }`}
     >
-      {/* Header Section */}
       <div
-        className={`hidden flex-col items-start justify-between mb-4 md:flex md:${
+        className={`hidden flex-col items-start justify-between mb-4 md:flex ${
           pendingRequests.length > 0 ? "" : "hidden"
         }`}
       >
@@ -81,8 +75,6 @@ const Requests = ({
           Requests
         </h2>
       </div>
-
-      {/* Scrollable Request Cards Section */}
       <div
         className={`${
           pendingRequests.length > 0
@@ -93,13 +85,12 @@ const Requests = ({
         {pendingRequests.length > 0 ? (
           pendingRequests.map((request) => {
             const route = routeData[request.id] || {};
-
             return (
               <div
                 key={request.id}
-                className="block bg-white border border-gray-300 rounded-md overflow-hidden"
+                className="block bg-white border border-gray-300 rounded-md overflow-hidden cursor-pointer"
+                onClick={() => handleCardClick(request)}
               >
-                {/* Image Section */}
                 <div className="relative">
                   <img
                     src={
@@ -118,16 +109,13 @@ const Requests = ({
                     {request.status.charAt(0).toUpperCase() +
                       request.status.slice(1)}
                   </div>
-                  {/* Pin Icon for Navigation */}
                   <FaLocationArrow
                     className="absolute top-4 right-4 text-2xl text-background-light cursor-pointer"
                     onClick={() => handleNavigate(request.id)}
                   />
                 </div>
 
-                {/* Request Info & Action */}
                 <div className="flex flex-col items-start justify-between p-4 gap-4">
-                  {/* Request Info */}
                   <div className="flex-1">
                     <div className="flex items-center gap-1">
                       <FaMapLocation className="text-background-medium" />
@@ -168,24 +156,21 @@ const Requests = ({
                             const requestDate = new Date(request.timestamp);
                             const now = new Date();
 
-                            // Format the request time to a more readable format
                             const formattedTime = new Intl.DateTimeFormat(
                               "en-US",
                               {
                                 year: "numeric",
-                                month: "long", // Full month name for readability
+                                month: "long",
                                 day: "numeric",
                                 hour: "numeric",
                                 minute: "numeric",
                                 second: "numeric",
-                                hour12: true, // To format as AM/PM
+                                hour12: true,
                               }
                             ).format(requestDate);
 
-                            // Calculate time elapsed in milliseconds
                             const timeElapsed = now - requestDate;
 
-                            // Convert timeElapsed to minutes, hours, days, etc.
                             const minutesElapsed = Math.floor(
                               timeElapsed / (1000 * 60)
                             );
@@ -194,7 +179,6 @@ const Requests = ({
                             if (minutesElapsed < 60) {
                               timeLabel = `${minutesElapsed} minutes ago`;
                             } else if (minutesElapsed < 1440) {
-                              // Less than a day
                               timeLabel = `${Math.floor(
                                 minutesElapsed / 60
                               )} hours ago`;
@@ -217,7 +201,6 @@ const Requests = ({
                     </div>
                   </div>
 
-                  {/* Accept Button */}
                   <div className="w-full">
                     {!selectedRequest && (
                       <button
@@ -236,25 +219,89 @@ const Requests = ({
           <NoRequests />
         )}
       </div>
+      {/* Modal for Request Details */}
+      {isModalOpen && selectedRequestData && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75">
+          <div className="relative bg-white rounded-lg shadow-xl p-6 md:p-8 max-w-lg w-full mx-4 sm:mx-0">
+            <h2 className="text-2xl font-bold text-center text-primary mb-4">
+              Emergency Request Details
+            </h2>
+            <div className="flex flex-row justify-between gap-2 w-full">
+              <p
+                className={`
+                  bg-yellow-500 text-white rounded-md px-2 py-1 text-sm
+                  ${
+                    selectedRequestData.status === "pending" ? "bg-warning" : ""
+                  }
+                `}
+              >
+                {selectedRequestData.status}
+              </p>
+              <p className="text-sm text-gray-700  mb-2 text-end">
+                Date & Time:{" "}
+                {new Date(selectedRequestData.timestamp).toLocaleString()}
+              </p>
+            </div>
+
+            <div className="relative">
+              <img
+                src={
+                  selectedRequestData.incidentPicture
+                    ? selectedRequestData.incidentPicture
+                    : placeholder
+                }
+                alt="Incident Picture"
+                className="w-full h-56 object-cover rounded-md shadow-sm"
+              />
+              <div className="absolute bottom-0 left-0 p-2 bg-black bg-opacity-70 text-white text-sm rounded-tr-lg">
+                {selectedRequestData.location.address}
+              </div>
+            </div>
+            <div className="grid grid-cols-1 gap-6 mb-6 ">
+              <div className="flex flex-col items-start justify-around w-full">
+                <div className="flex flex-row justify-between gap-2 w-full">
+                  <p className="text-lg text-primary-dark font-bold mb-1 col-span-2">
+                    {selectedRequestData.citizenName}
+                    <span className="text-gray-600">
+                      {" "}
+                      ({selectedRequestData.citizenRelation})
+                    </span>
+                  </p>
+                  <p className="text-lg text-primary-dark font-bold">
+                    {selectedRequestData.phone}
+                  </p>
+                </div>
+
+                <p className="text-md text-primary-medium font-semibold mb-2">
+                  Description:
+                </p>
+                <div className="border rounded-lg p-4 bg-gray-100 w-full h-32 overflow-y-auto ">
+                  <p className="text-base text-primary-dark">
+                    {selectedRequestData.incidentDescription}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="mt-6">
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="bg-primary-medium hover:bg-primary text-white font-semibold px-5 py-3 rounded-lg w-full transition-colors duration-300 shadow-md hover:shadow-md transform transition-all duration-200"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
-/**
- * Display message when there are no emergency requests
- */
-const NoRequests = () => {
-  return (
-    <div className="flex flex-col items-center justify-center h-full">
-      <BiSolidHappyBeaming className="text-8xl text-background-medium" />
-      <h2 className="text-2xl font-bold text-primary-medium mb-4">
-        No Emergency Requests
-      </h2>
-      <p className="text-center text-sm sm:text-base text-text-secondary">
-        There are currently no emergency requests. Please check again later.
-      </p>
-    </div>
-  );
-};
+const NoRequests = () => (
+  <div className="flex flex-col items-center justify-center h-full">
+    <BiSolidHappyBeaming className="text-4xl text-gray-400" />
+    <p className="text-gray-400">No requests available at the moment.</p>
+  </div>
+);
 
 export default Requests;

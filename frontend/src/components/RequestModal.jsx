@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 const RequestModal = ({ onConfirm, onCancel }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-6 z-50">
@@ -24,6 +25,19 @@ const RequestModal = ({ onConfirm, onCancel }) => {
               follow-up communication regarding your request.
             </li>
           </ul>
+          <p className="text-xs text-primary-dark text-center gap-2">
+            By submitting this request, you agree to our{" "}
+            <Link to="/privacy-policy" className="underline text-text-primary">
+              Privacy Policy
+            </Link>{" "}
+            and{" "}
+            <Link
+              to="/terms-of-service"
+              className="underline text-text-primary"
+            >
+              Terms of Service
+            </Link>
+          </p>
         </div>
 
         {/* Buttons */}

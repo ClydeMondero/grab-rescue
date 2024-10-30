@@ -13,7 +13,7 @@ const Markers = ({
     <>
       {myMarker && (
         <Marker longitude={myMarker.longitude} latitude={myMarker.latitude}>
-          <div className="relative flex flex-col items-center justify-center ">
+          <div className="relative flex flex-col items-center justify-center">
             {markerType === "citizen" ? (
               <FaLocationPin className="text-3xl text-secondary red-pulse" />
             ) : (
