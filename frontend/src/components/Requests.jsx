@@ -101,14 +101,17 @@ const Requests = ({
                     alt="Incident Picture"
                     className="w-full h-40 object-cover"
                   />
-                  <div
-                    className={`absolute top-4 left-4 text-sm font-semibold text-white py-1 px-3 rounded-lg shadow-md ${
-                      request.status === "pending" ? "bg-yellow-500" : ""
-                    }`}
-                  >
-                    {request.status.charAt(0).toUpperCase() +
-                      request.status.slice(1)}
-                  </div>
+                  {request.status && (
+                    <div
+                      className={`absolute top-4 left-4 text-sm font-semibold text-white py-1 px-3 rounded-lg shadow-md ${
+                        request.status === "pending" ? "bg-yellow-500" : ""
+                      }`}
+                    >
+                      {request.status.charAt(0).toUpperCase() +
+                        request.status.slice(1)}
+                    </div>
+                  )}
+
                   <FaLocationArrow
                     className="absolute top-4 right-4 text-2xl text-background-light cursor-pointer"
                     onClick={() => handleNavigate(request.id)}
@@ -121,7 +124,7 @@ const Requests = ({
                       <FaMapLocation className="text-background-medium" />
                       <p className="text-sm text-text-primary">
                         <strong className="text-[#557C55]">Location </strong>
-                        {request.location && (
+                        {request.location && request.location.address && (
                           <>
                             {request.location.address
                               .split(",")
@@ -219,6 +222,7 @@ const Requests = ({
           <NoRequests />
         )}
       </div>
+
       {/* Modal for Request Details */}
       {isModalOpen && selectedRequestData && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75">
@@ -285,7 +289,7 @@ const Requests = ({
             <div className="mt-6">
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="bg-primary-medium hover:bg-primary text-white font-semibold px-5 py-3 rounded-lg w-full transition-colors duration-300 shadow-md hover:shadow-md transform transition-all duration-200"
+                className="bg-primary-medium hover:bg-primary text-white font-semi shadow-md hover:shadow-md transform transition-all duration-200"
               >
                 Close
               </button>
