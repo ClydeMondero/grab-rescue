@@ -33,12 +33,17 @@ const Home = () => {
   const [requesting, setRequesting] = useState(false);
   const [request, setRequest] = useState(null);
   const [rescuer, setRescuer] = useState(null);
+  const [nearestRescuer, setNearestRescuer] = useState(null);
   const [onMobile, setOnMobile] = useState(false);
   const [allRescuers, setAllRescuers] = useState([]);
   const [onlineRescuers, setOnlineRescuers] = useState([]);
 
   const { getId } = useContext(StatusContext);
   const mapRef = useRef(null);
+
+  useEffect(() => {
+    console.log("nearestRescuer", nearestRescuer);
+  }, [nearestRescuer]);
 
   // Verify token function
   const verifyToken = async () => {
@@ -85,6 +90,10 @@ const Home = () => {
     };
   };
 
+  const handleNearestRescuerUpdate = (rescuer) => {
+    setNearestRescuer(rescuer);
+  };
+
   const handlePhone = () => {
     if (onMobile) {
       window.location.href = `tel:${request.phone}`;
@@ -100,6 +109,8 @@ const Home = () => {
     }
   };
 
+  //TODO: send notif
+
   const handleModalConfirm = async () => {
     if (mapRef.current) {
       const citizenId = getCitizenCookie();
@@ -107,10 +118,26 @@ const Home = () => {
       const location = await getLocationFromFirestore(citizenId);
 
       const { id } = await addRequestToFirestore(citizenId, location);
-
       setRequestCookie(id);
-
       checkRequest();
+
+      // Send notification to nearest rescuer
+      if (nearestRescuer && nearestRescuer.fcmToken) {
+        const notificationPayload = {
+          token: nearestRescuer.fcmToken,
+          title: "Emergency Request!",
+          body: "You are the nearest rescuer to a citizen in need. Please respond!",
+        };
+
+        try {
+          await axios.post("/messages/send", notificationPayload);
+
+          toast.success("Notification sent to nearest rescuer");
+        } catch (error) {
+          console.error("Failed to send notification:", error);
+          toast.error("Failed to send notification");
+        }
+      }
     }
 
     handleRequesting();
@@ -268,7 +295,11 @@ const Home = () => {
         </div>
 
         {/* Map Component */}
-        <Map ref={mapRef} onLocatingChange={handleLocatingChange} />
+        <Map
+          ref={mapRef}
+          onLocatingChange={handleLocatingChange}
+          onNearestRescuerUpdate={handleNearestRescuerUpdate}
+        />
 
         {requesting && (
           <div
