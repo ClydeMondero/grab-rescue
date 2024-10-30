@@ -49,6 +49,7 @@ export const setMessagingToken = async () => {
       vapidKey: import.meta.env.VITE_FIREBASE_MESSAGING_VAPID_KEY,
     });
     if (token) {
+      console.log(token);
       return token;
     } else {
       console.log(

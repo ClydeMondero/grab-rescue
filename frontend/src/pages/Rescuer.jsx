@@ -35,6 +35,7 @@ const Rescuer = (props) => {
     }
   };
 
+  //TODO: incosistent saving of FCM
   const requestNotificationPermission = async () => {
     if (!("Notification" in window)) {
       return;
