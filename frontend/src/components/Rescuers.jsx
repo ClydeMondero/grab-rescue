@@ -133,7 +133,10 @@ const AssignRescuers = (props) => {
       const response = await axios.put(
         `/users/updateStatus/${id}`,
         { status: newStatus },
-        createAuthHeader()
+        {
+          ...createAuthHeader(),
+          withCredentials: true,
+        }
       );
       addNotification(
         `Status changed to ${newStatus} successfully for user with ID: ${id}`
