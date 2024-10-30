@@ -8,6 +8,7 @@ import {
   query,
   onSnapshot,
   where,
+  deleteDoc,
 } from "firebase/firestore";
 import { getToken } from "firebase/messaging";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
@@ -101,6 +102,25 @@ export const getIDFromLocation = async (id) => {
     return docSnap.data().userId;
   } else {
     return null;
+  }
+};
+
+export const clearLocationsCollection = async () => {
+  try {
+    const querySnapshot = await getDocs(collection(store, "locations"));
+    const deletePromises = [];
+
+    querySnapshot.forEach((document) => {
+      const documentRef = doc(store, "locations", document.id);
+      deletePromises.push(deleteDoc(documentRef));
+    });
+
+    await Promise.all(deletePromises);
+    console.log(
+      "All documents in the 'locations' collection have been deleted."
+    );
+  } catch (error) {
+    console.error("Error clearing 'locations' collection: ", error);
   }
 };
 
