@@ -125,7 +125,10 @@ const AddRescuer = () => {
 
     try {
       const response = await (
-        await axios.post("/rescuers/create", formData, createAuthHeader())
+        await axios.post("/rescuers/create", formData, {
+          ...createAuthHeader(),
+          withCredentials: true,
+        })
       ).data;
       if (!response.success) throw new Error(response.message);
       toast.success(response.message);
