@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "grab-rescue-70318",
+  "private_key_id": "cbbbc274aff8b4b8fdc83a5f83e33c9e8cc50f86",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDDy3iHcTgD9a98\nk4FhH4cAxuYXRfA/LbjZB898dkBVJJOOzjr24vOz6lvnChnUaQCPyo5OYahGhYkv\nzj1uCb7QoF3SdLf/w9Mbix7UPf8shGvjgi5zU8/NWP+vr9FYO1GdLQPV6sJqMhkc\nJzm7kSi3f5SxPXf/gXlhJ1l9BV4KWbZ61pEBjbe7sWmyipYCUf1lUOr8nZG/1n2X\nuEE7YWRF9eKX1lvTT7zOIMoh/javqXmknghocEby3BVgCALFk0NoF67I3t2ebfZS\ni1n95mEZP5y6zYTap9TdsmPZLOmodUlSNDMV2ft5Gn5p3y3GEGQjxy4e/GrIyCGI\nnGmWCfALAgMBAAECggEAAdPbMj7/HX37rc6jwbOwRV0hjZgPQWNZmEOO2rJ2x87a\n9QQDPRFwVoo3kNgP7dddbm6HrbNv1sIhmzrml7UrCLRmgCgfqKTe1gnMfTuV0kJI\nWhG/dihNTCmqagoJRQYFFgBneTc9TSUBS4rMAfoandPdIBTyKkBKUR3turoyjYSH\nCGZw+68YCGxWJvgGeyuxueqmFOmGalDsoJHANrBIxb3nYZhlKwR92+U5giQV45OV\ndehLxluvjl4LAWB4hcnjJctGISMfElOL6lEqd1fb9IFMIChLNBC5mbPy0tqlVtyU\nskxPNuzN8vK+QijkYOBF2DFZP5CvSavsICSd3PPP+QKBgQDt54v/ttWwuKFvUMsq\ni0cYx26QDQhVUr8uVPiA4jCX//outJ8kn8Hvi57QF4zKdM1Y6dmvMZ6VN9ZqkAXN\nPSmi98HUOcoMYt7NVvgMqYVRnu+W/+dJlVQt/Ij9mF68mmrP0tjGuDUplJkNipRn\nj2ecBelj24bEzauILquQQGMifQKBgQDSr/ftWDr67P6KjlZhpMZEKBgmitqk2Rvc\nUAU8JpyTHrRuqpXREem6/R41MubkGMO516sbHlDphPBSEdqvZO+beWdZHMR03S3R\nWQQn8oHYDAfa0OdWBJE7uEz6jmjSOJHecQzMrAHQlqTGDlPyLPOn2bls5p8aIhhi\niknyNKabJwKBgQDOIk/CvNgBLKjsO7Qd49oxlTOuayxqSa1PZt5/Rf1W5rwO1gAC\nis5OUcrEgXNDRNtcjBtK2pKOtnf5k1sDj1hRVZ1D1uLDwrNMdmutBQF4TF9KlecA\ncfwjcGn+WZTUlHOyKP4diSS/J3tKKWYXKUFcBh9In8DxK0fSUqXi8nczPQKBgBiY\nqIYR7djLgC/mzBjcJrVgROmC/mGOYx1GTkYmb9MRG5lr2s+smq/UywkE50WrynXQ\nws4IrQOGHJRIN1KQoxRwiOszW5AVHjs5fC25twTk6qnWB5vYLqhdLMd3hq88IXNp\nmUfvsMqMO7JPi+dS7iMjXO1kwyBG6LfgUx+um+CzAoGBAKNu+OL3kkS7NvPEQMll\n8Nta5VS8ZQS0GfQgkcFXNCkj4NcR/p1+CGKWp31mu9sTjlmfjs5/c5jiR5pCFKa7\n/2TTdBd4qUOLUnt2JSIxy0CXAvq3SImJgpcTkXGxX0sWKHeMV/dnX50QQ5HgARk3\nYaUC++yyuL7qn/fyQiUXH/ZW\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-j19ji@grab-rescue-70318.iam.gserviceaccount.com",
+  "client_id": "102751630205265839767",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-j19ji%40grab-rescue-70318.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
