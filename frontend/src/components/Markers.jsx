@@ -2,7 +2,6 @@ import { Marker, Popup } from "react-map-gl";
 import { FaLocationPin } from "react-icons/fa6";
 import { BiSolidAmbulance } from "react-icons/bi";
 import ambulance from "../assets/ambulance.png";
-import { useEffect, useState } from "react";
 
 const Markers = ({
   myMarker,
@@ -10,17 +9,6 @@ const Markers = ({
   nearestOtherMarker,
   markerType,
 }) => {
-  const [noOnlineRescuers, setNoOnlineRescuers] = useState(false);
-
-  useEffect(() => {
-    const onlineRescuers = otherMarkers.filter(
-      (marker) => marker.status === "online" && marker.role === "rescuer"
-    );
-    setNoOnlineRescuers(
-      markerType === "citizen" && onlineRescuers.length === 0
-    );
-  }, [otherMarkers, markerType]);
-
   return (
     <>
       {myMarker && (
@@ -66,13 +54,6 @@ const Markers = ({
               </Marker>
             )
         )}
-
-      {/* Display message if markerType is "citizen" and no rescuers are online */}
-      {noOnlineRescuers && (
-        <div className="absolute top-0 left-0 right-0 text-center text-lg text-red-600 font-semibold">
-          No Online Rescuers
-        </div>
-      )}
     </>
   );
 };

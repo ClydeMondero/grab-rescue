@@ -13,6 +13,7 @@ import {
   addRequestToFirestore,
   getLocationFromFirestore,
   getRequestFromFirestore,
+  getLocationsFromFirestore, // Ensure this import is here
 } from "../services/firestoreService";
 import {
   getCitizenCookie,
@@ -33,9 +34,10 @@ const Home = () => {
   const [request, setRequest] = useState(null);
   const [rescuer, setRescuer] = useState(null);
   const [onMobile, setOnMobile] = useState(false);
+  const [allRescuers, setAllRescuers] = useState([]);
+  const [onlineRescuers, setOnlineRescuers] = useState([]);
 
   const { getId } = useContext(StatusContext);
-
   const mapRef = useRef(null);
 
   // Verify token function
@@ -129,14 +131,25 @@ const Home = () => {
   };
 
   useEffect(() => {
+    getLocationsFromFirestore("rescuer", setAllRescuers);
+  }, []);
+
+  useEffect(() => {
+    const onlineRescuersFiltered = allRescuers.filter(
+      (rescuer) => rescuer.status === "online" && rescuer.role === "rescuer"
+    );
+    setOnlineRescuers(onlineRescuersFiltered);
+    console.log("Online rescuers:", onlineRescuersFiltered.length);
+  }, [allRescuers]);
+
+  useEffect(() => {
     getId();
     verifyToken();
     checkRequest();
 
     const md = new MobileDetect(window.navigator.userAgent);
-
-    const isSmallScreen = window.innerWidth <= 768; // Customize width threshold
-    const isMobile = !!md.mobile() && isSmallScreen; // Refine detection with screen size
+    const isSmallScreen = window.innerWidth <= 768;
+    const isMobile = !!md.mobile() && isSmallScreen;
 
     setOnMobile(isMobile);
   }, []);
@@ -159,7 +172,7 @@ const Home = () => {
     };
 
     getRescuerDetails();
-  }, [request]); // Empty dependency array to run only once on mount.
+  }, [request]);
 
   return (
     <div className="h-dvh w-screen overflow-hidden flex flex-col">
@@ -335,14 +348,21 @@ const Home = () => {
         {!requesting &&
           (!locating ? (
             <button
-              className="w-full flex-1 bg-secondary hover:opacity-80 text-white font-bold p-4 rounded-lg"
-              onClick={() => setModalOpen(true)} // Open modal on click
+              className={`w-full flex-1 font-bold p-4 rounded-lg ${
+                onlineRescuers.length === 0
+                  ? "bg-background-medium cursor-not-allowed text-text-primary" // Disabled color
+                  : "bg-secondary hover:opacity-80 text-white" // Enabled color
+              }`}
+              onClick={() => setModalOpen(true)}
+              disabled={onlineRescuers.length === 0}
             >
-              Request for Help
+              {onlineRescuers.length === 0
+                ? "No Online Rescuers"
+                : "Request for Help"}
             </button>
           ) : (
             <button
-              className="w-full flex-1 bg-background-medium  text-white font-bold p-4 rounded-lg"
+              className="w-full flex-1 bg-background-medium text-white font-bold p-4 rounded-lg"
               disabled={true}
             >
               Tracking your Location
