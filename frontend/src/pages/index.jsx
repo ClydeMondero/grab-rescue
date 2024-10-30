@@ -7,7 +7,7 @@ import ResetPassword from "./ResetPasswordPage";
 import VerifyEmail from "./VerifyEmail";
 import NotFound from "./NotFound";
 import MultiStepForm from "./MultiStepForm";
-import PrivacyPolicy from "./PrivacyPolicy";
+import Policy from "./Policy";
 import TermsOfService from "./TermsOfService";
 export {
   MultiStepForm,
@@ -19,6 +19,6 @@ export {
   ForgotPassword,
   ResetPassword,
   VerifyEmail,
-  PrivacyPolicy,
+  Policy,
   TermsOfService,
 };
