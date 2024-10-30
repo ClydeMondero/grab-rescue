@@ -18,13 +18,15 @@ app.listen(port, () => {
 });
 
 //enable cors
-app.use(
-  cors({
-    origin: ["http://localhost:5173", "https://grab-rescue.onrender.com"],
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
-  })
-);
+const corsOptions = {
+  origin: ["http://localhost:5173", "https://grab-rescue.onrender.com"],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+
+app.options("*", cors(corsOptions));
 
 //parse cookies
 app.use(cookieParser());

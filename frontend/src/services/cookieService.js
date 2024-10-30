@@ -14,9 +14,12 @@ export const getCookie = (cookieName) => {
       c = c.substring(1);
     }
     if (c.indexOf(name) == 0) {
-      return c.substring(name.length, c.length);
+      const cookieValue = c.substring(name.length, c.length);
+      console.log("Retrieved cookie value for", cookieName, ":", cookieValue); // Log for debugging
+      return cookieValue;
     }
   }
+  console.warn("Cookie not found:", cookieName); // Log if cookie not found
   return "";
 };
 

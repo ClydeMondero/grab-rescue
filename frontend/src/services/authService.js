@@ -60,6 +60,13 @@ export const handleLogout = async (navigate) => {
 export const createAuthHeader = () => {
   const token = getCookie("token");
 
+  if (!token) {
+    console.warn("Token is missing or not set in cookies."); // Log if token is missing
+    return {};
+  }
+
+  console.log("Retrieved token:", token); // Log token for debugging
+
   return {
     headers: {
       Authorization: `Bearer ${token}`,

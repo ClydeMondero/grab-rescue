@@ -35,22 +35,22 @@ const Rescuer = (props) => {
     }
   };
 
-  useEffect(() => {
-    console.log("user", user);
-  }, [user]);
+  // useEffect(() => {
+  //   console.log("user", user);
+  // }, [user]);
 
-  useEffect(() => {
-    console.log("id", id);
-  }, [id]);
+  // useEffect(() => {
+  //   console.log("id", id);
+  // }, [id]);
 
   const requestNotificationPermission = async () => {
     if (!("Notification" in window)) {
-      console.log("This browser does not support notifications.");
+      // console.log("This browser does not support notifications.");
       return;
     }
 
     if (Notification.permission === "granted") {
-      console.log("Notification permission is already granted.");
+      // console.log("Notification permission is already granted.");
 
       const token = await setMessagingToken();
 
@@ -64,7 +64,7 @@ const Rescuer = (props) => {
     try {
       const permission = await Notification.requestPermission();
       if (permission === "granted") {
-        console.log("Notification permission granted.");
+        // console.log("Notification permission granted.");
 
         const token = await setMessagingToken();
 
@@ -73,7 +73,7 @@ const Rescuer = (props) => {
           // addMessagingTokenToLocation(locationId, token);
         }
       } else {
-        console.log("Notification permission denied.");
+        // console.log("Notification permission denied.");
       }
     } catch (error) {
       console.error("Error requesting notification permission:", error);
