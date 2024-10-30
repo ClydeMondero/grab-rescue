@@ -13,8 +13,6 @@ const Markers = ({
   const [noOnlineRescuers, setNoOnlineRescuers] = useState(false);
 
   useEffect(() => {
-    console.log("Updated otherMarkers:", otherMarkers.length);
-    console.log("Current markerType of myMarker:", markerType);
     const onlineRescuers = otherMarkers.filter(
       (marker) => marker.status === "online" && marker.role === "rescuer"
     );
