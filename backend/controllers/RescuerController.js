@@ -261,22 +261,12 @@ module.exports.CreateRescuer = async (req, res) => {
         "Active",
       ];
 
-      // extracts the "Authorization Header" from request
-      const auth = req.headers.authorization;
-
-      // extracts the ACTUAL token from the string "Bearer ....token"
-      const token = auth.substring(7, auth.length);
-
-      // extracts the content of the token used upon token creation (i.e. user_id)
-      // in this case, it extracts the user id of the request sender
-      const subject = await getTokenSubject(token);
-
       const insertResult = await pool.query(insertQuery, values);
-      //const userId = insertResult.rows[0].id;
+      const userId = insertResult.rows[0].id;
 
       // Log the rescuer creation
       await CreateLog({
-        userId: subject,
+        userId,
         action: `Rescuer Created with username: ${username} and email: ${email}`,
       });
 
