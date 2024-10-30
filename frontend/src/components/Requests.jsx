@@ -226,10 +226,23 @@ const Requests = ({
             <h2 className="text-2xl font-bold text-center text-primary mb-4">
               Emergency Request Details
             </h2>
-            <p className="text-sm text-gray-700  mb-2 text-end">
-              Date & Time:{" "}
-              {new Date(selectedRequestData.timestamp).toLocaleString()}
-            </p>
+            <div className="flex flex-row justify-between gap-2 w-full">
+              <p
+                className={`
+                  bg-yellow-500 text-white rounded-md px-2 py-1 text-sm
+                  ${
+                    selectedRequestData.status === "pending" ? "bg-warning" : ""
+                  }
+                `}
+              >
+                {selectedRequestData.status}
+              </p>
+              <p className="text-sm text-gray-700  mb-2 text-end">
+                Date & Time:{" "}
+                {new Date(selectedRequestData.timestamp).toLocaleString()}
+              </p>
+            </div>
+
             <div className="relative">
               <img
                 src={
@@ -272,7 +285,7 @@ const Requests = ({
             <div className="mt-6">
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="bg-primary-medium hover:bg-primary text-white font-semibold px-5 py-3 rounded-lg w-full transition-colors duration-300 shadow-md hover:shadow-lg transform transition-all duration-200"
+                className="bg-primary-medium hover:bg-primary text-white font-semibold px-5 py-3 rounded-lg w-full transition-colors duration-300 shadow-md hover:shadow-md transform transition-all duration-200"
               >
                 Close
               </button>

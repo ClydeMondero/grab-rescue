@@ -1,6 +1,11 @@
 import React, { useEffect, useState, useRef, useContext } from "react";
 import { RescuerMap as Map } from "../components";
-import { FaLocationArrow, FaPhone } from "react-icons/fa";
+import {
+  FaLocationArrow,
+  FaPhone,
+  FaChevronDown,
+  FaChevronUp,
+} from "react-icons/fa";
 import { getRequestFromFirestore } from "../services/firestoreService";
 import { Loader } from "../components";
 import MobileDetect from "mobile-detect";
@@ -14,11 +19,10 @@ const Navigate = ({ requestID }) => {
   const [onMobile, setOnMobile] = useState(false);
 
   const { navigating, setNavigating } = useContext(RescuerContext);
-
   const mapRef = useRef();
 
   const handleLocatingChange = (newLocatingState) => {
-    setLocating(newLocatingState); // Update only when locating changes
+    setLocating(newLocatingState);
   };
 
   useEffect(() => {
@@ -52,10 +56,8 @@ const Navigate = ({ requestID }) => {
 
   useEffect(() => {
     const md = new MobileDetect(window.navigator.userAgent);
-
-    const isSmallScreen = window.innerWidth <= 768; // Customize width threshold
-    const isMobile = !!md.mobile() && isSmallScreen; // Refine detection with screen size
-
+    const isSmallScreen = window.innerWidth <= 768;
+    const isMobile = !!md.mobile() && isSmallScreen;
     setOnMobile(isMobile);
   }, []);
 
@@ -100,6 +102,7 @@ const Navigate = ({ requestID }) => {
           </div>
         </div>
       )}
+
       {!requestData && (
         <div className="flex-none h-auto bg-background rounded-t-2xl p-4 shadow-lg border-x-background-medium border-t-2">
           <div className="flex items-center justify-center">
@@ -109,29 +112,54 @@ const Navigate = ({ requestID }) => {
           </div>
         </div>
       )}
+
       {requestData && (
-        <div className="flex-none h-auto bg-background rounded-t-2xl p-4 shadow-lg border-x-background-medium border-t-2">
+        <div
+          className={`flex-none bg-background rounded-t-2xl p-4 shadow-lg border-x-background-medium border-t-2 transition-all duration-300 ease-in-out ${
+            showDetails
+              ? "max-h-[calc(100vh-160px)] overflow-y-auto"
+              : "max-h-44"
+          }`}
+        >
+          {/* Toggle Icon at the Top */}
           <div
-            className="flex justify-between items-center cursor-pointer md:justify-center md:gap-6"
+            className="flex justify-center mb-2 cursor-pointer"
             onClick={() => setShowDetails(!showDetails)}
           >
-            <div className="flex flex-col">
-              <p className="text-primary-dark font-semibold text-xl">
-                {requestData.location.address.split(",")[0]}
-              </p>
-              <p className="text-primary-medium font-semibold text-xl">
-                {requestData.location.address.split(",").slice(1, 5).join(", ")}
-              </p>
-              <p className="text-md font-semibold text-background-dark">
-                {requestData.citizenName} •{" "}
-                {requestData.citizenRelation
-                  ? requestData.citizenRelation
-                  : "No Relation"}
-              </p>
-            </div>
-            <div className="flex flex-col items-center justify-between gap-2">
-              {/* Phone Call Button */}
+            {showDetails ? (
+              <FaChevronDown className="text-primary-medium text-2xl" />
+            ) : (
+              <FaChevronUp className="text-primary-medium text-2xl" />
+            )}
+          </div>
 
+          {/* Main Information */}
+          <div className="flex justify-between items-center cursor-pointer md:justify-center md:gap-4">
+            <div className="flex flex-col gap-1 border-b pb-2 mb-2">
+              <div className="text-primary-dark font-semibold text-xl">
+                <p>{requestData.location.address.split(",")[0]}</p>
+              </div>
+              <div className="text-primary-medium text-lg">
+                <p>
+                  {requestData.location.address
+                    .split(",")
+                    .slice(1, 5)
+                    .join(", ")}
+                </p>
+              </div>
+              <div className="flex items-center gap-2 text-md font-semibold text-background-dark mt-2">
+                <p>{requestData.citizenName}</p>
+                <span>•</span>
+                <p>
+                  {requestData.citizenRelation
+                    ? requestData.citizenRelation
+                    : "No Relation"}
+                </p>
+              </div>
+            </div>
+
+            {/* Phone and Status Section */}
+            <div className="flex flex-col items-center justify-between gap-2">
               {requestData.phone && (
                 <button
                   onClick={handlePhone}
@@ -147,12 +175,32 @@ const Navigate = ({ requestID }) => {
                     : "bg-orange-400"
                 }`}
               >
-                {/*TODO: change status to in-progress if isOnRoute*/}
                 {requestData.status.charAt(0).toUpperCase() +
                   requestData.status.slice(1)}
               </div>
             </div>
           </div>
+
+          {/* Details Section - Slide down/up effect */}
+          {showDetails && (
+            <div className="mt-2 transition-opacity duration-300 ease-in-out opacity-100">
+              <div className="flex flex-col gap-3">
+                {/* Image */}
+                <img
+                  src={requestData.incidentPicture || "placeholder"}
+                  alt="Incident Picture"
+                  className="w-full h-56 object-cover rounded-md shadow-sm"
+                />
+
+                {/* Description */}
+                <div className="border rounded-lg p-4 bg-gray-100 w-full h-32 overflow-y-auto">
+                  <p className="text-base text-primary-dark">
+                    {requestData.incidentDescription}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
