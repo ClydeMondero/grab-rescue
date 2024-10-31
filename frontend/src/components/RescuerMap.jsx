@@ -26,6 +26,7 @@ import * as turf from "@turf/turf";
 const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
   const { rescuer, setRescuer } = useContext(RescuerContext);
   const [locations, setLocations] = useState(null);
+  const [coords, setCoords] = useState(null);
 
   const mapRef = useRef();
   const geoControlRef = useRef();
@@ -44,6 +45,8 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
   const location = useLocation();
 
   const handleGeolocation = async (coords) => {
+    setCoords(coords);
+
     if (mapRef.current.resize()) {
       mapRef.current.resize();
     }
@@ -217,7 +220,7 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
         position="top-right"
         positionOptions={{ enableHighAccuracy: true }}
         trackUserLocation={true}
-        showUserLocation={false}
+        showUserLocation={coords === null}
         style={{ display: "none" }}
         onGeolocate={({ coords }) => {
           handleGeolocation(coords);

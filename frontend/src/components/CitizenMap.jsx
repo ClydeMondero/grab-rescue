@@ -37,6 +37,7 @@ const CitizenMap = forwardRef((props, ref) => {
     latitude: 14.9536,
     zoom: 15,
   });
+  const [coords, setCoords] = useState(null);
 
   const [rescuers, setRescuers] = useState(null);
   const [nearestRescuer, setNearestRescuer] = useState(null);
@@ -66,6 +67,8 @@ const CitizenMap = forwardRef((props, ref) => {
   const location = useLocation();
 
   const handleGeolocation = async (coords) => {
+    setCoords(coords);
+
     if (mapRef.current.resize()) {
       mapRef.current.resize();
     }
@@ -180,7 +183,7 @@ const CitizenMap = forwardRef((props, ref) => {
           position="top-right"
           positionOptions={{ enableHighAccuracy: true }}
           trackUserLocation={true}
-          showUserLocation={false}
+          showUserLocation={coords === null}
           onGeolocate={({ coords }) => {
             handleGeolocation(coords);
           }}
