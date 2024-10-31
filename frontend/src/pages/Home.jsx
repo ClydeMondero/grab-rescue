@@ -13,7 +13,8 @@ import {
   addRequestToFirestore,
   getLocationFromFirestore,
   getRequestFromFirestore,
-  getLocationsFromFirestore, // Ensure this import is here
+  getLocationsFromFirestore,
+  clearLocationsCollection, // Ensure this import is here
 } from "../services/firestoreService";
 import {
   getCitizenCookie,
