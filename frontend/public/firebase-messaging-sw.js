@@ -6,21 +6,65 @@ importScripts(
   "https://www.gstatic.com/firebasejs/9.17.1/firebase-messaging-compat.js"
 );
 
+// Event listeners for push, subscription change, and notification click
+self.addEventListener("push", (event) => {
+  if (event.data) {
+    let payload;
+    try {
+      payload = event.data.json();
+      console.log(payload);
+    } catch (e) {
+      console.error("Failed to parse push event data:", e);
+      return;
+    }
+
+    const notificationTitle = payload.notification?.title || "Default Title";
+    const notificationOptions = {
+      body: payload.notification?.body || "Default body text.",
+    };
+
+    event.waitUntil(
+      self.registration.showNotification(notificationTitle, notificationOptions)
+    );
+  }
+});
+
+self.addEventListener("pushsubscriptionchange", (event) => {
+  console.log("Push subscription change event:", event);
+  // Handle push subscription change if needed
+});
+
+self.addEventListener("notificationclick", (event) => {
+  console.log("Notification click event:", event);
+  event.notification.close();
+  event.waitUntil(
+    clients.matchAll({ type: "window" }).then((clientList) => {
+      for (const client of clientList) {
+        if (client.url === "/" && "focus" in client) {
+          return client.focus();
+        }
+      }
+      if (clients.openWindow) {
+        return clients.openWindow("/");
+      }
+    })
+  );
+});
+
+// Initialize Firebase Messaging
 fetch("/firebase-config.json")
   .then((response) => response.json())
   .then((firebaseConfig) => {
-    // Initialize Firebase with the loaded config
     firebase.initializeApp(firebaseConfig);
 
-    // Retrieve Firebase Messaging and handle background messages
     const messaging = firebase.messaging();
 
     messaging.onBackgroundMessage((payload) => {
       console.log("Received background message: ", payload);
-      const notificationTitle = payload.notification.title;
+
+      const notificationTitle = payload.notification?.title || "Default Title";
       const notificationOptions = {
-        body: payload.notification.body,
-        icon: payload.notification.icon,
+        body: payload.notification?.body || "Default body text.",
       };
 
       self.registration.showNotification(

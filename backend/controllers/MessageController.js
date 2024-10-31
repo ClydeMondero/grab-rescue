@@ -21,6 +21,7 @@ exports.sendNotification = (req, res) => {
     .messaging()
     .send(message)
     .then((response) => {
+      console.log(message);
       console.log("Successfully sent message:", response);
       res.status(200).send("Notification sent successfully");
     })

@@ -10,7 +10,7 @@ import {
   where,
   deleteDoc,
 } from "firebase/firestore";
-import { getToken } from "firebase/messaging";
+import { getToken, onMessage } from "firebase/messaging";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { store, storage, messaging } from "../../firebaseConfig";
 
@@ -49,7 +49,6 @@ export const setMessagingToken = async () => {
       vapidKey: import.meta.env.VITE_FIREBASE_MESSAGING_VAPID_KEY,
     });
     if (token) {
-      console.log(token);
       return token;
     } else {
       console.log(
@@ -67,11 +66,26 @@ export const addMessagingTokenToLocation = async (userId, fcmToken) => {
   try {
     const locationRef = doc(store, "locations", userId);
     await updateDoc(locationRef, { fcmToken });
-    console.log("FCM token added to location document.");
   } catch (error) {
     console.error("Error updating location document with FCM token:", error);
   }
 };
+
+onMessage(messaging, (payload) => {
+  console.log("Message received in the foreground: ", payload);
+
+  // Create and show a notification manually
+  const notificationTitle = payload.notification?.title || "Default Title";
+  const notificationOptions = {
+    body: payload.notification?.body || "Default body text.",
+  };
+
+  if (Notification.permission === "granted") {
+    new Notification(notificationTitle, notificationOptions);
+  } else {
+    console.error("Notification permission not granted.");
+  }
+});
 
 //update location status
 export const updateLocationStatus = async (id, status) => {

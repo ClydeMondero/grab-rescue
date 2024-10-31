@@ -47,7 +47,9 @@ const Rescuer = (props) => {
       if (token) {
         const locationId = await getLocationIDFromFirestore(id);
 
-        addMessagingTokenToLocation(locationId, token);
+        if (locationId) {
+          addMessagingTokenToLocation(locationId, token);
+        }
       }
       return;
     }
