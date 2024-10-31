@@ -55,7 +55,7 @@ const CitizenMap = forwardRef((props, ref) => {
   const [distance, setDistance] = useState();
   const [eta, setEta] = useState();
 
-  const { onLocatingChange } = props;
+  const { onLocatingChange, onNearestRescuerUpdate } = props;
 
   const mapRef = useRef();
   const geoControlRef = useRef();
@@ -113,6 +113,7 @@ const CitizenMap = forwardRef((props, ref) => {
 
     const nearest = getNearestRescuer(citizen, rescuers);
     setNearestRescuer(nearest);
+    onNearestRescuerUpdate(nearest);
 
     setCitizen({
       longitude: coords.longitude,
