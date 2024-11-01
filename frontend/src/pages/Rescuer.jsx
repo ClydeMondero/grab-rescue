@@ -55,7 +55,12 @@ const Rescuer = (props) => {
         if (newToken && id) {
           const locationId = await getLocationIDFromFirestore(id);
           if (locationId) {
-            await addMessagingTokenToLocation(locationId, newToken);
+            const location = await getLocationFromFirestore(locationId);
+
+            if (!location.fcmToken) {
+              console.log("FCM token added to location document:", newToken);
+              await addMessagingTokenToLocation(locationId, newToken);
+            }
           }
         }
       }

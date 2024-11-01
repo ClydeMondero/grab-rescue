@@ -3,7 +3,7 @@ import { FaTimes } from "react-icons/fa";
 import { MdLocationOff } from "react-icons/md";
 
 const LocationPrompt = () => {
-  const [locationEnabled, setLocationEnabled] = useState(null);
+  const [locationEnabled, setLocationEnabled] = useState(true);
 
   const requestLocation = () => {
     if ("geolocation" in navigator) {
