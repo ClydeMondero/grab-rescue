@@ -62,34 +62,32 @@ const LocationPrompt = () => {
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100] fade-in">
-      <div className="location-prompt bg-white rounded-lg p-6 w-11/12 sm:w-2/3 lg:w-1/3 relative">
-        <div className="flex items-center justify-center mb-2">
-          <h2 className="text-2xl font-bold text-primary-dark">
-            <div className="flex items-center justify-center">
-              <MdLocationOff className="text-5xl text-primary-medium mr-2 -mt-1 mb-2" />
-            </div>
-            Enable GPS for Full Experience
-          </h2>
-        </div>
-        <p className="mb-2">
-          <span className="text-sm font-bold text-error">
+    <div className="fixed inset-0 bg-green-700 bg-opacity-80 flex items-center justify-center z-[100] fade-in">
+      <div className="text-white flex flex-col items-center text-center p-10">
+        <MdLocationOff className="text-8xl text-white mb-4" />
+        <h2 className="text-4xl font-bold mb-4">
+          Enable GPS for Full Experience
+        </h2>
+        <p className="text-lg mb-6">
+          <span className="font-bold">
             This application requires GPS to function properly.
           </span>{" "}
           Please enable your GPS in device settings.
         </p>
-        <button
-          className="w-full bg-white border-2 hover:bg-highlight hover:text-white text-blue-500 font-bold py-2 px-4 rounded mt-4 mr-2  border-blue-500"
-          onClick={() => window.location.reload()}
-        >
-          Refresh
-        </button>
-        <button
-          className="absolute top-2 right-2 text-background-medium"
-          onClick={() => setLocationEnabled(true)}
-        >
-          <FaTimes className="text-2xl" />
-        </button>
+        <div className="flex flex-col gap-2 w-full max-w-xs">
+          <button
+            className="w-full bg-white text-green-700 font-bold py-3 px-6 text-xl rounded-lg hover:bg-green-800 hover:text-white"
+            onClick={() => window.location.reload()}
+          >
+            Refresh
+          </button>
+          <button
+            className="mt-4 text-white underline"
+            onClick={() => setLocationEnabled(true)}
+          >
+            Dismiss
+          </button>
+        </div>
       </div>
     </div>
   );
