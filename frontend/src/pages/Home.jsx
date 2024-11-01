@@ -42,10 +42,6 @@ const Home = () => {
   const { getId } = useContext(StatusContext);
   const mapRef = useRef(null);
 
-  useEffect(() => {
-    console.log("nearestRescuer", nearestRescuer);
-  }, [nearestRescuer]);
-
   // Verify token function
   const verifyToken = async () => {
     const { data } = await axios.post("/auth/", {}, { withCredentials: true });
@@ -110,7 +106,10 @@ const Home = () => {
     }
   };
 
-  //TODO: send notif
+  useEffect(() => {
+    if (!nearestRescuer) return;
+    console.log("nearestRescuer", nearestRescuer.fcmToken);
+  }, [nearestRescuer]);
 
   const handleModalConfirm = async () => {
     if (mapRef.current) {
@@ -128,6 +127,7 @@ const Home = () => {
           token: nearestRescuer.fcmToken,
           title: "Emergency Request!",
           body: "You are the nearest rescuer to a citizen in need. Please respond!",
+          citizenId: citizenId,
         };
 
         try {
@@ -167,7 +167,6 @@ const Home = () => {
       (rescuer) => rescuer.status === "online" && rescuer.role === "rescuer"
     );
     setOnlineRescuers(onlineRescuersFiltered);
-    console.log("Online rescuers:", onlineRescuersFiltered.length);
   }, [allRescuers]);
 
   useEffect(() => {

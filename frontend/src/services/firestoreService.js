@@ -71,22 +71,6 @@ export const addMessagingTokenToLocation = async (userId, fcmToken) => {
   }
 };
 
-onMessage(messaging, (payload) => {
-  console.log("Message received in the foreground: ", payload);
-
-  // Create and show a notification manually
-  const notificationTitle = payload.notification?.title || "Default Title";
-  const notificationOptions = {
-    body: payload.notification?.body || "Default body text.",
-  };
-
-  if (Notification.permission === "granted") {
-    new Notification(notificationTitle, notificationOptions);
-  } else {
-    console.error("Notification permission not granted.");
-  }
-});
-
 //update location status
 export const updateLocationStatus = async (id, status) => {
   const q = query(collection(store, "locations"), where("userId", "==", id));
@@ -201,6 +185,22 @@ export const getLocationsFromFirestore = (role, setLocations) => {
   });
 
   return unsubscribe; // To stop listening when needed
+};
+
+export const getLocationFromFirestoreById = async (id) => {
+  try {
+    const locationRef = doc(store, "locations", id);
+    const locationSnap = await getDoc(locationRef);
+
+    if (locationSnap.exists()) {
+      return { id: locationSnap.id, ...locationSnap.data() };
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error("Error getting location by ID: ", error);
+    return null;
+  }
 };
 
 export const getOnlineLocationsFromFirestore = (role, setLocations) => {

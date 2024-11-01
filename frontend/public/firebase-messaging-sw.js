@@ -12,7 +12,6 @@ self.addEventListener("push", (event) => {
     let payload;
     try {
       payload = event.data.json();
-      console.log(payload);
     } catch (e) {
       console.error("Failed to parse push event data:", e);
       return;
@@ -30,12 +29,10 @@ self.addEventListener("push", (event) => {
 });
 
 self.addEventListener("pushsubscriptionchange", (event) => {
-  console.log("Push subscription change event:", event);
   // Handle push subscription change if needed
 });
 
 self.addEventListener("notificationclick", (event) => {
-  console.log("Notification click event:", event);
   event.notification.close();
   event.waitUntil(
     clients.matchAll({ type: "window" }).then((clientList) => {
@@ -60,8 +57,6 @@ fetch("/firebase-config.json")
     const messaging = firebase.messaging();
 
     messaging.onBackgroundMessage((payload) => {
-      console.log("Received background message: ", payload);
-
       const notificationTitle = payload.notification?.title || "Default Title";
       const notificationOptions = {
         body: payload.notification?.body || "Default body text.",

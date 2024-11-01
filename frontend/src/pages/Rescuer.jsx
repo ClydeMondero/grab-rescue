@@ -13,6 +13,7 @@ import {
 import { useState, useEffect, useContext } from "react";
 import {
   addMessagingTokenToLocation,
+  getLocationFromFirestore,
   getLocationIDFromFirestore,
   getRequestsFromFirestore,
   setMessagingToken,
@@ -20,50 +21,46 @@ import {
 import { StatusContext } from "../contexts/StatusContext";
 import { getSelectedRequestCookie } from "../services/cookieService";
 import { RescuerProvider } from "../contexts/RescuerContext";
+import { onMessage } from "firebase/messaging";
+import { messaging } from "../../firebaseConfig";
+import { FaExclamation } from "react-icons/fa";
 
 const Rescuer = (props) => {
   const { user } = props;
   const [requests, setRequests] = useState([]);
   const [selectedRequest, setSelectedRequest] = useState(null);
   const { id, getId } = useContext(StatusContext);
+  const [showOverlay, setShowOverlay] = useState(false);
+  const [notificationTitle, setNotificationTitle] = useState("");
+  const [notificationBody, setNotificationBody] = useState("");
 
   const getSelectedRequest = () => {
     const selectedRequestID = getSelectedRequestCookie();
-
     if (selectedRequestID) {
       setSelectedRequest(selectedRequestID);
     }
   };
 
-  //TODO: incosistent saving of FCM
-  const requestNotificationPermission = async () => {
-    if (!("Notification" in window)) {
-      return;
-    }
-
-    if (Notification.permission === "granted") {
-      const token = await setMessagingToken();
-
-      if (token) {
-        const locationId = await getLocationIDFromFirestore(id);
-
-        if (locationId) {
-          addMessagingTokenToLocation(locationId, token);
-        }
-      }
-      return;
-    }
-
+  const handleNotificationPermission = async () => {
     try {
-      const permission = await Notification.requestPermission();
+      let permission = Notification.permission;
+
+      if (permission !== "granted") {
+        permission = await Notification.requestPermission();
+      }
+
       if (permission === "granted") {
-        const token = await setMessagingToken();
+        const newToken = await setMessagingToken();
 
-        if (token) {
+        if (newToken && id) {
           const locationId = await getLocationIDFromFirestore(id);
-
           if (locationId) {
-            addMessagingTokenToLocation(locationId, token);
+            const location = await getLocationFromFirestore(locationId);
+
+            if (!location.fcmToken) {
+              console.log("FCM token added to location document:", newToken);
+              await addMessagingTokenToLocation(locationId, newToken);
+            }
           }
         }
       }
@@ -72,10 +69,19 @@ const Rescuer = (props) => {
     }
   };
 
+  onMessage(messaging, (payload) => {
+    const title = payload.notification?.title || "Emergency Request!";
+    const body =
+      payload.notification?.body ||
+      "You are the nearest rescuer. Please respond!";
+
+    setNotificationTitle(title);
+    setNotificationBody(body);
+    setShowOverlay(true);
+  });
+
   useEffect(() => {
     getId();
-
-    requestNotificationPermission();
 
     getSelectedRequest();
 
@@ -86,6 +92,12 @@ const Rescuer = (props) => {
     };
   }, []);
 
+  useEffect(() => {
+    if (!id) return;
+
+    handleNotificationPermission();
+  }, [id]);
+
   if (user.account_type !== "Rescuer") {
     return <RouterNavigate to="/not-found" replace />;
   }
@@ -93,54 +105,75 @@ const Rescuer = (props) => {
   return (
     <div className="h-dvh flex flex-col">
       <RescuerProvider>
-        {/* Header */}
-
         <Header user={user} />
 
-        <div className="flex-1 overflow-y-auto bg-background-light">
-          <Routes>
-            {/* Default Route to Navigate */}
-            <Route
-              path="/"
-              element={<RouterNavigate to="/rescuer/navigate" replace />}
-            />
+        {showOverlay && (
+          <div className="fixed inset-0 bg-red-700 bg-opacity-80 flex items-center justify-center z-50">
+            <div className="text-white flex flex-col items-center text-center p-10">
+              <FaExclamation className="text-8xl mb-4" />
+              <h1 className="text-4xl font-bold mb-4">{notificationTitle}</h1>
+              <p className="text-lg mb-6">{notificationBody}</p>
+              <div className="flex flex-col gap-2">
+                <button
+                  className="bg-white text-red-700 px-6 py-3 text-xl font-bold rounded-lg"
+                  onClick={() => {
+                    setShowOverlay(false);
+                    // Optionally navigate to the response page
+                    // navigate("/emergency-response");
+                  }}
+                >
+                  Respond Now
+                </button>
+                <button
+                  className="mt-4 text-white underline"
+                  onClick={() => setShowOverlay(false)}
+                >
+                  Dismiss
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
-            <Route
-              path="/requests"
-              element={
-                <Requests
-                  userId={user.id}
-                  requests={requests}
-                  selectedRequest={selectedRequest}
-                  setSelectedRequest={setSelectedRequest}
-                />
-              }
-            />
-            <Route
-              path="/navigate"
-              element={
-                <Navigate
-                  user={user}
-                  requests={requests}
-                  requestID={selectedRequest}
-                />
-              }
-            />
-            <Route path="/profile" element={<ViewProfile user={user} />} />
-            <Route
-              path="/request-details/:id"
-              element={<RequestDetails user={user} />}
-            />
-            <Route
-              path="/change-password"
-              element={<ChangePassword user={user} />}
-            />
-            <Route path="/change-email" element={<ChangeEmail user={user} />} />
-          </Routes>
-          <Toast />
-        </div>
+        <Routes>
+          <Route
+            path="/"
+            element={<RouterNavigate to="/rescuer/navigate" replace />}
+          />
+          <Route
+            path="/requests"
+            element={
+              <Requests
+                userId={user.id}
+                requests={requests}
+                selectedRequest={selectedRequest}
+                setSelectedRequest={setSelectedRequest}
+              />
+            }
+          />
+          <Route
+            path="/navigate"
+            element={
+              <Navigate
+                user={user}
+                requests={requests}
+                requestID={selectedRequest}
+              />
+            }
+          />
+          <Route path="/profile" element={<ViewProfile user={user} />} />
+          <Route
+            path="/request-details/:id"
+            element={<RequestDetails user={user} />}
+          />
+          <Route
+            path="/change-password"
+            element={<ChangePassword user={user} />}
+          />
+          <Route path="/change-email" element={<ChangeEmail user={user} />} />
+        </Routes>
 
-        {/* Bottom Navigation always visible */}
+        <Toast />
 
         <Bottom user={user} />
       </RescuerProvider>

@@ -11,6 +11,7 @@ import { Loader } from "../components";
 import MobileDetect from "mobile-detect";
 import { toast } from "react-toastify";
 import { RescuerContext } from "../contexts/RescuerContext";
+import placeholder from "../assets/placeholder.png";
 
 const Navigate = ({ requestID }) => {
   const [showDetails, setShowDetails] = useState(false);
@@ -104,7 +105,7 @@ const Navigate = ({ requestID }) => {
       )}
 
       {!requestData && (
-        <div className="flex-none h-auto bg-background rounded-t-2xl p-4 shadow-lg border-x-background-medium border-t-2">
+        <div className="flex-none h-auto bg-background rounded-t-2xl p-4 ">
           <div className="flex items-center justify-center">
             <p className="text-primary-medium font-semibold text-xl text-center">
               You're not assigned to any request.
@@ -115,10 +116,8 @@ const Navigate = ({ requestID }) => {
 
       {requestData && (
         <div
-          className={`flex-none bg-background rounded-t-2xl p-4 shadow-lg border-x-background-medium border-t-2 transition-all duration-300 ease-in-out ${
-            showDetails
-              ? "max-h-[calc(100vh-160px)] overflow-y-auto"
-              : "max-h-44"
+          className={`flex-none bg-background rounded-t-2xl p-4 transition-all duration-300 ease-in-out ${
+            showDetails ? "h-[75%] overflow-hidden" : ""
           }`}
         >
           {/* Toggle Icon at the Top */}
@@ -127,15 +126,15 @@ const Navigate = ({ requestID }) => {
             onClick={() => setShowDetails(!showDetails)}
           >
             {showDetails ? (
-              <FaChevronDown className="text-primary-medium text-2xl" />
+              <FaChevronDown className="text-background-medium text-2xl" />
             ) : (
-              <FaChevronUp className="text-primary-medium text-2xl" />
+              <FaChevronUp className="text-background-medium text-2xl" />
             )}
           </div>
 
           {/* Main Information */}
           <div className="flex justify-between items-center cursor-pointer md:justify-center md:gap-4">
-            <div className="flex flex-col gap-1 border-b pb-2 mb-2">
+            <div className="flex flex-col gap-1 pb-2 mb-2">
               <div className="text-primary-dark font-semibold text-xl">
                 <p>{requestData.location.address.split(",")[0]}</p>
               </div>
@@ -187,16 +186,26 @@ const Navigate = ({ requestID }) => {
               <div className="flex flex-col gap-3">
                 {/* Image */}
                 <img
-                  src={requestData.incidentPicture || "placeholder"}
+                  src={
+                    requestData.incidentPicture
+                      ? requestData.incidentPicture
+                      : placeholder
+                  }
                   alt="Incident Picture"
                   className="w-full h-56 object-cover rounded-md shadow-sm"
                 />
 
                 {/* Description */}
-                <div className="border rounded-lg p-4 bg-gray-100 w-full h-32 overflow-y-auto">
-                  <p className="text-base text-primary-dark">
-                    {requestData.incidentDescription}
-                  </p>
+                <div className="border rounded-lg p-4 w-full flex-1 overflow-y-auto">
+                  {!requestData.incidentDescription ? (
+                    <p className="text-base text-primary-dark">
+                      No description provided.
+                    </p>
+                  ) : (
+                    <p className="text-base text-primary-dark">
+                      {requestData.incidentDescription}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
