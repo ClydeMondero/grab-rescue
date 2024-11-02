@@ -32,6 +32,7 @@ import { useLocation } from "react-router-dom";
 import { setGeolocateIcon } from "../utils/GeolocateUtility";
 
 const CitizenMap = forwardRef((props, ref) => {
+  const { assignedRescuer } = props;
   const [citizen, setCitizen] = useState({
     longitude: 120.9107,
     latitude: 14.9536,
@@ -205,6 +206,7 @@ const CitizenMap = forwardRef((props, ref) => {
               myMarker={citizen}
               otherMarkers={rescuers}
               nearestOtherMarker={nearestRescuer}
+              assignedRescuer={assignedRescuer}
               markerType={"citizen"}
             />
 
