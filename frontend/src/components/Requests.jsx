@@ -115,9 +115,12 @@ const Requests = ({
                       request.status === "pending" ? "bg-yellow-500" : ""
                     }`}
                   >
-                    {request.status.charAt(0).toUpperCase() +
-                      request.status.slice(1)}
+                    {request.status
+                      ? String(request.status[0]).toUpperCase() +
+                        request.status.slice(1)
+                      : ""}
                   </div>
+
                   {/* Pin Icon for Navigation */}
                   <FaLocationArrow
                     className="absolute top-4 right-4 text-2xl text-background-light cursor-pointer"

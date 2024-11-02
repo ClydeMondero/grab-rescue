@@ -38,6 +38,7 @@ const Home = () => {
   const [onMobile, setOnMobile] = useState(false);
   const [allRescuers, setAllRescuers] = useState([]);
   const [onlineRescuers, setOnlineRescuers] = useState([]);
+  const [assignedRescuer, setAssignedRescuer] = useState(null);
 
   const { getId } = useContext(StatusContext);
   const mapRef = useRef(null);
@@ -170,6 +171,13 @@ const Home = () => {
   }, [allRescuers]);
 
   useEffect(() => {
+    const assigned = allRescuers.filter(
+      (rescuer) => rescuer.userId === request.rescuerId
+    );
+    setAssignedRescuer(assigned[0]);
+  }, [request]);
+
+  useEffect(() => {
     getId();
     verifyToken();
     checkRequest();
@@ -299,6 +307,7 @@ const Home = () => {
           ref={mapRef}
           onLocatingChange={handleLocatingChange}
           onNearestRescuerUpdate={handleNearestRescuerUpdate}
+          assignedRescuer={assignedRescuer}
         />
 
         {requesting && (
