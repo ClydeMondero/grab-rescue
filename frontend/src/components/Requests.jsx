@@ -12,6 +12,9 @@ import placeholder from "../assets/placeholder.png";
 import { formatDistance, formatDuration } from "../utils/DistanceUtility";
 import { setSelectedRequestCookie } from "../services/cookieService";
 import { acceptRescueRequestInFirestore } from "../services/firestoreService";
+import { getLocationsFromFirestore } from "../services/firestoreService";
+import { getNearestRescuer } from "../services/locationService";
+import { set } from "react-hook-form";
 
 // TODO: Add Completed Button
 
@@ -23,6 +26,15 @@ const Requests = ({
 }) => {
   const navigate = useNavigate();
   const { rescuer, setPage } = useContext(RescuerContext);
+  const [rescuers, setRescuers] = useState([]);
+  const [loggedInRescuer, setLoggedInRescuer] = useState(null);
+  const [otherRescuers, setOtherRescuers] = useState([]);
+  const [nearestRescuer, setNearestRescuer] = useState(null);
+  const [citizen, setCitizen] = useState({
+    longitude: 120.9107,
+    latitude: 14.9536,
+    zoom: 15,
+  });
 
   // State to store routes data for requests
   const [routeData, setRouteData] = useState({});
@@ -33,15 +45,54 @@ const Requests = ({
    * Handle Accept button click
    * @param {string} requestID - Request ID to accept
    */
+  useEffect(() => {
+    console.log("Citizen state updated:", citizen);
+    const nearest = getNearestRescuer(citizen, otherRescuers);
+    setNearestRescuer(nearest);
+
+    if ((otherRescuers, loggedInRescuer)) {
+      console.log("Logged in rescuer:", loggedInRescuer.userId);
+      console.log("Other rescuers:", otherRescuers);
+      console.log("Nearest rescuer:", nearest.userId);
+    }
+
+    if (nearest) {
+      if (nearest.userId !== loggedInRescuer?.userId) {
+        console.log("You are not the nearest rescuer.");
+      } else {
+        console.log("You are the nearest rescuer.");
+      }
+    } else {
+      console.log("No nearest rescuer found.");
+    }
+  }, [citizen, otherRescuers, userId]);
+
   const handleAccept = async (requestID) => {
     setSelectedRequestCookie(requestID);
     setSelectedRequest(requestID);
 
-    await acceptRescueRequestInFirestore(userId, requestID);
+    const selected = requests.find((request) => request.id === requestID);
+    if (selected) {
+      console.log(
+        "Selected request:",
+        selected.location.longitude,
+        selected.location.latitude
+      );
 
-    setPage("Navigate");
+      setCitizen({
+        longitude: selected.location.longitude,
+        latitude: selected.location.latitude,
+        zoom: 15,
+      });
 
-    navigate("/rescuer/navigate");
+      // The nearest rescuer check is now handled in useEffect
+      // Uncomment the following lines to execute acceptance logic
+      // await acceptRescueRequestInFirestore(userId, requestID);
+      // setPage("Navigate");
+      // navigate("/rescuer/navigate");
+    } else {
+      console.error("Request not found for ID:", requestID);
+    }
   };
 
   const fetchRoutes = async () => {
@@ -52,6 +103,29 @@ const Requests = ({
     }
     setRouteData(newRouteData);
   };
+
+  useEffect(() => {
+    const unsubscribe = getLocationsFromFirestore("rescuer", (data) => {
+      setRescuers(data);
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (rescuers) {
+      const currentRescuer = rescuers.find(
+        (rescuer) => rescuer.userId === userId
+      );
+      const others = rescuers.filter(
+        (rescuer) => rescuer.userId !== userId && rescuer.status !== "offline"
+      );
+      setLoggedInRescuer(currentRescuer);
+      setOtherRescuers(others);
+    }
+  }, [rescuers, rescuer]);
 
   useEffect(() => {
     setPendingRequests(
