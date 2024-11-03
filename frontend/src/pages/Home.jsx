@@ -164,6 +164,7 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
+    if (!allRescuers) return;
     const onlineRescuersFiltered = allRescuers.filter(
       (rescuer) => rescuer.status === "online" && rescuer.role === "rescuer"
     );
@@ -171,6 +172,7 @@ const Home = () => {
   }, [allRescuers]);
 
   useEffect(() => {
+    if (!request) return;
     const assigned = allRescuers.filter(
       (rescuer) => rescuer.userId === request.rescuerId
     );
