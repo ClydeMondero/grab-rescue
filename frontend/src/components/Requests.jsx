@@ -27,12 +27,11 @@ const Requests = ({
   const navigate = useNavigate();
   const { rescuer, setPage } = useContext(RescuerContext);
   const [rescuers, setRescuers] = useState([]);
-  const [loggedInRescuer, setLoggedInRescuer] = useState(null);
-  const [otherRescuers, setOtherRescuers] = useState([]);
+  const [filteredRescuers, setFilteredRescuers] = useState([]);
   const [nearestRescuer, setNearestRescuer] = useState(null);
   const [citizen, setCitizen] = useState({
-    longitude: 120.9107,
-    latitude: 14.9536,
+    longitude: 120.926105,
+    latitude: 14.969063,
     zoom: 15,
   });
 
@@ -46,26 +45,23 @@ const Requests = ({
    * @param {string} requestID - Request ID to accept
    */
   useEffect(() => {
-    console.log("Citizen state updated:", citizen);
-    const nearest = getNearestRescuer(citizen, otherRescuers);
-    setNearestRescuer(nearest);
+    if (selectedRequest) {
+      console.log("Filtered rescuers:", filteredRescuers);
+      console.log("Citizen state updated:", citizen);
+      const nearest = getNearestRescuer(citizen, filteredRescuers);
+      setNearestRescuer(nearest);
 
-    if ((otherRescuers, loggedInRescuer)) {
-      console.log("Logged in rescuer:", loggedInRescuer.userId);
-      console.log("Other rescuers:", otherRescuers);
-      console.log("Nearest rescuer:", nearest.userId);
-    }
-
-    if (nearest) {
-      if (nearest.userId !== loggedInRescuer?.userId) {
-        console.log("You are not the nearest rescuer.");
+      if (nearest) {
+        if (nearest.userId !== userId) {
+          console.log("You are not the nearest rescuer.");
+        } else {
+          console.log("You are the nearest rescuer.");
+        }
       } else {
-        console.log("You are the nearest rescuer.");
+        console.log("No nearest rescuer found.");
       }
-    } else {
-      console.log("No nearest rescuer found.");
     }
-  }, [citizen, otherRescuers, userId]);
+  }, [citizen, rescuers, userId]);
 
   const handleAccept = async (requestID) => {
     setSelectedRequestCookie(requestID);
@@ -85,8 +81,6 @@ const Requests = ({
         zoom: 15,
       });
 
-      // The nearest rescuer check is now handled in useEffect
-      // Uncomment the following lines to execute acceptance logic
       // await acceptRescueRequestInFirestore(userId, requestID);
       // setPage("Navigate");
       // navigate("/rescuer/navigate");
@@ -106,7 +100,7 @@ const Requests = ({
 
   useEffect(() => {
     const unsubscribe = getLocationsFromFirestore("rescuer", (data) => {
-      setRescuers(data);
+      setRescuers(data.filter((rescuer) => rescuer.status !== "offline"));
     });
 
     return () => {
@@ -115,17 +109,24 @@ const Requests = ({
   }, []);
 
   useEffect(() => {
-    if (rescuers) {
-      const currentRescuer = rescuers.find(
-        (rescuer) => rescuer.userId === userId
+    if (requests) {
+      // Filter requests that are currently assigned
+      const filterAssignedRequests = requests.filter(
+        (request) => request.status === "assigned"
       );
-      const others = rescuers.filter(
-        (rescuer) => rescuer.userId !== userId && rescuer.status !== "offline"
+
+      // Extract the IDs of the assigned rescuers
+      const assignedRescuerIds = filterAssignedRequests.map(
+        (request) => request.rescuerId
       );
-      setLoggedInRescuer(currentRescuer);
-      setOtherRescuers(others);
+
+      // Filter rescuers that are not assigned to any request
+      const filteredAssignedRescuers = rescuers.filter(
+        (rescuer) => !assignedRescuerIds.includes(rescuer.userId)
+      );
+      setFilteredRescuers(filteredAssignedRescuers);
     }
-  }, [rescuers, rescuer]);
+  }, [requests, rescuers]);
 
   useEffect(() => {
     setPendingRequests(

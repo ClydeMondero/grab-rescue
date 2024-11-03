@@ -84,16 +84,24 @@ export const getAddress = async (longitude, latitude) => {
 //get nearest rescuer
 export const getNearestRescuer = (citizen, rescuers) => {
   const distances = rescuers.map((rescuer) => {
-    return getDistance(
+    const distance = getDistance(
       citizen.latitude,
       citizen.longitude,
       rescuer.latitude,
       rescuer.longitude
     );
+    console.log(`Distance to rescuer ${rescuer.userId}: ${distance}`); // Log distance
+    return distance;
   });
 
   const minDistance = Math.min(...distances);
-  const nearestRescuer = rescuers[distances.indexOf(minDistance)];
+  const nearestRescuerIndex = distances.indexOf(minDistance);
+  const nearestRescuer = rescuers[nearestRescuerIndex];
+
+  console.log("Distances:", distances);
+  console.log("Minimum distance:", minDistance);
+  console.log("Nearest rescuer index:", nearestRescuerIndex);
+  console.log("Nearest rescuer:", nearestRescuer);
 
   return nearestRescuer;
 };
