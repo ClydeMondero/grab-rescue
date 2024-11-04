@@ -370,6 +370,16 @@ export const acceptRescueRequestInFirestore = async (
   }
 };
 
+export const updateRequestStatusInFirestore = async (requestId, status) => {
+  const updateData = { status };
+
+  try {
+    await updateDoc(doc(store, "requests", requestId), updateData);
+  } catch (error) {
+    console.error("Error updating document: ", error);
+  }
+};
+
 // get location from firestore
 export const getLocationFromFirestore = async (id) => {
   try {
