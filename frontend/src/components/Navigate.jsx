@@ -174,8 +174,10 @@ const Navigate = ({ requestID }) => {
                     : "bg-orange-400"
                 }`}
               >
-                {requestData.status.charAt(0).toUpperCase() +
-                  requestData.status.slice(1)}
+                {requestData.status
+                  ? String(requestData.status[0]).toUpperCase() +
+                    requestData.status.slice(1)
+                  : ""}
               </div>
             </div>
           </div>

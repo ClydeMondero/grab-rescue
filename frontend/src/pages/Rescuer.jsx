@@ -86,7 +86,6 @@ const Rescuer = (props) => {
     getSelectedRequest();
 
     const unsubscribe = getRequestsFromFirestore(setRequests);
-
     return () => {
       unsubscribe();
     };

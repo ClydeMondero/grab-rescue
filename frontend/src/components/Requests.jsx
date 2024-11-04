@@ -12,6 +12,9 @@ import placeholder from "../assets/placeholder.png";
 import { formatDistance, formatDuration } from "../utils/DistanceUtility";
 import { setSelectedRequestCookie } from "../services/cookieService";
 import { acceptRescueRequestInFirestore } from "../services/firestoreService";
+import { getLocationsFromFirestore } from "../services/firestoreService";
+import { getNearestRescuer } from "../services/locationService";
+import { set } from "react-hook-form";
 
 // TODO: Add Completed Button
 
@@ -23,6 +26,14 @@ const Requests = ({
 }) => {
   const navigate = useNavigate();
   const { rescuer, setPage } = useContext(RescuerContext);
+  const [rescuers, setRescuers] = useState([]);
+  const [filteredRescuers, setFilteredRescuers] = useState([]);
+  const [nearestRescuer, setNearestRescuer] = useState(null);
+  const [citizen, setCitizen] = useState({
+    longitude: 120.926105,
+    latitude: 14.969063,
+    zoom: 15,
+  });
 
   // State to store routes data for requests
   const [routeData, setRouteData] = useState({});
@@ -33,15 +44,49 @@ const Requests = ({
    * Handle Accept button click
    * @param {string} requestID - Request ID to accept
    */
+  useEffect(() => {
+    if (selectedRequest) {
+      console.log("Filtered rescuers:", filteredRescuers);
+      console.log("Citizen state updated:", citizen);
+      const nearest = getNearestRescuer(citizen, filteredRescuers);
+      setNearestRescuer(nearest);
+
+      if (nearest) {
+        if (nearest.userId !== userId) {
+          console.log("You are not the nearest rescuer.");
+        } else {
+          console.log("You are the nearest rescuer.");
+        }
+      } else {
+        console.log("No nearest rescuer found.");
+      }
+    }
+  }, [citizen, rescuers, userId]);
+
   const handleAccept = async (requestID) => {
     setSelectedRequestCookie(requestID);
     setSelectedRequest(requestID);
 
-    await acceptRescueRequestInFirestore(userId, requestID);
+    const selected = requests.find((request) => request.id === requestID);
+    if (selected) {
+      console.log(
+        "Selected request:",
+        selected.location.longitude,
+        selected.location.latitude
+      );
 
-    setPage("Navigate");
+      setCitizen({
+        longitude: selected.location.longitude,
+        latitude: selected.location.latitude,
+        zoom: 15,
+      });
 
-    navigate("/rescuer/navigate");
+      // await acceptRescueRequestInFirestore(userId, requestID);
+      // setPage("Navigate");
+      // navigate("/rescuer/navigate");
+    } else {
+      console.error("Request not found for ID:", requestID);
+    }
   };
 
   const fetchRoutes = async () => {
@@ -52,6 +97,36 @@ const Requests = ({
     }
     setRouteData(newRouteData);
   };
+
+  useEffect(() => {
+    const unsubscribe = getLocationsFromFirestore("rescuer", (data) => {
+      setRescuers(data.filter((rescuer) => rescuer.status !== "offline"));
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (requests) {
+      // Filter requests that are currently assigned
+      const filterAssignedRequests = requests.filter(
+        (request) => request.status === "assigned"
+      );
+
+      // Extract the IDs of the assigned rescuers
+      const assignedRescuerIds = filterAssignedRequests.map(
+        (request) => request.rescuerId
+      );
+
+      // Filter rescuers that are not assigned to any request
+      const filteredAssignedRescuers = rescuers.filter(
+        (rescuer) => !assignedRescuerIds.includes(rescuer.userId)
+      );
+      setFilteredRescuers(filteredAssignedRescuers);
+    }
+  }, [requests, rescuers]);
 
   useEffect(() => {
     setPendingRequests(
@@ -115,9 +190,12 @@ const Requests = ({
                       request.status === "pending" ? "bg-yellow-500" : ""
                     }`}
                   >
-                    {request.status.charAt(0).toUpperCase() +
-                      request.status.slice(1)}
+                    {request.status
+                      ? String(request.status[0]).toUpperCase() +
+                        request.status.slice(1)
+                      : ""}
                   </div>
+
                   {/* Pin Icon for Navigation */}
                   <FaLocationArrow
                     className="absolute top-4 right-4 text-2xl text-background-light cursor-pointer"
