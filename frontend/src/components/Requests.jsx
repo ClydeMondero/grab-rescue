@@ -1,22 +1,19 @@
 import { useContext, useState, useEffect } from "react";
-import { FaMapLocation } from "react-icons/fa6";
 import { FaLocationArrow } from "react-icons/fa";
+import { FaMapLocation } from "react-icons/fa6";
 import { BiSolidHappyBeaming } from "react-icons/bi";
 import { RiPinDistanceFill } from "react-icons/ri";
 import { MdAccessTimeFilled } from "react-icons/md";
 import { IoSpeedometerSharp } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import { RescuerContext } from "../contexts/RescuerContext";
-import { getRouteData } from "../services/locationService";
+import { getRouteData, getNearestRescuer } from "../services/locationService";
 import placeholder from "../assets/placeholder.png";
 import { formatDistance, formatDuration } from "../utils/DistanceUtility";
 import { setSelectedRequestCookie } from "../services/cookieService";
 import { acceptRescueRequestInFirestore } from "../services/firestoreService";
 import { getLocationsFromFirestore } from "../services/firestoreService";
-import { getNearestRescuer } from "../services/locationService";
-import { set } from "react-hook-form";
-
-// TODO: Add Completed Button
+import NotNearestRescuerPrompt from "./NotNearestRescuerPrompt"; // Import the modal component
 
 const Requests = ({
   userId,
@@ -29,64 +26,70 @@ const Requests = ({
   const [rescuers, setRescuers] = useState([]);
   const [filteredRescuers, setFilteredRescuers] = useState([]);
   const [nearestRescuer, setNearestRescuer] = useState(null);
+  const [showNotNearestModal, setShowNotNearestModal] = useState(false);
+  const [hasConfirmedRequest, setHasConfirmedRequest] = useState(false); // New state to prevent repeated modal
   const [citizen, setCitizen] = useState({
     longitude: 120.926105,
     latitude: 14.969063,
     zoom: 15,
   });
 
-  // State to store routes data for requests
   const [routeData, setRouteData] = useState({});
-
   const [pendingRequests, setPendingRequests] = useState([]);
 
-  /**
-   * Handle Accept button click
-   * @param {string} requestID - Request ID to accept
-   */
   useEffect(() => {
-    if (selectedRequest) {
-      console.log("Filtered rescuers:", filteredRescuers);
-      console.log("Citizen state updated:", citizen);
+    if (selectedRequest && !hasConfirmedRequest) {
+      console.log("Selected request:", selectedRequest);
       const nearest = getNearestRescuer(citizen, filteredRescuers);
       setNearestRescuer(nearest);
 
       if (nearest) {
         if (nearest.userId !== userId) {
           console.log("You are not the nearest rescuer.");
+          setShowNotNearestModal(true);
         } else {
           console.log("You are the nearest rescuer.");
+          handleAssign();
+          setShowNotNearestModal(false);
         }
       } else {
         console.log("No nearest rescuer found.");
+        setShowNotNearestModal(false);
       }
     }
-  }, [citizen, rescuers, userId]);
+  }, [citizen, filteredRescuers, userId, selectedRequest, hasConfirmedRequest]);
 
   const handleAccept = async (requestID) => {
-    setSelectedRequestCookie(requestID);
     setSelectedRequest(requestID);
-
     const selected = requests.find((request) => request.id === requestID);
     if (selected) {
-      console.log(
-        "Selected request:",
-        selected.location.longitude,
-        selected.location.latitude
-      );
-
       setCitizen({
         longitude: selected.location.longitude,
         latitude: selected.location.latitude,
         zoom: 15,
       });
-
-      // await acceptRescueRequestInFirestore(userId, requestID);
-      // setPage("Navigate");
-      // navigate("/rescuer/navigate");
     } else {
       console.error("Request not found for ID:", requestID);
     }
+  };
+
+  const handleAssign = async () => {
+    setSelectedRequestCookie(selectedRequest);
+    setHasConfirmedRequest(true);
+    await acceptRescueRequestInFirestore(userId, selectedRequest);
+    setPage("Navigate");
+    navigate("/rescuer/navigate");
+  };
+
+  const handleContinue = async () => {
+    setShowNotNearestModal(false);
+    console.log("Continue with the request.");
+    handleAssign();
+  };
+
+  const handleCancel = () => {
+    setSelectedRequest(null);
+    setShowNotNearestModal(false);
   };
 
   const fetchRoutes = async () => {
@@ -102,25 +105,17 @@ const Requests = ({
     const unsubscribe = getLocationsFromFirestore("rescuer", (data) => {
       setRescuers(data.filter((rescuer) => rescuer.status !== "offline"));
     });
-
-    return () => {
-      unsubscribe();
-    };
+    return () => unsubscribe();
   }, []);
 
   useEffect(() => {
     if (requests) {
-      // Filter requests that are currently assigned
       const filterAssignedRequests = requests.filter(
         (request) => request.status === "assigned"
       );
-
-      // Extract the IDs of the assigned rescuers
       const assignedRescuerIds = filterAssignedRequests.map(
         (request) => request.rescuerId
       );
-
-      // Filter rescuers that are not assigned to any request
       const filteredAssignedRescuers = rescuers.filter(
         (rescuer) => !assignedRescuerIds.includes(rescuer.userId)
       );
@@ -134,19 +129,18 @@ const Requests = ({
     );
 
     if (pendingRequests.length > 0) {
-      fetchRoutes();
+      if (requests && rescuer) {
+        fetchRoutes();
+      }
     }
   }, [requests, rescuer]);
 
   return (
     <div
-      className={`h-full flex flex-col p-6  ${
+      className={`h-full flex flex-col p-6 ${
         pendingRequests.length > 0 ? "" : "justify-center"
-      }
-        
       }`}
     >
-      {/* Header Section */}
       <div
         className={`hidden flex-col items-start justify-between mb-4 md:flex md:${
           pendingRequests.length > 0 ? "" : "hidden"
@@ -157,7 +151,6 @@ const Requests = ({
         </h2>
       </div>
 
-      {/* Scrollable Request Cards Section */}
       <div
         className={`${
           pendingRequests.length > 0
@@ -174,7 +167,6 @@ const Requests = ({
                 key={request.id}
                 className="block bg-white border border-gray-300 rounded-md overflow-hidden"
               >
-                {/* Image Section */}
                 <div className="relative">
                   <img
                     src={
@@ -196,16 +188,13 @@ const Requests = ({
                       : ""}
                   </div>
 
-                  {/* Pin Icon for Navigation */}
                   <FaLocationArrow
                     className="absolute top-4 right-4 text-2xl text-background-light cursor-pointer"
-                    onClick={() => handleNavigate(request.id)}
+                    onClick={() => handleAccept(request.id)}
                   />
                 </div>
 
-                {/* Request Info & Action */}
                 <div className="flex flex-col items-start justify-between p-4 gap-4">
-                  {/* Request Info */}
                   <div className="flex-1">
                     <div className="flex items-center gap-1">
                       <FaMapLocation className="text-background-medium" />
@@ -246,24 +235,20 @@ const Requests = ({
                             const requestDate = new Date(request.timestamp);
                             const now = new Date();
 
-                            // Format the request time to a more readable format
                             const formattedTime = new Intl.DateTimeFormat(
                               "en-US",
                               {
                                 year: "numeric",
-                                month: "long", // Full month name for readability
+                                month: "long",
                                 day: "numeric",
                                 hour: "numeric",
                                 minute: "numeric",
                                 second: "numeric",
-                                hour12: true, // To format as AM/PM
+                                hour12: true,
                               }
                             ).format(requestDate);
 
-                            // Calculate time elapsed in milliseconds
                             const timeElapsed = now - requestDate;
-
-                            // Convert timeElapsed to minutes, hours, days, etc.
                             const minutesElapsed = Math.floor(
                               timeElapsed / (1000 * 60)
                             );
@@ -272,7 +257,6 @@ const Requests = ({
                             if (minutesElapsed < 60) {
                               timeLabel = `${minutesElapsed} minutes ago`;
                             } else if (minutesElapsed < 1440) {
-                              // Less than a day
                               timeLabel = `${Math.floor(
                                 minutesElapsed / 60
                               )} hours ago`;
@@ -295,7 +279,6 @@ const Requests = ({
                     </div>
                   </div>
 
-                  {/* Accept Button */}
                   <div className="w-full">
                     {!selectedRequest && (
                       <button
@@ -314,6 +297,13 @@ const Requests = ({
           <NoRequests />
         )}
       </div>
+
+      {showNotNearestModal && (
+        <NotNearestRescuerPrompt
+          onContinue={handleContinue}
+          onCancel={handleCancel}
+        />
+      )}
     </div>
   );
 };
