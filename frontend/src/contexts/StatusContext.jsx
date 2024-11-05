@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect, useRef } from "react";
+import { createContext, useState, useEffect } from "react";
 import {
   getCitizenCookie,
   getStatusCookie,
@@ -23,50 +23,82 @@ const StatusProvider = ({ children }) => {
     if (userCookie) {
       const userId = await getIDFromCookie();
       setId(userId);
+      console.log("User ID set:", userId);
     } else {
       const citizenCookie = getCitizenCookie();
 
       if (citizenCookie) {
         const citizenId = await getIDFromLocation(citizenCookie);
         setId(citizenId);
+        console.log("Citizen ID set:", citizenId);
       }
     }
   };
 
   useEffect(() => {
     const handleVisibilityChange = () => {
-      if (document.hidden) {
-        // User is switching away from the app, mark as 'inactive'
-        setIsOnline(false);
-      } else {
-        setIsOnline(true);
+      const onlineStatus = !document.hidden;
+      setIsOnline(onlineStatus);
+      console.log("Visibility changed, isOnline:", onlineStatus);
+    };
+
+    const handleBeforeUnload = (ev) => {
+      if (id) {
+        setStatusCookie("offline");
+        updateLocationStatus(id, "offline");
+        console.log("User is going offline, ID:", id);
       }
+      ev.returnValue = "Changes you made may not be saved.";
+    };
+
+    const handleActivity = () => {
+      setIsOnline(true);
+      setStatusCookie("online");
+      if (id) updateLocationStatus(id, "online");
     };
 
     document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    // Listen for user activity events
+    document.addEventListener("mousemove", handleActivity);
+    document.addEventListener("keydown", handleActivity);
+    document.addEventListener("touchstart", handleActivity);
+
+    console.log("Event listeners added for user activity.");
 
     return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      document.removeEventListener("mousemove", handleActivity);
+      document.removeEventListener("keydown", handleActivity);
+      document.removeEventListener("touchstart", handleActivity);
+      console.log("Event listeners removed for user activity.");
     };
-  }, []);
+  }, [id]); // Only depend on id for event listeners
 
   useEffect(() => {
     const statusCookie = getStatusCookie();
+    console.log("Current isOnline:", isOnline); // Log current online status
 
     if (!isOnline) {
-      if (!statusCookie || statusCookie == "online") {
+      if (!statusCookie || statusCookie === "online") {
         setStatusCookie("offline");
-
-        updateLocationStatus(id, "offline");
+        if (id) {
+          updateLocationStatus(id, "offline");
+          console.log("Status updated to offline for ID:", id);
+        }
       }
-    } else if (isOnline) {
-      if (!statusCookie || statusCookie == "offline") {
+    } else {
+      if (!statusCookie || statusCookie === "offline") {
         setStatusCookie("online");
-
-        updateLocationStatus(id, "online");
+        if (id) {
+          updateLocationStatus(id, "online");
+          console.log("Status updated to online for ID:", id);
+        }
       }
     }
-  }, [isOnline]);
+  }, [isOnline, id]); // Include isOnline and id as dependencies
 
   return (
     <StatusContext.Provider value={{ isOnline, getId, id }}>
