@@ -14,12 +14,13 @@ import {
   getLocationFromFirestore,
   getRequestFromFirestore,
   getLocationsFromFirestore,
-  clearLocationsCollection, // Ensure this import is here
+  clearLocationsCollection,
 } from "../services/firestoreService";
 import {
   getCitizenCookie,
   getRequestCookie,
   setRequestCookie,
+  deleteCookie, // Import deleteCookie
 } from "../services/cookieService";
 import { StatusContext } from "../contexts/StatusContext";
 import MobileDetect from "mobile-detect";
@@ -81,6 +82,12 @@ const Home = () => {
 
     const unsubscribe = getRequestFromFirestore(requestId, (onGoingRequest) => {
       setRequest(onGoingRequest);
+
+      // Check if the request status is 'rescued'
+      if (onGoingRequest && onGoingRequest.status === "rescued") {
+        setRequesting(null); // Clear requesting state
+        deleteCookie("request_token"); // Delete the request_token cookie
+      }
     });
 
     return () => {
@@ -241,12 +248,6 @@ const Home = () => {
           >
             <p className="text-primary text-md font-semibold">Login as Admin</p>
           </li>
-          {/* <li
-            onClick={() => navigate("/register")}
-            className="bg-primary text-white border-[2px] border-primary px-4 py-2 cursor-pointer rounded-md hover:opacity-80"
-          >
-            <p className="text-md font-semibold">Be a Rescuer</p>
-          </li> */}
         </ul>
       </div>
 
@@ -283,14 +284,6 @@ const Home = () => {
                     Login as Admin
                   </button>
                 </li>
-                {/* <li className="py-2 border-b w-full">
-                  <button
-                    onClick={() => navigate("/register")}
-                    className="flex items-center justify-center w-full text-lg font-semibold "
-                  >
-                    Be a Rescuer
-                  </button>
-                </li> */}
                 <li className="py-2">
                   <button
                     onClick={() => navigate("/about")}
@@ -314,9 +307,7 @@ const Home = () => {
 
         {requesting && (
           <div
-            className={`
-            bg-white p-4 rounded-lg shadow-lg transition-all duration-300 ease-in-out
-          `}
+            className={`bg-white p-4 rounded-lg shadow-lg transition-all duration-300 ease-in-out`}
           >
             {request && request.status == "pending" ? (
               <p>Waiting for rescuer acceptance...</p>
@@ -352,12 +343,10 @@ const Home = () => {
 
         {/* Sliding Pane */}
         {requesting && (
-          // Add Request Details
           <div
-            className={`
-              border-x-background-medium border-t-2 p-2 w-full flex flex-col items-center transition-all duration-300 ease-in-out rounded-t-2xl ${
-                formVisible ? "h-[100%] bg-white" : "h-[10%] bg-primary-medium "
-              } `}
+            className={`border-x-background-medium border-t-2 p-2 w-full flex flex-col items-center transition-all duration-300 ease-in-out rounded-t-2xl ${
+              formVisible ? "h-[100%] bg-white" : "h-[10%] bg-primary-medium "
+            } `}
           >
             <MdDragHandle
               onClick={() => setFormVisible(!formVisible)}
