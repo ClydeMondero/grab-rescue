@@ -85,8 +85,10 @@ const Home = () => {
 
       // Check if the request status is 'rescued'
       if (onGoingRequest && onGoingRequest.status === "rescued") {
-        setRequesting(null); // Clear requesting state
+        setRequest(null);
+        setRequesting(false); // Clear requesting state
         deleteCookie("request_token"); // Delete the request_token cookie
+        setAssignedRescuer(null);
       }
     });
 
