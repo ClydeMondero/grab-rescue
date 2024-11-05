@@ -5,19 +5,27 @@ import {
   FaPhone,
   FaChevronDown,
   FaChevronUp,
+  FaChevronRight,
 } from "react-icons/fa";
-import { getRequestFromFirestore } from "../services/firestoreService";
+import {
+  getRequestFromFirestore,
+  updateRequestStatusInFirestore,
+} from "../services/firestoreService";
 import { Loader } from "../components";
 import MobileDetect from "mobile-detect";
 import { toast } from "react-toastify";
 import { RescuerContext } from "../contexts/RescuerContext";
 import placeholder from "../assets/placeholder.png";
 
+const statuses = ["assigned", "in transit", "en route", "rescued"];
+
 const Navigate = ({ requestID }) => {
   const [showDetails, setShowDetails] = useState(false);
   const [requestData, setRequestData] = useState(null);
   const [locating, setLocating] = useState(false);
   const [onMobile, setOnMobile] = useState(false);
+  const [showModal, setShowModal] = useState(false); // State for showing the modal
+  const [statusToUpdate, setStatusToUpdate] = useState(null); // State to hold the next status to update
 
   const { navigating, setNavigating } = useContext(RescuerContext);
   const mapRef = useRef();
@@ -55,6 +63,26 @@ const Navigate = ({ requestID }) => {
     }
   };
 
+  const handleStatusChangeClick = (newStatus) => {
+    setStatusToUpdate(newStatus);
+    setShowModal(true); // Show confirmation modal
+  };
+
+  const confirmStatusChange = () => {
+    if (
+      statusToUpdate &&
+      statuses.indexOf(statusToUpdate) > statuses.indexOf(requestData.status)
+    ) {
+      setRequestData((prevData) => ({ ...prevData, status: statusToUpdate }));
+      updateRequestStatusInFirestore(requestID, statusToUpdate);
+    }
+    setShowModal(false); // Close modal after confirmation
+  };
+
+  const cancelStatusChange = () => {
+    setShowModal(false); // Close modal without changing status
+  };
+
   useEffect(() => {
     const md = new MobileDetect(window.navigator.userAgent);
     const isSmallScreen = window.innerWidth <= 768;
@@ -62,8 +90,18 @@ const Navigate = ({ requestID }) => {
     setOnMobile(isMobile);
   }, []);
 
+  // Find the next status based on the current status
+  const getNextStatus = (currentStatus) => {
+    const currentIndex = statuses.indexOf(currentStatus);
+    return currentIndex < statuses.length - 1
+      ? statuses[currentIndex + 1]
+      : null;
+  };
+
+  const nextStatus = getNextStatus(requestData?.status);
+
   return (
-    <div className="relative flex flex-col h-full bg-background-light">
+    <div className="relative flex flex-col h-full">
       <div className="flex-1">
         {requestID ? (
           requestData ? (
@@ -105,7 +143,7 @@ const Navigate = ({ requestID }) => {
       )}
 
       {!requestData && (
-        <div className="flex-none h-auto bg-background rounded-t-2xl p-4 ">
+        <div className="flex-none h-auto bg-background rounded-t-2xl p-4">
           <div className="flex items-center justify-center">
             <p className="text-primary-medium font-semibold text-xl text-center">
               You're not assigned to any request.
@@ -115,11 +153,7 @@ const Navigate = ({ requestID }) => {
       )}
 
       {requestData && (
-        <div
-          className={`flex-none bg-background rounded-t-2xl p-4 transition-all duration-300 ease-in-out ${
-            showDetails ? "h-[75%] overflow-hidden" : ""
-          }`}
-        >
+        <div className="flex-none bg-background rounded-t-2xl p-4 transition-all duration-300 ease-in-out mt-4 max-w-4xl mx-auto">
           {/* Toggle Icon at the Top */}
           <div
             className="flex justify-center mb-2 cursor-pointer"
@@ -133,9 +167,9 @@ const Navigate = ({ requestID }) => {
           </div>
 
           {/* Main Information */}
-          <div className="flex justify-between items-center cursor-pointer md:justify-center md:gap-4">
+          <div className="flex justify-between items-center md:gap-4">
             <div className="flex flex-col gap-1 pb-2 mb-2">
-              <div className="text-primary-dark font-semibold text-xl">
+              <div className="text-primary-dark font-semibold text-2xl">
                 <p>{requestData.location.address.split(",")[0]}</p>
               </div>
               <div className="text-primary-medium text-lg">
@@ -146,38 +180,50 @@ const Navigate = ({ requestID }) => {
                     .join(", ")}
                 </p>
               </div>
+
+              {/* Inline Name and Relation */}
               <div className="flex items-center gap-2 text-md font-semibold text-background-dark mt-2">
                 <p>{requestData.citizenName}</p>
                 <span>•</span>
-                <p>
-                  {requestData.citizenRelation
-                    ? requestData.citizenRelation
-                    : "No Relation"}
-                </p>
+                <p>{requestData.citizenRelation || "No Relation"}</p>
               </div>
             </div>
 
-            {/* Phone and Status Section */}
-            <div className="flex flex-col items-center justify-between gap-2">
+            {/* Phone Button and Status Section */}
+            <div className="flex flex-col items-end gap-2">
+              {/* Phone Button */}
               {requestData.phone && (
                 <button
                   onClick={handlePhone}
-                  className="flex items-center justify-center w-12 h-12 bg-primary rounded-full text-white text-2xl cursor-pointer"
+                  className="bg-primary p-3 rounded-full text-white shadow hover:bg-primary-dark transition"
                 >
-                  <FaPhone />
+                  <FaPhone className="text-3xl" />
                 </button>
               )}
-              <div
-                className={`text-sm font-semibold text-white py-2 px-5 rounded-lg shadow-md ${
-                  requestData.status === "assigned"
-                    ? "bg-highlight"
-                    : "bg-orange-400"
-                }`}
-              >
-                {requestData.status
-                  ? String(requestData.status[0]).toUpperCase() +
-                    requestData.status.slice(1)
-                  : ""}
+
+              {/* Status and Next Status Section, Aligned to the Right */}
+              <div className="flex items-center gap-2 mt-2 ">
+                <div className="text-sm font-semibold text-white py-2 px-5 rounded-full bg-highlight">
+                  {requestData.status
+                    ? requestData.status[0].toUpperCase() +
+                      requestData.status.slice(1)
+                    : ""}
+                </div>
+                {nextStatus && (
+                  <>
+                    <div className="flex items-center animate-pulse">
+                      <FaChevronRight className="text-primary-medium" />
+                      <FaChevronRight className="text-primary-medium" />
+                    </div>
+                    <button
+                      style={{ minWidth: "6rem" }}
+                      onClick={() => handleStatusChangeClick(nextStatus)}
+                      className="text-sm text-gray-700 border border-gray-300 rounded-full px-5 py-2 opacity-70 cursor-pointer hover:bg-gray-100 transition-all"
+                    >
+                      {nextStatus.charAt(0).toUpperCase() + nextStatus.slice(1)}
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -212,6 +258,39 @@ const Navigate = ({ requestID }) => {
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Confirmation Modal */}
+      {showModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
+            <h2 className="text-lg font-semibold text-center mb-4">
+              Confirm Status Change
+            </h2>
+            <p className="text-center mb-6">
+              Are you sure you want to change the status to{" "}
+              <span className="font-semibold">
+                {statusToUpdate.charAt(0).toUpperCase() +
+                  statusToUpdate.slice(1)}
+              </span>
+              ?
+            </p>
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={confirmStatusChange}
+                className="bg-primary text-white py-2 px-4 rounded hover:bg-primary-dark transition"
+              >
+                Confirm
+              </button>
+              <button
+                onClick={cancelStatusChange}
+                className="bg-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-400 transition"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
