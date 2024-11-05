@@ -148,6 +148,14 @@ const CitizenMap = forwardRef((props, ref) => {
     }
   }, [nearestRescuer, citizen, rescuers]);
 
+  useEffect(() => {
+    if (rescuers && citizen) {
+      const nearest = getNearestRescuer(citizen, rescuers);
+      setNearestRescuer(nearest);
+      onNearestRescuerUpdate(nearest);
+    }
+  }, [rescuers, citizen]);
+
   useImperativeHandle(ref, () => ({
     locateCitizen: () => {
       geoControlRef.current?.trigger();
