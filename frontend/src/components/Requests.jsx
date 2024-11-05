@@ -125,7 +125,7 @@ const Requests = ({
 
   useEffect(() => {
     setPendingRequests(
-      requests.filter((request) => request.status !== "assigned")
+      requests.filter((request) => request.status === "pending")
     );
 
     if (pendingRequests.length > 0) {

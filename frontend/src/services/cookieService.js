@@ -2,7 +2,7 @@ import Cookies from "js-cookie";
 import CryptoJS from "crypto-js";
 
 export const deleteCookie = (cookieName) => {
-  document.cookie = `${cookieName}=; expires=${new Date()};`;
+  document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
 };
 
 export const getCookie = (cookieName) => {
