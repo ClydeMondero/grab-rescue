@@ -30,6 +30,7 @@ import { useLocating } from "../hooks";
 import { getOnlineLocationsFromFirestore } from "../services/firestoreService";
 import { useLocation } from "react-router-dom";
 import { setGeolocateIcon } from "../utils/GeolocateUtility";
+import { get } from "lodash";
 
 const CitizenMap = forwardRef((props, ref) => {
   const { assignedRescuer } = props;
@@ -126,12 +127,21 @@ const CitizenMap = forwardRef((props, ref) => {
   };
 
   const getRoute = async () => {
-    const route = await getRouteData(nearestRescuer, citizen);
+    let route;
+    if (assignedRescuer) {
+      route = await getRouteData(assignedRescuer, citizen);
+    } else {
+      route = await getRouteData(nearestRescuer, citizen);
+    }
 
     setRouteData(route);
     setDistance(route.distance);
     setEta(route.duration);
   };
+
+  useEffect(() => {
+    getRoute();
+  }, [assignedRescuer]);
 
   useEffect(() => {
     const unsubscribe = getOnlineLocationsFromFirestore("rescuer", setRescuers);
@@ -143,10 +153,30 @@ const CitizenMap = forwardRef((props, ref) => {
   }, []);
 
   useEffect(() => {
+    if (assignedRescuer) {
+      console.log("assignedRescuer", assignedRescuer);
+    }
+  }, [assignedRescuer]);
+
+  useEffect(() => {
+    if (nearestRescuer) {
+      console.log("nearestRescuer", nearestRescuer);
+    }
+  }, [nearestRescuer]);
+
+  useEffect(() => {
     if (nearestRescuer) {
       getRoute();
     }
   }, [nearestRescuer, citizen, rescuers]);
+
+  useEffect(() => {
+    if (rescuers && citizen) {
+      const nearest = getNearestRescuer(citizen, rescuers);
+      setNearestRescuer(nearest);
+      onNearestRescuerUpdate(nearest);
+    }
+  }, [rescuers, citizen]);
 
   useImperativeHandle(ref, () => ({
     locateCitizen: () => {

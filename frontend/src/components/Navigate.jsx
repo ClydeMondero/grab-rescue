@@ -16,10 +16,14 @@ import MobileDetect from "mobile-detect";
 import { toast } from "react-toastify";
 import { RescuerContext } from "../contexts/RescuerContext";
 import placeholder from "../assets/placeholder.png";
+import {
+  getSelectedRequestCookie,
+  deleteCookie,
+} from "../services/cookieService";
 
 const statuses = ["assigned", "in transit", "en route", "rescued"];
 
-const Navigate = ({ requestID }) => {
+const Navigate = ({ requestID, setSelectedRequest }) => {
   const [showDetails, setShowDetails] = useState(false);
   const [requestData, setRequestData] = useState(null);
   const [locating, setLocating] = useState(false);
@@ -65,7 +69,8 @@ const Navigate = ({ requestID }) => {
 
   const handleStatusChangeClick = (newStatus) => {
     setStatusToUpdate(newStatus);
-    setShowModal(true); // Show confirmation modal
+    setShowModal(true);
+    ``;
   };
 
   const confirmStatusChange = () => {
@@ -75,6 +80,11 @@ const Navigate = ({ requestID }) => {
     ) {
       setRequestData((prevData) => ({ ...prevData, status: statusToUpdate }));
       updateRequestStatusInFirestore(requestID, statusToUpdate);
+      if (statusToUpdate === "rescued") {
+        deleteCookie("selected_request");
+        setSelectedRequest(null);
+        setRequestData(null);
+      }
     }
     setShowModal(false); // Close modal after confirmation
   };
@@ -209,7 +219,7 @@ const Navigate = ({ requestID }) => {
                       requestData.status.slice(1)
                     : ""}
                 </div>
-                {nextStatus && (
+                {nextStatus && !locating && (
                   <>
                     <div className="flex items-center animate-pulse">
                       <FaChevronRight className="text-primary-medium" />
