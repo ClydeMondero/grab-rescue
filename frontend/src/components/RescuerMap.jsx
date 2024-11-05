@@ -1,4 +1,11 @@
-import { useState, useRef, useEffect, useContext } from "react";
+import {
+  useState,
+  useRef,
+  useEffect,
+  useContext,
+  useMemo,
+  useCallback,
+} from "react";
 import { GeolocateControl, Map as MapGL, Marker } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useLocating } from "../hooks";
@@ -22,6 +29,7 @@ import { FaLocationPin } from "react-icons/fa6";
 import { useLocation } from "react-router-dom";
 import { setGeolocateIcon } from "../utils/GeolocateUtility";
 import * as turf from "@turf/turf";
+import { debounce, throttle } from "lodash";
 
 const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
   const { rescuer, setRescuer } = useContext(RescuerContext);
@@ -56,7 +64,6 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
     if (locations == null) return;
 
     const id = await getIDFromCookie();
-
     const existingLocation = locations.find(
       (location) => location.userId === id
     );
@@ -85,70 +92,68 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
     };
 
     if (routeData) {
-      const onRoute = checkIfOnRoute(currentLocation, routeData);
-      setIsOnRoute(onRoute);
+      throttledCheckIfOnRoute(currentLocation, routeData);
     }
   };
 
-  const checkIfOnRoute = (currentLocation, route) => {
-    const currentPoint = turf.point([
-      currentLocation.longitude,
-      currentLocation.latitude,
-    ]);
-    const line = turf.lineString(route.geometry.coordinates);
+  const throttledCheckIfOnRoute = useCallback(
+    throttle((currentLocation, route) => {
+      const currentPoint = turf.point([
+        currentLocation.longitude,
+        currentLocation.latitude,
+      ]);
+      const line = turf.lineString(route.geometry.coordinates);
+      const distance = turf.pointToLineDistance(currentPoint, line, {
+        units: "meters",
+      });
+      const threshold = 20;
+      setIsOnRoute(distance <= threshold);
+    }, 500), // Adjust throttle delay
+    []
+  );
 
-    const distance = turf.pointToLineDistance(currentPoint, line, {
-      units: "meters",
-    });
+  const memoizedRouteData = useMemo(() => {
+    if (!rescuer || !citizen) return null;
+    return getRouteData(rescuer, citizen);
+  }, [rescuer, citizen]);
 
-    const threshold = 20;
-    return distance <= threshold;
-  };
-
-  const getRoute = async () => {
-    const route = await getRouteData(rescuer, citizen);
-
-    setRouteData(route);
-    setDistance(route.distance);
-    setEta(route.duration);
-  };
+  useEffect(() => {
+    if (memoizedRouteData) {
+      setRouteData(memoizedRouteData);
+      setDistance(memoizedRouteData.distance);
+      setEta(memoizedRouteData.duration);
+    }
+  }, [memoizedRouteData]);
 
   const handleNavigating = () => {
-    mapRef.current.flyTo({
-      center: [rescuer.longitude, rescuer.latitude],
-      zoom: rescuer.zoom,
-      pitch: 60,
-      bearing: rescuer.bearing,
-      essential: true,
+    requestAnimationFrame(() => {
+      mapRef.current.flyTo({
+        center: [rescuer.longitude, rescuer.latitude],
+        zoom: rescuer.zoom,
+        pitch: 60,
+        bearing: rescuer.bearing,
+        essential: true,
+      });
     });
-
-    setRescuer({ ...rescuer, pitch: 60 });
   };
 
-  const handleOrientation = (event) => {
+  const handleOrientation = debounce((event) => {
     const { alpha } = event;
-
     if (alpha !== null) {
       const bearing = alpha;
-      const zoom = 18; // Set desired zoom level
-
-      setRescuer((prev) => ({
-        ...prev,
-        bearing,
-        zoom,
-      }));
-
+      const zoom = 18;
+      setRescuer((prev) => ({ ...prev, bearing, zoom }));
       if (mapRef.current) {
         mapRef.current.flyTo({
           center: [rescuer.longitude, rescuer.latitude],
-          zoom: zoom,
-          bearing: bearing,
-          pitch: 60, // Optional: set a pitch for a 3D effect
+          zoom,
+          bearing,
+          pitch: 60,
           essential: true,
         });
       }
     }
-  };
+  }, 100);
 
   useEffect(() => {
     if (citizen) {
@@ -159,7 +164,6 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
   useEffect(() => {
     if (navigating) {
       handleNavigating();
-
       if (typeof DeviceOrientationEvent.requestPermission === "function") {
         DeviceOrientationEvent.requestPermission()
           .then((response) => {
@@ -180,7 +184,6 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
         bearing: 0,
         essential: true,
       });
-
       setRescuer((prev) => ({
         ...prev,
         pitch: 0,
@@ -194,11 +197,11 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
   }, [navigating]);
 
   useEffect(() => {
-    const unsubscribe = getLocationsFromFirestore("rescuer", setLocations);
+    const fetchLocations = () =>
+      getLocationsFromFirestore("rescuer", setLocations);
+    const interval = setInterval(fetchLocations, 5000); // Fetch every 5 seconds
 
-    return () => {
-      unsubscribe();
-    };
+    return () => clearInterval(interval); // Clear on unmount
   }, []);
 
   return (
@@ -212,7 +215,9 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
       dragRotate={false}
       pitchWithRotate={false}
       onLoad={() => {
-        geoControlRef.current?.trigger();
+        if (!navigating && geoControlRef.current) {
+          geoControlRef.current.trigger();
+        }
       }}
     >
       <GeolocateControl
