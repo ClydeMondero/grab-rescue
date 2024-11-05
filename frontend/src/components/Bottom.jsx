@@ -20,7 +20,7 @@ const Bottom = ({ user }) => {
     const unsubscribe = getRequestsFromFirestore((requests) => {
       const assignedRequests = requests.filter(
         (request) =>
-          request.rescuerId === user?.id && request.status === "assigned"
+          request.rescuerId === user?.id && request.status !== "rescued"
       );
       setRequests(assignedRequests);
       setIsAssigned(assignedRequests.length > 0);
