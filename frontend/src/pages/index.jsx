@@ -9,6 +9,7 @@ import NotFound from "./NotFound";
 import MultiStepForm from "./MultiStepForm";
 import Policy from "./Policy";
 import TermsOfService from "./TermsOfService";
+import Download from "./Download";
 export {
   MultiStepForm,
   Login,
@@ -21,4 +22,5 @@ export {
   VerifyEmail,
   Policy,
   TermsOfService,
+  Download,
 };

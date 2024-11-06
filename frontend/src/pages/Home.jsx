@@ -227,6 +227,14 @@ const Home = () => {
               About
             </p>
           </li>
+          <li>
+            <p
+              className="text-lg font-semibold cursor-pointer text-text-primary"
+              onClick={() => navigate("/download")}
+            >
+              Download
+            </p>
+          </li>
           <li
             onClick={() => navigate("/login?role=Rescuer")}
             className="cursor-pointer text-text-primary border-primary border-[2px] px-4 py-2 rounded-md hover:opacity-80"
@@ -297,6 +305,14 @@ const Home = () => {
                     className="flex items-center w-full text-lg font-semibold hover:underline"
                   >
                     About
+                  </button>
+                </li>
+                <li className="py-2">
+                  <button
+                    onClick={() => navigate("/download")}
+                    className="flex items-center w-full text-lg font-semibold hover:underline"
+                  >
+                    Download
                   </button>
                 </li>
               </ul>

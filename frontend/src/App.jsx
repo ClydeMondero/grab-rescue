@@ -10,6 +10,7 @@ import {
   VerifyEmail,
   Policy,
   TermsOfService,
+  Download,
 } from "./pages";
 import axios from "axios";
 import { PrivateRoute, GeolocateButton, LocationPrompt } from "./components";
@@ -37,6 +38,7 @@ const App = () => {
           <Route path="/admin/*" element={<PrivateRoute Component={Admin} />} />
           <Route path="/privacy-policy" element={<Policy />} />
           <Route path="/terms-of-service" element={<TermsOfService />} />
+          <Route path="/download" element={<Download />} />
           <Route
             path="/rescuer/*"
             element={<PrivateRoute Component={Rescuer} />}

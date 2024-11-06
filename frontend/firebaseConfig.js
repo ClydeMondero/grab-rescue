@@ -15,16 +15,16 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+initializeApp(firebaseConfig);
 
-//Initialize Firestore
-export const store = getFirestore(app);
+// Initialize Firestore
+export const store = getFirestore();
 
-//Initialize Firebase Storage
-export const storage = getStorage(app);
+// Initialize Firebase Storage
+export const storage = getStorage();
 
 // Initialize Firebase Cloud Messaging
-export const messaging = getMessaging(app);
+export const messaging = getMessaging();
 
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker
