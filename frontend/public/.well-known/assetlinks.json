@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.onrender.grab_rescue.twa",
+      "sha256_cert_fingerprints": [
+        "95:C5:AA:19:E3:A1:9B:87:5F:DA:EE:AE:9C:C4:90:0C:DC:44:28:AA:D7:38:91:FE:62:F6:41:3C:8B:41:BD:D3"
+      ]
+    }
+  }
+]
