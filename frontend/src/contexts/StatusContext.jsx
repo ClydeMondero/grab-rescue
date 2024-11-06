@@ -23,14 +23,12 @@ const StatusProvider = ({ children }) => {
     if (userCookie) {
       const userId = await getIDFromCookie();
       setId(userId);
-      console.log("User ID set:", userId);
     } else {
       const citizenCookie = getCitizenCookie();
 
       if (citizenCookie) {
         const citizenId = await getIDFromLocation(citizenCookie);
         setId(citizenId);
-        console.log("Citizen ID set:", citizenId);
       }
     }
   };
@@ -39,14 +37,12 @@ const StatusProvider = ({ children }) => {
     const handleVisibilityChange = () => {
       const onlineStatus = !document.hidden;
       setIsOnline(onlineStatus);
-      console.log("Visibility changed, isOnline:", onlineStatus);
     };
 
     const handleBeforeUnload = (ev) => {
       if (id) {
         setStatusCookie("offline");
         updateLocationStatus(id, "offline");
-        console.log("User is going offline, ID:", id);
       }
       ev.returnValue = "Changes you made may not be saved.";
     };
@@ -65,28 +61,23 @@ const StatusProvider = ({ children }) => {
     document.addEventListener("keydown", handleActivity);
     document.addEventListener("touchstart", handleActivity);
 
-    console.log("Event listeners added for user activity.");
-
     return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       window.removeEventListener("beforeunload", handleBeforeUnload);
       document.removeEventListener("mousemove", handleActivity);
       document.removeEventListener("keydown", handleActivity);
       document.removeEventListener("touchstart", handleActivity);
-      console.log("Event listeners removed for user activity.");
     };
   }, [id]); // Only depend on id for event listeners
 
   useEffect(() => {
     const statusCookie = getStatusCookie();
-    console.log("Current isOnline:", isOnline); // Log current online status
 
     if (!isOnline) {
       if (!statusCookie || statusCookie === "online") {
         setStatusCookie("offline");
         if (id) {
           updateLocationStatus(id, "offline");
-          console.log("Status updated to offline for ID:", id);
         }
       }
     } else {
@@ -94,7 +85,6 @@ const StatusProvider = ({ children }) => {
         setStatusCookie("online");
         if (id) {
           updateLocationStatus(id, "online");
-          console.log("Status updated to online for ID:", id);
         }
       }
     }
