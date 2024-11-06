@@ -4,7 +4,6 @@ import { FaLocationArrow, FaExclamation } from "react-icons/fa";
 import { RescuerContext } from "../contexts/RescuerContext";
 import { useState, useEffect } from "react";
 import { getRequestsFromFirestore } from "../services/firestoreService";
-
 const Bottom = ({ user }) => {
   const { page, setPage } = useContext(RescuerContext);
   const [requests, setRequests] = useState([]);
@@ -33,7 +32,7 @@ const Bottom = ({ user }) => {
   return (
     !navigating &&
     (page === "Requests" || page === "Navigate") && (
-      <div className="bg-background text-white flex items-center justify-around py-4 border-t-2 border-background-light">
+      <div className="sticky bottom-0 bg-background text-white flex items-center justify-around py-4 border-t-2 border-background-light">
         <Link
           to="/rescuer/requests"
           className={`flex flex-col items-center ${

@@ -127,7 +127,8 @@ const CitizenMap = forwardRef((props, ref) => {
   };
 
   const getRoute = async () => {
-    let route;
+    let route = null;
+
     if (assignedRescuer) {
       route = await getRouteData(assignedRescuer, citizen);
     } else {
@@ -138,10 +139,6 @@ const CitizenMap = forwardRef((props, ref) => {
     setDistance(route.distance);
     setEta(route.duration);
   };
-
-  useEffect(() => {
-    getRoute();
-  }, [assignedRescuer]);
 
   useEffect(() => {
     const unsubscribe = getOnlineLocationsFromFirestore("rescuer", setRescuers);
@@ -165,10 +162,10 @@ const CitizenMap = forwardRef((props, ref) => {
   }, [nearestRescuer]);
 
   useEffect(() => {
-    if (nearestRescuer) {
+    if (nearestRescuer || assignedRescuer) {
       getRoute();
     }
-  }, [nearestRescuer, citizen, rescuers]);
+  }, [nearestRescuer, assignedRescuer, citizen, rescuers]);
 
   useEffect(() => {
     if (rescuers && citizen) {
