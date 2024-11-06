@@ -252,13 +252,15 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
             </Marker>
           )}
 
-          <Route
-            routeData={routeData}
-            routeOpacity={{
-              background: 0.2,
-              line: 1,
-            }}
-          />
+          {citizen && (
+            <Route
+              routeData={routeData}
+              routeOpacity={{
+                background: 0.2,
+                line: 1,
+              }}
+            />
+          )}
         </>
       )}
     </MapGL>
