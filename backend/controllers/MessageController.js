@@ -1,9 +1,10 @@
 const admin = require("firebase-admin");
 
 if (process.env.NODE_ENV === "production") {
-  // Production environment: use credentials via GOOGLE_APPLICATION_CREDENTIALS
+  const serviceAccount = require(__dirname + "/../config/serviceKey.json");
+
   admin.initializeApp({
-    credential: admin.credential.applicationDefault(),
+    credential: admin.credential.cert(serviceAccount),
   });
 } else {
   // Development environment: use the local service account key file
