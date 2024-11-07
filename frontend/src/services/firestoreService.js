@@ -336,6 +336,20 @@ export const updateRequestInFirestore = async (
   }
 };
 
+//complete request in firestore
+export const completeRequestInFirestore = async (requestId, address) => {
+  const updateData = {
+    rescuedTimestamp: new Date().toISOString(),
+    rescuedAddress: address,
+  };
+
+  try {
+    await updateDoc(doc(store, "requests", requestId), updateData);
+  } catch (error) {
+    console.error("Error updating document: ", error);
+  }
+};
+
 // Function to upload image to Firebase Storage
 export const uploadImageToFirebaseStorage = async (file) => {
   const storageRef = ref(storage, `incidentPictures/${file.name}`);
