@@ -1,11 +1,18 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaAmbulance, FaMapMarkerAlt } from "react-icons/fa";
 import { AiFillPrinter } from "react-icons/ai";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 
 const OngoingRescues = ({ requests, user }) => {
+  const [showMap, setShowMap] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState(null);
+  const [selectedRescue, setSelectedRescue] = useState(null);
   const [filterStatus, setFilterStatus] = useState("all");
+
+  useEffect(() => {
+    console.log("Requests:", requests);
+  }, [requests]);
 
   const ongoingRescues = requests
     .filter((request) => {
@@ -28,7 +35,6 @@ const OngoingRescues = ({ requests, user }) => {
       }).format(new Date(request.acceptedTimestamp)),
     }));
 
-  const [showMap, setShowMap] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 5;
 
@@ -45,7 +51,21 @@ const OngoingRescues = ({ requests, user }) => {
   };
 
   const handleShowMap = (location) => {
-    setShowMap(location);
+    setSelectedLocation(location);
+    setShowMap(true);
+  };
+
+  const handleCloseMap = () => {
+    setShowMap(false);
+    setSelectedLocation(null);
+  };
+
+  const handleRowClick = (requests) => {
+    setSelectedRescue(requests);
+  };
+
+  const handleCloseDetails = () => {
+    setSelectedRescue(null);
   };
 
   const handlePrint = () => {
@@ -142,27 +162,83 @@ const OngoingRescues = ({ requests, user }) => {
           </button>
         </div>
 
+        {/* Filter Status */}
+        <div className="mb-4">
+          <label
+            htmlFor="status-filter"
+            className="mr-2 font-semibold text-gray-700"
+          >
+            Filter by status:
+          </label>
+          <select
+            id="status-filter"
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            className="border border-gray-300 rounded-md px-3 py-1"
+          >
+            <option value="all">All</option>
+            <option value="assigned">Assigned</option>
+            <option value="rescued">Rescued</option>
+          </select>
+        </div>
+
+        {/* Mobile Card View */}
+        <div className="lg:hidden grid gap-4 sm:grid-cols-2">
+          {paginatedRescues.map((rescue, index) => (
+            <div
+              onClick={() => handleRowClick(rescue)}
+              key={rescue.id}
+              className="border border-gray-300 rounded-lg p-4 shadow-md bg-white "
+            >
+              <div className="mb-2">
+                <span className="text-xs font-semibold text-gray-600">
+                  Rescuer ID:
+                </span>{" "}
+                <span className="text-sm">{rescue.rescuer}</span>
+              </div>
+              <div className="mb-2">
+                <span className="text-xs font-semibold text-gray-600">
+                  Location:
+                </span>{" "}
+                <span className="text-sm">{rescue.location}</span>
+              </div>
+              <div className="mb-2">
+                <span className="text-xs font-semibold text-gray-600">
+                  Accepted Timestamp:
+                </span>{" "}
+                <span className="text-sm">{rescue.acceptedTimestamp}</span>
+              </div>
+              <div className="mb-2">
+                <span className="text-xs font-semibold text-gray-600">
+                  Status:
+                </span>{" "}
+                <span
+                  className={`text-sm font-bold ${
+                    rescue.status === "assigned" ? "text-info" : "text-primary"
+                  }`}
+                >
+                  {rescue.status.charAt(0).toUpperCase() +
+                    rescue.status.slice(1)}
+                </span>
+              </div>
+
+              {/* Conditionally Render Map Button */}
+              {rescue.status === "assigned" && (
+                <div className="flex justify-center">
+                  <button
+                    onClick={() => handleShowMap(rescue.location)}
+                    className="bg-secondary text-white px-4 py-1 rounded-full hover:bg-primary-medium transition flex items-center justify-center"
+                  >
+                    <FaMapMarkerAlt className="text-xl" />
+                  </button>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
         {/* Table for larger screens */}
         <div className="hidden lg:block overflow-x-auto">
-          {/* Filter Status */}
-          <div className="mb-4">
-            <label
-              htmlFor="status-filter"
-              className="mr-2 font-semibold text-gray-700"
-            >
-              Filter by status:
-            </label>
-            <select
-              id="status-filter"
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-              className="border border-gray-300 rounded-md px-3 py-1"
-            >
-              <option value="all">All</option>
-              <option value="assigned">Assigned</option>
-              <option value="rescued">Rescued</option>
-            </select>
-          </div>
           <table className="min-w-full bg-gray-200 border border-gray-200 rounded-md overflow-hidden">
             <thead className="bg-[#557C55] text-white">
               <tr>
@@ -179,92 +255,179 @@ const OngoingRescues = ({ requests, user }) => {
                 <th className="px-4 py-2 text-center text-xs font-medium">
                   Status
                 </th>
-
-                {/* Conditionally Render Map Column Header */}
-                {filterStatus !== "rescued" && (
-                  <th className="px-4 py-2 text-center text-xs font-medium">
-                    Map
-                  </th>
-                )}
+                <th className="px-4 py-2 text-center text-xs font-medium">
+                  Map
+                </th>
               </tr>
             </thead>
             <tbody>
-              {paginatedRescues.map((rescue, index) => (
+              {paginatedRescues.map((requests, index) => (
                 <tr
-                  key={rescue.id}
-                  className={`border-b ${
-                    index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                  }`}
+                  key={requests.id}
+                  onClick={() => handleRowClick(requests)}
+                  className={index % 2 === 0 ? "bg-white " : "bg-gray-100"}
                 >
-                  <td className="px-4 py-2 text-xs text-center font-semibold text-warning">
-                    {rescue.id}
+                  <td className="px-4 py-2 text-center text-sm text-info font-semibold">
+                    {requests.id}
                   </td>
-                  <td className="px-4 py-2 text-xs text-center">
-                    {rescue.rescuer}
+                  <td className="px-4 py-2 text-center text-sm">
+                    {requests.rescuer}
                   </td>
-                  <td className="px-4 py-2 text-xs text-center">
-                    {rescue.location}
+                  <td className="px-4 py-2 text-center text-sm">
+                    {requests.location}
                   </td>
-                  <td className="px-4 py-2 text-xs text-center">
-                    {rescue.acceptedTimestamp}
+                  <td className="px-4 py-2 text-center text-sm">
+                    {requests.acceptedTimestamp}
                   </td>
-                  <td
-                    className={`px-4 py-2 text-xs text-center ${
-                      rescue.status === "assigned"
-                        ? "text-info"
-                        : "text-primary"
-                    }`}
-                  >
-                    {rescue.status.charAt(0).toUpperCase() +
-                      rescue.status.slice(1)}
+                  <td className="px-4 py-2 text-center">
+                    <span
+                      className={`font-semibold ${
+                        requests.status === "assigned"
+                          ? "text-info"
+                          : "text-primary"
+                      }`}
+                    >
+                      {requests.status.charAt(0).toUpperCase() +
+                        requests.status.slice(1)}
+                    </span>
                   </td>
-
-                  {/* Conditionally Render Map Button */}
-                  {rescue.status === "assigned" && (
-                    <td className="px-4 py-2 text-xs text-center">
-                      <button
-                        onClick={() => handleShowMap(rescue.location)}
-                        className="bg-secondary text-white px-4 py-1 rounded-full hover:bg-primary-medium transition flex items-center justify-center"
-                      >
-                        <FaMapMarkerAlt className="text-xl" />
-                      </button>
-                    </td>
-                  )}
+                  <td className="px-4 py-2 text-center">
+                    {requests.status === "assigned" && (
+                      <div className="flex justify-center">
+                        <button
+                          onClick={() => handleShowMap(requests.location)}
+                          className="bg-secondary text-white px-4 py-1 rounded-full hover:bg-primary-medium transition flex items-center justify-center"
+                        >
+                          <FaMapMarkerAlt className="text-xl" />
+                        </button>
+                      </div>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
 
-        {/* Pagination Controls */}
-        <div className="flex justify-center mt-4">
-          <button
-            onClick={() => handlePageChange(currentPage - 1)}
-            className={`px-3 py-1 border rounded-md ${
-              currentPage === 1
-                ? "bg-gray-300 text-gray-500"
-                : "bg-white text-primary-dark"
-            }`}
-            disabled={currentPage === 1}
-          >
-            Previous
-          </button>
-          <span className="mx-3 text-sm text-gray-600">
-            Page {currentPage} of {totalPages}
-          </span>
-          <button
-            onClick={() => handlePageChange(currentPage + 1)}
-            className={`px-3 py-1 border rounded-md ${
-              currentPage === totalPages
-                ? "bg-gray-300 text-gray-500"
-                : "bg-white text-primary-dark"
-            }`}
-            disabled={currentPage === totalPages}
-          >
-            Next
-          </button>
+        {/* Pagination */}
+        <div className="mt-4">
+          <div className="flex justify-between items-center">
+            <button
+              disabled={currentPage === 1}
+              onClick={() => handlePageChange(currentPage - 1)}
+              className={`${
+                currentPage === 1
+                  ? "bg-gray-300"
+                  : "bg-primary-medium text-white"
+              } px-4 py-2 rounded-md`}
+            >
+              Previous
+            </button>
+            <span className="text-gray-700 text-sm">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              disabled={currentPage === totalPages}
+              onClick={() => handlePageChange(currentPage + 1)}
+              className={`${
+                currentPage === totalPages
+                  ? "bg-gray-300"
+                  : "bg-primary-medium text-white"
+              } px-4 py-2 rounded-md`}
+            >
+              Next
+            </button>
+          </div>
         </div>
       </div>
+      {showMap && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-4 rounded-lg max-w-lg w-full">
+            <h4 className="text-xl font-bold mb-4">Map Location</h4>
+            <div style={{ height: "400px", width: "100%" }}>
+              <p>{selectedLocation}</p>
+            </div>
+            <button
+              onClick={handleCloseMap}
+              className="mt-4 bg-red-500 text-white px-4 py-2 rounded-md"
+            >
+              Close Map
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Rescue Details Modal */}
+      {selectedRescue && (
+        <div className="fixed inset-0 bg-gray-700 bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 transition-opacity duration-300 ease-in-out">
+          <div className="bg-white p-8 rounded-xl shadow-lg transform transition-transform duration-300 ease-in-out max-w-2xl w-full">
+            <h4 className="text-xl font-bold mb-5 text-primary-dark border-b pb-2 border-gray-300">
+              Rescue Details
+            </h4>
+            <div className="space-y-3">
+              <div className="flex items-center">
+                <strong className="w-28 text-gray-700">Location:</strong>
+                <span className="text-gray-600">{selectedRescue.location}</span>
+              </div>
+              <div className="flex items-center">
+                <strong className="w-28 text-gray-700">Rescuer ID:</strong>
+                <span className="text-gray-600">{selectedRescue.rescuer}</span>
+              </div>
+              <div className="flex items-center">
+                <strong className="w-28 text-gray-700">Phone Number:</strong>
+                <span className="text-gray-600">{selectedRescue.phone}</span>
+              </div>
+              <div className="flex items-center">
+                <strong className="w-28 text-gray-700">Name:</strong>
+                <span className="text-gray-600">{selectedRescue.age}</span>
+              </div>
+              <div className="flex items-center">
+                <strong className="w-28 text-gray-700">Status:</strong>
+                <span
+                  className={`font-semibold text-sm ${
+                    selectedRescue.status === "assigned"
+                      ? "text-green-600"
+                      : "text-red-600"
+                  }`}
+                >
+                  <span
+                    className={`font-semibold text-sm ${
+                      selectedRescue.status === "assigned"
+                        ? "text-info"
+                        : selectedRescue.status === "rescued"
+                        ? "text-primary"
+                        : "text-secondary"
+                    }`}
+                  >
+                    {selectedRescue.status.charAt(0).toUpperCase() +
+                      selectedRescue.status.slice(1)}
+                  </span>
+                </span>
+              </div>
+              <div className="flex items-center">
+                <strong className="w-28 text-gray-700">
+                  {selectedRescue.status === "rescued"
+                    ? "Rescued Time"
+                    : "Accepted Time"}
+                </strong>
+                <span className="text-gray-600">
+                  {selectedRescue.status === "rescued"
+                    ? selectedRescue.acceptedTimestamp
+                    : selectedRescue.acceptedTimestamp}
+                </span>
+              </div>
+            </div>
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={handleCloseDetails}
+                className="px-5 py-2 bg-secondary text-white rounded-md hover:bg-red-700 shadow-sm transition-transform transform hover:scale-105"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
