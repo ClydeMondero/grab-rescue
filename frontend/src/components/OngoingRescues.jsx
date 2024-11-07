@@ -5,8 +5,14 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 
 const OngoingRescues = ({ requests, user }) => {
+  const [filterStatus, setFilterStatus] = useState("all");
+
   const ongoingRescues = requests
-    .filter((request) => request.status === "assigned")
+    .filter((request) => {
+      if (filterStatus === "all")
+        return request.status === "assigned" || request.status === "rescued";
+      return request.status === filterStatus;
+    })
     .map((request, index) => ({
       id: index + 1,
       location: request.location.address,
@@ -38,12 +44,6 @@ const OngoingRescues = ({ requests, user }) => {
     }
   };
 
-  const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
-  const visiblePages = pageNumbers.slice(
-    Math.max(0, currentPage - 2),
-    Math.min(totalPages, currentPage + 3)
-  );
-
   const handleShowMap = (location) => {
     setShowMap(location);
   };
@@ -56,9 +56,7 @@ const OngoingRescues = ({ requests, user }) => {
       "Ongoing Rescues Report",
       doc.internal.pageSize.getWidth() / 2,
       10,
-      {
-        align: "center",
-      }
+      { align: "center" }
     );
 
     const tableColumn = [
@@ -74,8 +72,6 @@ const OngoingRescues = ({ requests, user }) => {
       rescuer: rescue.rescuer,
       location: rescue.location,
       acceptedTimestamp: rescue.acceptedTimestamp,
-      estimatedArrivalTime: rescue.estimatedArrivalTime,
-      estimatedDepartureTime: rescue.estimatedDepartureTime,
       status: rescue.status,
     }));
 
@@ -120,7 +116,7 @@ const OngoingRescues = ({ requests, user }) => {
   };
 
   return (
-    <div className="flex flex-col p-4 lg:p-6 h-full ">
+    <div className="flex flex-col p-4 lg:p-6 h-full">
       {/* Header */}
       <div className="flex items-center mb-2 sm:mb-4 border-b border-gray-200 pb-3">
         <FaAmbulance className="text-3xl sm:text-2xl lg:text-3xl text-primary-dark mr-2 fill-current" />
@@ -132,29 +128,6 @@ const OngoingRescues = ({ requests, user }) => {
       <p className="text-lg font-semibold text-[#557C55] self-start">
         Monitoring the status and progress of active rescue efforts.
       </p>
-
-      {/* Map Toggle */}
-      {showMap && (
-        <div className="mb-6">
-          <h5 className="text-xl font-semibold mb-2 text-primary">
-            Location Map: {showMap}
-          </h5>
-          <div
-            className="map-placeholder bg-[#eaeaea] rounded-lg"
-            style={{ height: "200px" }}
-          >
-            <p className="text-center pt-4 text-md">
-              Map displaying location: {showMap}
-            </p>
-          </div>
-          <button
-            className="bg-secondary text-white mt-3 px-4 py-1 rounded-full hover:bg-primary-medium transition flex items-center justify-center"
-            onClick={() => setShowMap(false)}
-          >
-            Hide Map
-          </button>
-        </div>
-      )}
 
       {/* Rescue Data Table */}
       <div className="flex flex-col flex-1">
@@ -169,64 +142,27 @@ const OngoingRescues = ({ requests, user }) => {
           </button>
         </div>
 
-        {/* Responsive Card Container */}
-        <div className="overflow-x-auto lg:hidden">
-          {paginatedRescues.map((rescue) => (
-            <div
-              key={rescue.id}
-              className="bg-gray-200 rounded-xl p-3 mb-3 shadow-sm"
-            >
-              <h5 className="text-md truncate">
-                <span className="text-primary-dark font-semibold">
-                  Rescue ID:{" "}
-                </span>
-                <span className="text-gray-500">{rescue.rescuer}</span>
-              </h5>
-              <h5 className="truncate">
-                <span className="text-primary-dark font-semibold">
-                  Location:{" "}
-                </span>
-                <span className="text-gray-500">{rescue.location}</span>
-              </h5>
-              <h5 className="truncate">
-                <span className="text-primary-dark font-semibold">
-                  Accepted:{" "}
-                </span>
-                <span className="text-gray-500">
-                  {rescue.acceptedTimestamp}
-                </span>
-              </h5>
-              <h5 className="truncate">
-                <span className="text-primary-dark font-semibold">
-                  Status:{" "}
-                </span>
-                <span
-                  className={
-                    rescue.status === "pending"
-                      ? "text-warning"
-                      : rescue.status === "assigned"
-                      ? "text-info"
-                      : rescue.status === "in-progress"
-                      ? "text-orange-500"
-                      : "text-primary-medium"
-                  }
-                >
-                  {rescue.status}
-                </span>
-              </h5>
-              <button
-                onClick={() => handleShowMap(rescue.location)}
-                className="bg-secondary mt-3 text-white px-4 py-1 rounded-full hover:bg-primary-medium transition flex items-center justify-center"
-              >
-                <FaMapMarkerAlt className="text-xl" />
-                Show Map
-              </button>
-            </div>
-          ))}
-        </div>
-
         {/* Table for larger screens */}
         <div className="hidden lg:block overflow-x-auto">
+          {/* Filter Status */}
+          <div className="mb-4">
+            <label
+              htmlFor="status-filter"
+              className="mr-2 font-semibold text-gray-700"
+            >
+              Filter by status:
+            </label>
+            <select
+              id="status-filter"
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="border border-gray-300 rounded-md px-3 py-1"
+            >
+              <option value="all">All</option>
+              <option value="assigned">Assigned</option>
+              <option value="rescued">Rescued</option>
+            </select>
+          </div>
           <table className="min-w-full bg-gray-200 border border-gray-200 rounded-md overflow-hidden">
             <thead className="bg-[#557C55] text-white">
               <tr>
@@ -243,9 +179,13 @@ const OngoingRescues = ({ requests, user }) => {
                 <th className="px-4 py-2 text-center text-xs font-medium">
                   Status
                 </th>
-                <th className="px-4 py-2 text-center text-xs font-medium">
-                  Map
-                </th>
+
+                {/* Conditionally Render Map Column Header */}
+                {filterStatus !== "rescued" && (
+                  <th className="px-4 py-2 text-center text-xs font-medium">
+                    Map
+                  </th>
+                )}
               </tr>
             </thead>
             <tbody>
@@ -268,66 +208,62 @@ const OngoingRescues = ({ requests, user }) => {
                   <td className="px-4 py-2 text-xs text-center">
                     {rescue.acceptedTimestamp}
                   </td>
-                  <td className="px-4 py-2 text-xs text-center ">
-                    <span
-                      className={
-                        {
-                          pending:
-                            "bg-white py-1 px-3rounded-full shadow-sm text-warning",
-                          assigned:
-                            "bg-white py-1 px-3 rounded-full shadow-sm text-info",
-                          "in-progress":
-                            "bg-white py-1 px-3 rounded-full shadow-sm text-secondary",
-                          completed:
-                            "bg-white py-1 px-3 rounded-full shadow-sm text-primary-medium",
-                        }[rescue.status]
-                      }
-                    >
-                      {rescue.status}
-                    </span>
+                  <td
+                    className={`px-4 py-2 text-xs text-center ${
+                      rescue.status === "assigned"
+                        ? "text-info"
+                        : "text-primary"
+                    }`}
+                  >
+                    {rescue.status.charAt(0).toUpperCase() +
+                      rescue.status.slice(1)}
                   </td>
-                  <td className="px-4 py-2 text-xs text-center">
-                    <button
-                      onClick={() => handleShowMap(rescue.location)}
-                      className="bg-secondary text-white p-2 rounded-full hover:bg-primary-medium transition flex items-center justify-center"
-                    >
-                      <FaMapMarkerAlt className="text-xl" />
-                    </button>
-                  </td>
+
+                  {/* Conditionally Render Map Button */}
+                  {rescue.status === "assigned" && (
+                    <td className="px-4 py-2 text-xs text-center">
+                      <button
+                        onClick={() => handleShowMap(rescue.location)}
+                        className="bg-secondary text-white px-4 py-1 rounded-full hover:bg-primary-medium transition flex items-center justify-center"
+                      >
+                        <FaMapMarkerAlt className="text-xl" />
+                      </button>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-      </div>
 
-      {/* Pagination */}
-      <div className="flex justify-center mt-4">
-        <button
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-          className="px-3 py-1 bg-[#557C55] text-white rounded-l-md"
-        >
-          Prev
-        </button>
-        {visiblePages.map((page) => (
+        {/* Pagination Controls */}
+        <div className="flex justify-center mt-4">
           <button
-            key={page}
-            onClick={() => handlePageChange(page)}
-            className={`px-3 py-1 ${
-              currentPage === page ? "bg-[#6EA46E]" : "bg-[#557C55]"
-            } text-white`}
+            onClick={() => handlePageChange(currentPage - 1)}
+            className={`px-3 py-1 border rounded-md ${
+              currentPage === 1
+                ? "bg-gray-300 text-gray-500"
+                : "bg-white text-primary-dark"
+            }`}
+            disabled={currentPage === 1}
           >
-            {page}
+            Previous
           </button>
-        ))}
-        <button
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-          className="px-3 py-1 bg-[#557C55] text-white rounded-r-md"
-        >
-          Next
-        </button>
+          <span className="mx-3 text-sm text-gray-600">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={() => handlePageChange(currentPage + 1)}
+            className={`px-3 py-1 border rounded-md ${
+              currentPage === totalPages
+                ? "bg-gray-300 text-gray-500"
+                : "bg-white text-primary-dark"
+            }`}
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   );
