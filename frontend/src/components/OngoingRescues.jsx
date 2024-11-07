@@ -3,21 +3,25 @@ import { FaAmbulance, FaMapMarkerAlt } from "react-icons/fa";
 import { AiFillPrinter } from "react-icons/ai";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+import axios from "axios";
 
 const OngoingRescues = ({ requests, user }) => {
   const [showMap, setShowMap] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [selectedRescue, setSelectedRescue] = useState(null);
   const [filterStatus, setFilterStatus] = useState("all");
-
-  useEffect(() => {
-    console.log("Requests:", requests);
-  }, [requests]);
+  const [rescuerName, setRescuerName] = useState(null);
 
   const ongoingRescues = requests
     .filter((request) => {
-      if (filterStatus === "all")
-        return request.status === "assigned" || request.status === "rescued";
+      if (filterStatus === "all") {
+        return (
+          request.status === "assigned" ||
+          request.status === "in transit" ||
+          request.status === "en route" ||
+          request.status === "rescued"
+        );
+      }
       return request.status === filterStatus;
     })
     .map((request, index) => ({
@@ -33,6 +37,7 @@ const OngoingRescues = ({ requests, user }) => {
         minute: "2-digit",
         second: "2-digit",
       }).format(new Date(request.acceptedTimestamp)),
+      originalRequest: request,
     }));
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -60,12 +65,49 @@ const OngoingRescues = ({ requests, user }) => {
     setSelectedLocation(null);
   };
 
-  const handleRowClick = (requests) => {
-    setSelectedRescue(requests);
+  const handleRowClick = (request) => {
+    setSelectedRescue(request.originalRequest);
+    getRescuer(request.rescuer);
   };
+
+  const getRescuer = async (rescuerId) => {
+    try {
+      const response = await axios.get(`/rescuers/get/${rescuerId}`);
+      if (response.data) {
+        return response.data;
+      } else {
+        console.error("Rescuer not found");
+        return null;
+      }
+    } catch (error) {
+      console.error("Error fetching rescuer: ", error);
+      return null;
+    }
+  };
+
+  useEffect(() => {
+    const fetchRescuer = async () => {
+      if (selectedRescue?.rescuerId) {
+        const rescuer = await getRescuer(selectedRescue.rescuerId);
+        if (rescuer) {
+          const { first_name, middle_name, last_name } = rescuer[0];
+          const fullName = `${first_name} ${middle_name} ${last_name}`;
+
+          setRescuerName(fullName);
+        }
+      }
+    };
+
+    fetchRescuer();
+  }, [selectedRescue]);
+
+  useEffect(() => {
+    console.log("Selected Rescue:", selectedRescue);
+  }, [selectedRescue]);
 
   const handleCloseDetails = () => {
     setSelectedRescue(null);
+    setRescuerName(null);
   };
 
   const handlePrint = () => {
@@ -178,6 +220,8 @@ const OngoingRescues = ({ requests, user }) => {
           >
             <option value="all">All</option>
             <option value="assigned">Assigned</option>
+            <option value="in transit">In Transit</option>
+            <option value="en route">En Route</option>
             <option value="rescued">Rescued</option>
           </select>
         </div>
@@ -284,6 +328,10 @@ const OngoingRescues = ({ requests, user }) => {
                       className={`font-semibold ${
                         requests.status === "assigned"
                           ? "text-info"
+                          : requests.status === "in transit"
+                          ? "text-yellow-500"
+                          : requests.status === "en route"
+                          ? "text-orange-500"
                           : "text-primary"
                       }`}
                     >
@@ -292,7 +340,7 @@ const OngoingRescues = ({ requests, user }) => {
                     </span>
                   </td>
                   <td className="px-4 py-2 text-center">
-                    {requests.status === "assigned" && (
+                    {requests.status !== "rescued" && (
                       <div className="flex justify-center">
                         <button
                           onClick={() => handleShowMap(requests.location)}
@@ -366,20 +414,33 @@ const OngoingRescues = ({ requests, user }) => {
             </h4>
             <div className="space-y-3">
               <div className="flex items-center">
-                <strong className="w-28 text-gray-700">Location:</strong>
-                <span className="text-gray-600">{selectedRescue.location}</span>
+                <strong className="w-28 text-gray-700">
+                  Request Location:
+                </strong>
+                <span className="text-gray-600">
+                  {selectedRescue.location.address}
+                </span>
               </div>
               <div className="flex items-center">
                 <strong className="w-28 text-gray-700">Rescuer ID:</strong>
-                <span className="text-gray-600">{selectedRescue.rescuer}</span>
+                <span className="text-gray-600">
+                  {selectedRescue.rescuerId}
+                </span>
+              </div>
+              <div className="mb-2">
+                <strong className="w-28 text-gray-700">Rescuer Name:</strong>
+                <span className="text-gray-600">{rescuerName}</span>
               </div>
               <div className="flex items-center">
                 <strong className="w-28 text-gray-700">Phone Number:</strong>
                 <span className="text-gray-600">{selectedRescue.phone}</span>
               </div>
+
               <div className="flex items-center">
-                <strong className="w-28 text-gray-700">Name:</strong>
-                <span className="text-gray-600">{selectedRescue.age}</span>
+                <strong className="w-28 text-gray-700">Requester Name:</strong>
+                <span className="text-gray-600">
+                  {selectedRescue.citizenName}
+                </span>
               </div>
               <div className="flex items-center">
                 <strong className="w-28 text-gray-700">Status:</strong>
@@ -387,7 +448,13 @@ const OngoingRescues = ({ requests, user }) => {
                   className={`font-semibold text-sm ${
                     selectedRescue.status === "assigned"
                       ? "text-green-600"
-                      : "text-red-600"
+                      : selectedRescue.status === "in transit"
+                      ? "text-yellow-600"
+                      : selectedRescue.status === "en route"
+                      ? "text-blue-600"
+                      : selectedRescue.status === "rescued"
+                      ? "text-primary"
+                      : "text-secondary"
                   }`}
                 >
                   <span
@@ -411,10 +478,49 @@ const OngoingRescues = ({ requests, user }) => {
                     : "Accepted Time"}
                 </strong>
                 <span className="text-gray-600">
-                  {selectedRescue.status === "rescued"
-                    ? selectedRescue.acceptedTimestamp
-                    : selectedRescue.acceptedTimestamp}
+                  {selectedRescue.status === "rescued" &&
+                  selectedRescue.rescuedTimestamp
+                    ? new Intl.DateTimeFormat("en-US", {
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit",
+                      }).format(new Date(selectedRescue.rescuedTimestamp))
+                    : new Intl.DateTimeFormat("en-US", {
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit",
+                      }).format(new Date(selectedRescue.acceptedTimestamp))}
                 </span>
+              </div>
+              {selectedRescue.status === "rescued" && (
+                <div className="flex items-center">
+                  <strong className="w-28 text-gray-700">
+                    Rescued Location:
+                  </strong>
+                  <span className="text-gray-600">
+                    {selectedRescue.rescuedAddress}
+                  </span>
+                </div>
+              )}
+              <div className="flex items-center">
+                <strong className="w-28 text-gray-700">
+                  Incident Picture:
+                </strong>
+                {selectedRescue.incidentPicture ? (
+                  <img
+                    src={selectedRescue.incidentPicture}
+                    alt="Incident Picture"
+                    className="w-40 h-40 mx-auto rounded-lg"
+                  />
+                ) : (
+                  <span className="text-gray-600">No picture available</span>
+                )}
               </div>
             </div>
             <div className="mt-6 flex justify-end">

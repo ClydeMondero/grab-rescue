@@ -8,13 +8,17 @@ import {
   FaChevronRight,
 } from "react-icons/fa";
 import {
+  completeRequestInFirestore,
   getRequestFromFirestore,
   updateRequestStatusInFirestore,
+  getLocationFromFirestore,
+  getLocationIDFromFirestore,
 } from "../services/firestoreService";
 import { Loader } from "../components";
 import MobileDetect from "mobile-detect";
 import { toast } from "react-toastify";
 import { RescuerContext } from "../contexts/RescuerContext";
+import { StatusContext } from "../contexts/StatusContext";
 import placeholder from "../assets/placeholder.png";
 import {
   getSelectedRequestCookie,
@@ -30,7 +34,7 @@ const Navigate = ({ requestID, setSelectedRequest }) => {
   const [onMobile, setOnMobile] = useState(false);
   const [showModal, setShowModal] = useState(false); // State for showing the modal
   const [statusToUpdate, setStatusToUpdate] = useState(null); // State to hold the next status to update
-
+  const { id, getId } = useContext(StatusContext);
   const { navigating, setNavigating } = useContext(RescuerContext);
   const mapRef = useRef();
 
@@ -73,7 +77,7 @@ const Navigate = ({ requestID, setSelectedRequest }) => {
     ``;
   };
 
-  const confirmStatusChange = () => {
+  const confirmStatusChange = async () => {
     if (
       statusToUpdate &&
       statuses.indexOf(statusToUpdate) > statuses.indexOf(requestData.status)
@@ -81,6 +85,10 @@ const Navigate = ({ requestID, setSelectedRequest }) => {
       setRequestData((prevData) => ({ ...prevData, status: statusToUpdate }));
       updateRequestStatusInFirestore(requestID, statusToUpdate);
       if (statusToUpdate === "rescued") {
+        const location = await getRescueLocation();
+        if (location && location.address) {
+          completeRequestInFirestore(requestID, location.address);
+        }
         deleteCookie("selected_request");
         setSelectedRequest(null);
         setRequestData(null);
@@ -89,9 +97,23 @@ const Navigate = ({ requestID, setSelectedRequest }) => {
     setShowModal(false); // Close modal after confirmation
   };
 
-  const cancelStatusChange = () => {
-    setShowModal(false); // Close modal without changing status
+  const getRescueLocation = async () => {
+    if (id) {
+      const locationId = await getLocationIDFromFirestore(id);
+      if (locationId) {
+        const location = await getLocationFromFirestore(locationId);
+        return location;
+      }
+    }
   };
+
+  const cancelStatusChange = () => {
+    setShowModal(false);
+  };
+
+  useEffect(() => {
+    getId();
+  }, []);
 
   useEffect(() => {
     const md = new MobileDetect(window.navigator.userAgent);
