@@ -30,7 +30,6 @@ import { useLocating } from "../hooks";
 import { getOnlineLocationsFromFirestore } from "../services/firestoreService";
 import { useLocation } from "react-router-dom";
 import { setGeolocateIcon } from "../utils/GeolocateUtility";
-import { get } from "lodash";
 
 const CitizenMap = forwardRef((props, ref) => {
   const { assignedRescuer } = props;
@@ -190,8 +189,6 @@ const CitizenMap = forwardRef((props, ref) => {
         dragRotate={false}
         pitchWithRotate={false}
         onLoad={() => {
-          console.log("Geocontrol", geoControlRef.current);
-
           geoControlRef.current?.trigger();
         }}
       >
@@ -227,7 +224,9 @@ const CitizenMap = forwardRef((props, ref) => {
               markerType={"citizen"}
             />
 
-            <Route routeData={routeData} routeOpacity={routeOpacity} />
+            {routeData && (
+              <Route routeData={routeData} routeOpacity={routeOpacity} />
+            )}
 
             {distance && eta && <DistanceEta distance={distance} eta={eta} />}
           </>

@@ -1,19 +1,4 @@
-const admin = require("firebase-admin");
-
-if (process.env.NODE_ENV === "production") {
-  const serviceAccount = require(__dirname + "/../config/serviceKey.json");
-
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-  });
-} else {
-  // Development environment: use the local service account key file
-  const serviceAccount = require("../config/serviceKey.json");
-
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-  });
-}
+const admin = require("../config/firebaseAdmin");
 
 exports.sendNotification = (req, res) => {
   const { token, title, body } = req.body;

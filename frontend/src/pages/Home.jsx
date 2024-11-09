@@ -30,6 +30,7 @@ import {
 } from "../services/cookieService";
 import { StatusContext } from "../contexts/StatusContext";
 import MobileDetect from "mobile-detect";
+import { toast } from "react-toastify";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -120,6 +121,10 @@ const Home = () => {
         });
     }
   };
+
+  useEffect(() => {
+    console.log("nearestRescuer:", nearestRescuer);
+  }, [nearestRescuer]);
 
   const handleModalConfirm = async () => {
     if (mapRef.current) {
