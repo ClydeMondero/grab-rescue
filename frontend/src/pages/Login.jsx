@@ -101,7 +101,7 @@ const Login = () => {
           </p>
         </div>
         <div className="flex justify-center mb-4">
-          <img src={logo} alt="Logo" className="h-12" />
+          <img src={logo} alt="Logo" className="h-36" />
         </div>
         <h2 className="text-center text-2xl font-semibold mb-5 text-primary-dark">
           Login as {role}
