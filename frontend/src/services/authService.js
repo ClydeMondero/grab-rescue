@@ -42,7 +42,8 @@ export const handleLogout = async (navigate) => {
 
   if (data.success) {
     updateLocationStatus(userId, "offline");
-    navigate("/");
+    window.location = "/";
+    // navigate("/");
     return;
   }
   toast.error(data.message);

@@ -190,6 +190,8 @@ const CitizenMap = forwardRef((props, ref) => {
         dragRotate={false}
         pitchWithRotate={false}
         onLoad={() => {
+          console.log("Geocontrol", geoControlRef.current);
+
           geoControlRef.current?.trigger();
         }}
       >

@@ -54,7 +54,10 @@ const StatusProvider = ({ children }) => {
     };
 
     document.addEventListener("visibilitychange", handleVisibilityChange);
-    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    if (window.location.pathname !== "/login") {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    }
 
     // Listen for user activity events
     document.addEventListener("mousemove", handleActivity);
