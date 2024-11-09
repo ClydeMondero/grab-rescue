@@ -53,13 +53,9 @@ const Download = () => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    // Listen for the beforeinstallprompt event
     const handleBeforeInstallPrompt = (e) => {
-      // Prevent the mini-infobar from appearing on mobile
       e.preventDefault();
-      // Stash the event so it can be triggered later
       setDeferredPrompt(e);
-      // Show the install button
       setIsVisible(true);
     };
 
@@ -75,134 +71,90 @@ const Download = () => {
   const handleDownloadPWA = async () => {
     if (!deferredPrompt) return;
 
-    // Show the install prompt
     deferredPrompt.prompt();
 
-    // Wait for the user to respond to the prompt
     const { outcome } = await deferredPrompt.userChoice;
     console.log(`User response to the install prompt: ${outcome}`);
 
-    // Clear the deferred prompt variable, since it can only be used once
     setDeferredPrompt(null);
-    setIsVisible(false); // Hide the install button after prompt
-  };
-
-  const handleGoBack = () => {
-    navigate(-1);
+    setIsVisible(false);
   };
 
   return (
     <div
       className="relative min-h-screen bg-gray-50 overflow-hidden"
-      style={{ height: "100dvh", overflow: "hidden" }}
+      style={{ height: "100dvh" }}
     >
       <Nav navigate={navigate} />
 
       {/* Page Content */}
       <div
-        className={`relative flex flex-col md:flex-row justify-center items-center p-8 w-full h-full overflow-hidden bg-cover bg-center`}
+        className={`relative flex flex-col ${
+          isMobile ? "items-center" : "md:flex-row"
+        } justify-center md:justify-between items-center p-8 w-full h-full overflow-hidden bg-cover bg-center`}
         style={{
           backgroundImage: `url(${isMobile ? backGroundMobile : backGround})`,
         }}
       >
-        {/* Back Button Positioned at Top Left */}
+        {/* Back Button */}
         {isMobile && (
           <button
-            onClick={handleGoBack}
+            onClick={() => navigate(-1)}
             className="absolute top-6 left-2 text-white px-6 py-2"
           >
             <FaChevronLeft className="mr-2 text-primary-medium text-2xl" />
           </button>
         )}
 
-        {/* Content Section (Adjust position to make room for the back button) */}
-        <div className="flex flex-col md:items-center md:w-1/2 text-center md:text-left mb-8 md:mb-0 space-y-8 mt-24 md:mt-0">
-          <h1 className="text-4xl md:text-6xl font-bold text-secondary tracking-tight mb-4 text-shadow-md">
+        {/* Content Section */}
+        <div className="flex flex-col items-center md:items-start text-center md:text-left space-y-6 md:w-6/12 md:px-12 mt-24 md:mt-0">
+          <h1 className="text-4xl md:text-6xl font-bold text-secondary tracking-tight mb-6 md:mb-8">
             Download Our App
           </h1>
-          <p className="text-lg md:text-xl text-primary-dark mb-8 max-w-xs md:max-w-md leading-relaxed text-shadow-md">
+          <p className="text-xl md:text-2xl text-primary-dark max-w-xs md:max-w-md leading-relaxed">
             Choose your preferred format to download the app and enjoy seamless
             access to all of our features.
           </p>
 
-          <div className="flex flex-col items-center justify-center w-full space-y-6 md:flex-row md:space-y-0 md:space-x-6">
-            {/* PWA Download Section */}
+          <div className="flex flex-col items-center md:flex-row gap-4">
+            {/* PWA Download Button */}
             {isVisible && (
-              <div className="flex flex-col items-center">
-                <button
-                  onClick={handleDownloadPWA}
-                  className="gap-2 flex items-center justify-center px-8 py-4 bg-blue-400 text-white font-semibold rounded-full shadow-md"
-                >
-                  <IoMdDownload className="w-4 h-4" />
-                  <span className="font-medium">Download PWA</span>
-                </button>
-                <span className="text-md text-center text-gray-500 mt-2">
-                  <FaWindows className="inline-block mr-1" />
-                  <FaApple className="inline-block mr-1" />
-                  <FaLinux className="inline-block mr-1" />
-                  <FaAndroid className="inline-block mr-1" />
-                </span>
-              </div>
-            )}
-            {/* APK Download Button */}
-            <div className="flex flex-col items-center">
               <button
-                className="gap-2 flex items-center justify-center px-8 py-4 bg-green-500 text-white font-semibold rounded-full shadow-md"
+                onClick={handleDownloadPWA}
+                className="flex items-center gap-2 px-8 py-4 bg-blue-400 text-white font-semibold rounded-full shadow-md"
+              >
+                <IoMdDownload className="w-4 h-4" />
+                <span>Download PWA</span>
+              </button>
+            )}
+
+            <div className="flex flex-col items-center">
+              {/* APK Download Button */}
+              <button
                 onClick={handleDownloadAPK}
+                className="flex items-center gap-2 px-8 py-4 bg-green-500 text-white font-semibold rounded-full shadow-md"
               >
                 <IoLogoGooglePlaystore className="w-4 h-4" />
-                <span className="font-medium">Download APK</span>
+                <span>Download APK</span>
               </button>
-              <span className="text-md text-center text-gray-500 mt-2">
-                <FaAndroid className="inline-block mr-1" />
-              </span>
+
+              {/* Platform Icons */}
+              <div className="flex gap-2 text-gray-500 mt-2">
+                <FaAndroid />
+              </div>
             </div>
           </div>
         </div>
 
         {/* Logo Section */}
-        <div className="flex flex-col items-center justify-center md:w-1/2 mb-6 md:mb-0">
+        <div className="flex justify-center items-center w-full md:w-5/12 md:ml-4 lg:ml-6">
           <img
             src={bgGif}
             alt="Grab Rescue"
-            className="w-64 h-5/6 object-contain"
+            className="w-48 md:w-52 lg:w-64 object-contain"
           />
         </div>
       </div>
-
-      {/* Mobile View Content */}
-      {isMobile && (
-        <div className="flex flex-col items-center p-8 mt-10">
-          <h1 className="text-3xl font-bold text-primary tracking-tight mb-4 text-center">
-            Download Our App
-          </h1>
-          <p className="text-lg text-primary-dark mb-8 max-w-xs leading-relaxed text-center">
-            Choose your preferred format to download the app and enjoy seamless
-            access to all of our features.
-          </p>
-
-          <div className="flex flex-col items-center justify-center w-full space-y-6">
-            <button className="gap-2 flex items-center justify-between px-8 py-4 bg-blue-400 text-white font-semibold rounded-full shadow-md">
-              <IoMdDownload className="w-4 h-4" />
-              <span className="font-medium">Download PWA</span>
-            </button>
-
-            <button className="gap-2 flex items-center justify-between px-8 py-4 bg-green-500 text-white font-semibold rounded-full shadow-md">
-              <IoLogoGooglePlaystore className="w-4 h-4" />
-              <span className="font-medium">Download APK</span>
-            </button>
-          </div>
-
-          {/* Mobile Logo Section */}
-          <div className="flex flex-col items-center mt-12">
-            <img
-              src={bgGif}
-              alt="Grab Rescue"
-              className="w-64 h-5/6 object-contain"
-            />
-          </div>
-        </div>
-      )}
     </div>
   );
 };
