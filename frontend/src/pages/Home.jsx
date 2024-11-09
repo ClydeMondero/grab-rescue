@@ -242,6 +242,14 @@ const Home = () => {
           {mobileMenuOpen && (
             <div className="absolute top-14 right-0 w-56 bg-background text-primary-medium rounded-md shadow-lg py-2 flex items-center justify-center">
               <ul className="space-y-2 flex flex-col items-center w-full">
+                <li className="py-2">
+                  <button
+                    onClick={() => navigate("/")}
+                    className="flex items-center w-full text-lg font-semibold hover:underline"
+                  >
+                    Home
+                  </button>
+                </li>
                 <li className="py-2 border-b w-full justify-center">
                   <button
                     onClick={() => navigate("/login?role=Rescuer")}
@@ -260,18 +268,18 @@ const Home = () => {
                 </li>
                 <li className="py-2">
                   <button
-                    onClick={() => navigate("/about")}
-                    className="flex items-center w-full text-lg font-semibold hover:underline"
-                  >
-                    About
-                  </button>
-                </li>
-                <li className="py-2">
-                  <button
                     onClick={() => navigate("/download")}
                     className="flex items-center w-full text-lg font-semibold hover:underline"
                   >
                     Download
+                  </button>
+                </li>
+                <li className="py-2">
+                  <button
+                    onClick={() => navigate("/about")}
+                    className="flex items-center w-full text-lg font-semibold hover:underline"
+                  >
+                    About
                   </button>
                 </li>
               </ul>
