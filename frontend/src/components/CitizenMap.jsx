@@ -150,18 +150,6 @@ const CitizenMap = forwardRef((props, ref) => {
   }, []);
 
   useEffect(() => {
-    if (assignedRescuer) {
-      console.log("assignedRescuer", assignedRescuer);
-    }
-  }, [assignedRescuer]);
-
-  useEffect(() => {
-    if (nearestRescuer) {
-      console.log("nearestRescuer", nearestRescuer);
-    }
-  }, [nearestRescuer]);
-
-  useEffect(() => {
     if (nearestRescuer || assignedRescuer) {
       getRoute();
     }

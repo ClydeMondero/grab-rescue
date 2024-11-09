@@ -11,6 +11,7 @@ import {
   Policy,
   TermsOfService,
   Download,
+  About,
 } from "./pages";
 import axios from "axios";
 import { PrivateRoute, GeolocateButton, LocationPrompt } from "./components";
@@ -39,6 +40,7 @@ const App = () => {
           <Route path="/privacy-policy" element={<Policy />} />
           <Route path="/terms-of-service" element={<TermsOfService />} />
           <Route path="/download" element={<Download />} />
+          <Route path="/about" element={<About />} />
           <Route
             path="/rescuer/*"
             element={<PrivateRoute Component={Rescuer} />}
