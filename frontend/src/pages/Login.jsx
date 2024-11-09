@@ -74,7 +74,8 @@ const Login = () => {
         toast.success(data.message);
         updateLocationStatus(id, "offline");
         setTimeout(() => {
-          navigate("/" + role.toLowerCase(), { replace: true });
+          window.location = "/" + role.toLowerCase();
+          // navigate("/" + role.toLowerCase(), { replace: true });
         }, 1500);
       } else {
         toast[data.error ? "error" : "warning"](data.message);
