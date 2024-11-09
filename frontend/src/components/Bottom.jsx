@@ -52,14 +52,15 @@ const Bottom = ({ user }) => {
             Requests
           </span>
         </Link>
-        <Link
-          to="/rescuer/navigate"
+        <a
+          href="/rescuer/navigate"
           className={`flex flex-col items-center ${
             isAssigned ? "pointer-events-none opacity-50" : ""
           }`}
           onClick={(e) => {
-            if (!isAssigned) updatePage("Navigate");
-            else e.preventDefault();
+            if (!isAssigned) {
+              updatePage("Navigate");
+            }
           }}
         >
           <FaLocationArrow
@@ -70,7 +71,7 @@ const Bottom = ({ user }) => {
           <span className="text-sm font-semibold text-primary-dark">
             Navigate
           </span>
-        </Link>
+        </a>
       </div>
     )
   );

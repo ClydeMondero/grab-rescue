@@ -1,4 +1,4 @@
-import logo from "../../public/logo.png";
+import logo from "../assets/logo.png";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -101,7 +101,7 @@ const Login = () => {
           </p>
         </div>
         <div className="flex justify-center mb-4">
-          <img src={logo} alt="Logo" className="h-36" />
+          <img src={logo} alt="Logo" />
         </div>
         <h2 className="text-center text-2xl font-semibold mb-5 text-primary-dark">
           Login as {role}
