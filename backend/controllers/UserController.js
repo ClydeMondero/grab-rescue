@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const zxcvbn = require("zxcvbn");
 const { CreateLog } = require("./LogController");
+const { getTokenSubject } = require("../utils/SecretToken");
 
 // Get Users with Filtering and Name Search (Rescuers and Admins)
 module.exports.GetUsers = async (req, res) => {
@@ -54,7 +55,7 @@ module.exports.GetUsers = async (req, res) => {
 module.exports.GetUser = async (req, res) => {
   try {
     const { rows } = await pool.query(
-      "SELECT id, first_name, middle_initial, last_name, to_char(birthday, 'YYYY-MM-DD') AS birthday, municipality, barangay, profile_image, contact_number, email, username, is_online, verified, account_type, status FROM users WHERE id = $1",
+      "SELECT id, first_name, middle_name, last_name, to_char(birthday, 'YYYY-MM-DD') AS birthday, municipality, barangay, profile_image, contact_number, email, username, is_online, verified, account_type, status FROM users WHERE id = $1",
       [req.params.id]
     );
     if (rows.length === 0) {
@@ -70,7 +71,7 @@ module.exports.GetUser = async (req, res) => {
 module.exports.UpdateUser = async (req, res) => {
   const {
     first_name: firstName,
-    middle_initial: middleInitial,
+    middle_name: middleName,
     last_name: lastName,
     birthday,
     municipality,
@@ -145,7 +146,7 @@ module.exports.UpdateUser = async (req, res) => {
     const updates = [];
     const newUserData = {
       first_name: firstName,
-      middle_initial: middleInitial,
+      middle_name: middleName,
       last_name: lastName,
       birthday,
       municipality,
@@ -189,12 +190,12 @@ module.exports.UpdateUser = async (req, res) => {
 
     // Update the user in the database
     const updateQuery = `
-      UPDATE users SET first_name = $1, middle_initial = $2, last_name = $3, birthday = $4, age = $5,
+      UPDATE users SET first_name = $1, middle_name = $2, last_name = $3, birthday = $4, age = $5,
       municipality = $6, barangay = $7, contact_number = $8, username = $9 WHERE id = $10
     `;
     const values = [
       firstName,
-      middleInitial,
+      middleName,
       lastName,
       birthday,
       age,
@@ -498,7 +499,7 @@ module.exports.UpdateUserStatus = async (req, res) => {
     // Log the status update action
     await CreateLog({
       userId: id,
-      action: `User status updated from ${currentStatus} to ${newStatus}`,
+      action: `User status update: Rescuer with ID: ${id} changed from ${currentStatus} to ${newStatus}`,
     });
 
     return res.status(200).json({

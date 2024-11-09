@@ -8,9 +8,11 @@ import {
   query,
   onSnapshot,
   where,
+  deleteDoc,
 } from "firebase/firestore";
+import { getToken, onMessage } from "firebase/messaging";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { store, storage } from "../../firebaseConfig";
+import { store, storage, messaging } from "../../firebaseConfig";
 
 //add location to firestore
 export const addLocationToFirestore = async (
@@ -37,6 +39,35 @@ export const addLocationToFirestore = async (
     return { id: docRef.id };
   } catch (error) {
     console.log("Error adding document: ", error);
+  }
+};
+
+// get FCM token
+export const setMessagingToken = async () => {
+  try {
+    const token = await getToken(messaging, {
+      vapidKey: import.meta.env.VITE_FIREBASE_MESSAGING_VAPID_KEY,
+    });
+    if (token) {
+      return token;
+    } else {
+      console.log(
+        "No registration token available. Request permission to generate one."
+      );
+      return null;
+    }
+  } catch (error) {
+    console.error("An error occurred while retrieving token. ", error);
+    return null;
+  }
+};
+
+export const addMessagingTokenToLocation = async (userId, fcmToken) => {
+  try {
+    const locationRef = doc(store, "locations", userId);
+    await updateDoc(locationRef, { fcmToken });
+  } catch (error) {
+    console.error("Error updating location document with FCM token:", error);
   }
 };
 
@@ -68,6 +99,46 @@ export const getIDFromLocation = async (id) => {
 
   if (docSnap.exists()) {
     return docSnap.data().userId;
+  } else {
+    return null;
+  }
+};
+
+export const clearLocationsCollection = async () => {
+  try {
+    const querySnapshot = await getDocs(collection(store, "locations"));
+    const deletePromises = [];
+
+    querySnapshot.forEach((document) => {
+      const documentRef = doc(store, "locations", document.id);
+      deletePromises.push(deleteDoc(documentRef));
+    });
+
+    await Promise.all(deletePromises);
+    console.log(
+      "All documents in the 'locations' collection have been deleted."
+    );
+  } catch (error) {
+    console.error("Error clearing 'locations' collection: ", error);
+  }
+};
+
+//get location reference id by finding the same userId property in a location document
+export const getLocationIDFromFirestore = async (userId) => {
+  const q = query(
+    collection(store, "locations"),
+    where("userId", "==", userId)
+  );
+
+  const querySnapshot = await getDocs(q);
+
+  const location = querySnapshot.docs.map((doc) => ({
+    ...doc.data(),
+    id: doc.id,
+  }))[0];
+
+  if (location) {
+    return location.id;
   } else {
     return null;
   }
@@ -114,6 +185,22 @@ export const getLocationsFromFirestore = (role, setLocations) => {
   });
 
   return unsubscribe; // To stop listening when needed
+};
+
+export const getLocationFromFirestoreById = async (id) => {
+  try {
+    const locationRef = doc(store, "locations", id);
+    const locationSnap = await getDoc(locationRef);
+
+    if (locationSnap.exists()) {
+      return { id: locationSnap.id, ...locationSnap.data() };
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error("Error getting location by ID: ", error);
+    return null;
+  }
 };
 
 export const getOnlineLocationsFromFirestore = (role, setLocations) => {
@@ -169,15 +256,18 @@ export const getRequestsFromFirestore = (setRequests) => {
 };
 
 //get request from firestore
-export const getRequestFromFirestore = async (id) => {
+export const getRequestFromFirestore = (id, callback) => {
   try {
     const docRef = doc(store, "requests", id);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      return { id: docSnap.id, ...docSnap.data() };
-    } else {
-      return null;
-    }
+    const unsubscribe = onSnapshot(docRef, (doc) => {
+      if (doc.exists()) {
+        callback({ id: doc.id, ...doc.data() });
+      } else {
+        callback(null);
+      }
+    });
+
+    return unsubscribe; // To stop listening when needed
   } catch (error) {
     console.error("Error getting document: ", error);
     return null;
@@ -246,6 +336,20 @@ export const updateRequestInFirestore = async (
   }
 };
 
+//complete request in firestore
+export const completeRequestInFirestore = async (requestId, address) => {
+  const updateData = {
+    rescuedTimestamp: new Date().toISOString(),
+    rescuedAddress: address,
+  };
+
+  try {
+    await updateDoc(doc(store, "requests", requestId), updateData);
+  } catch (error) {
+    console.error("Error updating document: ", error);
+  }
+};
+
 // Function to upload image to Firebase Storage
 export const uploadImageToFirebaseStorage = async (file) => {
   const storageRef = ref(storage, `incidentPictures/${file.name}`);
@@ -277,6 +381,16 @@ export const acceptRescueRequestInFirestore = async (
   } catch (error) {
     console.error("Error updating document: ", error);
     return { success: false, error: error.message };
+  }
+};
+
+export const updateRequestStatusInFirestore = async (requestId, status) => {
+  const updateData = { status };
+
+  try {
+    await updateDoc(doc(store, "requests", requestId), updateData);
+  } catch (error) {
+    console.error("Error updating document: ", error);
   }
 };
 

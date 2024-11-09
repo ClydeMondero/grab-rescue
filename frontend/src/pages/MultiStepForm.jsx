@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from "react";
 import placeholder from "../assets/placeholder.png";
-import { updateRequestInFirestore } from "../services/firestoreService";
+import {
+  updateRequestInFirestore,
+  getRequestFromFirestore,
+} from "../services/firestoreService";
 import { Loader } from "../components";
-
-const MultiStepForm = ({ request }) => {
+import { getRequestCookie } from "../services/cookieService";
+import { Link } from "react-router-dom";
+const MultiStepForm = ({ request, setRequest }) => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     phone: "",
@@ -11,6 +15,7 @@ const MultiStepForm = ({ request }) => {
     citizenRelation: "",
     incidentPicture: "",
     incidentDescription: "",
+    previewImage: placeholder, // Initialize with Firebase URL or placeholder
   });
   const [required, setRequired] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -38,20 +43,28 @@ const MultiStepForm = ({ request }) => {
   const handleChange = (e) => {
     const { name, value, files } = e.target;
 
-    if (name == "phone") {
+    if (name === "phone") {
       const onlyNumbers = value.replace(/\D/g, "");
-      setFormData({
-        ...formData,
+      setFormData((prevData) => ({
+        ...prevData,
         phone: onlyNumbers,
-      });
+      }));
       setRequired(false);
+    } else if (name === "incidentPicture" && files && files[0]) {
+      const file = files[0];
+      setFormData((prevData) => ({
+        ...prevData,
+        incidentPicture: file,
+        previewImage: URL.createObjectURL(file), // Update preview URL with uploaded file
+      }));
     } else {
-      setFormData({
-        ...formData,
-        [name]: files ? files[0] : value, // Handle file input separately
-      });
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
     }
   };
+
   const handleSubmit = async () => {
     setIsLoading(true);
 
@@ -72,6 +85,8 @@ const MultiStepForm = ({ request }) => {
         incidentPicture,
         incidentDescription,
       });
+
+      checkRequest();
     } catch (error) {
       console.error("Error submitting the form:", error);
     }
@@ -81,6 +96,23 @@ const MultiStepForm = ({ request }) => {
       setStep(1);
     }, 2000);
   };
+
+  const checkRequest = async () => {
+    const requestId = getRequestCookie();
+
+    console.log(requestId);
+
+    const onGoingRequest = await getRequestFromFirestore(requestId);
+    setRequest(onGoingRequest);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (formData.previewImage && formData.previewImage !== placeholder) {
+        URL.revokeObjectURL(formData.previewImage);
+      }
+    };
+  }, [formData.previewImage]);
 
   const renderStep = () => {
     switch (step) {
@@ -92,13 +124,13 @@ const MultiStepForm = ({ request }) => {
                 className="text-md font-semibold text-text-secondary"
                 htmlFor="phone"
               >
-                Phone Number<span className="text-red-500">*</span>
+                Phone Number (required)
               </label>
               <input
                 type="tel"
                 name="phone"
-                required
                 value={formData.phone}
+                required
                 onChange={handleChange}
                 autoComplete="tel"
                 minLength={11}
@@ -108,6 +140,7 @@ const MultiStepForm = ({ request }) => {
                     ? "border-secondary focus:ring-secondary "
                     : "border-background-medium focus:ring-primary "
                 }`}
+                disabled={request?.phone ? true : false}
               />
               {required && (
                 <p className="text-secondary font-semibold">
@@ -128,13 +161,14 @@ const MultiStepForm = ({ request }) => {
           <div className="h-full flex flex-col justify-center gap-4">
             <div className="flex flex-col gap-4">
               <h2 className="text-md font-semibold text-text-secondary">
-                Your Name
+                Your Name (optional)
               </h2>
               <input
                 type="text"
                 name="citizenName"
                 value={formData.citizenName}
                 onChange={handleChange}
+                disabled={request?.citizenName ? true : false}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
               />
             </div>
@@ -161,13 +195,14 @@ const MultiStepForm = ({ request }) => {
           <div className="h-full flex flex-col justify-center gap-4">
             <div className="flex flex-col gap-4">
               <h2 className="text-md font-semibold text-text-secondary">
-                Relation to the Victim
+                Relation to the Victim (optional)
               </h2>
               <input
                 type="text"
                 name="citizenRelation"
                 value={formData.citizenRelation}
                 onChange={handleChange}
+                disabled={request?.citizenRelation ? true : false}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
               />
             </div>
@@ -194,29 +229,27 @@ const MultiStepForm = ({ request }) => {
           <div className="h-full flex flex-col justify-center gap-4">
             <div className="flex flex-col gap-4">
               <h2 className="text-md font-semibold text-text-secondary">
-                Upload Proof of Incident
+                Upload Proof of Incident (optional)
               </h2>
               <img
                 className="w-full h-48 object-cover rounded-lg mt-2"
-                src={
-                  formData.incidentPicture == ""
-                    ? placeholder
-                    : formData.incidentPicture
-                }
+                src={formData.previewImage}
                 alt="Preview of uploaded image"
               />
-              <input
-                type="file"
-                name="incidentPicture"
-                accept="image/*"
-                onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500
-                file:mr-4 file:py-2 file:px-4
-                file:rounded-full file:border-0
-                file:text-sm file:font-semibold
-                file:bg-gray-50 file:text-gray-700
-                hover:file:bg-gray-100 focus:file:bg-gray-50"
-              />
+              {!request?.incidentPicture && (
+                <input
+                  type="file"
+                  name="incidentPicture"
+                  accept="image/*"
+                  onChange={handleChange}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500
+                  file:mr-4 file:py-2 file:px-4
+                  file:rounded-full file:border-0
+                  file:text-sm file:font-semibold
+                  file:bg-gray-50 file:text-gray-700
+                  hover:file:bg-gray-100 focus:file:bg-gray-50"
+                />
+              )}
             </div>
             <div className="flex flex-col space-y-2">
               <div className="flex justify-between space-x-4">
@@ -251,17 +284,24 @@ const MultiStepForm = ({ request }) => {
                 rows={4}
                 placeholder="Provide a brief description of the situation"
                 style={{ resize: "none" }}
+                disabled={request?.incidentDescription ? true : false}
               />
             </div>
             <p className="text-xs text-text-secondary">
               By submitting this request, you agree to our{" "}
-              <a href="/policies" className="underline text-text-primary">
+              <Link
+                to="/privacy-policy"
+                className="underline text-text-primary"
+              >
                 Privacy Policy
-              </a>{" "}
+              </Link>{" "}
               and{" "}
-              <a href="terms" className="underline text-text-primary">
+              <Link
+                to="/terms-of-service"
+                className="underline text-text-primary"
+              >
                 Terms of Service
-              </a>
+              </Link>
             </p>
             <div className="flex justify-between space-x-4">
               <button
@@ -298,6 +338,7 @@ const MultiStepForm = ({ request }) => {
         citizenRelation: request.citizenRelation ?? "",
         incidentPicture: request.incidentPicture ?? "",
         incidentDescription: request.incidentDescription ?? "",
+        previewImage: request.incidentPicture ?? placeholder,
       });
     }
   }, [request]);

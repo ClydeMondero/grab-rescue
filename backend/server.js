@@ -9,6 +9,7 @@ const authRoute = require("./routes/AuthRoute");
 const rescuerRoute = require("./routes/RescuerRoute");
 const adminRoute = require("./routes/AdminRoute");
 const logRoute = require("./routes/LogRoute");
+const messageRoute = require("./routes/MessageRoute");
 
 const url = env.API_URL;
 const port = env.PORT;
@@ -18,13 +19,16 @@ app.listen(port, () => {
 });
 
 //enable cors
-app.use(
-  cors({
-    origin: ["http://localhost:5173", "https://grab-rescue.onrender.com"],
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
-  })
-);
+const corsOptions = {
+  origin: ["http://localhost:5173", "https://grab-rescue.onrender.com"],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true,
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+
+app.use(cors(corsOptions));
+
+app.options("*", cors(corsOptions));
 
 //parse cookies
 app.use(cookieParser());
@@ -38,3 +42,4 @@ app.use("/users", userRoute);
 app.use("/rescuers", rescuerRoute);
 app.use("/admins", adminRoute);
 app.use("/logs", logRoute);
+app.use("/messages", messageRoute);

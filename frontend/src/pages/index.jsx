@@ -7,8 +7,12 @@ import ResetPassword from "./ResetPasswordPage";
 import VerifyEmail from "./VerifyEmail";
 import NotFound from "./NotFound";
 import MultiStepForm from "./MultiStepForm";
-
+import Policy from "./Policy";
+import TermsOfService from "./TermsOfService";
+import Download from "./Download";
+import About from "./About";
 export {
+  About,
   MultiStepForm,
   Login,
   Admin,
@@ -18,4 +22,7 @@ export {
   ForgotPassword,
   ResetPassword,
   VerifyEmail,
+  Policy,
+  TermsOfService,
+  Download,
 };

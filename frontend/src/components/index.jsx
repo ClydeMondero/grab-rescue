@@ -1,3 +1,4 @@
+import Nav from "./Nav";
 import Loader from "./Loader";
 import AddRescuer from "./AddRescuer";
 import ChangePassword from "./ChangePassword";
@@ -27,8 +28,11 @@ import RescuerMarker from "./RescuerMarker";
 import GeolocateButton from "./GeolocateButton";
 import TurnIndicator from "./TurnIndicator";
 import RequestModal from "./RequestModal";
+import Notifications from "./Notifications";
+import LocationPrompt from "./LocationPrompt";
 
 export {
+  LocationPrompt,
   RequestModal,
   TurnIndicator,
   GeolocateButton,
@@ -58,4 +62,6 @@ export {
   Bottom,
   Navigate,
   Requests,
+  Notifications,
+  Nav,
 };

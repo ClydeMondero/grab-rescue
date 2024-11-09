@@ -1,4 +1,4 @@
-import logo from "../../public/logo.png";
+import logo from "../assets/logo.png";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -74,7 +74,8 @@ const Login = () => {
         toast.success(data.message);
         updateLocationStatus(id, "offline");
         setTimeout(() => {
-          navigate("/" + role.toLowerCase(), { replace: true });
+          window.location = "/" + role.toLowerCase();
+          // navigate("/" + role.toLowerCase(), { replace: true });
         }, 1500);
       } else {
         toast[data.error ? "error" : "warning"](data.message);
@@ -100,11 +101,8 @@ const Login = () => {
           </p>
         </div>
         <div className="flex justify-center mb-4">
-          <img src={logo} alt="Logo" className="h-12" />
+          <img src={logo} alt="Logo" />
         </div>
-        <h2 className="text-center text-2xl font-semibold mb-5 text-primary-dark">
-          Login as {role}
-        </h2>
         <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
           <div className="flex items-center border border-background-medium rounded-md focus-within:border-primary-medium">
             <FaEnvelope className="h-6 w-6 ml-2 mr-1 text-primary-dark" />

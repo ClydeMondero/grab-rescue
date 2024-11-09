@@ -264,7 +264,7 @@ const ChangePassword = (props) => {
               disabled={isLoading}
             >
               {isLoading ? (
-                <Loader isLoading={isLoading} />
+                <Loader isLoading={isLoading} size={25} />
               ) : (
                 <div className="flex items-center gap-2 font-bold">
                   <FaSave />

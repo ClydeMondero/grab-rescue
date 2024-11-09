@@ -2,7 +2,7 @@ import Cookies from "js-cookie";
 import CryptoJS from "crypto-js";
 
 export const deleteCookie = (cookieName) => {
-  document.cookie = `${cookieName}=; expires=${new Date()};`;
+  document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
 };
 
 export const getCookie = (cookieName) => {
@@ -14,9 +14,12 @@ export const getCookie = (cookieName) => {
       c = c.substring(1);
     }
     if (c.indexOf(name) == 0) {
-      return c.substring(name.length, c.length);
+      const cookieValue = c.substring(name.length, c.length);
+      console.log("Retrieved cookie value for", cookieName, ":", cookieValue); // Log for debugging
+      return cookieValue;
     }
   }
+  console.warn("Cookie not found:", cookieName); // Log if cookie not found
   return "";
 };
 

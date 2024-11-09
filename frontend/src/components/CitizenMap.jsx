@@ -32,11 +32,13 @@ import { useLocation } from "react-router-dom";
 import { setGeolocateIcon } from "../utils/GeolocateUtility";
 
 const CitizenMap = forwardRef((props, ref) => {
+  const { assignedRescuer } = props;
   const [citizen, setCitizen] = useState({
     longitude: 120.9107,
     latitude: 14.9536,
     zoom: 15,
   });
+  const [coords, setCoords] = useState(null);
 
   const [rescuers, setRescuers] = useState(null);
   const [nearestRescuer, setNearestRescuer] = useState(null);
@@ -55,7 +57,7 @@ const CitizenMap = forwardRef((props, ref) => {
   const [distance, setDistance] = useState();
   const [eta, setEta] = useState();
 
-  const { onLocatingChange } = props;
+  const { onLocatingChange, onNearestRescuerUpdate } = props;
 
   const mapRef = useRef();
   const geoControlRef = useRef();
@@ -66,6 +68,8 @@ const CitizenMap = forwardRef((props, ref) => {
   const location = useLocation();
 
   const handleGeolocation = async (coords) => {
+    setCoords(coords);
+
     if (mapRef.current.resize()) {
       mapRef.current.resize();
     }
@@ -113,6 +117,7 @@ const CitizenMap = forwardRef((props, ref) => {
 
     const nearest = getNearestRescuer(citizen, rescuers);
     setNearestRescuer(nearest);
+    onNearestRescuerUpdate(nearest);
 
     setCitizen({
       longitude: coords.longitude,
@@ -121,7 +126,13 @@ const CitizenMap = forwardRef((props, ref) => {
   };
 
   const getRoute = async () => {
-    const route = await getRouteData(nearestRescuer, citizen);
+    let route = null;
+
+    if (assignedRescuer) {
+      route = await getRouteData(assignedRescuer, citizen);
+    } else {
+      route = await getRouteData(nearestRescuer, citizen);
+    }
 
     setRouteData(route);
     setDistance(route.distance);
@@ -138,10 +149,18 @@ const CitizenMap = forwardRef((props, ref) => {
   }, []);
 
   useEffect(() => {
-    if (nearestRescuer) {
+    if (nearestRescuer || assignedRescuer) {
       getRoute();
     }
-  }, [nearestRescuer, citizen, rescuers]);
+  }, [nearestRescuer, assignedRescuer, citizen, rescuers]);
+
+  useEffect(() => {
+    if (rescuers && citizen) {
+      const nearest = getNearestRescuer(citizen, rescuers);
+      setNearestRescuer(nearest);
+      onNearestRescuerUpdate(nearest);
+    }
+  }, [rescuers, citizen]);
 
   useImperativeHandle(ref, () => ({
     locateCitizen: () => {
@@ -179,7 +198,7 @@ const CitizenMap = forwardRef((props, ref) => {
           position="top-right"
           positionOptions={{ enableHighAccuracy: true }}
           trackUserLocation={true}
-          showUserLocation={false}
+          showUserLocation={coords === null}
           onGeolocate={({ coords }) => {
             handleGeolocation(coords);
           }}
@@ -201,10 +220,13 @@ const CitizenMap = forwardRef((props, ref) => {
               myMarker={citizen}
               otherMarkers={rescuers}
               nearestOtherMarker={nearestRescuer}
+              assignedRescuer={assignedRescuer}
               markerType={"citizen"}
             />
 
-            <Route routeData={routeData} routeOpacity={routeOpacity} />
+            {routeData && (
+              <Route routeData={routeData} routeOpacity={routeOpacity} />
+            )}
 
             {distance && eta && <DistanceEta distance={distance} eta={eta} />}
           </>

@@ -75,11 +75,13 @@ module.exports.Login = async (req, res) => {
       }
 
       const token = createSecretToken(userData.id);
+      const maxAge = 14 * 24 * 60 * 60 * 1000; // 14 days
       res.cookie("token", token, {
         withCredentials: true,
         secure: true,
-        sameSite: "Lax",
-        maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
+        sameSite: "none",
+        httpOnly: false,
+        maxAge,
       });
 
       delete userData.password; // Remove password from userData
@@ -116,8 +118,10 @@ module.exports.Logout = async (req, res) => {
 
     // Clear the cookie after updating the user's online status
     res.clearCookie("token", {
+      withCredentials: true,
       secure: true,
-      sameSite: "Lax",
+      sameSite: "none",
+      httpOnly: false,
     });
 
     return res

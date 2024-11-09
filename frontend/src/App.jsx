@@ -8,9 +8,13 @@ import {
   ForgotPassword,
   ResetPassword,
   VerifyEmail,
+  Policy,
+  TermsOfService,
+  Download,
+  About,
 } from "./pages";
 import axios from "axios";
-import { PrivateRoute, GeolocateButton } from "./components";
+import { PrivateRoute, GeolocateButton, LocationPrompt } from "./components";
 import { StatusProvider } from "./contexts/StatusContext";
 
 axios.defaults.baseURL =
@@ -23,6 +27,8 @@ const App = () => {
     <StatusProvider>
       <Router>
         <GeolocateButton />
+        <LocationPrompt />
+
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
@@ -31,6 +37,10 @@ const App = () => {
           {/* Email Verification Route */}
           <Route path="/verify/:token" element={<VerifyEmail />} />
           <Route path="/admin/*" element={<PrivateRoute Component={Admin} />} />
+          <Route path="/privacy-policy" element={<Policy />} />
+          <Route path="/terms-of-service" element={<TermsOfService />} />
+          <Route path="/download" element={<Download />} />
+          <Route path="/about" element={<About />} />
           <Route
             path="/rescuer/*"
             element={<PrivateRoute Component={Rescuer} />}

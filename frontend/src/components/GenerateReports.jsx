@@ -14,15 +14,16 @@ const GenerateReports = (props) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [accountType, setAccountType] = useState("");
   const [actionFilters, setActionFilters] = useState({
-    "Logged In": false,
-    "Logged Out": false,
-    "User changed password successfully": false,
-    "Email change verified and updated": false,
-    "User changed email": false,
-    "Rescuer created": false,
-    "User updated": false,
-    "Requested password reset": false,
-    "Password reset successful": false,
+    "Logged In": true,
+    "Logged Out": true,
+    "User changed password successfully": true,
+    "Email change verified and updated": true,
+    "User changed email": true,
+    "Rescuer created": true,
+    "User updated": true,
+    "User status update": true,
+    "Requested password reset": true,
+    "Password reset successful": true,
   });
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -65,15 +66,16 @@ const GenerateReports = (props) => {
   const resetFilters = () => {
     setAccountType(""); // Reset to default
     setActionFilters({
-      "Logged In": false,
-      "Logged Out": false,
-      "User changed password successfully": false,
-      "Email change verified and updated": false,
-      "User changed email": false,
-      "Rescuer created": false,
-      "User updated": false,
-      "Requested password reset": false,
-      "Password reset successful": false,
+      "Logged In": true,
+      "Logged Out": true,
+      "User changed password successfully": true,
+      "Email change verified and updated": true,
+      "User changed email": true,
+      "Rescuer created": true,
+      "User updated": true,
+      "User status update": true,
+      "Requested password reset": true,
+      "Password reset successful": true,
     });
     setStartDate("");
     setEndDate("");
@@ -125,9 +127,9 @@ const GenerateReports = (props) => {
         log.action,
         new Date(log.date_time).toLocaleString(), // Format date
         log.user_id,
-        `${log.first_name} ${
-          log.middle_initial ? log.middle_initial.trim() : ""
-        } ${log.last_name}`,
+        `${log.first_name} ${log.middle_name ? log.middle_name.trim() : ""} ${
+          log.last_name
+        }`,
       ]);
 
       // Generate the table with updated styles
@@ -196,7 +198,7 @@ const GenerateReports = (props) => {
     setSelectAll((prev) => !prev);
     const updatedFilters = Object.keys(actionFilters).reduce((acc, filter) => {
       // Disable "Rescuer Created" if account type is rescuer
-      if (filter === "Rescuer created" && accountType === "rescuer") {
+      if (filter === "Rescuer created" && accountType === "Rescuer") {
         acc[filter] = false;
       } else {
         acc[filter] = !selectAll;
@@ -240,14 +242,14 @@ const GenerateReports = (props) => {
 
   return (
     <div className="flex-1 p-4 sm:p-6 lg:p-8 h-full  flex flex-col">
-      <div className="flex items-center mb-4 sm:mb-6 pb-2 sm:pb-4 p-2 sm:p-4 rounded-lg">
-        <FaFileAlt className="text-2xl sm:text-3xl text-primary-medium mr-2 sm:mr-3" />
-        <h4 className="text-sm sm:text-2xl font-semibold text-primary-medium">
+      <div className="flex items-center mb-2 sm:mb-4 border-b border-gray-200 pb-3">
+        <FaFileAlt className="text-3xl sm:text-md lg:text-3xl text-primary-dark mr-2 fill-current" />
+        <h4 className="text-xl sm:text-md lg:text-3xl text-primary-dark font-bold">
           Generate Log Action Reports
         </h4>
       </div>
 
-      <p className="mb-4 sm:mb-6 text-md sm:text-md text-primary-medium">
+      <p className="text-lg font-semibold text-[#557C55] self-start">
         Select a report type to generate:
       </p>
 
@@ -327,7 +329,7 @@ const GenerateReports = (props) => {
                       onChange={() => handleCheckboxChange(filter)}
                       disabled={
                         filter === "Rescuer created" &&
-                        accountType === "rescuer"
+                        accountType === "Rescuer"
                       }
                     />
                     <span className="ml-2">{filter}</span>
