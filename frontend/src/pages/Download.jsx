@@ -8,6 +8,7 @@ import { IoLogoGooglePlaystore } from "react-icons/io5";
 import { IoMdDownload } from "react-icons/io";
 import { FaChevronLeft } from "react-icons/fa";
 import { FaWindows, FaApple, FaLinux, FaAndroid } from "react-icons/fa6";
+import { Nav } from "../components";
 
 const useWindowSize = () => {
   const [windowSize, setWindowSize] = useState({
@@ -93,46 +94,9 @@ const Download = () => {
   return (
     <div
       className="relative min-h-screen bg-gray-50 overflow-hidden"
-      style={{ height: "100vh", overflow: "hidden" }}
+      style={{ height: "100dvh", overflow: "hidden" }}
     >
-      {/* Desktop Navbar */}
-      <div className="hidden lg:h-[10%] bg-accent text-white shadow-lg px-4 py-2 lg:flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <img src={logo} alt="logo" className="h-12 text-primary" />
-        </div>
-        <ul className="space-x-4 flex items-center justify-center">
-          <li>
-            <p
-              className="text-lg font-semibold cursor-pointer text-text-primary"
-              onClick={() => navigate("/about")}
-            >
-              About
-            </p>
-          </li>
-          <li>
-            <p
-              className="text-lg font-semibold cursor-pointer text-text-primary"
-              onClick={() => navigate("/download")}
-            >
-              Download
-            </p>
-          </li>
-          <li
-            onClick={() => navigate("/login?role=Rescuer")}
-            className="cursor-pointer text-text-primary border-primary border-[2px] px-4 py-2 rounded-md hover:opacity-80"
-          >
-            <p className="text-primary text-md font-semibold">
-              Login as Rescuer
-            </p>
-          </li>
-          <li
-            onClick={() => navigate("/login?role=Admin")}
-            className="cursor-pointer border-[2px] border-primary px-4 py-2 rounded-md hover:opacity-80"
-          >
-            <p className="text-primary text-md font-semibold">Login as Admin</p>
-          </li>
-        </ul>
-      </div>
+      <Nav navigate={navigate} />
 
       {/* Page Content */}
       <div

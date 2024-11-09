@@ -1,3 +1,4 @@
+import Nav from "./Nav";
 import Loader from "./Loader";
 import AddRescuer from "./AddRescuer";
 import ChangePassword from "./ChangePassword";
@@ -62,4 +63,5 @@ export {
   Navigate,
   Requests,
   Notifications,
+  Nav,
 };
