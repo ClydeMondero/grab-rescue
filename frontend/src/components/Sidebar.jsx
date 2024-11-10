@@ -182,15 +182,6 @@ const Sidebar = () => {
             </span>
           </Link>
           <Link
-            to="/admin/notifications"
-            className="flex items-center px-4 py-2 hover:bg-[#6EA46E]"
-          >
-            <FaBell className={`text-lg ${!isOpen ? "text-xl" : "text-lg"}`} />
-            <span className={`${!isOpen && "hidden"} ml-4 duration-300`}>
-              Notifications
-            </span>
-          </Link>
-          <Link
             to="/admin/settings"
             className="flex items-center px-4 py-2 hover:bg-[#6EA46E]"
           >
@@ -334,15 +325,6 @@ const Sidebar = () => {
             />
             <span className={`${!isOpen && "hidden"} ml-4 duration-300`}>
               Generate Reports
-            </span>
-          </Link>
-          <Link
-            to="/admin/notifications"
-            className="flex items-center px-4 py-2 hover:bg-[#6EA46E]"
-          >
-            <FaBell className={`text-lg ${!isOpen ? "text-xl" : "text-lg"}`} />
-            <span className={`${!isOpen && "hidden"} ml-4 duration-300`}>
-              Notifications
             </span>
           </Link>
           <Link
