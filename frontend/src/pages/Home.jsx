@@ -29,6 +29,7 @@ import {
   deleteCookie, // Import deleteCookie
 } from "../services/cookieService";
 import { StatusContext } from "../contexts/StatusContext";
+import { RequestContext } from "../contexts/RequestContext";
 import MobileDetect from "mobile-detect";
 import { toast } from "react-toastify";
 
@@ -38,7 +39,7 @@ const Home = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [formVisible, setFormVisible] = useState(false);
   const [locating, setLocating] = useState(true);
-  const [requesting, setRequesting] = useState(false);
+  const { requesting, setRequesting } = useContext(RequestContext);
   const [request, setRequest] = useState(null);
   const [rescuer, setRescuer] = useState(null);
   const [nearestRescuer, setNearestRescuer] = useState(null);
@@ -249,40 +250,52 @@ const Home = () => {
               <ul className="space-y-2 flex flex-col items-center w-full">
                 <li className="py-2">
                   <button
-                    onClick={() => navigate("/")}
-                    className="flex items-center w-full text-lg font-semibold hover:underline"
+                    onClick={() => !requesting && navigate("/")}
+                    className={`flex items-center w-full text-lg font-semibold hover:underline ${
+                      requesting ? "cursor-not-allowed opacity-50" : ""
+                    }`}
                   >
                     Home
                   </button>
                 </li>
                 <li className="py-2 border-b w-full justify-center">
                   <button
-                    onClick={() => navigate("/login?role=Rescuer")}
-                    className="flex items-center justify-center w-full text-lg font-semibold "
+                    onClick={() =>
+                      !requesting && navigate("/login?role=Rescuer")
+                    }
+                    className={`flex items-center justify-center w-full text-lg font-semibold ${
+                      requesting ? "cursor-not-allowed opacity-50" : ""
+                    }`}
                   >
                     Login as Rescuer
                   </button>
                 </li>
                 <li className="py-2 border-b w-full justify-center">
                   <button
-                    onClick={() => navigate("/login?role=Admin")}
-                    className="flex items-center justify-center w-full text-lg font-semibold "
+                    onClick={() => !requesting && navigate("/login?role=Admin")}
+                    className={`flex items-center justify-center w-full text-lg font-semibold ${
+                      requesting ? "cursor-not-allowed opacity-50" : ""
+                    }`}
                   >
                     Login as Admin
                   </button>
                 </li>
                 <li className="py-2">
                   <button
-                    onClick={() => navigate("/download")}
-                    className="flex items-center w-full text-lg font-semibold hover:underline"
+                    onClick={() => !requesting && navigate("/download")}
+                    className={`flex items-center w-full text-lg font-semibold hover:underline ${
+                      requesting ? "cursor-not-allowed opacity-50" : ""
+                    }`}
                   >
                     Download
                   </button>
                 </li>
                 <li className="py-2">
                   <button
-                    onClick={() => navigate("/about")}
-                    className="flex items-center w-full text-lg font-semibold hover:underline"
+                    onClick={() => !requesting && navigate("/about")}
+                    className={`flex items-center w-full text-lg font-semibold hover:underline ${
+                      requesting ? "cursor-not-allowed opacity-50" : ""
+                    }`}
                   >
                     About
                   </button>

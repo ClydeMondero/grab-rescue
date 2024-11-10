@@ -16,6 +16,7 @@ import {
 import axios from "axios";
 import { PrivateRoute, GeolocateButton, LocationPrompt } from "./components";
 import { StatusProvider } from "./contexts/StatusContext";
+import { RequestProvider } from "./contexts/RequestContext";
 
 axios.defaults.baseURL =
   process.env.NODE_ENV === "production"
@@ -25,29 +26,34 @@ axios.defaults.baseURL =
 const App = () => {
   return (
     <StatusProvider>
-      <Router>
-        <GeolocateButton />
-        <LocationPrompt />
+      <RequestProvider>
+        <Router>
+          <GeolocateButton />
+          <LocationPrompt />
 
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password/:token" element={<ResetPassword />} />
-          {/* Email Verification Route */}
-          <Route path="/verify/:token" element={<VerifyEmail />} />
-          <Route path="/admin/*" element={<PrivateRoute Component={Admin} />} />
-          <Route path="/privacy-policy" element={<Policy />} />
-          <Route path="/terms-of-service" element={<TermsOfService />} />
-          <Route path="/download" element={<Download />} />
-          <Route path="/about" element={<About />} />
-          <Route
-            path="/rescuer/*"
-            element={<PrivateRoute Component={Rescuer} />}
-          />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Router>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password/:token" element={<ResetPassword />} />
+            {/* Email Verification Route */}
+            <Route path="/verify/:token" element={<VerifyEmail />} />
+            <Route
+              path="/admin/*"
+              element={<PrivateRoute Component={Admin} />}
+            />
+            <Route path="/privacy-policy" element={<Policy />} />
+            <Route path="/terms-of-service" element={<TermsOfService />} />
+            <Route path="/download" element={<Download />} />
+            <Route path="/about" element={<About />} />
+            <Route
+              path="/rescuer/*"
+              element={<PrivateRoute Component={Rescuer} />}
+            />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Router>
+      </RequestProvider>
     </StatusProvider>
   );
 };
