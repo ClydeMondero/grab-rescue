@@ -32,6 +32,7 @@ import { StatusContext } from "../contexts/StatusContext";
 import { RequestContext } from "../contexts/RequestContext";
 import MobileDetect from "mobile-detect";
 import { toast } from "react-toastify";
+import { hotlines } from "../constants/Hotlines";
 
 const Home = () => {
   const navigate = useNavigate();
