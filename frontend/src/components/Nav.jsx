@@ -15,7 +15,11 @@ const Nav = ({ navigate }) => {
         <img
           src={logo}
           alt="logo"
+<<<<<<< HEAD
           className="h- text-primary cursor-pointer"
+=======
+          className="h-10 text-primary cursor-pointer"
+>>>>>>> 3df7c142bbafaea5f1042968d521258484001d3d
           onClick={() => navigate("/")}
         />
       </div>

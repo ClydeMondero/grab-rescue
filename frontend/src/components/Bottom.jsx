@@ -52,14 +52,25 @@ const Bottom = ({ user }) => {
             Requests
           </span>
         </Link>
+<<<<<<< HEAD
         <Link
           to="/rescuer/navigate"
+=======
+        <a
+          href="/rescuer/navigate"
+>>>>>>> 3df7c142bbafaea5f1042968d521258484001d3d
           className={`flex flex-col items-center ${
             isAssigned ? "pointer-events-none opacity-50" : ""
           }`}
           onClick={(e) => {
+<<<<<<< HEAD
             if (!isAssigned) updatePage("Navigate");
             else e.preventDefault();
+=======
+            if (!isAssigned) {
+              updatePage("Navigate");
+            }
+>>>>>>> 3df7c142bbafaea5f1042968d521258484001d3d
           }}
         >
           <FaLocationArrow
@@ -70,7 +81,11 @@ const Bottom = ({ user }) => {
           <span className="text-sm font-semibold text-primary-dark">
             Navigate
           </span>
+<<<<<<< HEAD
         </Link>
+=======
+        </a>
+>>>>>>> 3df7c142bbafaea5f1042968d521258484001d3d
       </div>
     )
   );

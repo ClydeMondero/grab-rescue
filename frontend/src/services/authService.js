@@ -41,7 +41,11 @@ export const handleLogout = async (navigate) => {
   );
 
   if (data.success) {
+<<<<<<< HEAD
     updateLocationStatus(userId, "offline");
+=======
+    await updateLocationStatus(userId, "offline");
+>>>>>>> 3df7c142bbafaea5f1042968d521258484001d3d
     window.location = "/";
     // navigate("/");
     return;

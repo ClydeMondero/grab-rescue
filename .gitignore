@@ -14,7 +14,11 @@ dist
 dist-ssr
 *.local
 
+<<<<<<< HEAD
 /config/serviceKey.json
+=======
+serviceKey.json
+>>>>>>> 3df7c142bbafaea5f1042968d521258484001d3d
 
 # Editor directories and files
 .vscode/*

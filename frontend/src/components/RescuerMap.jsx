@@ -212,8 +212,11 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
       dragRotate={false}
       pitchWithRotate={false}
       onLoad={() => {
+<<<<<<< HEAD
         console.log("Geocontrol", geoControlRef.current);
 
+=======
+>>>>>>> 3df7c142bbafaea5f1042968d521258484001d3d
         geoControlRef.current?.trigger(); // Trigger after map is fully loaded
       }}
     >

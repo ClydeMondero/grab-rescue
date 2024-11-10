@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 const admin = require("firebase-admin");
 
 if (process.env.NODE_ENV === "production") {
@@ -14,6 +15,9 @@ if (process.env.NODE_ENV === "production") {
     credential: admin.credential.cert(serviceAccount),
   });
 }
+=======
+const admin = require("../config/firebaseAdmin");
+>>>>>>> 3df7c142bbafaea5f1042968d521258484001d3d
 
 exports.sendNotification = (req, res) => {
   const { token, title, body } = req.body;

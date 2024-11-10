@@ -101,11 +101,16 @@ const Login = () => {
           </p>
         </div>
         <div className="flex justify-center mb-4">
+<<<<<<< HEAD
           <img src={logo} alt="Logo" className="h-36" />
         </div>
         <h2 className="text-center text-2xl font-semibold mb-5 text-primary-dark">
           Login as {role}
         </h2>
+=======
+          <img src={logo} alt="Logo" />
+        </div>
+>>>>>>> 3df7c142bbafaea5f1042968d521258484001d3d
         <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
           <div className="flex items-center border border-background-medium rounded-md focus-within:border-primary-medium">
             <FaEnvelope className="h-6 w-6 ml-2 mr-1 text-primary-dark" />

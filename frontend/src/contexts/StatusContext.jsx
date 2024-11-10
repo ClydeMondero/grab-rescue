@@ -18,17 +18,30 @@ const StatusProvider = ({ children }) => {
   const [id, setId] = useState(null);
 
   const getId = async () => {
+<<<<<<< HEAD
     const userCookie = getUserCookie();
 
     if (userCookie) {
       const userId = await getIDFromCookie();
       setId(userId);
+=======
+    // Prefer user cookie if available
+    const userId = await getIDFromCookie();
+
+    if (userId) {
+      setId(userId);
+      console.log("Setting rescuer ID:", userId);
+>>>>>>> 3df7c142bbafaea5f1042968d521258484001d3d
     } else {
       const citizenCookie = getCitizenCookie();
 
       if (citizenCookie) {
         const citizenId = await getIDFromLocation(citizenCookie);
         setId(citizenId);
+<<<<<<< HEAD
+=======
+        console.log("Setting citizen ID:", citizenId);
+>>>>>>> 3df7c142bbafaea5f1042968d521258484001d3d
       }
     }
   };

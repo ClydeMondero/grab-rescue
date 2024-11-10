@@ -30,6 +30,10 @@ import {
 } from "../services/cookieService";
 import { StatusContext } from "../contexts/StatusContext";
 import MobileDetect from "mobile-detect";
+<<<<<<< HEAD
+=======
+import { toast } from "react-toastify";
+>>>>>>> 3df7c142bbafaea5f1042968d521258484001d3d
 
 const Home = () => {
   const navigate = useNavigate();
@@ -121,6 +125,7 @@ const Home = () => {
     }
   };
 
+<<<<<<< HEAD
   const handleModalConfirm = async () => {
     if (mapRef.current) {
       const citizenId = getCitizenCookie();
@@ -169,6 +174,60 @@ const Home = () => {
   };
 
   useEffect(() => {
+=======
+  useEffect(() => {
+    console.log("nearestRescuer:", nearestRescuer);
+  }, [nearestRescuer]);
+
+  const handleModalConfirm = async () => {
+    if (mapRef.current) {
+      const citizenId = getCitizenCookie();
+
+      const location = await getLocationFromFirestore(citizenId);
+
+      const { id } = await addRequestToFirestore(citizenId, location);
+      setRequestCookie(id);
+      checkRequest();
+
+      // Send notification to nearest rescuer
+      if (nearestRescuer && nearestRescuer.fcmToken) {
+        const notificationPayload = {
+          token: nearestRescuer.fcmToken,
+          title: "Emergency Request!",
+          body: "You are the nearest rescuer to a citizen in need. Please respond!",
+          citizenId: citizenId,
+        };
+
+        try {
+          await axios.post("/messages/send", notificationPayload);
+
+          toast.success("Notification sent to nearest rescuer");
+        } catch (error) {
+          console.error("Failed to send notification:", error);
+          toast.error("Failed to send notification");
+        }
+      }
+    }
+
+    handleRequesting();
+  };
+
+  const handleRequesting = () => {
+    setModalOpen(false);
+    setRequesting(true);
+    setFormVisible(true);
+  };
+
+  const handleModalCancel = () => {
+    setModalOpen(false); // Just close the modal, don't show the form
+  };
+
+  const handleLocatingChange = (newLocatingState) => {
+    setLocating(newLocatingState); // Update only when locating changes
+  };
+
+  useEffect(() => {
+>>>>>>> 3df7c142bbafaea5f1042968d521258484001d3d
     getLocationsFromFirestore("rescuer", setAllRescuers);
   }, []);
 
