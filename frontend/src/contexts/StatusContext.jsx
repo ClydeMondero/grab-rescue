@@ -18,27 +18,20 @@ const StatusProvider = ({ children }) => {
   const [id, setId] = useState(null);
 
   const getId = async () => {
-    const userCookie = getUserCookie();
-    const citizenCookie = getCitizenCookie();
-
-    console.log("User Cookie (rescuer):", userCookie);
-    console.log("Citizen Cookie:", citizenCookie);
-
     // Prefer user cookie if available
-    if (userCookie) {
-      const userId = await getIDFromCookie();
-      if (userId) {
-        setId(userId);
-        console.log("Setting rescuer ID:", userId);
-        return; // Stop further execution if rescuer ID is set
-      }
-    }
+    const userId = await getIDFromCookie();
 
-    // Fall back to citizen cookie only if no user cookie is present
-    if (citizenCookie) {
-      const citizenId = await getIDFromLocation(citizenCookie);
-      setId(citizenId);
-      console.log("Setting citizen ID:", citizenId);
+    if (userId) {
+      setId(userId);
+      console.log("Setting rescuer ID:", userId);
+    } else {
+      const citizenCookie = getCitizenCookie();
+
+      if (citizenCookie) {
+        const citizenId = await getIDFromLocation(citizenCookie);
+        setId(citizenId);
+        console.log("Setting citizen ID:", citizenId);
+      }
     }
   };
 
