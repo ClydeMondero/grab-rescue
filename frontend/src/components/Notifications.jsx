@@ -21,7 +21,7 @@ const Notifications = () => {
       </p>
 
       {/* Card Container for Notifications */}
-      <ul className="rounded-md p-2 bg-primary-medium">
+      <ul className="rounded-md p-2">
         {notifications.length > 0 ? (
           notifications.map((notification) => (
             <li
@@ -29,10 +29,10 @@ const Notifications = () => {
               key={notification.id}
             >
               <div className="flex justify-between items-center ">
-                <h5 className="text-xl font-medium text-white">
+                <h5 className="text-xl font-medium text-primary-medium">
                   {notification.message}
                 </h5>
-                <small className="text-white">
+                <small className="text-primary-dark font-semibold">
                   {new Intl.DateTimeFormat("en-US", {
                     year: "numeric",
                     month: "short",

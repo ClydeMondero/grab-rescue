@@ -15,7 +15,7 @@ const Policy = () => {
   };
 
   const handleBack = () => {
-    navigate(-1); // Navigates to the previous page
+    navigate(-1);
   };
 
   useEffect(() => {
@@ -38,76 +38,118 @@ const Policy = () => {
           </button>
         </div>
 
-        <h1 className="text-3xl md:text-4xl font-bold mb-8 text-center text-primary-dark ">
-          Privacy Policy
+        <h1 className="text-3xl md:text-4xl font-bold mb-8 text-center text-primary-dark">
+          Policy Information
         </h1>
 
         <div className="space-y-6 md:space-y-8">
           {[
             {
-              title: "1. Information Collected",
-              content:
-                "We collect information necessary for emergency dispatch, such as location data, contact details, and emergency-related information.",
+              title: "Privacy Policy",
+              sections: [
+                {
+                  subtitle: "Information Collected",
+                  content:
+                    "We collect information necessary for emergency dispatch, such as location data, contact details, and emergency-related information.",
+                },
+                {
+                  subtitle: "Use of Information",
+                  content:
+                    "Collected data is used exclusively to notify emergency responders and the Municipal Disaster Risk Reduction and Management Office to facilitate prompt response to incidents.",
+                },
+                {
+                  subtitle: "Data Sharing",
+                  content:
+                    "Information is shared only with authorized emergency response teams. We do not share, sell, or disclose user data to third parties outside of emergency-related purposes.",
+                },
+                {
+                  subtitle: "Data Retention",
+                  content:
+                    "Personal information is retained only as long as needed for emergency records or as required by law.",
+                },
+                {
+                  subtitle: "User Rights",
+                  content:
+                    "Users have the right to access, update, or delete their personal information, as outlined by the Data Privacy Act of 2012.",
+                },
+                {
+                  subtitle: "Data Security",
+                  content:
+                    "We employ secure servers and encryption practices to protect user data. However, no security measure is infallible, and we cannot guarantee absolute security.",
+                },
+                {
+                  subtitle: "Contact Us",
+                  content: (
+                    <>
+                      For privacy inquiries, please reach out to{" "}
+                      <a
+                        href="mailto:grab-rescue.ph@gmail.com"
+                        className="text-teal-600 underline hover:text-teal-800"
+                      >
+                        grab-rescue.ph@gmail.com
+                      </a>
+                      .
+                    </>
+                  ),
+                },
+              ],
             },
             {
-              title: "2. Use of Information",
-              content:
-                "Collected data is used exclusively to notify emergency responders and the Municipal Disaster Risk Reduction and Management Office to facilitate prompt response to incidents.",
+              title: "Acceptable Use Policy",
+              sections: [
+                {
+                  subtitle: "Intended Use",
+                  content:
+                    "Grab Rescue is designed for emergency reporting. Misuse of the app for false reporting, prank calls, or non-emergency purposes is prohibited and may result in account suspension or legal action.",
+                },
+                {
+                  subtitle: "User Conduct",
+                  content:
+                    "Users are expected to provide accurate information and maintain respectful communication with responders.",
+                },
+                {
+                  subtitle: "Device Requirements",
+                  content:
+                    "Grab Rescue relies on user devices for location data. Users should ensure their devices are operational and location services are enabled during emergencies.",
+                },
+                {
+                  subtitle: "Prohibited Activities",
+                  content:
+                    "Unauthorized access, attempting to breach security protocols, or using the app in a manner that disrupts service operations is strictly prohibited.",
+                },
+                {
+                  subtitle: "Consequences of Violation",
+                  content:
+                    "Violations may result in restricted access, suspension, or termination of service, and users may face legal action. Prank calls to emergency services are addressed under Article 154 of the Revised Penal Code, Anti-Cybercrime Law (RA 10175), and the Disaster Risk Reduction and Management Act (RA 10121). This law penalizes anyone who, without good cause, spreads false information or alarms that may incite panic, disrupt public order, or interfere with government operations, including emergency services.",
+                },
+              ],
             },
             {
-              title: "3. Data Sharing",
-              content:
-                "Information is shared only with authorized emergency response teams. We do not share, sell, or disclose user data to third parties outside of emergency-related purposes.",
+              title: "Security Policy",
+              sections: [
+                {
+                  subtitle: "Access Control",
+                  content:
+                    "Only authorized personnel can access user data, which is limited to relevant emergency personnel and administrative staff.",
+                },
+              ],
             },
-            {
-              title: "4. Data Retention",
-              content:
-                "Personal information is retained only as long as needed for emergency records or as required by law.",
-            },
-            {
-              title: "5. User Rights",
-              content:
-                "Users have the right to access, update, or delete their personal information, as outlined by the Data Privacy Act of 2012.",
-            },
-            {
-              title: "6. Data Security",
-              content:
-                "We employ secure servers and encryption practices to protect user data. However, no security measure is infallible, and we cannot guarantee absolute security.",
-            },
-            {
-              title: "7. Contact Us",
-              content: (
-                <>
-                  For privacy inquiries, please reach out to{" "}
-                  <a
-                    href="mailto:grab-rescue.ph@gmail.com"
-                    className="text-teal-600 underline hover:text-teal-800"
-                  >
-                    grab-rescue.ph@gmail.com
-                  </a>
-                  .
-                </>
-              ),
-            },
-            {
-              title: "8. Acceptable Use Policy",
-              content:
-                "GrabRescue is designed for emergency reporting. Misuse of the app for false reporting, prank calls, or non-emergency purposes is prohibited and may result in account suspension or legal action.",
-            },
-            {
-              title: "9. Security Policy",
-              content:
-                "Only authorized personnel can access user data, which is limited to relevant emergency personnel and administrative staff.",
-            },
-          ].map((section, index) => (
+          ].map((policy, index) => (
             <section
               key={index}
               className="bg-white p-6 md:p-8 rounded-lg shadow-sm border-t-4 border-primary"
             >
-              <h2 className="text-xl md:text-2xl font-semibold text-primary">
-                {section.title}
+              <h2 className="text-2xl md:text-3xl font-bold text-primary-dark mb-4">
+                {policy.title}
               </h2>
-              <p className="mt-3 text-primary-dark">{section.content}</p>
+              {policy.sections.map((section, subIndex) => (
+                <div key={subIndex} className="mb-4">
+                  <h3 className="text-xl md:text-2xl font-semibold text-primary">
+                    {section.subtitle}
+                  </h3>
+                  <p className="mt-2 text-primary-dark">{section.content}</p>
+                </div>
+              ))}
             </section>
           ))}
         </div>
@@ -119,7 +161,7 @@ const Policy = () => {
           className="fixed bottom-6 right-6 bg-primary text-white p-3 rounded-full shadow-lg hover: transition-transform transform hover:scale-110"
           aria-label="Scroll to top"
         >
-          <FaArrowUp className="" size={20} />
+          <FaArrowUp size={20} />
         </button>
       )}
     </div>
