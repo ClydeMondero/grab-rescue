@@ -94,30 +94,9 @@ const ViewProfile = (props) => {
         </div>
 
         {/* Main Profile Container */}
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          {/*TODO: upload profile picture  */}
-          {/* Profile Picture Section */}
-          <div className="flex flex-col gap-2 bg-white rounded-lg p-4 shadow-sm">
-            <h2 className="text-lg font-semibold text-[#557C55] self-start">
-              Profile Picture
-            </h2>
-            <div className="flex-1 flex items-center justify-center mb-2 md:mb-4">
-              <div className="relative">
-                <img
-                  src={profile.profile_image}
-                  alt="Profile"
-                  className="rounded-full w-24 h-24 md:w-36 md:h-36 object-cover border border-gray-300 shadow-md"
-                />
-                {/* Upload new picture */}
-                <button className="absolute bottom-0 right-0 bg-[#557C55] text-white p-2 md:p-3 rounded-full hover:bg-[#6EA46E] transition shadow-md flex items-center justify-center">
-                  <FaEdit className="text-xs md:text-base" />
-                </button>
-              </div>
-            </div>
-          </div>
-
+        <div className="w-full flex items-center justify-center md:flex-row gap-4">
           {/* Profile Information Card */}
-          <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-300">
+          <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-300 w-full md:w-1/2">
             <h2 className="text-lg font-semibold text-[#557C55] mb-2">
               Profile Information
             </h2>

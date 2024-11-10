@@ -85,7 +85,7 @@ const TermsOfService = () => {
             {
               title: "11. Governing Law",
               content:
-                "These Terms shall be governed by and construed in accordance with the laws of the Philippines. Republic Act No. 10173 or the Data Privacy Act of 2012 plays a major role in shaping the requirements for Terms and Conditions (T&C), especially concerning data privacy and user consent.",
+                "These Terms shall be governed by and construed in accordance with the laws of the Philippines. Republic Act No. 10173 or the Data Privacy Act of 2012, Republic Act 10175 or the Anti Cybercrime Law and Republic Act 10121 or Disaster Risk Reduction, Management Act and Revised Penal Code Article 154 ( Unlawful Use of Means of Publication and Unlawful Utterances )plays a major role in shaping the requirements for Terms and Conditions (T&C), especially concerning data privacy and user consent.",
             },
             {
               title: "13. Contact Information",
