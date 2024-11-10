@@ -33,7 +33,7 @@ import { RequestContext } from "../contexts/RequestContext";
 import MobileDetect from "mobile-detect";
 import { toast } from "react-toastify";
 import { hotlines } from "../constants/Hotlines";
-
+import { HotlineModal } from "../pages";
 const Home = () => {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -48,6 +48,7 @@ const Home = () => {
   const [allRescuers, setAllRescuers] = useState([]);
   const [onlineRescuers, setOnlineRescuers] = useState([]);
   const [assignedRescuer, setAssignedRescuer] = useState(null);
+  const [hotlineModalOpen, setHotlineModalOpen] = useState(false);
 
   const { getId } = useContext(StatusContext);
   const mapRef = useRef(null);
@@ -393,8 +394,13 @@ const Home = () => {
                   ? "bg-background-medium cursor-not-allowed text-text-primary" // Disabled color
                   : "bg-secondary hover:opacity-80 text-white" // Enabled color
               }`}
-              onClick={() => setModalOpen(true)}
-              disabled={onlineRescuers.length === 0}
+              onClick={() => {
+                if (onlineRescuers.length === 0) {
+                  setHotlineModalOpen(true);
+                } else {
+                  setModalOpen(true);
+                }
+              }}
             >
               {onlineRescuers.length === 0
                 ? "No Online Rescuers"
@@ -408,6 +414,11 @@ const Home = () => {
               Tracking your Location
             </button>
           ))}
+
+        {/* Render HotlineModal */}
+        {hotlineModalOpen && (
+          <HotlineModal onClose={() => setHotlineModalOpen(false)} />
+        )}
 
         {/* Mobile Map Buttons (only show on mobile screens) */}
         <div className="flex-1 bg-white flex items-center justify-around gap-4 rounded-lg px-2 py-4 font-medium text-sm text-center md:hidden">

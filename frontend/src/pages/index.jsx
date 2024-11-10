@@ -11,6 +11,7 @@ import Policy from "./Policy";
 import TermsOfService from "./TermsOfService";
 import Download from "./Download";
 import About from "./About";
+import HotlineModal from "./HotlineModal";
 export {
   About,
   MultiStepForm,
@@ -25,4 +26,5 @@ export {
   Policy,
   TermsOfService,
   Download,
+  HotlineModal,
 };
