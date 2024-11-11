@@ -98,7 +98,7 @@ const Requests = ({
 
   const fetchRoutes = async () => {
     const newRouteData = {};
-    for (const request of requests) {
+    for (const request of pendingRequests) {
       const route = await getRouteData(rescuer, request.location);
       newRouteData[request.id] = route;
     }
@@ -132,10 +132,8 @@ const Requests = ({
       requests.filter((request) => request.status === "pending")
     );
 
-    if (pendingRequests.length > 0) {
-      if (requests && rescuer) {
-        fetchRoutes();
-      }
+    if (pendingRequests.length > 0 && rescuer) {
+      fetchRoutes();
     }
   }, [requests, rescuer]);
 
@@ -219,14 +217,18 @@ const Requests = ({
                       <RiPinDistanceFill className="text-background-medium" />
                       <p className="text-sm text-text-primary">
                         <strong className="text-[#557C55]">Distance </strong>
-                        {route.distance && formatDistance(route.distance)}
+                        {route?.distance
+                          ? formatDistance(route.distance)
+                          : "Loading..."}
                       </p>
                     </div>
                     <div className="flex items-center gap-1">
                       <IoSpeedometerSharp className="text-background-medium" />
                       <p className="text-sm text-text-primary">
                         <strong className="text-[#557C55]">ETA </strong>
-                        {route.duration && formatDuration(route.duration)}
+                        {route?.duration
+                          ? formatDuration(route.duration)
+                          : "Loading..."}
                       </p>
                     </div>
                     <div className="flex items-center gap-1">
