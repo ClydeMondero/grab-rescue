@@ -11,7 +11,7 @@ const OngoingRescues = ({ requests, user }) => {
   const [selectedRescue, setSelectedRescue] = useState(null);
   const [filterStatus, setFilterStatus] = useState("all");
   const [rescuerName, setRescuerName] = useState(null);
-
+  const [rescuerContactNumber, setRescuerContactNumber] = useState(null);
   const ongoingRescues = requests
     .filter((request) => {
       if (filterStatus === "all") {
@@ -101,8 +101,9 @@ const OngoingRescues = ({ requests, user }) => {
         if (rescuer) {
           const { first_name, middle_name, last_name } = rescuer[0];
           const fullName = `${first_name} ${middle_name} ${last_name}`;
-
+          const contactNumber = `${rescuer[0].contact_number}`;
           setRescuerName(fullName);
+          setRescuerContactNumber(contactNumber);
         }
       }
     };
@@ -479,7 +480,7 @@ const OngoingRescues = ({ requests, user }) => {
                     Phone Number:
                   </strong>
                   <span className="text-gray-600 font-semibold text-sm md:text-base">
-                    {selectedRescue.phone}
+                    {rescuerContactNumber}
                   </span>
                 </div>
               </div>
@@ -500,6 +501,14 @@ const OngoingRescues = ({ requests, user }) => {
                   </strong>
                   <span className="text-gray-600 font-semibold text-sm md:text-base">
                     {selectedRescue.citizenName}
+                  </span>
+                </div>
+                <div className="flex items-center">
+                  <strong className="w-28 md:w-36 text-primary-medium text-sm md:text-base">
+                    Phone Number:
+                  </strong>
+                  <span className="text-gray-600 font-semibold text-sm md:text-base">
+                    {selectedRescue.phone}
                   </span>
                 </div>
                 <div className="flex items-center">

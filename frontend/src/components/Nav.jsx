@@ -1,13 +1,20 @@
-import { useState } from "react";
+import { useState, useEffect, useContext } from "react";
 import logo from "../assets/logo.png";
+import { RequestContext } from "../contexts/RequestContext";
 import { FaTimes } from "react-icons/fa";
 
 const Nav = ({ navigate }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { requesting } = useContext(RequestContext);
 
   const toggleModal = () => {
     setIsModalOpen((prev) => !prev);
   };
+
+  // Helper function to disable buttons
+  const buttonStyle = requesting
+    ? "cursor-not-allowed opacity-50 text-gray-400"
+    : "cursor-pointer text-text-primary";
 
   return (
     <div className="hidden lg:h-[10%] bg-accent text-white shadow-lg px-4 py-2 lg:flex items-center justify-between">
@@ -16,30 +23,30 @@ const Nav = ({ navigate }) => {
           src={logo}
           alt="logo"
           className="h-10 text-primary cursor-pointer"
-          onClick={() => navigate("/")}
+          onClick={() => !requesting && navigate("/")}
         />
       </div>
       <ul className="space-x-4 flex items-center justify-center">
         <li>
           <p
-            className="text-lg font-semibold cursor-pointer text-text-primary"
-            onClick={() => navigate("/")}
+            className={`text-lg font-semibold ${buttonStyle}`}
+            onClick={() => !requesting && navigate("/")}
           >
             Home
           </p>
         </li>
         <li>
           <p
-            className="text-lg font-semibold cursor-pointer text-text-primary"
-            onClick={() => navigate("/download")}
+            className={`text-lg font-semibold ${buttonStyle}`}
+            onClick={() => !requesting && navigate("/download")}
           >
             Download
           </p>
         </li>
         <li>
           <p
-            className="text-lg font-semibold cursor-pointer text-text-primary"
-            onClick={() => navigate("/about")}
+            className={`text-lg font-semibold ${buttonStyle}`}
+            onClick={() => !requesting && navigate("/about")}
           >
             About
           </p>
@@ -47,7 +54,8 @@ const Nav = ({ navigate }) => {
         <li>
           <button
             onClick={toggleModal}
-            className="cursor-pointer bg-primary px-6 py-2 rounded-md hover:opacity-80"
+            className={`px-6 py-2 rounded-md bg-primary ${buttonStyle}`}
+            disabled={requesting}
           >
             <p className="text-white text-md font-semibold">Login</p>
           </button>
@@ -70,19 +78,29 @@ const Nav = ({ navigate }) => {
           <div className="flex flex-col space-y-4 w-full max-w-xs">
             <button
               onClick={() => {
-                navigate("/login?role=Rescuer");
-                setIsModalOpen(false);
+                if (!requesting) {
+                  navigate("/login?role=Rescuer");
+                  setIsModalOpen(false);
+                }
               }}
-              className="w-full bg-white text-green-700 font-bold py-3 rounded-lg hover:bg-gray-100 text-center"
+              className={`w-full bg-white text-green-700 font-bold py-3 rounded-lg hover:bg-gray-100 text-center ${
+                requesting ? "cursor-not-allowed opacity-50" : ""
+              }`}
+              disabled={requesting}
             >
               Login as Rescuer
             </button>
             <button
               onClick={() => {
-                navigate("/login?role=Admin");
-                setIsModalOpen(false);
+                if (!requesting) {
+                  navigate("/login?role=Admin");
+                  setIsModalOpen(false);
+                }
               }}
-              className="w-full bg-white text-green-700 font-bold py-3 rounded-lg hover:bg-gray-100 text-center"
+              className={`w-full bg-white text-green-700 font-bold py-3 rounded-lg hover:bg-gray-100 text-center ${
+                requesting ? "cursor-not-allowed opacity-50" : ""
+              }`}
+              disabled={requesting}
             >
               Login as Admin
             </button>

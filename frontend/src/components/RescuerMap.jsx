@@ -151,6 +151,12 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
   };
 
   useEffect(() => {
+    if (mapRef.current && mapRef.current.resize()) {
+      mapRef.current.resize();
+    }
+  }, [navigating]);
+
+  useEffect(() => {
     if (citizen) {
       getRoute();
     }
@@ -220,7 +226,8 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
         position="top-right"
         positionOptions={{ enableHighAccuracy: true }}
         trackUserLocation={true}
-        showUserLocation={coords === null}
+        showUserLocation={coords && false}
+        showAccuracyCircle={false}
         style={{ display: "none" }}
         onGeolocate={({ coords }) => {
           handleGeolocation(coords);

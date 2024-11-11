@@ -237,9 +237,9 @@ module.exports.CreateRescuer = async (req, res) => {
       const insertQuery = `
       INSERT INTO users (
         first_name, middle_name, last_name, birthday, age, municipality, 
-        barangay, contact_number, email, username, password, account_type, 
-        verified, is_online, verification_token, status
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+        barangay, profile_image, contact_number, email, username, password, 
+        account_type, verified, is_online, verification_token, status
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
       RETURNING id
     `;
       const values = [
@@ -250,6 +250,7 @@ module.exports.CreateRescuer = async (req, res) => {
         age,
         municipality,
         barangay,
+        "https://www.gravatar.com/avatar/?d=mp",
         contactNumber,
         email,
         username,

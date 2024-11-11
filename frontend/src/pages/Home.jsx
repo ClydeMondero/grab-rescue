@@ -13,7 +13,7 @@ import { FaChevronDown, FaPhone } from "react-icons/fa";
 import { FaLocationPin } from "react-icons/fa6";
 import { BiSolidHide, BiSolidAmbulance } from "react-icons/bi";
 import { MdDragHandle } from "react-icons/md";
-import { MdRoute } from "react-icons/md";
+import { MdRoute, MdCheck } from "react-icons/md";
 import { MultiStepForm } from "../pages";
 import {
   addRequestToFirestore,
@@ -29,16 +29,19 @@ import {
   deleteCookie, // Import deleteCookie
 } from "../services/cookieService";
 import { StatusContext } from "../contexts/StatusContext";
+import { RequestContext } from "../contexts/RequestContext";
 import MobileDetect from "mobile-detect";
 import { toast } from "react-toastify";
-
+import { hotlines } from "../constants/Hotlines";
+import { HotlineModal } from "../pages";
+import { map } from "zod";
 const Home = () => {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [formVisible, setFormVisible] = useState(false);
   const [locating, setLocating] = useState(true);
-  const [requesting, setRequesting] = useState(false);
+  const { requesting, setRequesting } = useContext(RequestContext);
   const [request, setRequest] = useState(null);
   const [rescuer, setRescuer] = useState(null);
   const [nearestRescuer, setNearestRescuer] = useState(null);
@@ -46,6 +49,8 @@ const Home = () => {
   const [allRescuers, setAllRescuers] = useState([]);
   const [onlineRescuers, setOnlineRescuers] = useState([]);
   const [assignedRescuer, setAssignedRescuer] = useState(null);
+  const [hotlineModalOpen, setHotlineModalOpen] = useState(false);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
 
   const { getId } = useContext(StatusContext);
   const mapRef = useRef(null);
@@ -88,14 +93,6 @@ const Home = () => {
 
     const unsubscribe = getRequestFromFirestore(requestId, (onGoingRequest) => {
       setRequest(onGoingRequest);
-
-      // Check if the request status is 'rescued'
-      if (onGoingRequest && onGoingRequest.status === "rescued") {
-        setRequest(null);
-        setRequesting(false); // Clear requesting state
-        deleteCookie("request_token"); // Delete the request_token cookie
-        setAssignedRescuer(null);
-      }
     });
 
     return () => {
@@ -121,10 +118,6 @@ const Home = () => {
         });
     }
   };
-
-  useEffect(() => {
-    console.log("nearestRescuer:", nearestRescuer);
-  }, [nearestRescuer]);
 
   const handleModalConfirm = async () => {
     if (mapRef.current) {
@@ -163,6 +156,14 @@ const Home = () => {
     setModalOpen(false);
     setRequesting(true);
     setFormVisible(true);
+  };
+
+  const handleCompleteRequest = () => {
+    setRequest(null);
+    setRequesting(false);
+    deleteCookie("request_token");
+    setAssignedRescuer(null);
+    setShowConfirmationModal(false);
   };
 
   const handleModalCancel = () => {
@@ -207,7 +208,7 @@ const Home = () => {
 
   useEffect(() => {
     if (mapRef.current && mapRef.current.resize) {
-      mapRef.current.resize();
+      setTimeout(() => mapRef.current.resize(), 500);
     }
   }, [formVisible]);
 
@@ -247,42 +248,54 @@ const Home = () => {
           {mobileMenuOpen && (
             <div className="absolute top-14 right-0 w-56 bg-background text-primary-medium rounded-md shadow-lg py-2 flex items-center justify-center">
               <ul className="space-y-2 flex flex-col items-center w-full">
-                <li className="py-2">
+                <li className="py-2 border-b w-full">
                   <button
-                    onClick={() => navigate("/")}
-                    className="flex items-center w-full text-lg font-semibold hover:underline"
+                    onClick={() => !requesting && navigate("/")}
+                    className={`flex items-center justify-center w-full text-lg font-semibold ${
+                      requesting ? "cursor-not-allowed opacity-50" : ""
+                    }`}
                   >
                     Home
                   </button>
                 </li>
                 <li className="py-2 border-b w-full justify-center">
                   <button
-                    onClick={() => navigate("/login?role=Rescuer")}
-                    className="flex items-center justify-center w-full text-lg font-semibold "
+                    onClick={() =>
+                      !requesting && navigate("/login?role=Rescuer")
+                    }
+                    className={`flex items-center justify-center w-full text-lg font-semibold ${
+                      requesting ? "cursor-not-allowed opacity-50" : ""
+                    }`}
                   >
                     Login as Rescuer
                   </button>
                 </li>
                 <li className="py-2 border-b w-full justify-center">
                   <button
-                    onClick={() => navigate("/login?role=Admin")}
-                    className="flex items-center justify-center w-full text-lg font-semibold "
+                    onClick={() => !requesting && navigate("/login?role=Admin")}
+                    className={`flex items-center justify-center w-full text-lg font-semibold ${
+                      requesting ? "cursor-not-allowed opacity-50" : ""
+                    }`}
                   >
                     Login as Admin
                   </button>
                 </li>
-                <li className="py-2">
+                <li className="py-2 border-b w-full justify-center">
                   <button
-                    onClick={() => navigate("/download")}
-                    className="flex items-center w-full text-lg font-semibold hover:underline"
+                    onClick={() => !requesting && navigate("/download")}
+                    className={`flex items-center justify-center w-full text-lg font-semibold  ${
+                      requesting ? "cursor-not-allowed opacity-50" : ""
+                    }`}
                   >
                     Download
                   </button>
                 </li>
                 <li className="py-2">
                   <button
-                    onClick={() => navigate("/about")}
-                    className="flex items-center w-full text-lg font-semibold hover:underline"
+                    onClick={() => !requesting && navigate("/about")}
+                    className={`flex items-center justify-center w-full text-lg font-semibold  ${
+                      requesting ? "cursor-not-allowed opacity-50" : ""
+                    }`}
                   >
                     About
                   </button>
@@ -298,6 +311,7 @@ const Home = () => {
           onLocatingChange={handleLocatingChange}
           onNearestRescuerUpdate={handleNearestRescuerUpdate}
           assignedRescuer={assignedRescuer}
+          requesting={requesting}
         />
 
         {requesting && (
@@ -318,9 +332,37 @@ const Home = () => {
                     }`.trim()}
                   </p>
                   <p className="text-background-dark text-sm font-semibold">
-                    {rescuer.municipality}
+                    {rescuer.municipality}, {rescuer.barangay}
                   </p>
+                  <p className="text-background-dark text-sm font-semibold">
+                    {request
+                      ? request.status.charAt(0).toUpperCase() +
+                        request.status.slice(1)
+                      : ""}
+                  </p>
+                  {/* Show rescued details if status is "rescued" */}
+                  {request?.status === "rescued" && (
+                    <div className="mt-4 w-56 lg:w-auto">
+                      <p className="text-primary-dark text-sm font-semibold">
+                        Rescued Address: {request.rescuedAddress}
+                      </p>
+                      <p className="text-primary-dark text-sm font-semibold">
+                        Rescued Time:{" "}
+                        {new Date(request.rescuedTimestamp).toLocaleString()}
+                      </p>
+                    </div>
+                  )}
+                  {requesting && request?.status === "rescued" && (
+                    <button
+                      onClick={() => setShowConfirmationModal(true)}
+                      className="mt-2 flex items-center justify-center w-48 h-10 rounded-full bg-primary hover:bg-primary-medium text-white"
+                    >
+                      <MdCheck className="text-xl font-bold" />
+                      <span className="text-md ml-1">Complete Request</span>
+                    </button>
+                  )}
                 </div>
+
                 <button
                   onClick={handlePhone}
                   className="flex items-center justify-center w-12 h-12 bg-primary rounded-full text-white text-2xl cursor-pointer"
@@ -344,7 +386,9 @@ const Home = () => {
             } `}
           >
             <MdDragHandle
-              onClick={() => setFormVisible(!formVisible)}
+              onClick={() => {
+                setFormVisible(!formVisible);
+              }}
               className="text-background-medium h-10 w-10"
             />
             <p
@@ -379,8 +423,13 @@ const Home = () => {
                   ? "bg-background-medium cursor-not-allowed text-text-primary" // Disabled color
                   : "bg-secondary hover:opacity-80 text-white" // Enabled color
               }`}
-              onClick={() => setModalOpen(true)}
-              disabled={onlineRescuers.length === 0}
+              onClick={() => {
+                if (onlineRescuers.length === 0) {
+                  setHotlineModalOpen(true);
+                } else {
+                  setModalOpen(true);
+                }
+              }}
             >
               {onlineRescuers.length === 0
                 ? "No Online Rescuers"
@@ -394,6 +443,11 @@ const Home = () => {
               Tracking your Location
             </button>
           ))}
+
+        {/* Render HotlineModal */}
+        {hotlineModalOpen && (
+          <HotlineModal onClose={() => setHotlineModalOpen(false)} />
+        )}
 
         {/* Mobile Map Buttons (only show on mobile screens) */}
         <div className="flex-1 bg-white flex items-center justify-around gap-4 rounded-lg px-2 py-4 font-medium text-sm text-center md:hidden">
@@ -450,6 +504,37 @@ const Home = () => {
           onCancel={handleModalCancel} // Handle modal cancellation to simply close the modal
         />
       )}
+
+      {/* Inline Confirmation Modal */}
+      {showConfirmationModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50 transition-opacity duration-300 ease-in-out">
+          <div className="bg-white rounded-md shadow-lg transform transition-all p-8 max-w-md w-full text-center relative">
+            <h2 className="text-2xl font-bold text-primary mb-4">
+              REQUEST COMPLETED!
+            </h2>
+            <p className="text-xl font-semibold text-primary-dark mb-6">
+              Are you sure you want to complete this request?
+            </p>
+
+            <div className="flex justify-center space-x-4">
+              <button
+                onClick={handleCompleteRequest}
+                className="bg-primary hover:bg-primary-medium text-white font-semibold py-3 px-6 rounded-md  transition-colors duration-200 ease-in-out"
+              >
+                Confirm
+              </button>
+
+              <button
+                onClick={() => setShowConfirmationModal(false)}
+                className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-3 px-6 rounded-md transition-colors duration-200 ease-in-out"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <Toast />
     </div>
   );

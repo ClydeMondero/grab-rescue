@@ -24,10 +24,14 @@ const Requests = ({
   const navigate = useNavigate();
   const { rescuer, setPage } = useContext(RescuerContext);
   const [rescuers, setRescuers] = useState([]);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [detailedRequest, setDetailedRequest] = useState(null);
+
   const [filteredRescuers, setFilteredRescuers] = useState([]);
   const [nearestRescuer, setNearestRescuer] = useState(null);
   const [showNotNearestModal, setShowNotNearestModal] = useState(false);
-  const [hasConfirmedRequest, setHasConfirmedRequest] = useState(false); // New state to prevent repeated modal
+  const [hasConfirmedRequest, setHasConfirmedRequest] = useState(false);
   const [citizen, setCitizen] = useState({
     longitude: 120.926105,
     latitude: 14.969063,
@@ -78,7 +82,7 @@ const Requests = ({
     setHasConfirmedRequest(true);
     await acceptRescueRequestInFirestore(userId, selectedRequest);
     setPage("Navigate");
-    navigate("/rescuer/navigate");
+    window.location = "/navigate";
   };
 
   const handleContinue = async () => {
@@ -135,6 +139,11 @@ const Requests = ({
     }
   }, [requests, rescuer]);
 
+  const handleCardClick = (request) => {
+    setDetailedRequest(request);
+    setIsModalOpen(true);
+  };
+
   return (
     <div
       className={`h-full flex flex-col p-6 ${
@@ -154,7 +163,7 @@ const Requests = ({
       <div
         className={`${
           pendingRequests.length > 0
-            ? "grid grid-cols-1 md:grid-cols-2 gap-3 overflow-y-auto"
+            ? "grid grid-cols-1 md:grid-cols-2 gap-6 overflow-y-auto"
             : ""
         }`}
       >
@@ -165,7 +174,8 @@ const Requests = ({
             return (
               <div
                 key={request.id}
-                className="block bg-white border border-gray-300 rounded-md overflow-hidden"
+                className="block bg-white border border-gray-300 rounded-lg"
+                onClick={() => handleCardClick(request)}
               >
                 <div className="relative">
                   <img
@@ -187,11 +197,6 @@ const Requests = ({
                         request.status.slice(1)
                       : ""}
                   </div>
-
-                  <FaLocationArrow
-                    className="absolute top-4 right-4 text-2xl text-background-light cursor-pointer"
-                    onClick={() => handleAccept(request.id)}
-                  />
                 </div>
 
                 <div className="flex flex-col items-start justify-between p-4 gap-4">
@@ -283,7 +288,7 @@ const Requests = ({
                     {!selectedRequest && (
                       <button
                         onClick={() => handleAccept(request.id)}
-                        className="w-full px-4 py-2 text-sm sm:text-base font-semibold text-white bg-[#557C55] rounded-lg transition-all hover:bg-[#465B46] active:scale-95 shadow-md"
+                        className="w-full px-4 py-4 text-sm sm:text-base font-semibold text-white bg-[#557C55] rounded-lg transition-all hover:bg-[#465B46] active:scale-95 shadow-md"
                       >
                         Accept Request
                       </button>
@@ -304,6 +309,148 @@ const Requests = ({
           onCancel={handleCancel}
         />
       )}
+
+      {isModalOpen && (
+        <RequestDetailsModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          request={detailedRequest}
+        />
+      )}
+    </div>
+  );
+};
+
+const RequestDetailsModal = ({ isOpen, onClose, request }) => {
+  if (!isOpen || !request) return null;
+
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+      <div className="bg-white rounded-md p-8 w-11/12 sm:w-3/4 lg:w-1/2 max-w-lg mx-auto">
+        {/* Header */}
+        <div className="flex justify-between items-center mb-6 border-b-2 pb-2 border-gray-200">
+          <h2 className="text-2xl font-semibold text-primary">
+            Request Details
+          </h2>
+          <button
+            onClick={onClose}
+            className="flex items-center justify-center w-8 h-8 text-secondary rounded-full"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
+
+        {/* Incident Image */}
+        <div className="flex justify-center mb-4">
+          <img
+            src={request.incidentPicture || placeholder}
+            alt="Incident"
+            className="w-100 h-40 object-cover rounded-md"
+          />
+        </div>
+
+        {/* Information Section */}
+        <div className="space-y-6 text-gray-700">
+          {/* Row 1: Name and Phone Number */}
+          <div className="flex items-center space-x-4">
+            <div className="flex flex-col flex-1">
+              <p className="text-lg font-medium text-primary-medium">
+                Citizen Name:
+              </p>
+              <p className="text-base text-primary-dark font-semibold">
+                {request.citizenName || "N/A"}
+              </p>
+            </div>
+            <div className="flex flex-col flex-1">
+              <p className="text-lg font-medium text-primary-medium">
+                Contact Number:
+              </p>
+              <p className="text-base text-primary-dark font-semibold">
+                {request.phone || "N/A"}
+              </p>
+            </div>
+          </div>
+
+          {/* Row 2: Relation and Description */}
+          <div className="flex items-center space-x-4">
+            <div className="flex flex-col flex-1">
+              <p className="text-lg font-medium text-primary-medium">
+                Relation:
+              </p>
+              <p className="text-base text-primary-dark font-semibold">
+                {request.citizenRelation || "N/A"}
+              </p>
+            </div>
+            <div className="flex flex-col flex-1">
+              <p className="text-lg font-medium text-primary-medium">
+                Description:
+              </p>
+              <p className="text-base text-primary-dark font-semibold">
+                {request.incidentDescription || "N/A"}
+              </p>
+            </div>
+          </div>
+
+          {/* Row 3: Location */}
+          <div className="flex flex-col">
+            <p className="text-lg font-medium text-primary-medium">Location:</p>
+            <p className="text-base text-primary-dark font-semibold">
+              {request.location?.address || "Address not available"}
+            </p>
+          </div>
+
+          {/* Row 4: Distance, ETA, and Request Time */}
+          <div className="flex items-center space-x-4">
+            <div className="flex flex-col flex-1">
+              <p className="text-lg font-medium text-primary-medium">
+                Distance:
+              </p>
+              <p className="text-base text-primary-dark font-semibold">
+                {request.distance ? formatDistance(request.distance) : "N/A"}
+              </p>
+            </div>
+            <div className="flex flex-col flex-1">
+              <p className="text-lg font-medium text-primary-medium">ETA:</p>
+              <p className="text-base text-primary-dark font-semibold">
+                {request.duration ? formatDuration(request.duration) : "N/A"}
+              </p>
+            </div>
+          </div>
+
+          {/* Row 5: Status and Request Time */}
+          <div className="flex flex-col">
+            <p className="text-lg font-medium text-primary-medium">
+              Request Time:
+            </p>
+            <p className="text-base text-primary-dark font-semibold">
+              {new Date(request.timestamp).toLocaleString()}
+            </p>
+          </div>
+
+          {/* Row 6: Status */}
+          <div className="flex flex-col">
+            <p className="text-lg font-medium text-primary-medium">Status:</p>
+            <p className="text-base text-yellow-500 font-semibold">
+              {request.status
+                ? request.status.charAt(0).toUpperCase() +
+                  request.status.slice(1)
+                : "N/A"}
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

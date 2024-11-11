@@ -199,63 +199,66 @@ const Navigate = ({ requestID, setSelectedRequest }) => {
           </div>
 
           {/* Main Information */}
-          <div className="flex justify-between items-center md:gap-4">
+          <div className="flex justify-between gap-6">
             <div className="flex flex-col gap-1 pb-2 mb-2">
-              <div className="text-primary-dark font-semibold text-2xl">
-                <p>{requestData.location.address.split(",")[0]}</p>
-              </div>
-              <div className="text-primary-medium text-lg">
-                <p>
-                  {requestData.location.address
-                    .split(",")
-                    .slice(1, 5)
-                    .join(", ")}
-                </p>
-              </div>
-
-              {/* Inline Name and Relation */}
-              <div className="flex items-center gap-2 text-md font-semibold text-background-dark mt-2">
-                <p>{requestData.citizenName}</p>
-                <span>•</span>
-                <p>{requestData.citizenRelation || "No Relation"}</p>
-              </div>
-            </div>
-
-            {/* Phone Button and Status Section */}
-            <div className="flex flex-col items-end gap-2">
-              {/* Phone Button */}
-              {requestData.phone && (
-                <button
-                  onClick={handlePhone}
-                  className="bg-primary p-3 rounded-full text-white shadow hover:bg-primary-dark transition"
-                >
-                  <FaPhone className="text-3xl" />
-                </button>
-              )}
-
-              {/* Status and Next Status Section, Aligned to the Right */}
-              <div className="flex items-center gap-2 mt-2 ">
-                <div className="text-sm font-semibold text-white py-2 px-5 rounded-full bg-highlight">
-                  {requestData.status
-                    ? requestData.status[0].toUpperCase() +
-                      requestData.status.slice(1)
-                    : ""}
+              <div className="flex gap-6">
+                <div className="flex flex-col gap-1">
+                  <div className="text-primary-dark font-semibold text-2xl">
+                    <p>{requestData.location.address.split(",")[0]}</p>
+                  </div>
+                  <div className="text-primary-medium text-lg">
+                    <p>
+                      {requestData.location.address
+                        .split(",")
+                        .slice(1, 5)
+                        .join(", ")}
+                    </p>
+                  </div>
                 </div>
-                {nextStatus && !locating && (
-                  <>
-                    <div className="flex items-center animate-pulse">
-                      <FaChevronRight className="text-primary-medium" />
-                      <FaChevronRight className="text-primary-medium" />
-                    </div>
-                    <button
-                      style={{ minWidth: "6rem" }}
-                      onClick={() => handleStatusChangeClick(nextStatus)}
-                      className="text-sm text-gray-700 border border-gray-300 rounded-full px-5 py-2 opacity-70 cursor-pointer hover:bg-gray-100 transition-all"
-                    >
-                      {nextStatus.charAt(0).toUpperCase() + nextStatus.slice(1)}
-                    </button>
-                  </>
+
+                {/* Phone Button */}
+                {requestData.phone && (
+                  <button
+                    onClick={handlePhone}
+                    className="p-3 h-max bg-primary rounded-full text-white shadow hover:bg-primary-dark transition"
+                  >
+                    <FaPhone className="text-3xl" />
+                  </button>
                 )}
+              </div>
+
+              <div className="flex items-center gap-6">
+                {/* Inline Name and Relation */}
+                <div className="flex items-center gap-2 text-md font-semibold text-background-dark mt-2">
+                  <p>{requestData.citizenName}</p>
+                  <span>•</span>
+                  <p>{requestData.citizenRelation || "No Relation"}</p>
+                </div>
+
+                <div className="flex-1 flex items-center gap-2 mt-2 ">
+                  <div className="text-sm font-semibold text-white py-2 px-5 rounded-full bg-highlight">
+                    {requestData.status
+                      ? requestData.status[0].toUpperCase() +
+                        requestData.status.slice(1)
+                      : ""}
+                  </div>
+                  {nextStatus && !locating && (
+                    <>
+                      <div className="flex items-center animate-pulse">
+                        <FaChevronRight className="text-primary-medium" />
+                        <FaChevronRight className="text-primary-medium" />
+                      </div>
+                      <button
+                        style={{ minWidth: "6rem" }}
+                        onClick={() => handleStatusChangeClick(nextStatus)}
+                        className="text-sm text-gray-700 border border-gray-300 rounded-full px-5 py-2 opacity-70 cursor-pointer hover:bg-gray-100 transition-all"
+                      >
+                        {nextStatus.charAt(0).toUpperCase() +
+                          nextStatus.slice(1)}
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -317,7 +320,7 @@ const Navigate = ({ requestID, setSelectedRequest }) => {
               </button>
               <button
                 onClick={cancelStatusChange}
-                className="bg-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-400 transition"
+                className="bg-background-medium text-gray-700 py-2 px-4 rounded hover:bg-gray-400 transition"
               >
                 Cancel
               </button>

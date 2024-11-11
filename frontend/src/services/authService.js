@@ -15,6 +15,8 @@ import { updateLocationStatus } from "../services/firestoreService";
 export const getIDFromCookie = async () => {
   const { data } = await axios.post("/auth/", {}, { withCredentials: true });
 
+  if (!data.success) return null;
+
   const userId = data.user.id;
 
   return userId;

@@ -7,32 +7,83 @@ const RequestDetailsModal = ({ request, isOpen, onClose }) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div className="bg-white rounded-lg p-6 w-11/12 sm:w-1/2 lg:w-1/3">
-        <h2 className="text-xl font-semibold text-primary mb-4">
-          Request Details
-        </h2>
-        <p className="mb-2">
-          <strong className="text-primary-medium">Name:</strong> {request.name}
-        </p>
-        <p className="mb-2">
-          <strong className="text-primary-medium">Contact Number:</strong>{" "}
-          {request.phone}
-        </p>
-        <p className="mb-2">
-          <strong className="text-primary-medium">Age:</strong> {request.age}
-        </p>
-        <p className="mb-4">
-          <strong className="text-primary-medium">Location:</strong>{" "}
-          {request.location && request.location.address
-            ? request.location.address
-            : "Address not available"}
-        </p>
-        <button
-          onClick={onClose}
-          className="mt-4 bg-primary-medium text-white px-4 py-2 rounded-md"
-        >
-          Close
-        </button>
+      <div className="bg-white rounded-md p-8 w-11/12 sm:w-3/4 lg:w-1/2 max-w-lg mx-auto">
+        <div className="flex justify-between items-center mb-6 border-b-2 pb-2 border-gray-200">
+          <h2 className="text-2xl font-semibold text-primary">
+            Request Details
+          </h2>
+          <button
+            onClick={onClose}
+            className="flex items-center justify-center w-8 h-8  text-secondary rounded-full"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
+
+        {/* Information Section */}
+        <div className="space-y-6 text-gray-700">
+          {/* Row 1 */}
+          <div className="flex items-center space-x-4">
+            <div className="flex flex-col flex-1">
+              <p className="text-lg font-medium text-primary-medium">
+                Contact Number:
+              </p>
+              <p className="text-base text-primary-dark font-semibold">
+                {request.phone || "N/A"}
+              </p>
+            </div>
+            <div className="flex flex-col flex-1">
+              <p className="text-lg font-medium text-primary-medium">
+                Citizen Name:
+              </p>
+              <p className="text-base text-primary-dark font-semibold">
+                {request.citizenName || "N/A"}
+              </p>
+            </div>
+          </div>
+
+          {/* Row 2 */}
+          <div className="flex items-center space-x-4">
+            <div className="flex flex-col flex-1">
+              <p className="text-lg font-medium text-primary-medium">
+                Relation:
+              </p>
+              <p className="text-base text-primary-dark font-semibold">
+                {request.citizenRelation || "N/A"}
+              </p>
+            </div>
+            <div className="flex flex-col flex-1">
+              <p className="text-lg font-medium text-primary-medium">
+                Description:
+              </p>
+              <p className="text-base text-primary-dark font-semibold">
+                {request.incidentDescription || "N/A"}
+              </p>
+            </div>
+          </div>
+
+          {/* Location */}
+          <div className="flex flex-col">
+            <p className="text-lg font-medium text-primary-medium">Location:</p>
+            <p className="text-base text-primary-dark font-semibold">
+              {request.location && request.location.address
+                ? request.location.address
+                : "Address not available"}
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -79,7 +130,7 @@ const IncomingRequests = ({ requests }) => {
             pendingRequests.map((request) => (
               <div
                 key={request.id}
-                className="shadow-md flex flex-col sm:flex-row items-start sm:items-center bg-gray-200 rounded-lg p-3 sm:p-4 transition duration-300 ease-in-out hover:shadow-sm cursor-pointer"
+                className="shadow-sm flex flex-col sm:flex-row items-start sm:items-center bg-gray-200 rounded-lg p-3 sm:p-4 transition duration-300 ease-in-out hover: cursor-pointer"
                 onClick={() => openModal(request)}
               >
                 {/* Request Details */}
@@ -91,7 +142,7 @@ const IncomingRequests = ({ requests }) => {
                         ? request.location.address
                         : "Address not available"}
                     </div>
-                    <div className="text-sm font-medium text-gray-600">
+                    <div className="text-sm font-medium text-primary-dark">
                       {new Intl.DateTimeFormat("en-US", {
                         year: "numeric",
                         month: "2-digit",

@@ -89,11 +89,11 @@ const Sidebar = () => {
             onClick={toggleDropdown}
           >
             <div
-              className={`w-14 h-14 rounded-full bg-white text-primary text-2xl flex items-center justify-center ${
+              className={`w-14 h-14 rounded-full bg-white text-green text-3xl flex items-center justify-center ${
                 isOpen ? "md:flex" : "flex"
               }`}
             >
-              <AiOutlineUser className={`text-xl ${!isOpen && "text-2xl"}`} />
+              <p className="text-4xl text-primary-medium font-bold">A</p>
             </div>
             {isOpen && <AiFillCaretDown className="text-white ml-2 text-lg" />}
           </div>
@@ -182,15 +182,6 @@ const Sidebar = () => {
             </span>
           </Link>
           <Link
-            to="/admin/notifications"
-            className="flex items-center px-4 py-2 hover:bg-[#6EA46E]"
-          >
-            <FaBell className={`text-lg ${!isOpen ? "text-xl" : "text-lg"}`} />
-            <span className={`${!isOpen && "hidden"} ml-4 duration-300`}>
-              Notifications
-            </span>
-          </Link>
-          <Link
             to="/admin/settings"
             className="flex items-center px-4 py-2 hover:bg-[#6EA46E]"
           >
@@ -201,17 +192,6 @@ const Sidebar = () => {
               Settings
             </span>
           </Link>
-          <div
-            onClick={() => handleLogout(navigate)}
-            className="flex items-center px-4 py-2 hover:bg-[#6EA46E] cursor-pointer"
-          >
-            <AiOutlineLogout
-              className={`text-lg ${!isOpen ? "text-xl" : "text-lg"}`}
-            />
-            <span className={`${!isOpen && "hidden"} ml-4 duration-300`}>
-              Logout
-            </span>
-          </div>
         </div>
       </div>
 
@@ -252,7 +232,14 @@ const Sidebar = () => {
                 isOpen ? "flex" : "hidden"
               }`}
             >
-              <AiOutlineUser className={`text-xl ${!isOpen && "text-2xl"}`} />
+              <div
+                className={`text-4xl bg-white text-primary-medium font-bold rounded-full flex items-center justify-center ${
+                  !isOpen && "text-5xl"
+                }`}
+                style={{ width: "2.5rem", height: "2.5rem" }}
+              >
+                A
+              </div>
             </div>
             {isOpen && <AiFillCaretDown className="text-white ml-2 text-lg" />}
           </div>
@@ -341,15 +328,6 @@ const Sidebar = () => {
             </span>
           </Link>
           <Link
-            to="/admin/notifications"
-            className="flex items-center px-4 py-2 hover:bg-[#6EA46E]"
-          >
-            <FaBell className={`text-lg ${!isOpen ? "text-xl" : "text-lg"}`} />
-            <span className={`${!isOpen && "hidden"} ml-4 duration-300`}>
-              Notifications
-            </span>
-          </Link>
-          <Link
             to="/admin/settings"
             className="flex items-center px-4 py-2 hover:bg-[#6EA46E]"
           >
@@ -360,17 +338,6 @@ const Sidebar = () => {
               Settings
             </span>
           </Link>
-          <div
-            onClick={() => handleLogout(navigate)}
-            className="flex items-center px-4 py-2 hover:bg-[#6EA46E] cursor-pointer"
-          >
-            <AiOutlineLogout
-              className={`text-lg ${!isOpen ? "text-xl" : "text-lg"}`}
-            />
-            <span className={`${!isOpen && "hidden"} ml-4 duration-300`}>
-              Logout
-            </span>
-          </div>
         </div>
       </div>
     </>

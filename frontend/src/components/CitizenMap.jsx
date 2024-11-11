@@ -32,7 +32,7 @@ import { useLocation } from "react-router-dom";
 import { setGeolocateIcon } from "../utils/GeolocateUtility";
 
 const CitizenMap = forwardRef((props, ref) => {
-  const { assignedRescuer } = props;
+  const { assignedRescuer, requesting } = props;
   const [citizen, setCitizen] = useState({
     longitude: 120.9107,
     latitude: 14.9536,
@@ -140,6 +140,12 @@ const CitizenMap = forwardRef((props, ref) => {
   };
 
   useEffect(() => {
+    if (mapRef.current && mapRef.current.resize()) {
+      mapRef.current.resize();
+    }
+  }, [requesting]);
+
+  useEffect(() => {
     const unsubscribe = getOnlineLocationsFromFirestore("rescuer", setRescuers);
 
     return () => {
@@ -198,7 +204,8 @@ const CitizenMap = forwardRef((props, ref) => {
           position="top-right"
           positionOptions={{ enableHighAccuracy: true }}
           trackUserLocation={true}
-          showUserLocation={coords === null}
+          showUserLocation={coords && false}
+          showAccuracyCircle={false}
           onGeolocate={({ coords }) => {
             handleGeolocation(coords);
           }}

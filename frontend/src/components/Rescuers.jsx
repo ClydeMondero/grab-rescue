@@ -6,7 +6,6 @@ import { createAuthHeader } from "../services/authService";
 import axios from "axios";
 import { barangaysData } from "../constants/Barangays";
 import jsPDF from "jspdf";
-import { useNotifications } from "./NotificationContext";
 
 const AssignRescuers = (props) => {
   const { user } = props;
@@ -24,7 +23,6 @@ const AssignRescuers = (props) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRescuerId, setSelectedRescuerId] = useState(null);
   const [currentStatus, setCurrentStatus] = useState("All");
-  const { addNotification } = useNotifications();
   const rowsPerPage = 10;
 
   useEffect(() => {
@@ -138,9 +136,7 @@ const AssignRescuers = (props) => {
           withCredentials: true,
         }
       );
-      addNotification(
-        `Status changed to ${newStatus} successfully for user with ID: ${id}`
-      );
+
       console.log("Response from server:", response.data);
       setRescuers((prevRescuers) =>
         prevRescuers.map((rescuer) =>
@@ -151,7 +147,6 @@ const AssignRescuers = (props) => {
       setIsModalOpen(false);
     } catch (error) {
       console.error("Error updating status:", error);
-      addNotification(`Failed to change status for user with ID: ${id}`);
       setIsModalOpen(false);
     }
   };
