@@ -98,6 +98,7 @@ const Requests = ({
 
   const fetchRoutes = async () => {
     const newRouteData = {};
+
     for (const request of pendingRequests) {
       const route = await getRouteData(rescuer, request.location);
       newRouteData[request.id] = route;
@@ -128,14 +129,18 @@ const Requests = ({
   }, [requests, rescuers]);
 
   useEffect(() => {
-    setPendingRequests(
-      requests.filter((request) => request.status === "pending")
-    );
+    if (requests) {
+      const pendingRequests = requests.filter(
+        (request) => request.status === "pending"
+      );
 
-    if (pendingRequests.length > 0 && rescuer) {
-      fetchRoutes();
+      setPendingRequests(pendingRequests);
     }
-  }, [requests, rescuer]);
+  }, [requests]);
+
+  useEffect(() => {
+    fetchRoutes();
+  }, [pendingRequests]);
 
   const handleCardClick = (request) => {
     setDetailedRequest(request);
@@ -172,7 +177,7 @@ const Requests = ({
             return (
               <div
                 key={request.id}
-                className="block bg-white border border-gray-300 rounded-lg"
+                className="block bg-background-light shadow-lg rounded-lg"
                 onClick={() => handleCardClick(request)}
               >
                 <div className="relative">
@@ -183,7 +188,7 @@ const Requests = ({
                         : placeholder
                     }
                     alt="Incident Picture"
-                    className="w-full h-40 object-cover"
+                    className="w-full h-40 object-cover rounded-lg"
                   />
                   <div
                     className={`absolute top-4 left-4 text-sm font-semibold text-white py-1 px-3 rounded-lg shadow-md ${
