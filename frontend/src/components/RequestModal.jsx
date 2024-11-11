@@ -1,39 +1,44 @@
 import { Link } from "react-router-dom";
+
 const RequestModal = ({ onConfirm, onCancel }) => {
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-6 z-50">
-      <div className="bg-white rounded-lg p-4 relative md:w-1/2 lg:w-1/3">
+    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-6 z-50">
+      <div className="bg-white rounded-3xl p-6 relative md:w-1/2 lg:w-1/3 shadow-lg">
         {/* Success message */}
-        <p className="mb-6 text-2xl md:text-2xl text-primary text-center font-bold">
-          Before sending Request:
+        <p className="mb-4 text-2xl text-primary-dark text-center font-semibold">
+          Request Submission Guidelines
         </p>
 
-        {/* Policy message in bullet form with gap between list items */}
-        <div className="mb-6 text-xs md:text-xs">
-          <p className="mb-2 font-bold text-secondary">PLEASE NOTE:</p>
-          <ul className="list-disc list-inside mt-2 text-primary-dark font-semibold">
-            <li className="mb-2">
-              Reporting false emergencies is a serious offense that may result
-              in legal action, account suspension, or other penalties.
+        {/* Policy message in a minimal format */}
+        <div className="mb-6 text-sm md:text-base">
+          <p className="mb-2 font-bold text-secondary text-center">
+            PLEASE NOTE
+          </p>
+          <ul className="list-disc text-primary-dark font-medium ml-4 space-y-3">
+            <li>
+              <span className="font-bold">False emergencies</span> may result in
+              legal action, account suspension, or other penalties.
             </li>
-            <li className="mb-2">
-              Ensure that your request is genuine. If you are not in immediate
-              danger, please refrain from making a request.
+            <li>
+              Ensure your request is <span className="font-bold">genuine</span>.
+              If not in immediate danger, please refrain from making a request.
             </li>
-            <li className="mb-2">
-              You will be prompted to enter your name and phone number for
-              follow-up communication regarding your request.
+            <li>
+              You will be prompted to enter your{" "}
+              <span className="font-bold">name</span> and{" "}
+              <span className="font-bold">phone number</span> and other
+              information for follow-up communication regarding your request.
             </li>
           </ul>
-          <p className="text-xs text-primary-dark text-center gap-2">
+          <p className="text-center text-background-dark mt-4 text-xs">
             By submitting this request, you agree to our{" "}
-            <Link to="/privacy-policy" className="underline text-text-primary">
+            <Link to="/privacy-policy" className="underline text-primary-dark">
               Privacy Policy
             </Link>{" "}
             and{" "}
             <Link
               to="/terms-of-service"
-              className="underline text-text-primary"
+              className="underline text-primary-dark"
             >
               Terms of Service
             </Link>
@@ -41,15 +46,15 @@ const RequestModal = ({ onConfirm, onCancel }) => {
         </div>
 
         {/* Buttons */}
-        <div className="flex flex-col items-center gap-4">
+        <div className="flex flex-col items-center gap-3">
           <button
-            className="w-full bg-primary-medium hover:bg-primary text-white px-4 py-2 rounded md:text-base text-sm"
+            className="w-full bg-primary-medium hover:bg-primary text-white px-4 py-3 rounded-full md:text-base text-sm shadow-sm"
             onClick={onConfirm}
           >
             Confirm
           </button>
           <button
-            className="w-full border text-primary-dark px-4 py-2 rounded hover:bg-secondary hover:text-white md:text-base text-sm"
+            className="w-full border border-primary-dark text-primary-dark px-4 py-3 rounded-full hover:bg-secondary hover:text-white hover:border-none md:text-base text-sm"
             onClick={onCancel}
           >
             Cancel

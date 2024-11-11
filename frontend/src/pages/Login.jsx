@@ -1,5 +1,5 @@
 import logo from "../assets/logo.png";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams, useNavigate, Link } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { userLoginSchema } from "../models/Users"; // Ensure this handles email/username properly
@@ -100,7 +100,7 @@ const Login = () => {
             Back
           </p>
         </div>
-        <div className="flex justify-center mb-4">
+        <div className="flex justify-center mb-8">
           <img src={logo} alt="Logo" />
         </div>
         <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
@@ -139,6 +139,22 @@ const Login = () => {
               )}
             </span>
           </div>
+          <p className="text-xs p-2 text-background-medium text-center gap-2">
+            By continuing, you agree to our{" "}
+            <Link
+              to="/privacy-policy"
+              className="underline text-background-dark"
+            >
+              Privacy Policy
+            </Link>{" "}
+            and{" "}
+            <Link
+              to="/terms-of-service"
+              className="underline text-background-dark"
+            >
+              Terms of Service
+            </Link>
+          </p>
           <button
             type="submit"
             className="w-full bg-primary-medium text-white font-bold py-2 rounded-md hover:opacity-80 focus:outline-none"

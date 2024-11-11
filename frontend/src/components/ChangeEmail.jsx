@@ -64,7 +64,7 @@ const ChangeEmail = (props) => {
   };
 
   return (
-    <div className="flex-1 p-6 h-100 bg-light flex flex-col items-center justify-center">
+    <div className="flex-1 p-6 h-100 bg-light flex flex-col items-center justify-start">
       <div className="w-full items-center gap-4 mb-6 hidden md:flex">
         <FaChevronLeft
           className="text-background-dark text-2xl cursor-pointer "

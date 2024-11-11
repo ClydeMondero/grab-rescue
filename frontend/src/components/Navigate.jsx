@@ -74,7 +74,6 @@ const Navigate = ({ requestID, setSelectedRequest }) => {
   const handleStatusChangeClick = (newStatus) => {
     setStatusToUpdate(newStatus);
     setShowModal(true);
-    ``;
   };
 
   const confirmStatusChange = async () => {
@@ -227,7 +226,7 @@ const Navigate = ({ requestID, setSelectedRequest }) => {
                 )}
               </div>
 
-              <div className="flex items-center gap-6">
+              <div className="flex flex-col gap-2 md:flex-row">
                 {/* Inline Name and Relation */}
                 <div className="flex items-center gap-2 text-md font-semibold text-background-dark mt-2">
                   <p>{requestData.citizenName}</p>
@@ -235,8 +234,14 @@ const Navigate = ({ requestID, setSelectedRequest }) => {
                   <p>{requestData.citizenRelation || "No Relation"}</p>
                 </div>
 
-                <div className="flex-1 flex items-center gap-2 mt-2 ">
-                  <div className="text-sm font-semibold text-white py-2 px-5 rounded-full bg-highlight">
+                <div className="flex-1 flex items-center mt-2 self-center gap-2 ">
+                  <div
+                    className={`text-sm font-semibold text-white py-3 px-6 rounded-full ${
+                      requestData.status === "rescued"
+                        ? "bg-green-500"
+                        : "bg-highlight"
+                    }`}
+                  >
                     {requestData.status
                       ? requestData.status[0].toUpperCase() +
                         requestData.status.slice(1)
@@ -245,13 +250,13 @@ const Navigate = ({ requestID, setSelectedRequest }) => {
                   {nextStatus && !locating && (
                     <>
                       <div className="flex items-center animate-pulse">
-                        <FaChevronRight className="text-primary-medium" />
-                        <FaChevronRight className="text-primary-medium" />
+                        <FaChevronRight className="text-xs text-primary-medium" />
+                        <FaChevronRight className="text-xs text-primary-medium" />
                       </div>
                       <button
                         style={{ minWidth: "6rem" }}
                         onClick={() => handleStatusChangeClick(nextStatus)}
-                        className="text-sm text-gray-700 border border-gray-300 rounded-full px-5 py-2 opacity-70 cursor-pointer hover:bg-gray-100 transition-all"
+                        className="text-sm text-gray-700 border border-gray-300 rounded-full px-6 py-3 opacity-70 cursor-pointer hover:bg-gray-100 transition-all"
                       >
                         {nextStatus.charAt(0).toUpperCase() +
                           nextStatus.slice(1)}
@@ -298,29 +303,29 @@ const Navigate = ({ requestID, setSelectedRequest }) => {
 
       {/* Confirmation Modal */}
       {showModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
-            <h2 className="text-lg font-semibold text-center mb-4">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+          <div className="bg-white p-4 rounded-2xl shadow-md max-w-xs w-full">
+            <h2 className="text-md font-medium text-center mb-3">
               Confirm Status Change
             </h2>
-            <p className="text-center mb-6">
+            <p className="text-sm text-center mb-4">
               Are you sure you want to change the status to{" "}
-              <span className="font-semibold">
+              <span className="font-bold text-primary-medium">
                 {statusToUpdate.charAt(0).toUpperCase() +
                   statusToUpdate.slice(1)}
               </span>
               ?
             </p>
-            <div className="flex justify-center gap-4">
+            <div className="flex justify-center gap-3">
               <button
                 onClick={confirmStatusChange}
-                className="bg-primary text-white py-2 px-4 rounded hover:bg-primary-dark transition"
+                className="bg-primary text-white py-2 px-5 rounded-full hover:bg-primary-dark transition text-sm"
               >
                 Confirm
               </button>
               <button
                 onClick={cancelStatusChange}
-                className="bg-background-medium text-gray-700 py-2 px-4 rounded hover:bg-gray-400 transition"
+                className="bg-gray-200 text-gray-600 py-2 px-5 rounded-full hover:bg-gray-300 transition text-sm"
               >
                 Cancel
               </button>

@@ -8,6 +8,8 @@ import { getRequestsFromFirestore } from "../services/firestoreService";
 
 const Header = ({ user }) => {
   const [showDropdown, setShowDropdown] = useState(false);
+  const [isVisible, setIsVisible] = useState(true); // New state for visibility
+  const [scrollPosition, setScrollPosition] = useState(0);
   const navigate = useNavigate();
   const { page, setPage, navigating } = useContext(RescuerContext);
   const [requests, setRequests] = useState([]);
@@ -27,10 +29,36 @@ const Header = ({ user }) => {
     };
   }, [user]);
 
+  // Scroll event to hide/show header
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollPosition = window.scrollY;
+      if (currentScrollPosition > scrollPosition) {
+        // Scrolling down
+        setIsVisible(false);
+      } else {
+        // Scrolling up
+        setIsVisible(true);
+      }
+      setScrollPosition(currentScrollPosition);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [scrollPosition]);
+
   return (
     <>
       {!navigating && (
-        <div className="bg-background text-white flex items-center justify-between p-6 sticky top-0 left-0 right-0 z-50">
+        <div
+          className={`bg-background text-white flex items-center justify-between p-6 sticky top-0 left-0 right-0 z-50 transition-transform duration-300 ${
+            isVisible
+              ? "transform translate-y-0"
+              : "transform -translate-y-full"
+          }`}
+        >
           <div className="text-xl font-bold flex items-center">
             <img src={logo} alt="" className="hidden h-10 md:block" />
             <div className="flex items-center gap-4 md:hidden">

@@ -64,7 +64,7 @@ const Nav = ({ navigate }) => {
 
       {/* Minimal Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-green-700 bg-opacity-80 flex flex-col items-center justify-center z-[100] text-white p-6">
+        <div className="fixed inset-0 bg-highlight bg-opacity-80 flex flex-col items-center justify-center z-[100] text-white p-6">
           <button
             onClick={toggleModal}
             className="absolute top-4 right-4 text-white hover:text-gray-300"
@@ -83,7 +83,7 @@ const Nav = ({ navigate }) => {
                   setIsModalOpen(false);
                 }
               }}
-              className={`w-full bg-white text-green-700 font-bold py-3 rounded-lg hover:bg-gray-100 text-center ${
+              className={`w-full bg-white text-highlight font-bold py-3 rounded-lg hover:bg-gray-100 text-center ${
                 requesting ? "cursor-not-allowed opacity-50" : ""
               }`}
               disabled={requesting}
@@ -97,7 +97,7 @@ const Nav = ({ navigate }) => {
                   setIsModalOpen(false);
                 }
               }}
-              className={`w-full bg-white text-green-700 font-bold py-3 rounded-lg hover:bg-gray-100 text-center ${
+              className={`w-full bg-white text-highlight font-bold py-3 rounded-lg hover:bg-gray-100 text-center ${
                 requesting ? "cursor-not-allowed opacity-50" : ""
               }`}
               disabled={requesting}

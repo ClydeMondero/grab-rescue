@@ -7,7 +7,6 @@ import {
   Header,
   Bottom,
   ChangeEmail,
-  RequestDetails,
   Toast,
 } from "../components";
 import { useState, useEffect, useContext } from "react";
@@ -107,14 +106,14 @@ const Rescuer = (props) => {
         <Header user={user} />
 
         {showOverlay && (
-          <div className="fixed inset-0 bg-red-700 bg-opacity-80 flex items-center justify-center z-50">
+          <div className="fixed inset-0 bg-green-700 bg-opacity-80 flex items-center justify-center z-50">
             <div className="text-white flex flex-col items-center text-center p-10">
               <FaExclamation className="text-8xl mb-4" />
               <h1 className="text-4xl font-bold mb-4">{notificationTitle}</h1>
               <p className="text-lg mb-6">{notificationBody}</p>
               <div className="flex flex-col gap-2">
                 <button
-                  className="bg-white text-red-700 px-6 py-3 text-xl font-bold rounded-lg"
+                  className="bg-white text-green-700 px-6 py-3 text-xl font-bold rounded-lg"
                   onClick={() => {
                     setShowOverlay(false);
                     // Optionally navigate to the response page
@@ -162,10 +161,6 @@ const Rescuer = (props) => {
             }
           />
           <Route path="/profile" element={<ViewProfile user={user} />} />
-          <Route
-            path="/request-details/:id"
-            element={<RequestDetails user={user} />}
-          />
           <Route
             path="/change-password"
             element={<ChangePassword user={user} />}
