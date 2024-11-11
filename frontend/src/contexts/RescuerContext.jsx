@@ -32,6 +32,10 @@ const RescuerProvider = ({ children }) => {
     }
   });
 
+  useEffect(() => {
+    console.log("rescuer", rescuer);
+  }, [rescuer]);
+
   return (
     <RescuerContext.Provider
       value={{ rescuer, setRescuer, page, setPage, navigating, setNavigating }}

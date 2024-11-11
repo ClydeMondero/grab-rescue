@@ -146,6 +146,12 @@ const CitizenMap = forwardRef((props, ref) => {
   }, [requesting]);
 
   useEffect(() => {
+    if (mapRef.current && geoControlRef.current) {
+      setTimeout(() => {
+        geoControlRef.current.trigger(); // Trigger after map is fully loaded
+      }, 1000);
+    }
+
     const unsubscribe = getOnlineLocationsFromFirestore("rescuer", setRescuers);
 
     return () => {
