@@ -4,7 +4,7 @@ import { MdPersonAdd } from "react-icons/md";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { barangaysData } from "../constants/Barangays";
-import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { Toast } from "../components";
 import zxcvbn from "zxcvbn"; // Import zxcvbn
 import "react-toastify/dist/ReactToastify.css";
@@ -161,7 +161,7 @@ const AddRescuer = () => {
 
   return (
     <>
-      <div className="flex-1 p-2 sm:p-4 lg:h-fullflex flex-col">
+      <div className="h-full p-2 sm:p-4 lg:h-flex flex-col ">
         {/* Header Section */}
         <div className="flex items-center mb-2 sm:mb-4 border-b border-gray-200 pb-3">
           <MdPersonAdd className="text-3xl sm:text-2xl lg:text-3xl text-primary-dark mr-2 fill-current" />
@@ -170,7 +170,7 @@ const AddRescuer = () => {
           </h4>
         </div>
         {/* Add Rescuer Form */}
-        <div className="p-2 sm:p-6 lg:p-2 max-h-[70vh] overflow-y-auto">
+        <div className="flex-1 p-2 sm:p-6 lg:p-2 overflow-y-auto">
           <form className="space-y-2 sm:space-y-4" onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
               {/* Form Fields */}
@@ -188,7 +188,7 @@ const AddRescuer = () => {
                   value={formData.firstName}
                   onChange={handleChange}
                   required
-                  className="mt-1 block w-full px-2 py-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
+                  className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
                   placeholder="First name"
                 />
               </div>
@@ -206,7 +206,7 @@ const AddRescuer = () => {
                   value={formData.middleName}
                   onChange={handleChange}
                   required
-                  className="mt-1 block w-full px-2 py-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
+                  className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
                   placeholder="Middle Initial"
                 />
               </div>
@@ -224,7 +224,7 @@ const AddRescuer = () => {
                   value={formData.lastName}
                   onChange={handleChange}
                   required
-                  className="mt-1 block w-full px-2 py-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
+                  className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
                   placeholder="Last name"
                 />
               </div>
@@ -242,7 +242,7 @@ const AddRescuer = () => {
                   value={formData.birthday}
                   onChange={handleChange}
                   required
-                  className="mt-1 block w-full px-2 py-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
+                  className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
                 />
               </div>
               <div>
@@ -258,7 +258,7 @@ const AddRescuer = () => {
                   name="age"
                   value={formData.age}
                   readOnly
-                  className="mt-1 block w-full px-2 py-1 bg-gray-100 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
+                  className="mt-1 block w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
                   placeholder="Age"
                 />
               </div>
@@ -380,7 +380,7 @@ const AddRescuer = () => {
                     onFocus={() => setIsPasswordFocused(true)}
                     onBlur={() => setIsPasswordFocused(false)}
                     required
-                    className="mt-1 block w-full px-2 py-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
+                    className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
                     placeholder="Password"
                   />
                   <span
@@ -388,9 +388,9 @@ const AddRescuer = () => {
                     onClick={togglePasswordVisibility}
                   >
                     {showPassword ? (
-                      <AiFillEye className="text-primary-medium" />
+                      <FaEyeSlash className="text-lg text-background-medium" />
                     ) : (
-                      <AiFillEyeInvisible className="text-primary-medium" />
+                      <FaEye className="text-lg text-background-medium" />
                     )}
                   </span>
                 </div>
@@ -440,17 +440,17 @@ const AddRescuer = () => {
                     value={formData.confirmPassword}
                     onChange={handleChange}
                     required
-                    className="mt-1 block w-full px-2 py-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
+                    className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#557C55] focus:border-[#557C55] transition"
                     placeholder="Confirm Password"
                   />
                   <span
                     className="absolute inset-y-0 right-0 flex items-center pr-2 cursor-pointer"
                     onClick={toggleConfirmPasswordVisibility}
                   >
-                    {showConfirmPassword ? (
-                      <AiFillEye className="text-primary-medium" />
+                    {showPassword ? (
+                      <FaEyeSlash className="text-lg text-background-medium" />
                     ) : (
-                      <AiFillEyeInvisible className="text-primary-medium" />
+                      <FaEye className="text-lg text-background-medium" />
                     )}
                   </span>
                 </div>

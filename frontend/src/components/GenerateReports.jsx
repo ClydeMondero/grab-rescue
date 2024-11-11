@@ -249,10 +249,6 @@ const GenerateReports = (props) => {
         </h4>
       </div>
 
-      <p className="text-lg font-semibold text-[#557C55] self-start">
-        Select a report type to generate:
-      </p>
-
       <div className="bg-white rounded-md p-2 sm:p-4 flex flex-col space-y-2 sm:space-y-4">
         {reports.map((report) => (
           <div

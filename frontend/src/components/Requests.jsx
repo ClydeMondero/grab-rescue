@@ -13,7 +13,7 @@ import { formatDistance, formatDuration } from "../utils/DistanceUtility";
 import { setSelectedRequestCookie } from "../services/cookieService";
 import { acceptRescueRequestInFirestore } from "../services/firestoreService";
 import { getLocationsFromFirestore } from "../services/firestoreService";
-import NotNearestRescuerPrompt from "./NotNearestRescuerPrompt"; // Import the modal component
+import { NoRequests, NotNearestRescuerPrompt } from "../components";
 
 const Requests = ({
   userId,
@@ -448,23 +448,6 @@ const RequestDetailsModal = ({ isOpen, onClose, request }) => {
           </div>
         </div>
       </div>
-    </div>
-  );
-};
-
-/**
- * Display message when there are no emergency requests
- */
-const NoRequests = () => {
-  return (
-    <div className="flex flex-col items-center justify-center h-full">
-      <BiSolidHappyBeaming className="text-8xl text-background-medium" />
-      <h2 className="text-2xl font-bold text-primary-medium mb-4">
-        No Emergency Requests
-      </h2>
-      <p className="text-center text-sm sm:text-base text-text-secondary">
-        There are currently no emergency requests. Please check again later.
-      </p>
     </div>
   );
 };

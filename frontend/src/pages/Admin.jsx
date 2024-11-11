@@ -37,12 +37,12 @@ const Admin = (props) => {
   }
 
   return (
-    <div className="flex flex-col md:flex-row">
+    <div className="flex flex-col md:flex-row dark:bg-dark-background-light bg-background-light text-text-primary dark:text-dark-text-primary">
       {/* Sidebar */}
       <Sidebar user={user} />
 
       {/* Main Content */}
-      <div className="flex-1 p-6 md:p-8 md:mt-0 mt-16">
+      <div className="flex-1 p-6 md:p-8 md:mt-0 mt-16 bg-background dark:bg-dark-background-light text-text-primary dark:text-dark-text-primary">
         <Routes>
           <Route
             path="/"
