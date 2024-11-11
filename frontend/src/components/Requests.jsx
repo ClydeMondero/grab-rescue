@@ -154,7 +154,7 @@ const Requests = ({
       <div
         className={`${
           pendingRequests.length > 0
-            ? "grid grid-cols-1 md:grid-cols-2 gap-3 overflow-y-auto"
+            ? "grid grid-cols-1 md:grid-cols-2 gap-6 overflow-y-auto"
             : ""
         }`}
       >
@@ -165,7 +165,7 @@ const Requests = ({
             return (
               <div
                 key={request.id}
-                className="block bg-white border border-gray-300 rounded-md overflow-hidden"
+                className="block bg-white border border-gray-300 rounded-lg"
               >
                 <div className="relative">
                   <img
@@ -187,11 +187,6 @@ const Requests = ({
                         request.status.slice(1)
                       : ""}
                   </div>
-
-                  <FaLocationArrow
-                    className="absolute top-4 right-4 text-2xl text-background-light cursor-pointer"
-                    onClick={() => handleAccept(request.id)}
-                  />
                 </div>
 
                 <div className="flex flex-col items-start justify-between p-4 gap-4">
@@ -283,7 +278,7 @@ const Requests = ({
                     {!selectedRequest && (
                       <button
                         onClick={() => handleAccept(request.id)}
-                        className="w-full px-4 py-2 text-sm sm:text-base font-semibold text-white bg-[#557C55] rounded-lg transition-all hover:bg-[#465B46] active:scale-95 shadow-md"
+                        className="w-full px-4 py-4 text-sm sm:text-base font-semibold text-white bg-[#557C55] rounded-lg transition-all hover:bg-[#465B46] active:scale-95 shadow-md"
                       >
                         Accept Request
                       </button>
