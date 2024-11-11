@@ -379,7 +379,7 @@ const Home = () => {
         )}
 
         {/* Sliding Pane */}
-        {requesting && request.status != "rescued" && (
+        {requesting && request?.status != "rescued" && (
           <div
             className={`border-x-background-medium border-t-2 p-2 w-full flex flex-col items-center transition-all duration-300 ease-in-out rounded-t-2xl ${
               formVisible ? "h-[100%] bg-white" : "h-[10%] bg-primary-medium "
@@ -471,7 +471,9 @@ const Home = () => {
             >
               <BiSolidAmbulance className="text-text-primary text-2xl" />
             </button>
-            <p className="text-text-primary">Nearest Rescuer</p>
+            <p className="text-text-primary">
+              {assignedRescuer ? "Assigned Rescuer" : "Nearest Rescuer"}
+            </p>
           </div>
           <div className="flex flex-col items-center">
             <button
