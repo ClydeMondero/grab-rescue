@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaArrowUp, FaArrowLeft } from "react-icons/fa";
+import { FaArrowUp, FaArrowLeft, FaChevronLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 const Policy = () => {
@@ -31,7 +31,7 @@ const Policy = () => {
             onClick={handleBack}
             className="flex items-center text-teal-600 hover:text-teal-800 transition-colors"
           >
-            <FaArrowLeft className="mr-2 text-primary-dark" />
+            <FaChevronLeft className="text-xl mr-2 text-primary-dark" />
             <span className="text-lg font-semibold text-primary-dark">
               Back
             </span>
