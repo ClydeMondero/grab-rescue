@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { FaSun, FaMoon } from "react-icons/fa";
 
-const ThemeToggle = () => {
+const ThemeToggle = ({ isDisabled }) => {
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
 
   useEffect(() => {
@@ -22,6 +22,7 @@ const ThemeToggle = () => {
   return (
     <button
       onClick={toggleTheme}
+      disabled={isDisabled}
       className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-800 focus:outline-none"
       aria-label="Toggle Theme"
     >

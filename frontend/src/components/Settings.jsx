@@ -1,15 +1,18 @@
-import React from "react";
+import React, { useState } from "react";
 import { IoSettings } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import { handleLogout } from "../services/authService";
 import { FaSignOutAlt } from "react-icons/fa";
 import { ThemeToggle } from "../components";
+import FontSelector from "../components/FontSelector";
 
-const Settings = () => {
+const Settings = ({ fontClass, onFontChange }) => {
   const navigate = useNavigate();
 
   return (
-    <div className="flex-1 p-4 sm:p-6 lg:p-8 h-full bg-background dark:bg-dark-background">
+    <div
+      className={`flex-1 p-4 sm:p-6 lg:p-8 h-full bg-background dark:bg-dark-background ${fontClass}`}
+    >
       <div className="flex items-center mb-8 p-4 bg-white dark:bg-dark-background-light border-b-2 border-gray-200 dark:border-dark-border">
         <IoSettings className="text-3xl sm:text-2xl lg:text-3xl text-primary-dark dark:text-dark-primary mr-2 fill-current" />
         <h4 className="text-xl sm:text-md lg:text-3xl text-primary-dark dark:text-dark-primary font-bold">
@@ -19,18 +22,30 @@ const Settings = () => {
       <div className="bg-white dark:bg-dark-background flex flex-col space-y-4">
         {/* Theme Toggle */}
         <div className="bg-white dark:bg-dark-background-light rounded-md p-4 flex flex-col space-y-2">
-          <div className="flex justify-between items-center p-6 border rounded-md bg-white dark:bg-dark-background-light hover:bg-background-light dark:hover:bg-dark-background-medium transition">
-            <p className="text-lg font-medium text-primary-medium dark:text-dark-text-secondary">
-              Toggle Dark/Light Theme
+          <div className="flex justify-between items-center p-6 border rounded-md bg-white dark:bg-dark-background-light transition">
+            <p className="text-lg font-bold text-background-medium dark:text-dark-text-secondary">
+              Toggle Dark/Light Theme (Coming Soon)
             </p>
-            <ThemeToggle />
+            <ThemeToggle isDisabled />
+          </div>
+        </div>
+
+        {/* Font Selector */}
+        <div className="bg-white dark:bg-dark-background-light rounded-md p-4 flex flex-col space-y-2">
+          <div className="flex flex-col p-6 border rounded-md bg-white hover:bg-background-light  dark:bg-dark-background-light transition">
+            <div className="flex items-center justify-between">
+              <p className="text-lg font-bold text-primary-medium dark:text-dark-text-secondary">
+                Change Font
+              </p>
+              <FontSelector onFontChange={onFontChange} />
+            </div>
           </div>
         </div>
 
         {/* Logout Button */}
         <div className="bg-white dark:bg-dark-background-light rounded-md p-4 flex flex-col space-y-2">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-6 border rounded-md bg-white dark:bg-dark-background-light hover:bg-background-light dark:hover:bg-dark-background-medium transition">
-            <p className="text-lg font-medium text-primary-medium dark:text-dark-text-secondary">
+            <p className="text-lg font-bold text-primary-medium dark:text-dark-text-secondary">
               Log out of your account
             </p>
             <button

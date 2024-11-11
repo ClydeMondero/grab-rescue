@@ -31,8 +31,10 @@ import LocationPrompt from "./LocationPrompt";
 import NoRequests from "./NoRequests";
 import NotNearestRescuerPrompt from "./NotNearestRescuerPrompt";
 import ThemeToggle from "./ThemeToggle";
+import FontSelector from "./FontSelector";
 
 export {
+  FontSelector,
   ThemeToggle,
   NotNearestRescuerPrompt,
   LocationPrompt,

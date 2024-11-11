@@ -410,7 +410,7 @@ const AssignRescuers = (props) => {
                 <td
                   className={`px-4 py-2 text-center ${
                     rescue.verified ? "text-primary-medium" : "text-secondary"
-                  } text-xs md:text-sm`}
+                  } text-xs `}
                 >
                   {rescue.verified ? (
                     <span className="flex items-center justify-center rounded-full font-semibold py-2 text-blue-400">

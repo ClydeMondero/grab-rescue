@@ -42,6 +42,12 @@ export default {
         "dark-border": "#3e4550",
         "dark-shadow": "rgba(255, 255, 255, 0.1)",
       },
+      fontFamily: {
+        sans: ["Helvetica", "Arial", "sans-serif"],
+        serif: ["Georgia", "serif"],
+        mono: ["Courier New", "monospace"],
+        custom: ["'CustomFont', sans-serif"], // Add any custom font families here
+      },
     },
   },
   plugins: [],
