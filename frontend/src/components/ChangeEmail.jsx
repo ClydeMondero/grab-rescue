@@ -65,7 +65,7 @@ const ChangeEmail = (props) => {
 
   return (
     <div className="flex-1 p-6 h-100 bg-light flex flex-col items-center justify-start">
-      <div className="w-full items-center gap-4 mb-6 hidden md:flex">
+      <div className="w-full items-center gap-4 mb-6 hidden md:flex border-b-2 pb-2 border-gray-200">
         <FaChevronLeft
           className="text-background-dark text-2xl cursor-pointer "
           onClick={() => {

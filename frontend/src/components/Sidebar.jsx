@@ -1,20 +1,20 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { FaUserPlus, FaAmbulance, FaFileAlt, FaBell } from "react-icons/fa";
+import { Link, useLocation } from "react-router-dom";
+import { FaUserPlus, FaAmbulance, FaFileAlt } from "react-icons/fa";
 import {
   AiFillSetting,
   AiOutlineLogout,
-  AiOutlineUser,
   AiFillCaretDown,
 } from "react-icons/ai";
 import { MdMail, MdAssignmentInd, MdDashboard } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { handleLogout } from "../services/authService";
 
-const Sidebar = () => {
+const Sidebar = ({ user }) => {
   const [isOpen, setIsOpen] = useState(true);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
@@ -33,7 +33,6 @@ const Sidebar = () => {
 
   const initializeSidebar = () => {
     const pageWidth = window.innerWidth;
-
     if (pageWidth <= 768 && isOpen) {
       setIsOpen(false);
       setIsDropdownOpen(false);
@@ -45,7 +44,6 @@ const Sidebar = () => {
     }
   };
 
-  // Ensure sidebar visibility on screen resize
   useEffect(() => {
     window.addEventListener("resize", initializeSidebar);
     return () => {
@@ -57,18 +55,23 @@ const Sidebar = () => {
     initializeSidebar();
   }, []);
 
+  const isActive = (path) => location.pathname === path;
+
   return (
     <>
       {/* Desktop Sidebar */}
       <div
-        style={{ height: "100vh" }}
+        style={{ height: "100dvh" }}
         className={`hidden md:flex sticky top-0 left-0 h-full ${
           isOpen ? "w-64" : "w-20"
-        } bg-[#557C55] text-white flex-col transition-all duration-300`}
+        } bg-[#557C55] text-white flex-col items-center transition-all duration-300`}
         id="desktopSidebar"
       >
-        {/* Logo and Toggle Button */}
-        <div className="flex items-center justify-between p-4">
+        <div
+          className={`flex items-center justify-between p-4 ${
+            isOpen ? "self-start" : ""
+          }`}
+        >
           <div
             className="flex items-center cursor-pointer"
             onClick={toggleSidebar}
@@ -83,42 +86,44 @@ const Sidebar = () => {
         </div>
 
         {/* Profile Section */}
-        <div className="relative flex flex-col items-center p-4">
+        <div className="relative flex flex-col items-center p-4 w-full">
           <div
-            className="flex items-center justify-center cursor-pointer"
-            onClick={toggleDropdown}
+            className="flex items-center justify-center cursor-pointer w-full"
+            onClick={isOpen ? toggleDropdown : toggleSidebar}
           >
             <div
-              className={`w-14 h-14 rounded-full bg-white text-green text-3xl flex items-center justify-center ${
-                isOpen ? "md:flex" : "flex"
+              className={`w-12 h-12 rounded-full bg-white text-green text-3xl flex items-center justify-center ${
+                isOpen ? "md:flex w-10 h-10 text-2xl" : "flex"
               }`}
             >
-              <p className="text-4xl text-primary-medium font-bold">A</p>
+              <p className="text-xl text-primary-medium font-bold">
+                {user.username.charAt(0).toUpperCase()}
+              </p>
             </div>
             {isOpen && <AiFillCaretDown className="text-white ml-2 text-lg" />}
           </div>
           <div
             className={`${
               isDropdownOpen ? "block" : "hidden"
-            } bg-white text-[#6EA46E] absolute top-20 left-0 rounded-lg shadow-lg w-full`}
+            } bg-white text-[#6EA46E] absolute top-full rounded-lg shadow-lg w-3/4 flex flex-col `}
           >
             <Link
               to="/admin/viewProfile"
-              className="block px-4 py-2 hover:bg-gray-200"
+              className="block p-2 text-center border-background-medium border-b hover:bg-gray-200"
               onClick={closeDropdown}
             >
               View Profile
             </Link>
             <Link
               to="/admin/changePassword"
-              className="block px-4 py-2 hover:bg-gray-200"
+              className="block p-2 text-center border-background-medium border-b hover:bg-gray-200"
               onClick={closeDropdown}
             >
               Change Password
             </Link>
             <Link
+              className="block p-2 text-center border-background-medium border-b hover:bg-gray-200"
               to="/admin/changeEmail"
-              className="block px-4 py-2 hover:bg-gray-200"
               onClick={closeDropdown}
             >
               Change Email
@@ -127,10 +132,14 @@ const Sidebar = () => {
         </div>
 
         {/* Sidebar Links */}
-        <div className="flex flex-col space-y-2 mt-6">
+        <div className="flex flex-col gap-6 mt-6">
           <Link
             to="/admin/incomingRequests"
-            className="flex items-center px-4 py-2 hover:bg-[#6EA46E]"
+            className={`flex items-center px-4 py-2 hover:opacity-80 overflow-x-auto ${
+              isActive("/admin/incomingRequests")
+                ? "bg-white text-[#6EA46E] rounded-full"
+                : ""
+            }`}
           >
             <MdMail className={`text-lg ${!isOpen ? "text-xl" : "text-lg"}`} />
             <span className={`${!isOpen && "hidden"} ml-4 duration-300`}>
@@ -139,7 +148,11 @@ const Sidebar = () => {
           </Link>
           <Link
             to="/admin/ongoingRescues"
-            className="flex items-center px-4 py-2 hover:bg-[#6EA46E]"
+            className={`flex items-center px-4 py-2 hover:opacity-80 overflow-x-auto ${
+              isActive("/admin/ongoingRescues")
+                ? "bg-white text-[#6EA46E] rounded-full"
+                : ""
+            }`}
           >
             <FaAmbulance
               className={`text-lg ${!isOpen ? "text-xl" : "text-lg"}`}
@@ -150,7 +163,11 @@ const Sidebar = () => {
           </Link>
           <Link
             to="/admin/addRescuer"
-            className="flex items-center px-4 py-2 hover:bg-[#6EA46E]"
+            className={`flex items-center px-4 py-2 hover:opacity-80 overflow-x-auto ${
+              isActive("/admin/addRescuer")
+                ? "bg-white text-[#6EA46E] rounded-full"
+                : ""
+            }`}
           >
             <FaUserPlus
               className={`text-lg ${!isOpen ? "text-xl" : "text-lg"}`}
@@ -161,7 +178,11 @@ const Sidebar = () => {
           </Link>
           <Link
             to="/admin/rescuers"
-            className="flex items-center px-4 py-2 hover:bg-[#6EA46E]"
+            className={`flex items-center px-4 py-2 hover:opacity-80 overflow-x-auto ${
+              isActive("/admin/rescuers")
+                ? "bg-white text-[#6EA46E] rounded-full"
+                : ""
+            }`}
           >
             <MdAssignmentInd
               className={`text-lg ${!isOpen ? "text-xl" : "text-lg"}`}
@@ -172,7 +193,11 @@ const Sidebar = () => {
           </Link>
           <Link
             to="/admin/generateReports"
-            className="flex items-center px-4 py-2 hover:bg-[#6EA46E]"
+            className={`flex items-center px-4 py-2 hover:opacity-80 overflow-x-auto ${
+              isActive("/admin/generateReports")
+                ? "bg-white text-[#6EA46E] rounded-full"
+                : ""
+            }`}
           >
             <FaFileAlt
               className={`text-lg ${!isOpen ? "text-xl" : "text-lg"}`}
@@ -183,7 +208,11 @@ const Sidebar = () => {
           </Link>
           <Link
             to="/admin/settings"
-            className="flex items-center px-4 py-2 hover:bg-[#6EA46E]"
+            className={`flex items-center px-4 py-2 hover:opacity-80 overflow-x-auto ${
+              isActive("/admin/settings")
+                ? "bg-white text-[#6EA46E] rounded-full"
+                : ""
+            }`}
           >
             <AiFillSetting
               className={`text-lg ${!isOpen ? "text-xl" : "text-lg"}`}
@@ -225,7 +254,7 @@ const Sidebar = () => {
         <div className="relative flex flex-col items-center p-4">
           <div
             className="flex items-center justify-center cursor-pointer"
-            onClick={toggleDropdown}
+            onClick={isOpen ? toggleDropdown : toggleSidebar}
           >
             <div
               className={`w-14 h-14 rounded-full bg-white text-primary text-3xl flex items-center justify-center ${
@@ -233,12 +262,11 @@ const Sidebar = () => {
               }`}
             >
               <div
-                className={`text-4xl bg-white text-primary-medium font-bold rounded-full flex items-center justify-center ${
-                  !isOpen && "text-5xl"
+                className={`text-2xl bg-white text-primary-medium font-bold rounded-full flex items-center justify-center ${
+                  !isOpen && "text-2xl"
                 }`}
-                style={{ width: "2.5rem", height: "2.5rem" }}
               >
-                A
+                {user.username.charAt(0).toUpperCase()}
               </div>
             </div>
             {isOpen && <AiFillCaretDown className="text-white ml-2 text-lg" />}
@@ -246,25 +274,25 @@ const Sidebar = () => {
           <div
             className={`${
               isDropdownOpen ? "block" : "hidden"
-            } bg-white text-[#6EA46E] absolute top-20 left-0 rounded-lg shadow-lg`}
+            } bg-white text-[#6EA46E] absolute top-20 rounded-lg shadow-lg`}
           >
             <Link
               to="/admin/viewProfile"
-              className="block px-4 py-2 hover:bg-gray-200"
+              className="block p-2 text-center border-background-medium border-b hover:bg-gray-200"
               onClick={closeDropdown}
             >
               View Profile
             </Link>
             <Link
               to="/admin/changePassword"
-              className="block px-4 py-2 hover:bg-gray-200"
+              className="block p-2 text-center border-background-medium border-b hover:bg-gray-200"
               onClick={closeDropdown}
             >
               Change Password
             </Link>
             <Link
               to="/admin/changeEmail"
-              className="block px-4 py-2 hover:bg-gray-200"
+              className="block p-2 text-center border-background-medium border-b hover:bg-gray-200"
               onClick={closeDropdown}
             >
               Change Email
@@ -273,10 +301,14 @@ const Sidebar = () => {
         </div>
 
         {/* Sidebar Links */}
-        <div className="flex flex-col space-y-2 mt-6">
+        <div className="flex flex-col gap-6 mt-6">
           <Link
             to="/admin/incomingRequests"
-            className="flex items-center px-4 py-2 hover:bg-[#6EA46E]"
+            className={`flex items-center px-4 py-2 hover:opacity-80 overflow-x-auto ${
+              isActive("/admin/incomingRequests")
+                ? "bg-white text-[#6EA46E] rounded-full"
+                : ""
+            }`}
           >
             <MdMail className={`text-lg ${!isOpen ? "text-xl" : "text-lg"}`} />
             <span className={`${!isOpen && "hidden"} ml-4 duration-300`}>
@@ -285,7 +317,11 @@ const Sidebar = () => {
           </Link>
           <Link
             to="/admin/ongoingRescues"
-            className="flex items-center px-4 py-2 hover:bg-[#6EA46E]"
+            className={`flex items-center px-4 py-2 hover:opacity-80 overflow-x-auto ${
+              isActive("/admin/ongoingRescues")
+                ? "bg-white text-[#6EA46E] rounded-full"
+                : ""
+            }`}
           >
             <FaAmbulance
               className={`text-lg ${!isOpen ? "text-xl" : "text-lg"}`}
@@ -296,7 +332,11 @@ const Sidebar = () => {
           </Link>
           <Link
             to="/admin/addRescuer"
-            className="flex items-center px-4 py-2 hover:bg-[#6EA46E]"
+            className={`flex items-center px-4 py-2 hover:opacity-80 overflow-x-auto ${
+              isActive("/admin/addRescuer")
+                ? "bg-white text-[#6EA46E] rounded-full"
+                : ""
+            }`}
           >
             <FaUserPlus
               className={`text-lg ${!isOpen ? "text-xl" : "text-lg"}`}
@@ -307,7 +347,11 @@ const Sidebar = () => {
           </Link>
           <Link
             to="/admin/rescuers"
-            className="flex items-center px-4 py-2 hover:bg-[#6EA46E]"
+            className={`flex items-center px-4 py-2 hover:opacity-80 overflow-x-auto ${
+              isActive("/admin/rescuers")
+                ? "bg-white text-[#6EA46E] rounded-full"
+                : ""
+            }`}
           >
             <MdAssignmentInd
               className={`text-lg ${!isOpen ? "text-xl" : "text-lg"}`}
@@ -318,7 +362,11 @@ const Sidebar = () => {
           </Link>
           <Link
             to="/admin/generateReports"
-            className="flex items-center px-4 py-2 hover:bg-[#6EA46E]"
+            className={`flex items-center px-4 py-2 hover:opacity-80 overflow-x-auto ${
+              isActive("/admin/generateReports")
+                ? "bg-white text-[#6EA46E] rounded-full"
+                : ""
+            }`}
           >
             <FaFileAlt
               className={`text-lg ${!isOpen ? "text-xl" : "text-lg"}`}
@@ -329,7 +377,11 @@ const Sidebar = () => {
           </Link>
           <Link
             to="/admin/settings"
-            className="flex items-center px-4 py-2 hover:bg-[#6EA46E]"
+            className={`flex items-center px-4 py-2 hover:opacity-80 overflow-x-auto ${
+              isActive("/admin/settings")
+                ? "bg-white text-[#6EA46E] rounded-full"
+                : ""
+            }`}
           >
             <AiFillSetting
               className={`text-lg ${!isOpen ? "text-xl" : "text-lg"}`}

@@ -39,7 +39,7 @@ const Admin = (props) => {
   return (
     <div className="flex flex-col md:flex-row">
       {/* Sidebar */}
-      <Sidebar />
+      <Sidebar user={user} />
 
       {/* Main Content */}
       <div className="flex-1 p-6 md:p-8 md:mt-0 mt-16">
