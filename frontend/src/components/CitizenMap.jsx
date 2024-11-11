@@ -213,7 +213,7 @@ const CitizenMap = forwardRef((props, ref) => {
 
         <Controls
           mapRef={mapRef}
-          otherMarker={nearestRescuer}
+          otherMarker={assignedRescuer ? assignedRescuer : nearestRescuer}
           routeData={routeData}
           setRouteOpacity={setRouteOpacity}
           ref={buttonsRef}

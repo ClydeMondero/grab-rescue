@@ -379,7 +379,7 @@ const Home = () => {
         )}
 
         {/* Sliding Pane */}
-        {requesting && (
+        {requesting && request.status != "rescued" && (
           <div
             className={`border-x-background-medium border-t-2 p-2 w-full flex flex-col items-center transition-all duration-300 ease-in-out rounded-t-2xl ${
               formVisible ? "h-[100%] bg-white" : "h-[10%] bg-primary-medium "

@@ -75,7 +75,7 @@ const Header = ({ user }) => {
               >
                 <Link
                   to="/rescuer/profile"
-                  className={`block px-4 py-2 hover:bg-background-light ${
+                  className={`block px-4 py-2 hover:bg-background-light border-b border-background-light ${
                     isAssigned ? "opacity-50" : ""
                   }`}
                   onClick={() => {
@@ -88,7 +88,7 @@ const Header = ({ user }) => {
                 </Link>
                 <Link
                   to="/rescuer/change-password"
-                  className={`block px-4 py-2 hover:bg-background-light ${
+                  className={`block px-4 py-2 hover:bg-background-light border-b border-background-light ${
                     isAssigned ? "opacity-50" : ""
                   }`}
                   onClick={() => {
@@ -101,7 +101,7 @@ const Header = ({ user }) => {
                 </Link>
                 <Link
                   to="/rescuer/change-email"
-                  className={`block px-4 py-2 hover:bg-background-light ${
+                  className={`block px-4 py-2 hover:bg-background-light border-b border-background-light ${
                     isAssigned ? "opacity-50" : ""
                   }`}
                   onClick={() => {
@@ -114,7 +114,7 @@ const Header = ({ user }) => {
                 </Link>
                 <Link
                   onClick={() => !isAssigned && handleLogout(navigate)}
-                  className={`block px-4 py-2 hover:bg-background-light ${
+                  className={`block px-4 py-2 hover:bg-background-light border-b border-background-light ${
                     isAssigned ? "opacity-50" : ""
                   }`}
                 >
