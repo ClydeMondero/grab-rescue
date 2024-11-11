@@ -13,7 +13,7 @@ import { FaChevronDown, FaPhone } from "react-icons/fa";
 import { FaLocationPin } from "react-icons/fa6";
 import { BiSolidHide, BiSolidAmbulance } from "react-icons/bi";
 import { MdDragHandle } from "react-icons/md";
-import { MdRoute } from "react-icons/md";
+import { MdRoute, MdCheck } from "react-icons/md";
 import { MultiStepForm } from "../pages";
 import {
   addRequestToFirestore,
@@ -248,10 +248,10 @@ const Home = () => {
           {mobileMenuOpen && (
             <div className="absolute top-14 right-0 w-56 bg-background text-primary-medium rounded-md shadow-lg py-2 flex items-center justify-center">
               <ul className="space-y-2 flex flex-col items-center w-full">
-                <li className="py-2">
+                <li className="py-2 border-b w-full">
                   <button
                     onClick={() => !requesting && navigate("/")}
-                    className={`flex items-center w-full text-lg font-semibold hover:underline ${
+                    className={`flex items-center justify-center w-full text-lg font-semibold ${
                       requesting ? "cursor-not-allowed opacity-50" : ""
                     }`}
                   >
@@ -280,10 +280,10 @@ const Home = () => {
                     Login as Admin
                   </button>
                 </li>
-                <li className="py-2">
+                <li className="py-2 border-b w-full justify-center">
                   <button
                     onClick={() => !requesting && navigate("/download")}
-                    className={`flex items-center w-full text-lg font-semibold hover:underline ${
+                    className={`flex items-center justify-center w-full text-lg font-semibold  ${
                       requesting ? "cursor-not-allowed opacity-50" : ""
                     }`}
                   >
@@ -293,7 +293,7 @@ const Home = () => {
                 <li className="py-2">
                   <button
                     onClick={() => !requesting && navigate("/about")}
-                    className={`flex items-center w-full text-lg font-semibold hover:underline ${
+                    className={`flex items-center justify-center w-full text-lg font-semibold  ${
                       requesting ? "cursor-not-allowed opacity-50" : ""
                     }`}
                   >
@@ -342,11 +342,11 @@ const Home = () => {
                   </p>
                   {/* Show rescued details if status is "rescued" */}
                   {request?.status === "rescued" && (
-                    <div className="mt-4">
-                      <p className="text-primary-medium text-sm font-semibold">
+                    <div className="mt-4 w-56 lg:w-auto">
+                      <p className="text-primary-dark text-sm font-semibold">
                         Rescued Address: {request.rescuedAddress}
                       </p>
-                      <p className="text-primary-medium text-sm font-semibold">
+                      <p className="text-primary-dark text-sm font-semibold">
                         Rescued Time:{" "}
                         {new Date(request.rescuedTimestamp).toLocaleString()}
                       </p>
@@ -355,12 +355,14 @@ const Home = () => {
                   {requesting && request?.status === "rescued" && (
                     <button
                       onClick={() => setShowConfirmationModal(true)}
-                      className="w-half bg-primary hover:bg-primary-dark text-white font-bold p-4 rounded-lg"
+                      className="mt-2 flex items-center justify-center w-48 h-10 rounded-full bg-primary hover:bg-primary-medium text-white"
                     >
-                      Complete Request
+                      <MdCheck className="text-xl font-bold" />
+                      <span className="text-md ml-1">Complete Request</span>
                     </button>
                   )}
                 </div>
+
                 <button
                   onClick={handlePhone}
                   className="flex items-center justify-center w-12 h-12 bg-primary rounded-full text-white text-2xl cursor-pointer"
@@ -505,21 +507,26 @@ const Home = () => {
 
       {/* Inline Confirmation Modal */}
       {showConfirmationModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white rounded-lg p-6 max-w-sm w-full text-center">
-            <p className="text-lg font-semibold mb-4">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50 transition-opacity duration-300 ease-in-out">
+          <div className="bg-white rounded-md shadow-lg transform transition-all p-8 max-w-md w-full text-center relative">
+            <h2 className="text-2xl font-bold text-primary mb-4">
+              REQUEST COMPLETED!
+            </h2>
+            <p className="text-xl font-semibold text-primary-dark mb-6">
               Are you sure you want to complete this request?
             </p>
-            <div className="flex justify-center gap-4">
+
+            <div className="flex justify-center space-x-4">
               <button
                 onClick={handleCompleteRequest}
-                className="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded"
+                className="bg-primary hover:bg-primary-medium text-white font-semibold py-3 px-6 rounded-md  transition-colors duration-200 ease-in-out"
               >
                 Confirm
               </button>
+
               <button
                 onClick={() => setShowConfirmationModal(false)}
-                className="bg-gray-300 hover:bg-gray-400 text-gray-700 font-bold py-2 px-4 rounded"
+                className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-3 px-6 rounded-md transition-colors duration-200 ease-in-out"
               >
                 Cancel
               </button>
