@@ -287,7 +287,10 @@ const Requests = ({
                   <div className="w-full">
                     {!selectedRequest && (
                       <button
-                        onClick={() => handleAccept(request.id)}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          handleAccept(request.id);
+                        }}
                         className="w-full px-4 py-4 text-sm sm:text-base font-semibold text-white bg-[#557C55] rounded-lg transition-all hover:bg-[#465B46] active:scale-95 shadow-md"
                       >
                         Accept Request
