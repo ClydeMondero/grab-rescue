@@ -23,14 +23,12 @@ const StatusProvider = ({ children }) => {
 
     if (userId) {
       setId(userId);
-      console.log("Setting rescuer ID:", userId);
     } else {
       const citizenCookie = getCitizenCookie();
 
       if (citizenCookie) {
         const citizenId = await getIDFromLocation(citizenCookie);
         setId(citizenId);
-        console.log("Setting citizen ID:", citizenId);
       }
     }
   };
