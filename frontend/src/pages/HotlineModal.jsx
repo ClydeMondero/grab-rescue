@@ -75,7 +75,7 @@ const HotlineModal = ({ onClose, onMobile }) => {
         <div className="mt-4 flex justify-center">
           <button
             onClick={onClose}
-            className="bg-secondary text-white font-bold py-2 px-6 rounded-full hover:bg-primary-dark transition duration-200"
+            className="bg-secondary text-white font-bold py-2 px-6 rounded-full hover:bg-red-500 transition duration-200"
           >
             Close
           </button>
