@@ -96,7 +96,7 @@ const ViewProfile = (props) => {
         {/* Main Profile Container */}
         <div className="w-full flex items-center justify-center md:flex-row gap-4">
           {/* Profile Information Card */}
-          <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-300 w-full md:w-1/2">
+          <div className="bg-white rounded-lg p-4 shadow-sm w-full md:w-1/2">
             <h2 className="text-lg font-semibold text-[#557C55] mb-2">
               Profile Information
             </h2>

@@ -118,10 +118,6 @@ const Home = () => {
     }
   };
 
-  useEffect(() => {
-    console.log("nearestRescuer:", nearestRescuer);
-  }, [nearestRescuer]);
-
   const handleModalConfirm = async () => {
     if (mapRef.current) {
       const citizenId = getCitizenCookie();

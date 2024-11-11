@@ -198,7 +198,8 @@ const CitizenMap = forwardRef((props, ref) => {
           position="top-right"
           positionOptions={{ enableHighAccuracy: true }}
           trackUserLocation={true}
-          showUserLocation={coords === null}
+          showUserLocation={coords && false}
+          showAccuracyCircle={false}
           onGeolocate={({ coords }) => {
             handleGeolocation(coords);
           }}
