@@ -82,7 +82,7 @@ const Requests = ({
     setHasConfirmedRequest(true);
     await acceptRescueRequestInFirestore(userId, selectedRequest);
     setPage("Navigate");
-    window.location = "/navigate";
+    window.location.replace("/rescuer/navigate");
   };
 
   const handleContinue = async () => {

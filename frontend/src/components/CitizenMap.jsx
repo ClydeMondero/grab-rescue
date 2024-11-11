@@ -155,6 +155,14 @@ const CitizenMap = forwardRef((props, ref) => {
   }, []);
 
   useEffect(() => {
+    if (rescuers == null) return;
+
+    if (rescuers.length == 0) {
+      setRouteData(null);
+      setDistance(null);
+      setEta(null);
+    }
+
     if (nearestRescuer || assignedRescuer) {
       getRoute();
     }
