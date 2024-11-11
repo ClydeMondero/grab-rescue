@@ -151,6 +151,12 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
   };
 
   useEffect(() => {
+    if (mapRef.current && mapRef.current.resize()) {
+      mapRef.current.resize();
+    }
+  }, [navigating]);
+
+  useEffect(() => {
     if (citizen) {
       getRoute();
     }

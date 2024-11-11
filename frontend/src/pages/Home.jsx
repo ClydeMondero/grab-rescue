@@ -34,6 +34,7 @@ import MobileDetect from "mobile-detect";
 import { toast } from "react-toastify";
 import { hotlines } from "../constants/Hotlines";
 import { HotlineModal } from "../pages";
+import { map } from "zod";
 const Home = () => {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -207,7 +208,7 @@ const Home = () => {
 
   useEffect(() => {
     if (mapRef.current && mapRef.current.resize) {
-      mapRef.current.resize();
+      setTimeout(() => mapRef.current.resize(), 500);
     }
   }, [formVisible]);
 
@@ -310,6 +311,7 @@ const Home = () => {
           onLocatingChange={handleLocatingChange}
           onNearestRescuerUpdate={handleNearestRescuerUpdate}
           assignedRescuer={assignedRescuer}
+          requesting={requesting}
         />
 
         {requesting && (
@@ -382,7 +384,9 @@ const Home = () => {
             } `}
           >
             <MdDragHandle
-              onClick={() => setFormVisible(!formVisible)}
+              onClick={() => {
+                setFormVisible(!formVisible);
+              }}
               className="text-background-medium h-10 w-10"
             />
             <p

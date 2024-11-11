@@ -97,16 +97,6 @@ const Navigate = ({ requestID, setSelectedRequest }) => {
     setShowModal(false); // Close modal after confirmation
   };
 
-  useEffect(() => {
-    if (!requestID) return;
-    console.log(requestID);
-  }, [requestID]);
-
-  useEffect(() => {
-    if (!requestData) return;
-    console.log("requestData", requestData);
-  }, [requestData]);
-
   const getRescueLocation = async () => {
     if (id) {
       const locationId = await getLocationIDFromFirestore(id);
