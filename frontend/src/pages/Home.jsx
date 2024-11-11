@@ -49,6 +49,7 @@ const Home = () => {
   const [onlineRescuers, setOnlineRescuers] = useState([]);
   const [assignedRescuer, setAssignedRescuer] = useState(null);
   const [hotlineModalOpen, setHotlineModalOpen] = useState(false);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
 
   const { getId } = useContext(StatusContext);
   const mapRef = useRef(null);
@@ -91,14 +92,6 @@ const Home = () => {
 
     const unsubscribe = getRequestFromFirestore(requestId, (onGoingRequest) => {
       setRequest(onGoingRequest);
-
-      // Check if the request status is 'rescued'
-      if (onGoingRequest && onGoingRequest.status === "rescued") {
-        setRequest(null);
-        setRequesting(false); // Clear requesting state
-        deleteCookie("request_token"); // Delete the request_token cookie
-        setAssignedRescuer(null);
-      }
     });
 
     return () => {
@@ -166,6 +159,14 @@ const Home = () => {
     setModalOpen(false);
     setRequesting(true);
     setFormVisible(true);
+  };
+
+  const handleCompleteRequest = () => {
+    setRequest(null);
+    setRequesting(false);
+    deleteCookie("request_token");
+    setAssignedRescuer(null);
+    setShowConfirmationModal(false);
   };
 
   const handleModalCancel = () => {
@@ -333,8 +334,34 @@ const Home = () => {
                     }`.trim()}
                   </p>
                   <p className="text-background-dark text-sm font-semibold">
-                    {rescuer.municipality}
+                    {rescuer.municipality}, {rescuer.barangay}
                   </p>
+                  <p className="text-background-dark text-sm font-semibold">
+                    {request
+                      ? request.status.charAt(0).toUpperCase() +
+                        request.status.slice(1)
+                      : ""}
+                  </p>
+                  {/* Show rescued details if status is "rescued" */}
+                  {request?.status === "rescued" && (
+                    <div className="mt-4">
+                      <p className="text-primary-medium text-sm font-semibold">
+                        Rescued Address: {request.rescuedAddress}
+                      </p>
+                      <p className="text-primary-medium text-sm font-semibold">
+                        Rescued Time:{" "}
+                        {new Date(request.rescuedTimestamp).toLocaleString()}
+                      </p>
+                    </div>
+                  )}
+                  {requesting && request?.status === "rescued" && (
+                    <button
+                      onClick={() => setShowConfirmationModal(true)}
+                      className="w-half bg-primary hover:bg-primary-dark text-white font-bold p-4 rounded-lg"
+                    >
+                      Complete Request
+                    </button>
+                  )}
                 </div>
                 <button
                   onClick={handlePhone}
@@ -475,6 +502,32 @@ const Home = () => {
           onCancel={handleModalCancel} // Handle modal cancellation to simply close the modal
         />
       )}
+
+      {/* Inline Confirmation Modal */}
+      {showConfirmationModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white rounded-lg p-6 max-w-sm w-full text-center">
+            <p className="text-lg font-semibold mb-4">
+              Are you sure you want to complete this request?
+            </p>
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={handleCompleteRequest}
+                className="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded"
+              >
+                Confirm
+              </button>
+              <button
+                onClick={() => setShowConfirmationModal(false)}
+                className="bg-gray-300 hover:bg-gray-400 text-gray-700 font-bold py-2 px-4 rounded"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <Toast />
     </div>
   );

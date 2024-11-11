@@ -15,7 +15,7 @@ const Policy = () => {
   };
 
   const handleBack = () => {
-    navigate(-1);
+    window.location = "/";
   };
 
   useEffect(() => {

@@ -15,7 +15,7 @@ const TermsOfService = () => {
   };
 
   const handleBack = () => {
-    navigate(-1); // Navigates to the previous page
+    window.location = "/";
   };
 
   useEffect(() => {
