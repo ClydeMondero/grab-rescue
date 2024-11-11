@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from "react";
 import { FaChevronLeft, FaSave, FaEdit, FaTimes, FaUser } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { createAuthHeader } from "../services/authService";
 import { toast } from "react-toastify";
@@ -17,6 +17,7 @@ const ViewProfile = (props) => {
   const [age, setAge] = useState("");
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const location = useLocation();
 
   const setPage =
     user.account_type === "Rescuer" ? useContext(RescuerContext).setPage : null;
@@ -82,7 +83,7 @@ const ViewProfile = (props) => {
   return (
     <>
       <div className="flex-1 p-6 h-full to-background-light">
-        <div className="w-full items-center gap-4 mb-6 hidden md:flex">
+        <div className="w-full items-center gap-4 mb-6 hidden md:flex border-b-2 pb-2 border-gray-200">
           <FaChevronLeft
             className="text-background-dark text-2xl cursor-pointer "
             onClick={() => {

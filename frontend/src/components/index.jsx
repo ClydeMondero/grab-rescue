@@ -22,15 +22,21 @@ import DistanceEta from "./DistanceEta";
 import Navigate from "./Navigate";
 import Requests from "./Requests";
 import Header from "./Header";
-import RequestDetails from "./RequestDetails";
 import LocatingIndicator from "./LocatingIndicator";
 import RescuerMarker from "./RescuerMarker";
 import GeolocateButton from "./GeolocateButton";
 import TurnIndicator from "./TurnIndicator";
 import RequestModal from "./RequestModal";
 import LocationPrompt from "./LocationPrompt";
+import NoRequests from "./NoRequests";
+import NotNearestRescuerPrompt from "./NotNearestRescuerPrompt";
+import ThemeToggle from "./ThemeToggle";
+import FontSelector from "./FontSelector";
 
 export {
+  FontSelector,
+  ThemeToggle,
+  NotNearestRescuerPrompt,
   LocationPrompt,
   RequestModal,
   TurnIndicator,
@@ -57,9 +63,9 @@ export {
   Sidebar,
   ChangeEmail,
   Header,
-  RequestDetails,
   Bottom,
   Navigate,
   Requests,
   Nav,
+  NoRequests,
 };

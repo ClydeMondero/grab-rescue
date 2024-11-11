@@ -244,20 +244,16 @@ const GenerateReports = (props) => {
     <div className="flex-1 p-4 sm:p-6 lg:p-8 h-full  flex flex-col">
       <div className="flex items-center mb-2 sm:mb-4 border-b border-gray-200 pb-3">
         <FaFileAlt className="text-3xl sm:text-md lg:text-3xl text-primary-dark mr-2 fill-current" />
-        <h4 className="text-xl sm:text-md lg:text-3xl text-primary-dark font-bold">
+        <h4 className="text-xl sm:text-md lg:text-3xl text-primary-dark font-bold dark:text-primary">
           Generate Log Action Reports
         </h4>
       </div>
-
-      <p className="text-lg font-semibold text-[#557C55] self-start">
-        Select a report type to generate:
-      </p>
 
       <div className="bg-white rounded-md p-2 sm:p-4 flex flex-col space-y-2 sm:space-y-4">
         {reports.map((report) => (
           <div
             key={report.id}
-            className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 sm:p-2 border rounded-md bg-white hover:bg-[#F0F0F0] transition"
+            className="flex justify-between items-start sm:items-center p-6 border rounded-md bg-white hover:bg-[#F0F0F0] transition"
           >
             <div className="flex-1">
               <h5 className="text-md sm:text-xl font-semibold text-[#557C55]">

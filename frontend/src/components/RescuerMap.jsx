@@ -200,6 +200,12 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
   }, [navigating]);
 
   useEffect(() => {
+    if (mapRef.current && geoControlRef.current) {
+      setTimeout(() => {
+        geoControlRef.current.trigger(); // Trigger after map is fully loaded
+      }, 1000);
+    }
+
     const unsubscribe = getLocationsFromFirestore("rescuer", setLocations);
 
     return () => {

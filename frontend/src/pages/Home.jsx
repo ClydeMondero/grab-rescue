@@ -316,32 +316,49 @@ const Home = () => {
 
         {requesting && (
           <div
-            className={`bg-white p-4 rounded-lg shadow-lg transition-all duration-300 ease-in-out`}
+            className={`bg-white p-6 rounded-xl shadow-lg transition-all duration-300 ease-in-out`}
           >
             {request && request.status == "pending" ? (
               <p>Waiting for rescuer acceptance...</p>
             ) : rescuer ? (
-              <div className="flex items-center justify-between w-full">
-                <div>
+              <div className="flex items-center w-full">
+                <div className="flex flex-col w-full">
                   <p className="text-xs text-primary-medium">
                     Assigned Rescuer
                   </p>
-                  <p className="text-primary-dark font-semibold text-xl">
-                    {`${rescuer.first_name} ${rescuer.middle_name || ""} ${
-                      rescuer.last_name
-                    }`.trim()}
-                  </p>
-                  <p className="text-background-dark text-sm font-semibold">
-                    {rescuer.municipality}, {rescuer.barangay}
-                  </p>
-                  <p className="text-background-dark text-sm font-semibold">
-                    {request
-                      ? request.status.charAt(0).toUpperCase() +
-                        request.status.slice(1)
-                      : ""}
-                  </p>
+                  <div className="w-full flex items-center justify-between">
+                    <div className="flex flex-col">
+                      <p className="text-primary-dark font-semibold text-xl">
+                        {`${rescuer.first_name} ${rescuer.middle_name || ""} ${
+                          rescuer.last_name
+                        }`.trim()}
+                      </p>
+                      <p className="text-background-dark text-sm font-semibold">
+                        {rescuer.municipality}, {rescuer.barangay}
+                      </p>
+                      <p
+                        className={`px-3 py-6 rounded-full text-sm font-semibold ${
+                          request?.status === "rescued"
+                            ? "text-green-600"
+                            : "text-blue-600"
+                        }`}
+                      >
+                        {request
+                          ? request.status.charAt(0).toUpperCase() +
+                            request.status.slice(1)
+                          : ""}
+                      </p>
+                    </div>
+                    <button
+                      onClick={handlePhone}
+                      className="p-3 h-max bg-primary rounded-full text-white shadow hover:bg-primary-dark transition"
+                    >
+                      <FaPhone />
+                    </button>
+                  </div>
+
                   {/* Show rescued details if status is "rescued" */}
-                  {request?.status === "rescued" && (
+                  {/* {request?.status === "rescued" && (
                     <div className="mt-4 w-56 lg:w-auto">
                       <p className="text-primary-dark text-sm font-semibold">
                         Rescued Address: {request.rescuedAddress}
@@ -360,15 +377,8 @@ const Home = () => {
                       <MdCheck className="text-xl font-bold" />
                       <span className="text-md ml-1">Complete Request</span>
                     </button>
-                  )}
+                  )} */}
                 </div>
-
-                <button
-                  onClick={handlePhone}
-                  className="flex items-center justify-center w-12 h-12 bg-primary rounded-full text-white text-2xl cursor-pointer"
-                >
-                  <FaPhone />
-                </button>
               </div>
             ) : (
               <div className="flex items-center justify-center">
@@ -379,7 +389,7 @@ const Home = () => {
         )}
 
         {/* Sliding Pane */}
-        {requesting && (
+        {requesting && request?.status != "rescued" && (
           <div
             className={`border-x-background-medium border-t-2 p-2 w-full flex flex-col items-center transition-all duration-300 ease-in-out rounded-t-2xl ${
               formVisible ? "h-[100%] bg-white" : "h-[10%] bg-primary-medium "
@@ -471,7 +481,9 @@ const Home = () => {
             >
               <BiSolidAmbulance className="text-text-primary text-2xl" />
             </button>
-            <p className="text-text-primary">Nearest Rescuer</p>
+            <p className="text-text-primary">
+              {assignedRescuer ? "Assigned Rescuer" : "Nearest Rescuer"}
+            </p>
           </div>
           <div className="flex flex-col items-center">
             <button

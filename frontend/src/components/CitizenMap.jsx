@@ -146,6 +146,12 @@ const CitizenMap = forwardRef((props, ref) => {
   }, [requesting]);
 
   useEffect(() => {
+    if (mapRef.current && geoControlRef.current) {
+      setTimeout(() => {
+        geoControlRef.current.trigger(); // Trigger after map is fully loaded
+      }, 1000);
+    }
+
     const unsubscribe = getOnlineLocationsFromFirestore("rescuer", setRescuers);
 
     return () => {
@@ -155,6 +161,14 @@ const CitizenMap = forwardRef((props, ref) => {
   }, []);
 
   useEffect(() => {
+    if (rescuers == null) return;
+
+    if (rescuers.length == 0) {
+      setRouteData(null);
+      setDistance(null);
+      setEta(null);
+    }
+
     if (nearestRescuer || assignedRescuer) {
       getRoute();
     }
@@ -213,7 +227,7 @@ const CitizenMap = forwardRef((props, ref) => {
 
         <Controls
           mapRef={mapRef}
-          otherMarker={nearestRescuer}
+          otherMarker={assignedRescuer ? assignedRescuer : nearestRescuer}
           routeData={routeData}
           setRouteOpacity={setRouteOpacity}
           ref={buttonsRef}

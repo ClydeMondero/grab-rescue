@@ -62,7 +62,7 @@ const LocationPrompt = () => {
   }
 
   return (
-    <div className="fixed inset-0 bg-green-700 bg-opacity-80 flex items-center justify-center z-[100] fade-in">
+    <div className="fixed inset-0 bg-red-700 bg-opacity-80 flex items-center justify-center z-[100] fade-in">
       <div className="text-white flex flex-col items-center text-center p-10">
         <MdLocationOff className="text-8xl text-white mb-4" />
         <h2 className="text-4xl font-bold mb-4">
@@ -76,7 +76,7 @@ const LocationPrompt = () => {
         </p>
         <div className="flex flex-col gap-2 w-full max-w-xs">
           <button
-            className="w-full bg-white text-green-700 font-bold py-3 px-6 text-xl rounded-lg hover:bg-green-800 hover:text-white"
+            className="w-full bg-white text-red-700 font-bold py-3 px-6 text-xl rounded-lg hover:bg-secondary hover:text-white"
             onClick={() => window.location.reload()}
           >
             Refresh

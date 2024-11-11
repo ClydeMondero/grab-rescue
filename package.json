@@ -10,8 +10,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@heroicons/react": "^2.1.5",
-    "concurrently": "^8.2.2",
-    "react-toastify": "^10.0.6"
+    "concurrently": "^8.2.2"
   }
 }

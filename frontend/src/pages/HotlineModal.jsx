@@ -1,6 +1,6 @@
 import React from "react";
 import { hotlines } from "../constants/Hotlines";
-import { PhoneIcon, ClipboardIcon } from "@heroicons/react/20/solid"; // Updated for v2
+import { FaPhone, FaClipboard } from "react-icons/fa";
 import { toast } from "react-toastify";
 
 const HotlineModal = ({ onClose, onMobile }) => {
@@ -24,7 +24,7 @@ const HotlineModal = ({ onClose, onMobile }) => {
     <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50">
       <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-lg">
         <h2 className="text-xl font-bold mb-4 text-orange-500 text-center">
-          <PhoneIcon className="w-6 h-6 inline-block mr-2" />
+          <FaPhone className="w-6 h-6 inline-block mr-2" />
           Emergency Hotlines
         </h2>
         <div className="space-y-4">
@@ -63,7 +63,7 @@ const HotlineModal = ({ onClose, onMobile }) => {
                         className="bg-gray-200 text-gray-600 p-2 rounded-full hover:bg-gray-300 transition"
                         title="Copy to clipboard"
                       >
-                        <ClipboardIcon className="w-5 h-5" />
+                        <FaClipboard className="w-5 h-5" />
                       </button>
                     </div>
                   </li>

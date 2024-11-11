@@ -20,12 +20,36 @@ const Admin = (props) => {
   const { user } = props;
   const [requests, setRequests] = useState(null); // Initialize as null
 
+  // Load font preference from localStorage or default to 'sans'
+  const [fontClass, setFontClass] = useState(
+    localStorage.getItem("fontFamily") || "font-sans"
+  );
+
+  const handleFontChange = (selectedFont) => {
+    const newFontClass = `font-${selectedFont}`;
+    setFontClass(newFontClass);
+    localStorage.setItem("fontFamily", newFontClass);
+
+    // Apply the font class directly to document.body
+    document.body.classList.remove(
+      "font-sans",
+      "font-serif",
+      "font-mono",
+      "font-custom"
+    ); // Clear any previous font classes
+    document.body.classList.add(newFontClass); // Add the new font class
+  };
+
   useEffect(() => {
     const unsubscribe = getRequestsFromFirestore(setRequests);
+    // Apply the saved font class on initial load
+    document.body.classList.add(fontClass);
+
     return () => {
       unsubscribe();
+      document.body.classList.remove(fontClass); // Cleanup on unmount
     };
-  }, []);
+  }, [fontClass]);
 
   if (user.account_type !== "Admin") {
     return <Navigate to="/not-found" replace />;
@@ -37,12 +61,12 @@ const Admin = (props) => {
   }
 
   return (
-    <div className="flex flex-col md:flex-row">
+    <div className="flex flex-col md:flex-row dark:bg-dark-background-light bg-background-light text-text-primary dark:text-dark-text-primary">
       {/* Sidebar */}
-      <Sidebar />
+      <Sidebar user={user} />
 
       {/* Main Content */}
-      <div className="flex-1 p-6 md:p-8 md:mt-0 mt-16">
+      <div className="flex-1 p-6 md:p-8 md:mt-0 mt-16 bg-background dark:bg-dark-background-light text-text-primary dark:text-dark-text-primary">
         <Routes>
           <Route
             path="/"
@@ -62,7 +86,10 @@ const Admin = (props) => {
             path="/generateReports"
             element={<GenerateReports user={user} />}
           />
-          <Route path="/settings" element={<Settings user={user} />} />
+          <Route
+            path="/settings"
+            element={<Settings onFontChange={handleFontChange} />}
+          />
           <Route path="/viewProfile" element={<ViewProfile user={user} />} />
           <Route
             path="/changePassword"

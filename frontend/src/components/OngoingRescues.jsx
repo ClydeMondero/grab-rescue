@@ -197,43 +197,39 @@ const OngoingRescues = ({ requests, user }) => {
         </h4>
       </div>
 
-      <p className="text-sm sm:text-lg font-semibold text-[#557C55] self-start">
-        Monitoring the status and progress of active rescue efforts.
-      </p>
-
       {/* Rescue Data Table */}
-      <div className="flex flex-col flex-1">
-        {/* Print Button */}
-        <div className="flex justify-end mb-2">
+      <div className="flex flex-col flex-1 gap-2">
+        <div className="flex justify-between items-center">
+          {/* Filter Status */}
+          <div className="flex items-center">
+            <label
+              htmlFor="status-filter"
+              className="mr-2 font-semibold text-primary-dark bg-white rounded-md"
+            >
+              Filter by Status:
+            </label>
+            <select
+              id="status-filter"
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="bg-gray-200 text-black rounded-lg p-3 max-w-full lg:max-w-[200px]"
+            >
+              <option value="all">All</option>
+              <option value="assigned">Assigned</option>
+              <option value="in transit">In Transit</option>
+              <option value="en route">En Route</option>
+              <option value="rescued">Rescued</option>
+            </select>
+          </div>
+
+          {/* Print Button */}
           <button
             onClick={handlePrint}
-            className="bg-primary-medium text-white px-4 py-2 rounded-md hover:bg-[#6EA46E] transition flex items-center text-sm"
+            className="w-max bg-gray-200 text-black p-3 rounded-lg hover:opacity-80 transition flex items-center"
           >
             <AiFillPrinter className="text-base mr-1" />
             Generate PDF
           </button>
-        </div>
-
-        {/* Filter Status */}
-        <div className="mb-4">
-          <label
-            htmlFor="status-filter"
-            className="mr-2 font-semibold text-primary-dark bg-white px-2 py-1 rounded-md"
-          >
-            Filter by Status:
-          </label>
-          <select
-            id="status-filter"
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="bg-primary-medium text-white rounded-md px-3 py-1 max-w-full lg:max-w-[200px]"
-          >
-            <option value="all">All</option>
-            <option value="assigned">Assigned</option>
-            <option value="in transit">In Transit</option>
-            <option value="en route">En Route</option>
-            <option value="rescued">Rescued</option>
-          </select>
         </div>
 
         {/* Mobile Card View */}
@@ -376,36 +372,35 @@ const OngoingRescues = ({ requests, user }) => {
             </tbody>
           </table>
         </div>
-
-        {/* Pagination */}
-        <div className="mt-4">
-          <div className="flex justify-center items-center">
-            <button
-              disabled={currentPage === 1}
-              onClick={() => handlePageChange(currentPage - 1)}
-              className={`${
-                currentPage === 1
-                  ? "bg-gray-300"
-                  : "bg-primary-medium text-white"
-              } px-4 py-2 rounded-md`}
-            >
-              Prev
-            </button>
-            <span className="text-gray-700 text-sm">
-              Page {currentPage} of {totalPages}
-            </span>
-            <button
-              disabled={currentPage === totalPages}
-              onClick={() => handlePageChange(currentPage + 1)}
-              className={`${
-                currentPage === totalPages
-                  ? "bg-gray-300"
-                  : "bg-primary-medium text-white"
-              } px-4 py-2 rounded-md`}
-            >
-              Next
-            </button>
-          </div>
+      </div>
+      {/* Pagination */}
+      <div className="mt-4">
+        <div className="flex justify-center items-center gap-2">
+          <button
+            disabled={currentPage === 1}
+            onClick={() => handlePageChange(currentPage - 1)}
+            className={`${
+              currentPage === 1
+                ? "bg-background-light text-background-medium"
+                : "bg-primary-medium text-text-white"
+            } px-4 py-2 rounded-md`}
+          >
+            Prev
+          </button>
+          <span className="text-gray-700 text-sm">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            disabled={totalPages === 0 || currentPage === totalPages}
+            onClick={() => handlePageChange(currentPage + 1)}
+            className={`${
+              totalPages === 0 || currentPage === totalPages
+                ? "bg-background-light text-background-medium"
+                : "bg-primary-medium text-white"
+            } px-4 py-2 rounded-md`}
+          >
+            Next
+          </button>
         </div>
       </div>
       {showMap && (
