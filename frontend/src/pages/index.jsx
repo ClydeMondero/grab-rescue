@@ -12,6 +12,9 @@ import TermsOfService from "./TermsOfService";
 import Download from "./Download";
 import About from "./About";
 import HotlineModal from "./HotlineModal";
+import CitizenTutorial from "./CitizenTutorial";
+import AdminTutorial from "./AdminTutorial";
+import RescuerTutorial from "./RescuerTutorial";
 export {
   About,
   MultiStepForm,
@@ -27,4 +30,7 @@ export {
   TermsOfService,
   Download,
   HotlineModal,
+  RescuerTutorial,
+  AdminTutorial,
+  CitizenTutorial,
 };
