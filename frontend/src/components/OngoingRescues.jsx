@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
-import { FaAmbulance, FaMapMarkerAlt } from "react-icons/fa";
+import { FaAmbulance, FaMapMarkerAlt, FaTimes } from "react-icons/fa";
 import { AiFillPrinter } from "react-icons/ai";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import axios from "axios";
+import { Map } from "react-map-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
 
 const OngoingRescues = ({ requests, user }) => {
   const [showMap, setShowMap] = useState(false);
@@ -12,6 +14,7 @@ const OngoingRescues = ({ requests, user }) => {
   const [filterStatus, setFilterStatus] = useState("all");
   const [rescuerName, setRescuerName] = useState(null);
   const [rescuerContactNumber, setRescuerContactNumber] = useState(null);
+
   const ongoingRescues = requests
     .filter((request) => {
       if (filterStatus === "all") {
@@ -64,8 +67,12 @@ const OngoingRescues = ({ requests, user }) => {
     }
   };
 
-  const handleShowMap = (location) => {
-    setSelectedLocation(location);
+  const handleShowMap = (request) => {
+    console.log(request);
+    setSelectedLocation({
+      latitude: request.originalRequest.location.latitude,
+      longitude: request.originalRequest.location.longitude,
+    });
     setShowMap(true);
   };
 
@@ -109,10 +116,6 @@ const OngoingRescues = ({ requests, user }) => {
     };
 
     fetchRescuer();
-  }, [selectedRescue]);
-
-  useEffect(() => {
-    console.log("Selected Rescue:", selectedRescue);
   }, [selectedRescue]);
 
   const handleCloseDetails = () => {
@@ -232,63 +235,8 @@ const OngoingRescues = ({ requests, user }) => {
           </button>
         </div>
 
-        {/* Mobile Card View */}
-        <div className="lg:hidden grid gap-4 sm:grid-cols-2">
-          {paginatedRescues.map((rescue, index) => (
-            <div
-              onClick={() => handleRowClick(rescue)}
-              key={rescue.id}
-              className="border border-gray-300 rounded-lg p-4 shadow-md bg-white "
-            >
-              <div className="mb-2">
-                <span className="text-xs font-semibold text-gray-600">
-                  Rescuer ID:
-                </span>{" "}
-                <span className="text-sm">{rescue.rescuer}</span>
-              </div>
-              <div className="mb-2">
-                <span className="text-xs font-semibold text-gray-600">
-                  Location:
-                </span>{" "}
-                <span className="text-sm">{rescue.location}</span>
-              </div>
-              <div className="mb-2">
-                <span className="text-xs font-semibold text-gray-600">
-                  Accepted Timestamp:
-                </span>{" "}
-                <span className="text-sm">{rescue.acceptedTimestamp}</span>
-              </div>
-              <div className="mb-2">
-                <span className="text-xs font-semibold text-gray-600">
-                  Status:
-                </span>{" "}
-                <span
-                  className={`text-sm font-bold ${
-                    rescue.status === "assigned" ? "text-info" : "text-primary"
-                  }`}
-                >
-                  {rescue.status.charAt(0).toUpperCase() +
-                    rescue.status.slice(1)}
-                </span>
-              </div>
-
-              {/* Conditionally Render Map Button */}
-              {rescue.status === "assigned" && (
-                <div className="flex justify-center">
-                  <button
-                    onClick={() => handleShowMap(rescue.location)}
-                    className="bg-secondary text-white px-4 py-1 rounded-full hover:bg-primary-medium transition flex items-center justify-center"
-                  >
-                    <FaMapMarkerAlt className="text-xl" />
-                  </button>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-
         {/* Table for larger screens */}
-        <div className="hidden lg:block overflow-x-auto">
+        <div className="hidden lg:block overflow-x-auto cursor-pointer">
           <table className="min-w-full bg-gray-200 border border-gray-200 rounded-md overflow-hidden">
             <thead className="bg-[#557C55] text-white">
               <tr>
@@ -308,16 +256,14 @@ const OngoingRescues = ({ requests, user }) => {
                 <th className="px-4 py-2 text-center text-xs font-medium">
                   Map
                 </th>
-                <th className="px-4 py-2 text-center text-xs font-medium">
-                  Action
-                </th>
               </tr>
             </thead>
             <tbody>
               {paginatedRescues.map((requests, index) => (
                 <tr
                   key={requests.id}
-                  className={index % 2 === 0 ? "bg-white " : "bg-gray-100"}
+                  className="border-b bg-white hover:bg-background-light"
+                  onClick={() => handleRowClick(requests)}
                 >
                   <td className="px-4 py-2 text-center text-sm text-info font-semibold">
                     {requests.id}
@@ -332,40 +278,35 @@ const OngoingRescues = ({ requests, user }) => {
                     {requests.acceptedTimestamp}
                   </td>
                   <td className="px-4 py-2 text-center">
-                    <span
-                      className={`font-semibold ${
+                    <button
+                      className={`text-xs p-3 rounded-lg ${
                         requests.status === "assigned"
-                          ? "text-info"
+                          ? "bg-highlight text-white"
                           : requests.status === "in transit"
-                          ? "text-yellow-500"
+                          ? "bg-yellow-500 text-white"
                           : requests.status === "en route"
-                          ? "text-orange-500"
-                          : "text-primary"
+                          ? "bg-orange-500 text-white"
+                          : "bg-primary text-white"
                       }`}
                     >
                       {requests.status.charAt(0).toUpperCase() +
                         requests.status.slice(1)}
-                    </span>
+                    </button>
                   </td>
                   <td className="px-4 py-2 text-center">
                     {requests.status !== "rescued" && (
                       <div className="flex justify-center">
                         <button
-                          onClick={() => handleShowMap(requests.location)}
+                          onClick={(event) => {
+                            event.stopPropagation(); // Prevent row click event
+                            handleShowMap(requests);
+                          }}
                           className="bg-secondary text-white px-4 py-1 rounded-full hover:bg-primary-medium transition flex items-center justify-center"
                         >
                           <FaMapMarkerAlt className="text-xl" />
                         </button>
                       </div>
                     )}
-                  </td>
-                  <td className="px-4 py-2 text-center text-sm">
-                    <button
-                      onClick={() => handleRowClick(requests)}
-                      className="border border-info b-2 text-info px-4 py-1 rounded-full hover:bg-info hover:text-white transition"
-                    >
-                      View
-                    </button>
                   </td>
                 </tr>
               ))}
@@ -403,19 +344,32 @@ const OngoingRescues = ({ requests, user }) => {
           </button>
         </div>
       </div>
-      {showMap && (
+      {showMap && selectedLocation && !selectedRescue && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-4 rounded-lg max-w-lg w-full">
-            <h4 className="text-xl font-bold mb-4">Map Location</h4>
-            <div style={{ height: "400px", width: "100%" }}>
-              <p>{selectedLocation}</p>
+            <div className="flex items-center justify-between mb-4">
+              <h4 className="text-xl font-bold">Rescue Location Details</h4>
+              <FaTimes
+                onClick={handleCloseMap}
+                className="text-xl text-background-medium cursor-pointer"
+              />
             </div>
-            <button
-              onClick={handleCloseMap}
-              className="mt-4 bg-red-500 text-white px-4 py-2 rounded-md"
-            >
-              Close Map
-            </button>
+
+            <Map
+              initialViewState={{
+                latitude: selectedLocation.latitude,
+                longitude: selectedLocation.longitude,
+                zoom: 15,
+              }}
+              mapStyle={"mapbox://styles/mapbox/streets-v12"}
+              mapboxAccessToken={import.meta.env.VITE_MAPBOX_TOKEN}
+              maxzoom={15}
+            ></Map>
+
+            {/* Add a map component or iframe here to show map based on location */}
+            <div style={{ height: "400px", width: "100%" }}>
+              {/* Render the map here, potentially using selectedLocation’s coordinates */}
+            </div>
           </div>
         </div>
       )}

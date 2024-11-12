@@ -368,9 +368,7 @@ const AssignRescuers = (props) => {
             {paginatedRescuers.map((rescue, index) => (
               <tr
                 key={rescue.id}
-                className={`${
-                  index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                } border-b`}
+                className="border-b bg-white hover:bg-background-light"
               >
                 <td className="px-4 py-2 text-xs text-center text-secondary">
                   {rescue.id}

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AiOutlinePrinter } from "react-icons/ai";
+import { AiFillPrinter } from "react-icons/ai";
 import { FaFileAlt } from "react-icons/fa";
 import { Dialog } from "@headlessui/react";
 import jsPDF from "jspdf"; // Import jsPDF
@@ -265,7 +265,7 @@ const GenerateReports = (props) => {
               className="bg-[#557C55] text-white px-6 py-2 sm:px-5 sm:py-3 rounded-lg text-xs sm:text-sm hover:bg-[#6EA46E] transition mt-2 sm:mt-0 flex items-center"
               onClick={() => openModal(report)}
             >
-              <AiOutlinePrinter className="text-base sm:text-lg mr-2" />
+              <AiFillPrinter className="text-base sm:text-lg mr-2" />
               Generate
             </button>
           </div>
