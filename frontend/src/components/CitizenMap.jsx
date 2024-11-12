@@ -140,11 +140,6 @@ const CitizenMap = forwardRef((props, ref) => {
   };
 
   useEffect(() => {
-    if (!citizen) return;
-    handleGeolocation(citizen);
-  }, [rescuers]);
-
-  useEffect(() => {
     if (mapRef.current && mapRef.current.resize()) {
       mapRef.current.resize();
     }
@@ -184,6 +179,8 @@ const CitizenMap = forwardRef((props, ref) => {
       const nearest = getNearestRescuer(citizen, rescuers);
       setNearestRescuer(nearest);
       onNearestRescuerUpdate(nearest);
+      console.log("changing nearest rescuer");
+      console.log(nearest);
     }
   }, [rescuers, citizen]);
 
