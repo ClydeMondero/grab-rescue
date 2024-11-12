@@ -14,6 +14,7 @@ const OngoingRescues = ({ requests, user }) => {
   const [selectedRescue, setSelectedRescue] = useState(null);
   const [filterStatus, setFilterStatus] = useState("all");
   const [rescuerName, setRescuerName] = useState(null);
+  const [rescuerNames, setRescuerNames] = useState([]);
   const [rescuerContactNumber, setRescuerContactNumber] = useState(null);
   const [rescuerArea, setRescuerArea] = useState(null);
 
@@ -41,7 +42,8 @@ const OngoingRescues = ({ requests, user }) => {
     .map((request, index) => ({
       id: index + 1,
       location: request.location.address,
-      rescuer: `${request.rescuerId}`,
+      rescuer: request.rescuerId, // Store rescuer ID
+      rescuerName: rescuerNames[request.rescuerId] || "Unknown", // Get rescuer name based on ID
       status: request.status,
       acceptedTimestamp: new Intl.DateTimeFormat("en-US", {
         year: "numeric",
@@ -103,6 +105,21 @@ const OngoingRescues = ({ requests, user }) => {
     }
   };
 
+  const getRescuers = async (rescuerId) => {
+    try {
+      const response = await axios.get(`/rescuers/get/`);
+      if (response.data) {
+        return response.data;
+      } else {
+        console.error("Rescuer not found");
+        return null;
+      }
+    } catch (error) {
+      console.error("Error fetching rescuer: ", error);
+      return null;
+    }
+  };
+
   useEffect(() => {
     const fetchRescuer = async () => {
       if (selectedRescue?.rescuerId) {
@@ -122,6 +139,24 @@ const OngoingRescues = ({ requests, user }) => {
 
     fetchRescuer();
   }, [selectedRescue]);
+
+  useEffect(() => {
+    const fetchAllRescuers = async () => {
+      const rescuers = await getRescuers();
+      if (rescuers) {
+        // Concatenate first, middle, and last names to form the full name
+        const rescuersById = rescuers.reduce((acc, rescuer) => {
+          const fullName =
+            `${rescuer.first_name} ${rescuer.middle_name} ${rescuer.last_name}`.trim();
+          acc[rescuer.id] = fullName;
+          return acc;
+        }, {});
+        setRescuerNames(rescuersById);
+      }
+    };
+
+    fetchAllRescuers();
+  }, []);
 
   const handleCloseDetails = () => {
     setSelectedRescue(null);
@@ -145,6 +180,8 @@ const OngoingRescues = ({ requests, user }) => {
       { title: "Location", dataKey: "location" },
       { title: "Accepted Timestamp", dataKey: "acceptedTimestamp" },
       { title: "Status", dataKey: "status" },
+      { title: "Citizen Name", dataKey: "citizenName" },
+      { title: "Rescuer Name", dataKey: "rescuerName" },
     ];
 
     const tableRows = ongoingRescues.map((rescue) => ({
@@ -152,7 +189,9 @@ const OngoingRescues = ({ requests, user }) => {
       rescuer: rescue.rescuer,
       location: rescue.location,
       acceptedTimestamp: rescue.acceptedTimestamp,
-      status: rescue.status,
+      status: rescue?.status.charAt(0).toUpperCase() + rescue?.status.slice(1),
+      citizenName: rescue.originalRequest.citizenName || "N/A",
+      rescuerName: rescue.rescuerName, 
     }));
 
     doc.autoTable({
