@@ -22,6 +22,7 @@ import { FaLocationPin } from "react-icons/fa6";
 import { useLocation } from "react-router-dom";
 import { setGeolocateIcon } from "../utils/GeolocateUtility";
 import * as turf from "@turf/turf";
+import { set } from "lodash";
 
 const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
   const { rescuer, setRescuer } = useContext(RescuerContext);
@@ -95,33 +96,38 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
   };
 
   useEffect(() => {
-    // Start watching the user's location in a loop
-    const watchID = navigator.geolocation.watchPosition(
-      ({ coords }) => {
-        // Trigger handleGeolocation each time there's a position update
-        handleGeolocation(coords);
-        // Clear the watch, and start a new one
-        navigator.geolocation.clearWatch(watchID);
-        watchID = navigator.geolocation.watchPosition(
-          ({ coords }) => handleGeolocation(coords),
-          (error) => console.log("Error watching position:", error),
-          {
-            enableHighAccuracy: true,
-            maximumAge: 0,
-            timeout: 5000,
-          }
-        );
-      },
-      (error) => console.log("Error watching position:", error),
-      {
-        enableHighAccuracy: true,
-        maximumAge: 0,
-        timeout: 5000,
-      }
-    );
+    const timeoutID = setTimeout(() => {
+      // Start watching the user's location in a loop
+      const watchID = navigator.geolocation.watchPosition(
+        ({ coords }) => {
+          // Trigger handleGeolocation each time there's a position update
+          handleGeolocation(coords);
+          // Clear the watch, and start a new one
+          navigator.geolocation.clearWatch(watchID);
+          watchID = navigator.geolocation.watchPosition(
+            ({ coords }) => handleGeolocation(coords),
+            (error) => console.log("Error watching position:", error),
+            {
+              enableHighAccuracy: true,
+              maximumAge: 0,
+              timeout: 5000,
+            }
+          );
+        },
+        (error) => console.log("Error watching position:", error),
+        {
+          enableHighAccuracy: true,
+          maximumAge: 0,
+          timeout: 5000,
+        }
+      );
 
-    // Clear the watch on component unmount
-    return () => navigator.geolocation.clearWatch(watchID);
+      // Clear the watch on component unmount
+      return () => navigator.geolocation.clearWatch(watchID);
+    }, 3000);
+
+    // Clear the timeout on component unmount
+    return () => clearTimeout(timeoutID);
   }, []);
 
   const checkIfOnRoute = (currentLocation, route) => {
