@@ -158,3 +158,15 @@
     display: block;
   }
 }
+
+.parallax-hero {
+  background-image: url("../src/assets/hero-about.jpg");
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.parallax-hero > img {
+  filter: blur(10px);
+}

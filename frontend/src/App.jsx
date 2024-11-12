@@ -12,6 +12,9 @@ import {
   TermsOfService,
   Download,
   About,
+  RescuerTutorial,
+  AdminTutorial,
+  CitizenTutorial,
 } from "./pages";
 import axios from "axios";
 import { PrivateRoute, GeolocateButton, LocationPrompt } from "./components";
@@ -46,6 +49,9 @@ const App = () => {
             <Route path="/terms-of-service" element={<TermsOfService />} />
             <Route path="/download" element={<Download />} />
             <Route path="/about" element={<About />} />
+            <Route path="/citizen-tutorial" element={<CitizenTutorial />} />
+            <Route path="/rescuer-tutorial" element={<RescuerTutorial />} />
+            <Route path="/admin-tutorial" element={<AdminTutorial />} />
             <Route
               path="/rescuer/*"
               element={<PrivateRoute Component={Rescuer} />}
