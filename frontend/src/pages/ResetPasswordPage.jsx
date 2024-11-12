@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import { Toast } from "../components";
 import { FaEye, FaEyeSlash, FaLock, FaChevronLeft } from "react-icons/fa";
 import zxcvbn from "zxcvbn";
-import logo from "../../public/logo.png";
+import logo from "../assets/logo.png";
 import "react-toastify/dist/ReactToastify.css";
 
 const ResetPassword = () => {
@@ -82,11 +82,6 @@ const ResetPassword = () => {
         <div className="flex justify-center mb-4">
           <img src={logo} alt="Logo" className="h-12" />
         </div>
-
-        {/* Title */}
-        <h2 className="text-center text-2xl font-semibold mb-5 text-text-primary">
-          Reset Your Password
-        </h2>
 
         <form className="space-y-4" onSubmit={handleResetPassword}>
           {/* New Password Input */}

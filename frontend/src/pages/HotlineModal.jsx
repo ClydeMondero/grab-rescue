@@ -1,6 +1,6 @@
 import React from "react";
 import { hotlines } from "../constants/Hotlines";
-import { FaPhone, FaClipboard } from "react-icons/fa";
+import { FaPhone, FaClipboard, FaTimes } from "react-icons/fa";
 import { toast } from "react-toastify";
 
 const HotlineModal = ({ onClose, onMobile }) => {
@@ -22,17 +22,23 @@ const HotlineModal = ({ onClose, onMobile }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 p-8 flex justify-center items-center z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-lg">
-        <h2 className="text-xl font-bold mb-4 text-orange-500 text-center">
-          <FaPhone className="w-6 h-6 inline-block mr-2" />
-          Emergency Hotlines
-        </h2>
+      <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-lg relative">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-bold mb-4 text-orange-500 text-center">
+            <FaPhone className="w-6 h-6 inline-block mr-2" />
+            Emergency Hotlines
+          </h2>
+          <FaTimes
+            onClick={onClose}
+            className="text-xl self-start text-background-medium cursor-pointer"
+          />
+        </div>
         <div className="space-y-4">
           {Object.entries(hotlines).map(([location, services]) => (
-            <div key={location}>
-              <h3 className="text-lg font-semibold text-primary-dark mb-3">
+            <details key={location} className="mb-4">
+              <summary className="text-lg font-semibold text-primary-dark mb-3">
                 {location}
-              </h3>
+              </summary>
               <ul className="space-y-3">
                 {Object.entries(services).map(([service, number]) => (
                   <li
@@ -40,7 +46,7 @@ const HotlineModal = ({ onClose, onMobile }) => {
                     className="flex justify-between items-center bg-gray-50 p-3 rounded-md shadow-sm hover:bg-gray-100 transition duration-200"
                   >
                     <div className="flex-1">
-                      <span className="font-medium text-primary-medium">
+                      <span className="font-medium text-primary-medium flex items-center">
                         {service}
                       </span>
                     </div>
@@ -58,27 +64,12 @@ const HotlineModal = ({ onClose, onMobile }) => {
                         <FaPhone className="w-5 h-5" />
                       </button>
                       {/* Copy button with Clipboard icon */}
-                      <button
-                        onClick={() => handlePhoneAction(number)}
-                        className="bg-gray-200 text-gray-600 p-2 rounded-full hover:bg-gray-300 transition"
-                        title="Copy to clipboard"
-                      >
-                        <FaClipboard className="w-5 h-5" />
-                      </button>
                     </div>
                   </li>
                 ))}
               </ul>
-            </div>
+            </details>
           ))}
-        </div>
-        <div className="mt-4 flex justify-center">
-          <button
-            onClick={onClose}
-            className="bg-secondary text-white font-bold py-2 px-6 rounded-full hover:bg-red-500 transition duration-200"
-          >
-            Close
-          </button>
         </div>
       </div>
     </div>

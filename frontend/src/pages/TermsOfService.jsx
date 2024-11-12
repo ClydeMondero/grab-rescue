@@ -38,10 +38,10 @@ const TermsOfService = () => {
           </button>
         </div>
 
-        <h1 className="text-3xl md:text-4xl font-bold mb-8 text-center text-primary-dark ">
+        <h1 className="text-3xl md:text-4xl font-bold mb-8 text-center text-primary">
           Terms Of Services
         </h1>
-        <p className="text-center text-primary-dark text-sm mb-6">
+        <p className="text-center text-background-medium text-sm mb-6">
           Effective Date: November 2024
         </p>
 
@@ -110,9 +110,9 @@ const TermsOfService = () => {
           ].map((section, index) => (
             <section
               key={index}
-              className="bg-white p-6 md:p-8 rounded-lg shadow-sm border-t-4 border-primary"
+              className="bg-white p-6 md:p-8 rounded-lg shadow-sm border-t-4 border-background-dark"
             >
-              <h2 className="text-xl md:text-2xl font-semibold text-primary">
+              <h2 className="text-xl md:text-2xl font-semibold text-primary-dark">
                 {section.title}
               </h2>
               <p className="mt-3 text-primary-dark">{section.content}</p>

@@ -319,7 +319,14 @@ const Home = () => {
             className={`bg-white p-6 rounded-xl shadow-lg transition-all duration-300 ease-in-out`}
           >
             {request && request.status == "pending" ? (
-              <p>Waiting for rescuer acceptance...</p>
+              <p className="animate-pulse">
+                {
+                  [
+                    "Please stay at your location.",
+                    "Waiting for rescuer acceptance...",
+                  ].sort(() => 0.5 - Math.random())[0]
+                }
+              </p>
             ) : rescuer ? (
               <div className="flex items-center w-full">
                 <div className="flex flex-col w-full">
@@ -336,48 +343,26 @@ const Home = () => {
                       <p className="text-background-dark text-sm font-semibold">
                         {rescuer.municipality}, {rescuer.barangay}
                       </p>
-                      <p
-                        className={`px-3 py-6 rounded-full text-sm font-semibold ${
+                      <div
+                        className={`text-xs w-max font-semibold text-highlight p-3 mt-2 rounded-full border border-highlight ${
                           request?.status === "rescued"
-                            ? "text-green-600"
-                            : "text-blue-600"
+                            ? "border-green-500"
+                            : ""
                         }`}
                       >
                         {request
                           ? request.status.charAt(0).toUpperCase() +
                             request.status.slice(1)
                           : ""}
-                      </p>
+                      </div>
                     </div>
                     <button
                       onClick={handlePhone}
-                      className="p-3 h-max bg-primary rounded-full text-white shadow hover:bg-primary-dark transition"
+                      className="p-4 text-lg h-max bg-primary rounded-full text-white shadow hover:bg-primary-dark transition"
                     >
                       <FaPhone />
                     </button>
                   </div>
-
-                  {/* Show rescued details if status is "rescued" */}
-                  {/* {request?.status === "rescued" && (
-                    <div className="mt-4 w-56 lg:w-auto">
-                      <p className="text-primary-dark text-sm font-semibold">
-                        Rescued Address: {request.rescuedAddress}
-                      </p>
-                      <p className="text-primary-dark text-sm font-semibold">
-                        Rescued Time:{" "}
-                        {new Date(request.rescuedTimestamp).toLocaleString()}
-                      </p>
-                    </div>
-                  )}
-                  {requesting && request?.status === "rescued" && (
-                    <button
-                      onClick={() => setShowConfirmationModal(true)}
-                      className="mt-2 flex items-center justify-center w-48 h-10 rounded-full bg-primary hover:bg-primary-medium text-white"
-                    >
-                      <MdCheck className="text-xl font-bold" />
-                      <span className="text-md ml-1">Complete Request</span>
-                    </button>
-                  )} */}
                 </div>
               </div>
             ) : (
@@ -420,10 +405,22 @@ const Home = () => {
       <div
         className={`w-full ${
           requesting ? "h-[15%]" : "h-[25%]"
-        }flex flex-col gap-2 bg-background-light p-2 justify-center md:h-[10%] ${
+        } flex flex-col gap-2 bg-background-light p-2 justify-center md:h-[10%] ${
           requesting ? "md:hidden" : ""
-        }`}
+        } relative`}
       >
+        {/* Hotline Button */}
+        {!requesting && (locating || onlineRescuers.length === 0) && (
+          <div className="absolute -top-20 right-8 z-40">
+            <button
+              onClick={() => setHotlineModalOpen(true)}
+              className="bg-primary hover:bg-primary-medium text-white font-semibold p-4 rounded-full transition-colors duration-200 ease-in-out"
+            >
+              <FaPhone className="text-3xl" />
+            </button>
+          </div>
+        )}
+
         {/* Request Button */}
         {!requesting &&
           (!locating ? (
@@ -433,13 +430,8 @@ const Home = () => {
                   ? "bg-background-medium cursor-not-allowed text-text-primary" // Disabled color
                   : "bg-secondary hover:opacity-80 text-white" // Enabled color
               }`}
-              onClick={() => {
-                if (onlineRescuers.length === 0) {
-                  setHotlineModalOpen(true);
-                } else {
-                  setModalOpen(true);
-                }
-              }}
+              onClick={() => setModalOpen(true)}
+              disabled={onlineRescuers.length === 0}
             >
               {onlineRescuers.length === 0
                 ? "No Online Rescuers"
@@ -515,36 +507,6 @@ const Home = () => {
           onConfirm={handleModalConfirm} // Handle modal confirmation to show the form
           onCancel={handleModalCancel} // Handle modal cancellation to simply close the modal
         />
-      )}
-
-      {/* Inline Confirmation Modal */}
-      {showConfirmationModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50 transition-opacity duration-300 ease-in-out">
-          <div className="bg-white rounded-md shadow-lg transform transition-all p-8 max-w-md w-full text-center relative">
-            <h2 className="text-2xl font-bold text-primary mb-4">
-              REQUEST COMPLETED!
-            </h2>
-            <p className="text-xl font-semibold text-primary-dark mb-6">
-              Are you sure you want to complete this request?
-            </p>
-
-            <div className="flex justify-center space-x-4">
-              <button
-                onClick={handleCompleteRequest}
-                className="bg-primary hover:bg-primary-medium text-white font-semibold py-3 px-6 rounded-md  transition-colors duration-200 ease-in-out"
-              >
-                Confirm
-              </button>
-
-              <button
-                onClick={() => setShowConfirmationModal(false)}
-                className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-3 px-6 rounded-md transition-colors duration-200 ease-in-out"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
       )}
 
       <Toast />

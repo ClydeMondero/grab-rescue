@@ -38,7 +38,7 @@ const Policy = () => {
           </button>
         </div>
 
-        <h1 className="text-3xl md:text-4xl font-bold mb-8 text-center text-primary-dark">
+        <h1 className="text-3xl md:text-4xl font-bold mb-8 text-center text-primary">
           Policy Information
         </h1>
 
@@ -137,14 +137,17 @@ const Policy = () => {
           ].map((policy, index) => (
             <section
               key={index}
-              className="bg-white p-6 md:p-8 rounded-lg shadow-sm border-t-4 border-primary"
+              className="bg-gray-100 p-6 md:p-8 rounded-lg shadow-sm border-t-4 border-background-dark"
             >
               <h2 className="text-2xl md:text-3xl font-bold text-primary-dark mb-4">
                 {policy.title}
               </h2>
               {policy.sections.map((section, subIndex) => (
-                <div key={subIndex} className="mb-4">
-                  <h3 className="text-xl md:text-2xl font-semibold text-primary">
+                <div
+                  key={subIndex}
+                  className="mb-4 bg-white p-4 rounded-md shadow"
+                >
+                  <h3 className="text-xl md:text-2xl font-semibold text-primary-medium">
                     {section.subtitle}
                   </h3>
                   <p className="mt-2 text-primary-dark">{section.content}</p>

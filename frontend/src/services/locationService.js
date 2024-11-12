@@ -7,7 +7,7 @@ import {
 import { setCitizenCookie } from "../services/cookieService";
 import axios from "axios";
 
-const MIN_DISTANCE_THRESHOLD = 50; //in meters
+const MIN_DISTANCE_THRESHOLD = 10; //in meters
 
 //TODO: check if user moved by 50 meters
 export const hasUserMoved = (currentLat, currentLon, lastLat, lastLon) => {

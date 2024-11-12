@@ -4,7 +4,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Toast } from "../components";
 import { FaChevronLeft, FaEnvelope } from "react-icons/fa";
-import logo from "../../public/logo.png";
+import logo from "../assets/logo.png";
 import "react-toastify/dist/ReactToastify.css";
 
 const ForgotPassword = () => {
@@ -47,11 +47,6 @@ const ForgotPassword = () => {
         <div className="flex justify-center mb-4">
           <img src={logo} alt="Logo" className="h-12" />
         </div>
-        <h2 className="text-center text-2xl font-semibold mb-5 text-text-primary">
-          {role === "Admin"
-            ? "Admin Forgot Password"
-            : "Rescuer Forgot Password"}
-        </h2>
         <p className="text-center text-sm text-text-secondary mb-6">
           Enter your email address, and we will send you a link to reset your
           password.
