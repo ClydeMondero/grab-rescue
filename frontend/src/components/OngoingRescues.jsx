@@ -6,6 +6,7 @@ import "jspdf-autotable";
 import axios from "axios";
 import { Map } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
+import placeholder from "../assets/placeholder.png";
 
 const OngoingRescues = ({ requests, user }) => {
   const [showMap, setShowMap] = useState(false);
@@ -15,6 +16,7 @@ const OngoingRescues = ({ requests, user }) => {
   const [rescuerName, setRescuerName] = useState(null);
   const [rescuerNames, setRescuerNames] = useState([]);
   const [rescuerContactNumber, setRescuerContactNumber] = useState(null);
+  const [rescuerArea, setRescuerArea] = useState(null);
 
   const ongoingRescues = requests
     .filter((request) => {
@@ -83,9 +85,9 @@ const OngoingRescues = ({ requests, user }) => {
     setSelectedLocation(null);
   };
 
-  const handleRowClick = (request) => {
+  const handleRowClick = async (request) => {
+    console.log(request);
     setSelectedRescue(request.originalRequest);
-    getRescuer(request.rescuer);
   };
 
   const getRescuer = async (rescuerId) => {
@@ -126,6 +128,9 @@ const OngoingRescues = ({ requests, user }) => {
           const { first_name, middle_name, last_name } = rescuer[0];
           const fullName = `${first_name} ${middle_name} ${last_name}`;
           const contactNumber = `${rescuer[0].contact_number}`;
+          const { barangay, municipality } = rescuer[0];
+
+          setRescuerArea(barangay + ", " + municipality);
           setRescuerName(fullName);
           setRescuerContactNumber(contactNumber);
         }
@@ -383,226 +388,149 @@ const OngoingRescues = ({ requests, user }) => {
           </button>
         </div>
       </div>
-      {showMap && selectedLocation && !selectedRescue && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-4 rounded-lg max-w-lg w-full">
-            <div className="flex items-center justify-between mb-4">
-              <h4 className="text-xl font-bold">Rescue Location Details</h4>
-              <FaTimes
-                onClick={handleCloseMap}
-                className="text-xl text-background-medium cursor-pointer"
-              />
-            </div>
-
-            <Map
-              initialViewState={{
-                latitude: selectedLocation.latitude,
-                longitude: selectedLocation.longitude,
-                zoom: 15,
-              }}
-              mapStyle={"mapbox://styles/mapbox/streets-v12"}
-              mapboxAccessToken={import.meta.env.VITE_MAPBOX_TOKEN}
-              maxzoom={15}
-            ></Map>
-
-            {/* Add a map component or iframe here to show map based on location */}
-            <div style={{ height: "400px", width: "100%" }}>
-              {/* Render the map here, potentially using selectedLocation’s coordinates */}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Rescue Details Modal */}
       {selectedRescue && (
-        <div className="fixed inset-0 bg-gray-700 bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 transition-opacity duration-300 ease-in-out">
-          <div className="bg-white p-4 md:p-6 rounded-lg shadow-lg transform transition-transform duration-300 ease-in-out max-w-md md:max-w-xl w-full relative">
-            <button
-              onClick={handleCloseDetails}
-              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6 "
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-6xl transition-transform transform">
+            {/* Header */}
+            <div className="flex justify-between items-center mb-4 border-b border-gray-200 pb-3">
+              <h2 className="text-xl font-bold text-gray-700">
+                Rescue Details
+              </h2>
+              <button
+                onClick={handleCloseDetails}
+                className="text-gray-500 hover:text-gray-700"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-
-            <h4 className="text-lg md:text-xl font-bold mb-4 md:mb-5 text-primary border-b pb-2 md:pb-3 border-gray-300">
-              Rescue Details
-            </h4>
-
-            {/* Rescuer Details Section */}
-            <div className="mb-4 md:mb-6">
-              <h5 className="text-md md:text-lg font-semibold mb-3 md:mb-4 text-primary-dark">
-                Rescuer Information
-              </h5>
-              <div className="space-y-2 md:space-y-3">
-                <div className="flex items-center">
-                  <strong className="w-28 md:w-36 text-primary-medium text-sm md:text-base">
-                    Rescuer ID:
-                  </strong>
-                  <span className="text-gray-600 font-semibold text-sm md:text-base">
-                    {selectedRescue.rescuerId}
-                  </span>
-                </div>
-                <div className="flex items-center">
-                  <strong className="w-28 md:w-36 text-primary-medium text-sm md:text-base">
-                    Rescuer Name:
-                  </strong>
-                  <span className="text-gray-600 font-semibold text-sm md:text-base">
-                    {rescuerName}
-                  </span>
-                </div>
-                <div className="flex items-center">
-                  <strong className="w-28 md:w-36 text-primary-medium text-sm md:text-base">
-                    Phone Number:
-                  </strong>
-                  <span className="text-gray-600 font-semibold text-sm md:text-base">
-                    {rescuerContactNumber}
-                  </span>
-                </div>
-              </div>
+                <FaTimes className="text-2xl" />
+              </button>
             </div>
 
-            {/* Divider Line */}
-            <div className="border-t border-gray-300 mb-4 md:mb-6"></div>
-
-            {/* Citizen Details Section */}
-            <div className="mb-4 md:mb-6">
-              <h5 className="text-md md:text-lg font-semibold mb-3 md:mb-4 text-primary-dark">
-                Citizen Information
-              </h5>
-              <div className="space-y-2 md:space-y-3">
-                <div className="flex items-center">
-                  <strong className="w-28 md:w-36 text-primary-medium text-sm md:text-base">
-                    Requester Name:
-                  </strong>
-                  <span className="text-gray-600 font-semibold text-sm md:text-base">
-                    {selectedRescue.citizenName}
-                  </span>
-                </div>
-                <div className="flex items-center">
-                  <strong className="w-28 md:w-36 text-primary-medium text-sm md:text-base">
-                    Phone Number:
-                  </strong>
-                  <span className="text-gray-600 font-semibold text-sm md:text-base">
-                    {selectedRescue.phone}
-                  </span>
-                </div>
-                <div className="flex items-center">
-                  <strong className="w-28 md:w-36 text-primary-medium text-sm md:text-base">
-                    Request Location:
-                  </strong>
-                  <span className="text-gray-600 font-semibold text-sm md:text-base">
-                    {selectedRescue.location.address}
-                  </span>
+            {/* Main Content */}
+            <div className="grid grid-cols-3 gap-6">
+              {/* Large Image Section */}
+              <div className="col-span-1">
+                <h3 className="text-lg font-semibold text-gray-700 mb-2">
+                  Incident
+                </h3>
+                <div className="flex justify-center">
+                  {selectedRescue.incidentPicture ? (
+                    <img
+                      src={selectedRescue.incidentPicture}
+                      alt="Incident"
+                      className="w-full max-w-lg h-64 object-cover rounded-md border border-gray-200"
+                    />
+                  ) : (
+                    <img
+                      src={placeholder}
+                      className="w-full max-w-lg h-64 object-cover rounded-md border border-gray-200"
+                    />
+                  )}
                 </div>
               </div>
-            </div>
 
-            {/* Divider Line */}
-            <div className="border-t border-gray-300 mb-4 md:mb-6"></div>
-
-            {/* Status and Timing Section */}
-            <div className="mb-4 md:mb-6">
-              <h5 className="text-md md:text-lg font-semibold mb-3 md:mb-4 text-primary-dark">
-                Rescue Status
-              </h5>
-              <div className="space-y-2 md:space-y-3">
-                <div className="flex items-center">
-                  <strong className="w-28 md:w-36 text-primary-medium text-sm md:text-base">
-                    Status:
-                  </strong>
-                  <span
-                    className={`font-semibold text-sm md:text-base ${
-                      selectedRescue.status === "assigned"
-                        ? "text-blue-500"
-                        : selectedRescue.status === "rescued"
-                        ? "text-green-500"
-                        : "text-yellow-500"
-                    }`}
-                  >
-                    {selectedRescue.status.charAt(0).toUpperCase() +
-                      selectedRescue.status.slice(1)}
-                  </span>
-                </div>
-                <div className="flex items-center">
-                  <strong className="w-28 md:w-36 text-primary-medium text-sm md:text-base">
-                    {selectedRescue.status === "rescued"
-                      ? "Rescued Time:"
-                      : "Accepted Time:"}
-                  </strong>
-                  <span className="text-gray-600 font-semibold  text-sm md:text-base">
-                    {selectedRescue.status === "rescued" &&
-                    selectedRescue.rescuedTimestamp
-                      ? new Intl.DateTimeFormat("en-US", {
-                          year: "numeric",
-                          month: "2-digit",
-                          day: "2-digit",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                          second: "2-digit",
-                        }).format(new Date(selectedRescue.rescuedTimestamp))
-                      : new Intl.DateTimeFormat("en-US", {
-                          year: "numeric",
-                          month: "2-digit",
-                          day: "2-digit",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                          second: "2-digit",
-                        }).format(new Date(selectedRescue.acceptedTimestamp))}
-                  </span>
+              {/* Details Section */}
+              <div className="col-span-2 grid grid-cols-2 gap-6">
+                {/* Rescuer Info */}
+                <div className="space-y-2 border-b border-gray-200 pb-4">
+                  <h3 className="text-xl font-semibold text-primary-medium">
+                    Rescuer
+                  </h3>
+                  <p className="text-gray-600">
+                    <strong>Name:</strong> {rescuerName}
+                  </p>
+                  <p className="text-gray-600">
+                    <strong>Phone:</strong> {rescuerContactNumber}
+                  </p>
+                  <p className="text-gray-600">
+                    <strong>Assigned Area:</strong> {rescuerArea}
+                  </p>
                 </div>
 
-                {selectedRescue.status === "rescued" && (
-                  <div className="flex items-center">
-                    <strong className="w-28 md:w-36 text-gray-700 text-sm md:text-base">
-                      Rescued Location:
-                    </strong>
-                    <span className="text-gray-600 text-sm md:text-base">
-                      {selectedRescue.rescuedAddress}
-                    </span>
+                {/* Citizen Info */}
+                <div className="space-y-2 border-b border-gray-200 pb-4">
+                  <h3 className="text-xl font-semibold text-secondary">
+                    Citizen
+                  </h3>
+                  <p className="text-gray-600">
+                    <strong>Name:</strong> {selectedRescue.citizenName}
+                  </p>
+                  <p className="text-gray-600">
+                    <strong>Phone:</strong> {selectedRescue.phone}
+                  </p>
+                  <p className="text-gray-600">
+                    <strong>Location:</strong> {selectedRescue.location.address}
+                  </p>
+                </div>
+
+                {/* Rescue Status */}
+                <div className="space-y-2">
+                  <h3 className="text-lg font-semibold text-gray-700">
+                    Status
+                  </h3>
+                  <div className="flex items-center space-x-4">
+                    <button
+                      type="button"
+                      className={`px-4 py-2 font-semibold rounded-md shadow-sm ${
+                        selectedRescue.status === "assigned"
+                          ? "bg-blue-500 text-white"
+                          : selectedRescue.status === "rescued"
+                          ? "bg-green-500 text-white"
+                          : "bg-yellow-500 text-white"
+                      }`}
+                    >
+                      {selectedRescue.status.charAt(0).toUpperCase() +
+                        selectedRescue.status.slice(1)}
+                    </button>
+                    <p className="text-gray-600">
+                      {(() => {
+                        const requestDate = new Date(
+                          selectedRescue.status === "rescued"
+                            ? selectedRescue.rescuedTimestamp
+                            : selectedRescue.acceptedTimestamp
+                        );
+                        const now = new Date();
+                        const timeElapsed = now - requestDate;
+                        const minutesElapsed = Math.floor(
+                          timeElapsed / (1000 * 60)
+                        );
+                        let timeLabel = "";
+
+                        if (minutesElapsed < 60) {
+                          timeLabel = `${minutesElapsed} minutes ago`;
+                        } else if (minutesElapsed < 1440) {
+                          timeLabel = `${Math.floor(
+                            minutesElapsed / 60
+                          )} hours ago`;
+                        } else {
+                          timeLabel = `${Math.floor(
+                            minutesElapsed / (60 * 24)
+                          )} days ago`;
+                        }
+
+                        return (
+                          <>
+                            <span className="text-text-secondary">
+                              {timeLabel}
+                            </span>
+                          </>
+                        );
+                      })()}
+                    </p>
                   </div>
-                )}
-              </div>
-            </div>
+                </div>
 
-            {/* Incident Picture Section */}
-            <div className="mb-4 md:mb-6">
-              <span className="w-28 md:w-36 text-primary-medium font-bold text-sm md:text-base">
-                Incident Picture:
-              </span>
-              <div className="flex justify-center">
-                {selectedRescue.incidentPicture ? (
-                  <img
-                    src={selectedRescue.incidentPicture}
-                    alt="Incident Picture"
-                    className="w-full md:max-w-[34rem] h-40 object-contain"
-                  />
-                ) : (
-                  <span className="text-gray-600 text-sm md:text-base">
-                    No picture available
-                  </span>
-                )}
+                {/* Description */}
+                <div className="space-y-2">
+                  <h3 className="text-lg font-semibold text-gray-700">
+                    Description
+                  </h3>
+                  <div
+                    className="w-full px-3 py-2 text-gray-600 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-200 focus:border-indigo-500"
+                    style={{ height: "100px", overflow: "auto" }}
+                  >
+                    <p>{selectedRescue.incidentDescription || ""}</p>
+                  </div>
+                </div>
               </div>
-            </div>
-            <div className="flex items-center">
-              <strong className="w-28 md:w-36 text-primary-medium text-sm md:text-base">
-                Description:
-              </strong>
-              <span className="text-gray-600 font-semibold text-sm md:text-base">
-                {selectedRescue.incidentDescription}
-              </span>
             </div>
           </div>
         </div>
