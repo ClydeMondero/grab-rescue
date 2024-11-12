@@ -70,7 +70,7 @@ const CitizenMap = forwardRef((props, ref) => {
   const handleGeolocation = async (coords) => {
     setCoords(coords);
 
-    if (mapRef.current.resize()) {
+    if (mapRef.current && mapRef.current.resize()) {
       mapRef.current.resize();
     }
 
@@ -138,6 +138,11 @@ const CitizenMap = forwardRef((props, ref) => {
     setDistance(route.distance);
     setEta(route.duration);
   };
+
+  useEffect(() => {
+    if (!citizen) return;
+    handleGeolocation(citizen);
+  }, [rescuers]);
 
   useEffect(() => {
     if (mapRef.current && mapRef.current.resize()) {
