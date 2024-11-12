@@ -21,7 +21,7 @@ const HotlineModal = ({ onClose, onMobile }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-60 p-8 flex justify-center items-center z-50">
       <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-lg">
         <h2 className="text-xl font-bold mb-4 text-orange-500 text-center">
           <FaPhone className="w-6 h-6 inline-block mr-2" />
@@ -55,7 +55,7 @@ const HotlineModal = ({ onClose, onMobile }) => {
                         className="bg-primary text-white p-2 rounded-full hover:bg-primary-dark transition"
                         title="Call"
                       >
-                        <PhoneIcon className="w-5 h-5" />
+                        <FaPhone className="w-5 h-5" />
                       </button>
                       {/* Copy button with Clipboard icon */}
                       <button
