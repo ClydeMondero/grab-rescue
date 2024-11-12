@@ -420,10 +420,22 @@ const Home = () => {
       <div
         className={`w-full ${
           requesting ? "h-[15%]" : "h-[25%]"
-        }flex flex-col gap-2 bg-background-light p-2 justify-center md:h-[10%] ${
+        } flex flex-col gap-2 bg-background-light p-2 justify-center md:h-[10%] ${
           requesting ? "md:hidden" : ""
-        }`}
+        } relative`}
       >
+        {/* Hotline Button */}
+        {(locating || onlineRescuers.length === 0) && (
+          <div className="absolute -top-20 right-8 z-40">
+            <button
+              onClick={() => setHotlineModalOpen(true)}
+              className="bg-primary hover:bg-primary-medium text-white font-semibold p-4 rounded-full transition-colors duration-200 ease-in-out"
+            >
+              <FaPhone className="text-3xl" />
+            </button>
+          </div>
+        )}
+
         {/* Request Button */}
         {!requesting &&
           (!locating ? (
@@ -433,13 +445,6 @@ const Home = () => {
                   ? "bg-background-medium cursor-not-allowed text-text-primary" // Disabled color
                   : "bg-secondary hover:opacity-80 text-white" // Enabled color
               }`}
-              onClick={() => {
-                if (onlineRescuers.length === 0) {
-                  setHotlineModalOpen(true);
-                } else {
-                  setModalOpen(true);
-                }
-              }}
             >
               {onlineRescuers.length === 0
                 ? "No Online Rescuers"
