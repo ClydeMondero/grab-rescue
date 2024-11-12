@@ -425,9 +425,7 @@ const RequestDetailsModal = ({ isOpen, onClose, request }) => {
 
                     return (
                       <>
-                        <span className="text-text-secondary">
-                          ({timeLabel})
-                        </span>
+                        <span className="text-text-secondary">{timeLabel}</span>
                       </>
                     );
                   })()}
