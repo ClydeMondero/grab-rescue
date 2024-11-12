@@ -6,6 +6,8 @@ import "jspdf-autotable";
 import axios from "axios";
 import { Map } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import placeholder from "../assets/placeholder.png";
 
 const OngoingRescues = ({ requests, user }) => {
@@ -16,6 +18,11 @@ const OngoingRescues = ({ requests, user }) => {
   const [rescuerName, setRescuerName] = useState(null);
   const [rescuerNames, setRescuerNames] = useState([]);
   const [rescuerContactNumber, setRescuerContactNumber] = useState(null);
+  const [showPrintModal, setShowPrintModal] = useState(false);
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+  const [customStartDate, setCustomStartDate] = useState(null);
+  const [customEndDate, setCustomEndDate] = useState(null);
   const [rescuerArea, setRescuerArea] = useState(null);
 
   const ongoingRescues = requests
@@ -42,8 +49,8 @@ const OngoingRescues = ({ requests, user }) => {
     .map((request, index) => ({
       id: index + 1,
       location: request.location.address,
-      rescuer: request.rescuerId, // Store rescuer ID
-      rescuerName: rescuerNames[request.rescuerId] || "Unknown", // Get rescuer name based on ID
+      rescuer: request.rescuerId,
+      rescuerName: rescuerNames[request.rescuerId] || "Unknown",
       status: request.status,
       acceptedTimestamp: new Intl.DateTimeFormat("en-US", {
         year: "numeric",
@@ -72,7 +79,6 @@ const OngoingRescues = ({ requests, user }) => {
   };
 
   const handleShowMap = (request) => {
-    console.log(request);
     setSelectedLocation({
       latitude: request.originalRequest.location.latitude,
       longitude: request.originalRequest.location.longitude,
@@ -85,9 +91,9 @@ const OngoingRescues = ({ requests, user }) => {
     setSelectedLocation(null);
   };
 
-  const handleRowClick = async (request) => {
-    console.log(request);
+  const handleRowClick = (request) => {
     setSelectedRescue(request.originalRequest);
+    getRescuer(request.rescuer);
   };
 
   const getRescuer = async (rescuerId) => {
@@ -105,7 +111,7 @@ const OngoingRescues = ({ requests, user }) => {
     }
   };
 
-  const getRescuers = async (rescuerId) => {
+  const getRescuers = async () => {
     try {
       const response = await axios.get(`/rescuers/get/`);
       if (response.data) {
@@ -144,7 +150,6 @@ const OngoingRescues = ({ requests, user }) => {
     const fetchAllRescuers = async () => {
       const rescuers = await getRescuers();
       if (rescuers) {
-        // Concatenate first, middle, and last names to form the full name
         const rescuersById = rescuers.reduce((acc, rescuer) => {
           const fullName =
             `${rescuer.first_name} ${rescuer.middle_name} ${rescuer.last_name}`.trim();
@@ -158,13 +163,59 @@ const OngoingRescues = ({ requests, user }) => {
     fetchAllRescuers();
   }, []);
 
+  const formatDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  const handleReportSelection = (reportName) => {
+    const today = new Date();
+    let selectedStartDate, selectedEndDate;
+
+    if (reportName === "Daily Report") {
+      selectedStartDate = formatDate(today);
+      selectedEndDate = formatDate(today);
+    } else if (reportName === "Weekly Report") {
+      const sunday = new Date(today);
+      sunday.setDate(today.getDate() - today.getDay());
+      selectedStartDate = formatDate(sunday);
+      selectedEndDate = formatDate(today);
+    } else if (reportName === "Monthly Report") {
+      const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+      const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+      selectedStartDate = formatDate(startOfMonth);
+      selectedEndDate = formatDate(endOfMonth);
+    } else {
+      selectedStartDate = formatDate(customStartDate);
+      selectedEndDate = formatDate(customEndDate);
+    }
+
+    setStartDate(selectedStartDate);
+    setEndDate(selectedEndDate);
+
+    handleGeneratePDF(selectedStartDate, selectedEndDate);
+    setShowPrintModal(false);
+  };
+
   const handleCloseDetails = () => {
     setSelectedRescue(null);
     setRescuerName(null);
   };
 
-  const handlePrint = () => {
+  const handleGeneratePDF = (startDate, endDate) => {
     const doc = new jsPDF("landscape");
+
+    const start = new Date(startDate);
+    start.setUTCHours(0, 0, 0, 0);
+    const end = new Date(endDate);
+    end.setUTCHours(23, 59, 59, 999);
+
+    const filteredRescues = ongoingRescues.filter((rescue) => {
+      const requestTimestamp = new Date(rescue.originalRequest.timestamp);
+      return requestTimestamp >= start && requestTimestamp <= end;
+    });
 
     doc.setFontSize(18);
     doc.text(
@@ -177,21 +228,25 @@ const OngoingRescues = ({ requests, user }) => {
     const tableColumn = [
       { title: "#", dataKey: "id" },
       { title: "Rescuer ID", dataKey: "rescuer" },
-      { title: "Location", dataKey: "location" },
-      { title: "Accepted Timestamp", dataKey: "acceptedTimestamp" },
-      { title: "Status", dataKey: "status" },
-      { title: "Citizen Name", dataKey: "citizenName" },
       { title: "Rescuer Name", dataKey: "rescuerName" },
+      { title: "Citizen Name", dataKey: "citizenName" },
+      { title: "Location", dataKey: "location" },
+      { title: "Request Date & Time", dataKey: "requestTimestamp" },
+      { title: "Accepted Date & Time", dataKey: "acceptedTimestamp" },
+      { title: "Rescued Date & Time", dataKey: "rescuedTimestamp" },
+      { title: "Status", dataKey: "status" },
     ];
 
-    const tableRows = ongoingRescues.map((rescue) => ({
-      id: rescue.id,
+    const tableRows = filteredRescues.map((rescue, index) => ({
+      id: index + 1,
       rescuer: rescue.rescuer,
-      location: rescue.location,
-      acceptedTimestamp: rescue.acceptedTimestamp,
-      status: rescue?.status.charAt(0).toUpperCase() + rescue?.status.slice(1),
+      rescuerName: rescue.rescuerName || "Unknown",
       citizenName: rescue.originalRequest.citizenName || "N/A",
-      rescuerName: rescue.rescuerName, 
+      location: rescue.location,
+      requestTimestamp: formatDateTime(rescue.originalRequest.timestamp),
+      acceptedTimestamp: formatDateTime(rescue.acceptedTimestamp),
+      rescuedTimestamp: formatDateTime(rescue.originalRequest.rescuedTimestamp),
+      status: rescue.status.charAt(0).toUpperCase() + rescue.status.slice(1),
     }));
 
     doc.autoTable({
@@ -214,7 +269,6 @@ const OngoingRescues = ({ requests, user }) => {
       },
     });
 
-    // Add footer
     const pageHeight = doc.internal.pageSize.getHeight();
     const pageWidth = doc.internal.pageSize.getWidth();
     const footerY = pageHeight - 10;
@@ -231,12 +285,84 @@ const OngoingRescues = ({ requests, user }) => {
       footerY
     );
 
-    doc.save("ongoing_rescue_operations.pdf");
+    doc.save(`ongoing_rescue_operations_${startDate}_to_${endDate}.pdf`);
+  };
+
+  const formatDateTime = (dateString) => {
+    if (!dateString) return "N/A";
+    return new Date(dateString)
+      .toLocaleString("en-US", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+      })
+      .replace(",", "");
   };
 
   return (
     <div className="flex flex-col p-4 lg:p-6 h-full">
-      {/* Header */}
+      {showPrintModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-4 rounded-lg max-w-md w-full">
+            <h4 className="text-xl font-bold mb-4">Select Report Time frame</h4>
+            <button
+              onClick={() => handleReportSelection("Daily Report")}
+              className="w-full bg-primary-medium text-white p-2 rounded-lg mb-2"
+            >
+              Daily
+            </button>
+            <button
+              onClick={() => handleReportSelection("Weekly Report")}
+              className="w-full bg-primary-medium text-white p-2 rounded-lg mb-2"
+            >
+              Weekly
+            </button>
+            <button
+              onClick={() => handleReportSelection("Monthly Report")}
+              className="w-full bg-primary-medium text-white p-2 rounded-lg mb-2"
+            >
+              Monthly
+            </button>
+            <div className="mb-2">
+              <label className="block text-sm font-semibold mb-1">
+                Custom Date Range
+              </label>
+              <div className="flex space-x-2">
+                <DatePicker
+                  selected={customStartDate}
+                  onChange={(date) => setCustomStartDate(date)}
+                  placeholderText="Start Date"
+                  className="border border-gray-300 p-2 rounded-lg w-full"
+                />
+                <DatePicker
+                  selected={customEndDate}
+                  onChange={(date) => setCustomEndDate(date)}
+                  placeholderText="End Date"
+                  className="border border-gray-300 p-2 rounded-lg w-full"
+                />
+              </div>
+            </div>
+            <button
+              onClick={() => handleReportSelection("Custom Report")}
+              className="w-full bg-primary-medium text-white p-2 rounded-lg mb-2"
+              disabled={!customStartDate || !customEndDate}
+            >
+              Generate Custom Report
+            </button>
+            <button
+              onClick={() => setShowPrintModal(false)}
+              className="w-full bg-gray-200 text-black p-2 rounded-lg hover:opacity-80 transition"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="flex items-center mb-2 sm:mb-4 border-b border-gray-200 pb-3">
         <FaAmbulance className="text-3xl sm:text-2xl lg:text-3xl text-primary-dark mr-2 fill-current" />
         <h4 className="text-xl sm:text-md lg:text-3xl text-primary-dark font-bold">
@@ -244,10 +370,8 @@ const OngoingRescues = ({ requests, user }) => {
         </h4>
       </div>
 
-      {/* Rescue Data Table */}
       <div className="flex flex-col flex-1 gap-2">
         <div className="flex justify-between items-center">
-          {/* Filter Status */}
           <div className="flex items-center">
             <label
               htmlFor="status-filter"
@@ -263,15 +387,12 @@ const OngoingRescues = ({ requests, user }) => {
             >
               <option value="all">All</option>
               <option value="assigned">Assigned</option>
-              <option value="in transit">In Transit</option>
-              <option value="en route">En Route</option>
               <option value="rescued">Rescued</option>
             </select>
           </div>
 
-          {/* Print Button */}
           <button
-            onClick={handlePrint}
+            onClick={() => setShowPrintModal(true)}
             className="w-max bg-gray-200 text-black p-3 rounded-lg hover:opacity-80 transition flex items-center"
           >
             <AiFillPrinter className="text-base mr-1" />
@@ -279,7 +400,6 @@ const OngoingRescues = ({ requests, user }) => {
           </button>
         </div>
 
-        {/* Table for larger screens */}
         <div className="hidden lg:block overflow-x-auto cursor-pointer">
           <table className="min-w-full bg-gray-200 border border-gray-200 rounded-md overflow-hidden">
             <thead className="bg-[#557C55] text-white">
@@ -287,6 +407,12 @@ const OngoingRescues = ({ requests, user }) => {
                 <th className="px-4 py-2 text-center text-xs font-medium">#</th>
                 <th className="px-4 py-2 text-center text-xs font-medium">
                   Rescuer ID
+                </th>
+                <th className="px-4 py-2 text-center text-xs font-medium">
+                  Rescuer Name
+                </th>
+                <th className="px-4 py-2 text-center text-xs font-medium">
+                  Citizen Name
                 </th>
                 <th className="px-4 py-2 text-center text-xs font-medium">
                   Location
@@ -303,7 +429,7 @@ const OngoingRescues = ({ requests, user }) => {
               </tr>
             </thead>
             <tbody>
-              {paginatedRescues.map((requests, index) => (
+              {paginatedRescues.map((requests) => (
                 <tr
                   key={requests.id}
                   className="border-b bg-white hover:bg-background-light"
@@ -314,6 +440,12 @@ const OngoingRescues = ({ requests, user }) => {
                   </td>
                   <td className="px-4 py-2 text-center text-sm">
                     {requests.rescuer}
+                  </td>
+                  <td className="px-4 py-2 text-center text-sm">
+                    {requests.rescuerName}
+                  </td>
+                  <td className="px-4 py-2 text-center text-sm">
+                    {requests.originalRequest.citizenName || "N/A"}
                   </td>
                   <td className="px-4 py-2 text-center text-sm">
                     {requests.location}
@@ -342,7 +474,7 @@ const OngoingRescues = ({ requests, user }) => {
                       <div className="flex justify-center">
                         <button
                           onClick={(event) => {
-                            event.stopPropagation(); // Prevent row click event
+                            event.stopPropagation();
                             handleShowMap(requests);
                           }}
                           className="bg-secondary text-white px-4 py-1 rounded-full hover:bg-primary-medium transition flex items-center justify-center"
@@ -358,7 +490,7 @@ const OngoingRescues = ({ requests, user }) => {
           </table>
         </div>
       </div>
-      {/* Pagination */}
+
       <div className="mt-4">
         <div className="flex justify-center items-center gap-2">
           <button
@@ -388,6 +520,34 @@ const OngoingRescues = ({ requests, user }) => {
           </button>
         </div>
       </div>
+
+      {showMap && selectedLocation && !selectedRescue && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-4 rounded-lg max-w-lg w-full">
+            <div className="flex items-center justify-between mb-4">
+              <h4 className="text-xl font-bold">Rescue Location Details</h4>
+              <FaTimes
+                onClick={handleCloseMap}
+                className="text-xl text-background-medium cursor-pointer"
+              />
+            </div>
+
+            <Map
+              initialViewState={{
+                latitude: selectedLocation.latitude,
+                longitude: selectedLocation.longitude,
+                zoom: 15,
+              }}
+              mapStyle={"mapbox://styles/mapbox/streets-v12"}
+              mapboxAccessToken={import.meta.env.VITE_MAPBOX_TOKEN}
+              maxzoom={15}
+            ></Map>
+
+            <div style={{ height: "400px", width: "100%" }}></div>
+          </div>
+        </div>
+      )}
+
       {selectedRescue && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50">
           <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-6xl transition-transform transform">
