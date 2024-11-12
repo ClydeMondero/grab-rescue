@@ -7,11 +7,14 @@ const RequestDetailsModal = ({ request, isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div className="bg-white rounded-md p-4 max-w-lg w-full mx-auto overflow-y-auto">
-        <div className="flex justify-between items-center mb-4 border-b pb-2">
-          <h2 className="text-lg font-semibold">Request Details</h2>
-          <button onClick={onClose} className="text-gray-500">
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 px-4">
+      <div className="bg-white rounded-lg shadow-xl p-6 max-w-2xl w-full mx-auto overflow-y-auto">
+        <div className="flex justify-between items-center mb-4 border-b pb-3">
+          <h2 className="text-xl font-bold text-gray-800">Request Details</h2>
+          <button
+            onClick={onClose}
+            className="text-gray-600 hover:text-gray-800"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -30,36 +33,40 @@ const RequestDetailsModal = ({ request, isOpen, onClose }) => {
         </div>
 
         {/* Information Section */}
-        <div className="space-y-4 text-gray-700">
-          <div className="flex justify-between">
+        <div className="space-y-6 text-gray-700">
+          <div className="grid grid-cols-2 gap-6">
             <div>
-              <p className="text-sm font-medium">Contact Number:</p>
-              <p className="text-sm font-semibold">{request.phone || "N/A"}</p>
+              <p className="text-sm font-medium text-gray-600">
+                Contact Number:
+              </p>
+              <p className="text-sm font-semibold text-gray-800">
+                {request.phone || "N/A"}
+              </p>
             </div>
             <div>
-              <p className="text-sm font-medium">Citizen Name:</p>
-              <p className="text-sm font-semibold">
+              <p className="text-sm font-medium text-gray-600">Citizen Name:</p>
+              <p className="text-sm font-semibold text-gray-800">
                 {request.citizenName || "N/A"}
               </p>
             </div>
           </div>
-          <div className="flex justify-between">
+          <div className="grid grid-cols-2 gap-6">
             <div>
-              <p className="text-sm font-medium">Relation:</p>
-              <p className="text-sm font-semibold">
+              <p className="text-sm font-medium text-gray-600">Relation:</p>
+              <p className="text-sm font-semibold text-gray-800">
                 {request.citizenRelation || "N/A"}
               </p>
             </div>
             <div>
-              <p className="text-sm font-medium">Description:</p>
-              <p className="text-sm font-semibold">
+              <p className="text-sm font-medium text-gray-600">Description:</p>
+              <p className="text-sm font-semibold text-gray-800">
                 {request.incidentDescription || "N/A"}
               </p>
             </div>
           </div>
           <div>
-            <p className="text-sm font-medium">Location:</p>
-            <p className="text-sm font-semibold">
+            <p className="text-sm font-medium text-gray-600">Location:</p>
+            <p className="text-sm font-semibold text-gray-800">
               {request.location?.address || "Address not available"}
             </p>
           </div>
@@ -102,29 +109,31 @@ const IncomingRequests = ({ requests }) => {
           pendingRequests.map((request) => (
             <div
               key={request.id}
-              className="shadow-sm bg-gray-200 rounded p-3 cursor-pointer"
+              className="shadow-sm bg-background-light rounded-lg p-3 cursor-pointer"
               onClick={() => openModal(request)}
             >
-              <div className="text-sm font-semibold text-info">
+              <div className="text-lg font-semibold text-primary-dark">
                 {request.location?.address || "Address not available"}
               </div>
-              <div className="text-xs font-medium text-primary-dark">
-                {new Intl.DateTimeFormat("en-US", {
-                  year: "numeric",
-                  month: "2-digit",
-                  day: "2-digit",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  second: "2-digit",
-                }).format(new Date(request.timestamp))}
+              <div className="text-xs font-medium text-gray-700">
+                {new Intl.RelativeTimeFormat("en-US", {
+                  numeric: "auto",
+                }).format(
+                  -Math.round(
+                    (new Date() - new Date(request.timestamp)) / 1000 / 60
+                  ),
+                  "minute"
+                )}
               </div>
-              <div
-                className={`text-xs font-semibold mt-1 ${
-                  request.status === "pending" ? "text-warning" : "text-info"
+              <button
+                className={`text-white text-xs font-semibold mt-1 px-2 py-1 rounded ${
+                  request.status === "pending"
+                    ? "bg-yellow-500"
+                    : "bg-green-600"
                 }`}
               >
                 {request.status}
-              </div>
+              </button>
             </div>
           ))
         ) : (

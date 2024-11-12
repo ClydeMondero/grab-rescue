@@ -242,8 +242,8 @@ const AssignRescuers = (props) => {
       {/* Filters */}
       <div className="flex items-center justify-between mb-4">
         {/* Filters */}
-        <div className="flex items-center">
-          <div className="mr-4">
+        <div className="flex items-center flex-wrap">
+          <div className="mr-4 mb-4">
             <select
               value={selectedMunicipality}
               onChange={handleMunicipalityChange}
@@ -258,7 +258,7 @@ const AssignRescuers = (props) => {
             </select>
           </div>
 
-          <div className="mr-4">
+          <div className="mr-4 mb-4">
             <select
               value={selectedBarangay}
               onChange={(e) => setSelectedBarangay(e.target.value)}
@@ -273,7 +273,7 @@ const AssignRescuers = (props) => {
             </select>
           </div>
 
-          <div className="mr-4">
+          <div className="mr-4 mb-4">
             <select
               value={selectedVerified}
               onChange={(e) => setSelectedVerified(e.target.value)}
@@ -285,7 +285,7 @@ const AssignRescuers = (props) => {
             </select>
           </div>
 
-          <div className="mr-4">
+          <div className="mr-4 mb-4">
             <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
@@ -297,7 +297,7 @@ const AssignRescuers = (props) => {
             </select>
           </div>
 
-          <div className="mr-4">
+          <div className="mr-4 mb-4">
             <select
               value={currentStatus}
               onChange={(e) => setCurrentStatus(e.target.value)}
