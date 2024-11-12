@@ -47,7 +47,7 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
   const handleGeolocation = async (coords) => {
     setCoords(coords);
 
-    if (mapRef.current.resize()) {
+    if (mapRef.current && mapRef.current.resize()) {
       mapRef.current.resize();
     }
 
@@ -61,7 +61,10 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
       (location) => location.userId === id
     );
 
+    console.log("existingLocation", existingLocation);
+
     if (existingLocation) {
+      console.log("updating location");
       updateUserLocation(
         existingLocation.id,
         rescuer.longitude,
@@ -70,6 +73,7 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
         coords.latitude
       );
     } else {
+      console.log("adding location");
       addUserLocation(coords.longitude, coords.latitude, "rescuer", id);
     }
 
@@ -89,6 +93,36 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
       setIsOnRoute(onRoute);
     }
   };
+
+  useEffect(() => {
+    // Start watching the user's location in a loop
+    const watchID = navigator.geolocation.watchPosition(
+      ({ coords }) => {
+        // Trigger handleGeolocation each time there's a position update
+        handleGeolocation(coords);
+        // Clear the watch, and start a new one
+        navigator.geolocation.clearWatch(watchID);
+        watchID = navigator.geolocation.watchPosition(
+          ({ coords }) => handleGeolocation(coords),
+          (error) => console.log("Error watching position:", error),
+          {
+            enableHighAccuracy: true,
+            maximumAge: 0,
+            timeout: 5000,
+          }
+        );
+      },
+      (error) => console.log("Error watching position:", error),
+      {
+        enableHighAccuracy: true,
+        maximumAge: 0,
+        timeout: 5000,
+      }
+    );
+
+    // Clear the watch on component unmount
+    return () => navigator.geolocation.clearWatch(watchID);
+  }, []);
 
   const checkIfOnRoute = (currentLocation, route) => {
     const currentPoint = turf.point([
