@@ -8,6 +8,7 @@ import { Map } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import placeholder from "../assets/placeholder.png";
 
 const OngoingRescues = ({ requests, user }) => {
   const [showMap, setShowMap] = useState(false);
@@ -22,6 +23,7 @@ const OngoingRescues = ({ requests, user }) => {
   const [endDate, setEndDate] = useState(null);
   const [customStartDate, setCustomStartDate] = useState(null);
   const [customEndDate, setCustomEndDate] = useState(null);
+  const [rescuerArea, setRescuerArea] = useState(null);
 
   const ongoingRescues = requests
     .filter((request) => {
@@ -47,8 +49,8 @@ const OngoingRescues = ({ requests, user }) => {
     .map((request, index) => ({
       id: index + 1,
       location: request.location.address,
-      rescuer: request.rescuerId, // Store rescuer ID
-      rescuerName: rescuerNames[request.rescuerId] || "Unknown", // Get rescuer name based on ID
+      rescuer: request.rescuerId,
+      rescuerName: rescuerNames[request.rescuerId] || "Unknown",
       status: request.status,
       acceptedTimestamp: new Intl.DateTimeFormat("en-US", {
         year: "numeric",
@@ -77,7 +79,6 @@ const OngoingRescues = ({ requests, user }) => {
   };
 
   const handleShowMap = (request) => {
-    console.log(request);
     setSelectedLocation({
       latitude: request.originalRequest.location.latitude,
       longitude: request.originalRequest.location.longitude,
@@ -110,7 +111,7 @@ const OngoingRescues = ({ requests, user }) => {
     }
   };
 
-  const getRescuers = async (rescuerId) => {
+  const getRescuers = async () => {
     try {
       const response = await axios.get(`/rescuers/get/`);
       if (response.data) {
@@ -133,6 +134,9 @@ const OngoingRescues = ({ requests, user }) => {
           const { first_name, middle_name, last_name } = rescuer[0];
           const fullName = `${first_name} ${middle_name} ${last_name}`;
           const contactNumber = `${rescuer[0].contact_number}`;
+          const { barangay, municipality } = rescuer[0];
+
+          setRescuerArea(barangay + ", " + municipality);
           setRescuerName(fullName);
           setRescuerContactNumber(contactNumber);
         }
@@ -146,7 +150,6 @@ const OngoingRescues = ({ requests, user }) => {
     const fetchAllRescuers = async () => {
       const rescuers = await getRescuers();
       if (rescuers) {
-        // Concatenate first, middle, and last names to form the full name
         const rescuersById = rescuers.reduce((acc, rescuer) => {
           const fullName =
             `${rescuer.first_name} ${rescuer.middle_name} ${rescuer.last_name}`.trim();
@@ -160,7 +163,6 @@ const OngoingRescues = ({ requests, user }) => {
     fetchAllRescuers();
   }, []);
 
-  // Function to handle report timeframe selection and set dates
   const formatDate = (date) => {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -186,26 +188,16 @@ const OngoingRescues = ({ requests, user }) => {
       selectedStartDate = formatDate(startOfMonth);
       selectedEndDate = formatDate(endOfMonth);
     } else {
-      // Custom date range
       selectedStartDate = formatDate(customStartDate);
       selectedEndDate = formatDate(customEndDate);
     }
 
-    // Set state to retain the values if needed elsewhere
     setStartDate(selectedStartDate);
     setEndDate(selectedEndDate);
 
-    // Generate PDF with the selected date range
     handleGeneratePDF(selectedStartDate, selectedEndDate);
     setShowPrintModal(false);
   };
-
-  useEffect(() => {
-    if (startDate && endDate) {
-      console.log(startDate, endDate);
-      console.log("Ongoing Rescues", ongoingRescues);
-    }
-  }, [startDate, endDate]);
 
   const handleCloseDetails = () => {
     setSelectedRescue(null);
@@ -215,13 +207,11 @@ const OngoingRescues = ({ requests, user }) => {
   const handleGeneratePDF = (startDate, endDate) => {
     const doc = new jsPDF("landscape");
 
-    // Convert startDate and endDate to cover the full day range in UTC
     const start = new Date(startDate);
-    start.setUTCHours(0, 0, 0, 0); // Start of the day in UTC
+    start.setUTCHours(0, 0, 0, 0);
     const end = new Date(endDate);
-    end.setUTCHours(23, 59, 59, 999); // End of the day in UTC
+    end.setUTCHours(23, 59, 59, 999);
 
-    // Filter rescues within the date range based on originalRequest.timestamp
     const filteredRescues = ongoingRescues.filter((rescue) => {
       const requestTimestamp = new Date(rescue.originalRequest.timestamp);
       return requestTimestamp >= start && requestTimestamp <= end;
@@ -232,9 +222,7 @@ const OngoingRescues = ({ requests, user }) => {
       "Ongoing Rescues Report",
       doc.internal.pageSize.getWidth() / 2,
       10,
-      {
-        align: "center",
-      }
+      { align: "center" }
     );
 
     const tableColumn = [
@@ -281,7 +269,6 @@ const OngoingRescues = ({ requests, user }) => {
       },
     });
 
-    // Add footer
     const pageHeight = doc.internal.pageSize.getHeight();
     const pageWidth = doc.internal.pageSize.getWidth();
     const footerY = pageHeight - 10;
@@ -301,7 +288,6 @@ const OngoingRescues = ({ requests, user }) => {
     doc.save(`ongoing_rescue_operations_${startDate}_to_${endDate}.pdf`);
   };
 
-  // Helper function for formatting timestamps in the PDF
   const formatDateTime = (dateString) => {
     if (!dateString) return "N/A";
     return new Date(dateString)
@@ -319,7 +305,6 @@ const OngoingRescues = ({ requests, user }) => {
 
   return (
     <div className="flex flex-col p-4 lg:p-6 h-full">
-      {/* Modal for Print Options */}
       {showPrintModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-4 rounded-lg max-w-md w-full">
@@ -377,7 +362,7 @@ const OngoingRescues = ({ requests, user }) => {
           </div>
         </div>
       )}
-      {/* Header */}
+
       <div className="flex items-center mb-2 sm:mb-4 border-b border-gray-200 pb-3">
         <FaAmbulance className="text-3xl sm:text-2xl lg:text-3xl text-primary-dark mr-2 fill-current" />
         <h4 className="text-xl sm:text-md lg:text-3xl text-primary-dark font-bold">
@@ -385,10 +370,8 @@ const OngoingRescues = ({ requests, user }) => {
         </h4>
       </div>
 
-      {/* Rescue Data Table */}
       <div className="flex flex-col flex-1 gap-2">
         <div className="flex justify-between items-center">
-          {/* Filter Status */}
           <div className="flex items-center">
             <label
               htmlFor="status-filter"
@@ -408,7 +391,6 @@ const OngoingRescues = ({ requests, user }) => {
             </select>
           </div>
 
-          {/* Print Button */}
           <button
             onClick={() => setShowPrintModal(true)}
             className="w-max bg-gray-200 text-black p-3 rounded-lg hover:opacity-80 transition flex items-center"
@@ -418,7 +400,6 @@ const OngoingRescues = ({ requests, user }) => {
           </button>
         </div>
 
-        {/* Table for larger screens */}
         <div className="hidden lg:block overflow-x-auto cursor-pointer">
           <table className="min-w-full bg-gray-200 border border-gray-200 rounded-md overflow-hidden">
             <thead className="bg-[#557C55] text-white">
@@ -448,7 +429,7 @@ const OngoingRescues = ({ requests, user }) => {
               </tr>
             </thead>
             <tbody>
-              {paginatedRescues.map((requests, index) => (
+              {paginatedRescues.map((requests) => (
                 <tr
                   key={requests.id}
                   className="border-b bg-white hover:bg-background-light"
@@ -464,9 +445,7 @@ const OngoingRescues = ({ requests, user }) => {
                     {requests.rescuerName}
                   </td>
                   <td className="px-4 py-2 text-center text-sm">
-                    {requests.originalRequest.citizenName
-                      ? requests.originalRequest.citizenName
-                      : "N/A"}
+                    {requests.originalRequest.citizenName || "N/A"}
                   </td>
                   <td className="px-4 py-2 text-center text-sm">
                     {requests.location}
@@ -495,7 +474,7 @@ const OngoingRescues = ({ requests, user }) => {
                       <div className="flex justify-center">
                         <button
                           onClick={(event) => {
-                            event.stopPropagation(); // Prevent row click event
+                            event.stopPropagation();
                             handleShowMap(requests);
                           }}
                           className="bg-secondary text-white px-4 py-1 rounded-full hover:bg-primary-medium transition flex items-center justify-center"
@@ -511,7 +490,7 @@ const OngoingRescues = ({ requests, user }) => {
           </table>
         </div>
       </div>
-      {/* Pagination */}
+
       <div className="mt-4">
         <div className="flex justify-center items-center gap-2">
           <button
@@ -541,6 +520,7 @@ const OngoingRescues = ({ requests, user }) => {
           </button>
         </div>
       </div>
+
       {showMap && selectedLocation && !selectedRescue && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-4 rounded-lg max-w-lg w-full">
@@ -563,204 +543,154 @@ const OngoingRescues = ({ requests, user }) => {
               maxzoom={15}
             ></Map>
 
-            {/* Add a map component or iframe here to show map based on location */}
-            <div style={{ height: "400px", width: "100%" }}>
-              {/* Render the map here, potentially using selectedLocation’s coordinates */}
-            </div>
+            <div style={{ height: "400px", width: "100%" }}></div>
           </div>
         </div>
       )}
 
-      {/* Rescue Details Modal */}
       {selectedRescue && (
-        <div className="fixed inset-0 bg-gray-700 bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 transition-opacity duration-300 ease-in-out">
-          <div className="bg-white p-4 md:p-6 rounded-lg shadow-lg transform transition-transform duration-300 ease-in-out max-w-md md:max-w-xl w-full relative">
-            <button
-              onClick={handleCloseDetails}
-              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6 "
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-6xl transition-transform transform">
+            {/* Header */}
+            <div className="flex justify-between items-center mb-4 border-b border-gray-200 pb-3">
+              <h2 className="text-xl font-bold text-gray-700">
+                Rescue Details
+              </h2>
+              <button
+                onClick={handleCloseDetails}
+                className="text-gray-500 hover:text-gray-700"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-
-            <h4 className="text-lg md:text-xl font-bold mb-4 md:mb-5 text-primary border-b pb-2 md:pb-3 border-gray-300">
-              Rescue Details
-            </h4>
-
-            {/* Rescuer Details Section */}
-            <div className="mb-4 md:mb-6">
-              <h5 className="text-md md:text-lg font-semibold mb-3 md:mb-4 text-primary-dark">
-                Rescuer Information
-              </h5>
-              <div className="space-y-2 md:space-y-3">
-                <div className="flex items-center">
-                  <strong className="w-28 md:w-36 text-primary-medium text-sm md:text-base">
-                    Rescuer ID:
-                  </strong>
-                  <span className="text-gray-600 font-semibold text-sm md:text-base">
-                    {selectedRescue.rescuerId}
-                  </span>
-                </div>
-                <div className="flex items-center">
-                  <strong className="w-28 md:w-36 text-primary-medium text-sm md:text-base">
-                    Rescuer Name:
-                  </strong>
-                  <span className="text-gray-600 font-semibold text-sm md:text-base">
-                    {rescuerName}
-                  </span>
-                </div>
-                <div className="flex items-center">
-                  <strong className="w-28 md:w-36 text-primary-medium text-sm md:text-base">
-                    Phone Number:
-                  </strong>
-                  <span className="text-gray-600 font-semibold text-sm md:text-base">
-                    {rescuerContactNumber}
-                  </span>
-                </div>
-              </div>
+                <FaTimes className="text-2xl" />
+              </button>
             </div>
 
-            {/* Divider Line */}
-            <div className="border-t border-gray-300 mb-4 md:mb-6"></div>
-
-            {/* Citizen Details Section */}
-            <div className="mb-4 md:mb-6">
-              <h5 className="text-md md:text-lg font-semibold mb-3 md:mb-4 text-primary-dark">
-                Citizen Information
-              </h5>
-              <div className="space-y-2 md:space-y-3">
-                <div className="flex items-center">
-                  <strong className="w-28 md:w-36 text-primary-medium text-sm md:text-base">
-                    Requester Name:
-                  </strong>
-                  <span className="text-gray-600 font-semibold text-sm md:text-base">
-                    {selectedRescue.citizenName}
-                  </span>
-                </div>
-                <div className="flex items-center">
-                  <strong className="w-28 md:w-36 text-primary-medium text-sm md:text-base">
-                    Phone Number:
-                  </strong>
-                  <span className="text-gray-600 font-semibold text-sm md:text-base">
-                    {selectedRescue.phone}
-                  </span>
-                </div>
-                <div className="flex items-center">
-                  <strong className="w-28 md:w-36 text-primary-medium text-sm md:text-base">
-                    Request Location:
-                  </strong>
-                  <span className="text-gray-600 font-semibold text-sm md:text-base">
-                    {selectedRescue.location.address}
-                  </span>
+            {/* Main Content */}
+            <div className="grid grid-cols-3 gap-6">
+              {/* Large Image Section */}
+              <div className="col-span-1">
+                <h3 className="text-lg font-semibold text-gray-700 mb-2">
+                  Incident
+                </h3>
+                <div className="flex justify-center">
+                  {selectedRescue.incidentPicture ? (
+                    <img
+                      src={selectedRescue.incidentPicture}
+                      alt="Incident"
+                      className="w-full max-w-lg h-64 object-cover rounded-md border border-gray-200"
+                    />
+                  ) : (
+                    <img
+                      src={placeholder}
+                      className="w-full max-w-lg h-64 object-cover rounded-md border border-gray-200"
+                    />
+                  )}
                 </div>
               </div>
-            </div>
 
-            {/* Divider Line */}
-            <div className="border-t border-gray-300 mb-4 md:mb-6"></div>
-
-            {/* Status and Timing Section */}
-            <div className="mb-4 md:mb-6">
-              <h5 className="text-md md:text-lg font-semibold mb-3 md:mb-4 text-primary-dark">
-                Rescue Status
-              </h5>
-              <div className="space-y-2 md:space-y-3">
-                <div className="flex items-center">
-                  <strong className="w-28 md:w-36 text-primary-medium text-sm md:text-base">
-                    Status:
-                  </strong>
-                  <span
-                    className={`font-semibold text-sm md:text-base ${
-                      selectedRescue.status === "assigned"
-                        ? "text-blue-500"
-                        : selectedRescue.status === "rescued"
-                        ? "text-green-500"
-                        : "text-yellow-500"
-                    }`}
-                  >
-                    {selectedRescue.status.charAt(0).toUpperCase() +
-                      selectedRescue.status.slice(1)}
-                  </span>
-                </div>
-                <div className="flex items-center">
-                  <strong className="w-28 md:w-36 text-primary-medium text-sm md:text-base">
-                    {selectedRescue.status === "rescued"
-                      ? "Rescued Time:"
-                      : "Accepted Time:"}
-                  </strong>
-                  <span className="text-gray-600 font-semibold  text-sm md:text-base">
-                    {selectedRescue.status === "rescued" &&
-                    selectedRescue.rescuedTimestamp
-                      ? new Intl.DateTimeFormat("en-US", {
-                          year: "numeric",
-                          month: "2-digit",
-                          day: "2-digit",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                          second: "2-digit",
-                        }).format(new Date(selectedRescue.rescuedTimestamp))
-                      : new Intl.DateTimeFormat("en-US", {
-                          year: "numeric",
-                          month: "2-digit",
-                          day: "2-digit",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                          second: "2-digit",
-                        }).format(new Date(selectedRescue.acceptedTimestamp))}
-                  </span>
+              {/* Details Section */}
+              <div className="col-span-2 grid grid-cols-2 gap-6">
+                {/* Rescuer Info */}
+                <div className="space-y-2 border-b border-gray-200 pb-4">
+                  <h3 className="text-xl font-semibold text-primary-medium">
+                    Rescuer
+                  </h3>
+                  <p className="text-gray-600">
+                    <strong>Name:</strong> {rescuerName}
+                  </p>
+                  <p className="text-gray-600">
+                    <strong>Phone:</strong> {rescuerContactNumber}
+                  </p>
+                  <p className="text-gray-600">
+                    <strong>Assigned Area:</strong> {rescuerArea}
+                  </p>
                 </div>
 
-                {selectedRescue.status === "rescued" && (
-                  <div className="flex items-center">
-                    <strong className="w-28 md:w-36 text-gray-700 text-sm md:text-base">
-                      Rescued Location:
-                    </strong>
-                    <span className="text-gray-600 text-sm md:text-base">
-                      {selectedRescue.rescuedAddress}
-                    </span>
+                {/* Citizen Info */}
+                <div className="space-y-2 border-b border-gray-200 pb-4">
+                  <h3 className="text-xl font-semibold text-secondary">
+                    Citizen
+                  </h3>
+                  <p className="text-gray-600">
+                    <strong>Name:</strong> {selectedRescue.citizenName}
+                  </p>
+                  <p className="text-gray-600">
+                    <strong>Phone:</strong> {selectedRescue.phone}
+                  </p>
+                  <p className="text-gray-600">
+                    <strong>Location:</strong> {selectedRescue.location.address}
+                  </p>
+                </div>
+
+                {/* Rescue Status */}
+                <div className="space-y-2">
+                  <h3 className="text-lg font-semibold text-gray-700">
+                    Status
+                  </h3>
+                  <div className="flex items-center space-x-4">
+                    <button
+                      type="button"
+                      className={`px-4 py-2 font-semibold rounded-md shadow-sm ${
+                        selectedRescue.status === "assigned"
+                          ? "bg-blue-500 text-white"
+                          : selectedRescue.status === "rescued"
+                          ? "bg-green-500 text-white"
+                          : "bg-yellow-500 text-white"
+                      }`}
+                    >
+                      {selectedRescue.status.charAt(0).toUpperCase() +
+                        selectedRescue.status.slice(1)}
+                    </button>
+                    <p className="text-gray-600">
+                      {(() => {
+                        const requestDate = new Date(
+                          selectedRescue.status === "rescued"
+                            ? selectedRescue.rescuedTimestamp
+                            : selectedRescue.acceptedTimestamp
+                        );
+                        const now = new Date();
+                        const timeElapsed = now - requestDate;
+                        const minutesElapsed = Math.floor(
+                          timeElapsed / (1000 * 60)
+                        );
+                        let timeLabel = "";
+
+                        if (minutesElapsed < 60) {
+                          timeLabel = `${minutesElapsed} minutes ago`;
+                        } else if (minutesElapsed < 1440) {
+                          timeLabel = `${Math.floor(
+                            minutesElapsed / 60
+                          )} hours ago`;
+                        } else {
+                          timeLabel = `${Math.floor(
+                            minutesElapsed / (60 * 24)
+                          )} days ago`;
+                        }
+
+                        return (
+                          <>
+                            <span className="text-text-secondary">
+                              {timeLabel}
+                            </span>
+                          </>
+                        );
+                      })()}
+                    </p>
                   </div>
-                )}
-              </div>
-            </div>
+                </div>
 
-            {/* Incident Picture Section */}
-            <div className="mb-4 md:mb-6">
-              <span className="w-28 md:w-36 text-primary-medium font-bold text-sm md:text-base">
-                Incident Picture:
-              </span>
-              <div className="flex justify-center">
-                {selectedRescue.incidentPicture ? (
-                  <img
-                    src={selectedRescue.incidentPicture}
-                    alt="Incident Picture"
-                    className="w-full md:max-w-[34rem] h-40 object-contain"
-                  />
-                ) : (
-                  <span className="text-gray-600 text-sm md:text-base">
-                    No picture available
-                  </span>
-                )}
+                {/* Description */}
+                <div className="space-y-2">
+                  <h3 className="text-lg font-semibold text-gray-700">
+                    Description
+                  </h3>
+                  <div
+                    className="w-full px-3 py-2 text-gray-600 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-200 focus:border-indigo-500"
+                    style={{ height: "100px", overflow: "auto" }}
+                  >
+                    <p>{selectedRescue.incidentDescription || ""}</p>
+                  </div>
+                </div>
               </div>
-            </div>
-            <div className="flex items-center">
-              <strong className="w-28 md:w-36 text-primary-medium text-sm md:text-base">
-                Description:
-              </strong>
-              <span className="text-gray-600 font-semibold text-sm md:text-base">
-                {selectedRescue.incidentDescription}
-              </span>
             </div>
           </div>
         </div>
