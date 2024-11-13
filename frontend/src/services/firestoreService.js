@@ -205,10 +205,37 @@ export const getLocationFromFirestoreById = async (id) => {
   }
 };
 
-export const getOnlineLocationsFromFirestore = (role, setLocations) => {
+// Function to get active rescuer IDs from the `requests` collection
+const getActiveRescuerIDs = async () => {
+  const activeStatuses = ["assigned", "in transit", "en-route"];
+  const q = query(
+    collection(store, "requests"),
+    where("status", "in", activeStatuses)
+  );
+
+  const activeRescuers = new Set();
+
+  // Fetch documents that match active statuses
+  const querySnapshot = await getDocs(q);
+  querySnapshot.forEach((doc) => {
+    const data = doc.data();
+    if (data.rescuerId) {
+      activeRescuers.add(data.rescuerId);
+    }
+  });
+
+  return Array.from(activeRescuers); // Return array of active rescuer IDs
+};
+
+// Function to get filtered online rescuers from Firestore
+export const getFilteredOnlineRescuers = async (role, setRescuers) => {
+  // Get the list of active rescuer IDs
+  const activeRescuerIDs = await getActiveRescuerIDs();
+
   const q = query(
     collection(store, "locations"),
-    where("status", "==", "online")
+    where("status", "==", "online"),
+    where("role", "==", role)
   );
 
   // Set up the real-time listener
@@ -217,12 +244,13 @@ export const getOnlineLocationsFromFirestore = (role, setLocations) => {
 
     querySnapshot.forEach((doc) => {
       const data = doc.data();
-      if (data.role === role && !uniqueLocations.has(data.userId)) {
+      // Only add rescuers who are not in active assignments
+      if (!activeRescuerIDs.includes(data.userId)) {
         uniqueLocations.set(data.userId, { id: doc.id, ...data });
       }
     });
 
-    setLocations(Array.from(uniqueLocations.values())); // Update the locations in real-time
+    setRescuers(Array.from(uniqueLocations.values())); // Update rescuers in real-time
   });
 
   return unsubscribe; // To stop listening when needed

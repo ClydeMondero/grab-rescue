@@ -22,6 +22,7 @@ import {
   getLocationsFromFirestore,
   clearLocationsCollection,
   getLocationFromFirestoreInRealTime,
+  getFilteredOnlineRescuers,
 } from "../services/firestoreService";
 import {
   getCitizenCookie,
@@ -187,11 +188,19 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    if (!allRescuers) return;
-    const onlineRescuersFiltered = allRescuers.filter(
-      (rescuer) => rescuer.status === "online" && rescuer.role === "rescuer"
-    );
-    setOnlineRescuers(onlineRescuersFiltered);
+    const fetchAndSubscribe = async () => {
+      const unsubscribe = await getFilteredOnlineRescuers(
+        "rescuer",
+        setOnlineRescuers
+      );
+      return unsubscribe;
+    };
+
+    const unsubscribeFunction = fetchAndSubscribe();
+
+    return () => {
+      unsubscribeFunction.then((unsubscribe) => unsubscribe && unsubscribe());
+    };
   }, [allRescuers]);
 
   useEffect(() => {
@@ -322,6 +331,7 @@ const Home = () => {
         {/* Map Component */}
         <Map
           ref={mapRef}
+          rescuers={onlineRescuers}
           onLocatingChange={handleLocatingChange}
           onNearestRescuerUpdate={handleNearestRescuerUpdate}
           assignedRescuer={assignedRescuer}

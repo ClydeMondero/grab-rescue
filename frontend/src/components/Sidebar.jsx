@@ -158,7 +158,7 @@ const Sidebar = ({ user }) => {
               className={`text-lg ${!isOpen ? "text-xl" : "text-lg"}`}
             />
             <span className={`${!isOpen && "hidden"} ml-4 duration-300`}>
-              Ongoing Rescues
+              Rescues
             </span>
           </Link>
           <Link

@@ -27,12 +27,12 @@ import {
   LocatingIndicator,
 } from "../components";
 import { useLocating } from "../hooks";
-import { getOnlineLocationsFromFirestore } from "../services/firestoreService";
+import { getFilteredOnlineRescuers } from "../services/firestoreService";
 import { useLocation } from "react-router-dom";
 import { setGeolocateIcon } from "../utils/GeolocateUtility";
 
 const CitizenMap = forwardRef((props, ref) => {
-  const { assignedRescuer, requesting } = props;
+  const { assignedRescuer, requesting, rescuers } = props;
   const [citizen, setCitizen] = useState({
     longitude: 120.9107,
     latitude: 14.9536,
@@ -40,7 +40,6 @@ const CitizenMap = forwardRef((props, ref) => {
   });
   const [coords, setCoords] = useState(null);
 
-  const [rescuers, setRescuers] = useState(null);
   const [nearestRescuer, setNearestRescuer] = useState(null);
 
   const [routeData, setRouteData] = useState(null);
@@ -144,15 +143,6 @@ const CitizenMap = forwardRef((props, ref) => {
       mapRef.current.resize();
     }
   }, [requesting]);
-
-  useEffect(() => {
-    const unsubscribe = getOnlineLocationsFromFirestore("rescuer", setRescuers);
-
-    return () => {
-      // Unsubscribe from the listener when the component unmounts
-      unsubscribe();
-    };
-  }, []);
 
   useEffect(() => {
     if (rescuers == null) {
