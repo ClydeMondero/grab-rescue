@@ -472,28 +472,28 @@ const AssignRescuers = (props) => {
       {/* Modal Confirmation */}
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded shadow-lg">
-            <h2 className="text-lg font-semibold mb-4 text-[#557C55]">
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h2 className="text-lg font-semibold mb-4 text-green-600">
               Confirm Status Change
             </h2>
-            <p>
+            <p className="text-sm text-gray-600">
               Are you sure you want to mark this rescuer as{" "}
               {currentStatus === "Active" ? "Inactive" : "Active"}?
             </p>
-            <div className="mt-4 flex justify-end">
+            <div className="mt-4 flex justify-end gap-2">
               <button
                 onClick={() =>
                   handleToggleStatus(selectedRescuerId, currentStatus)
                 }
-                className="text-primary px-4 py-2 rounded mr-2"
+                className="bg-green-500 hover:bg-green-700 text-white px-4 py-2 rounded"
               >
                 Yes
               </button>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="text-secondary px-4 py-2 rounded"
+                className="bg-gray-300 hover:bg-gray-400 text-gray-600 px-4 py-2 rounded"
               >
-                No
+                Cancel
               </button>
             </div>
           </div>

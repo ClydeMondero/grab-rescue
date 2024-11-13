@@ -3,11 +3,11 @@ import { IoSettings } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import { handleLogout } from "../services/authService";
 import { FaSignOutAlt } from "react-icons/fa";
-import { ThemeToggle } from "../components";
-import FontSelector from "../components/FontSelector";
+import { ThemeToggle, FontSelector, Loader } from "../components";
 
 const Settings = ({ fontClass, onFontChange }) => {
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
 
   return (
     <div
@@ -49,12 +49,21 @@ const Settings = ({ fontClass, onFontChange }) => {
               Log out of your account
             </p>
             <button
-              onClick={() => handleLogout(navigate)}
+              onClick={() => {
+                setIsLoading(true);
+                handleLogout(navigate);
+              }}
               className="bg-secondary dark:bg-dark-secondary text-white text-base font-bold py-2 px-6 rounded-full hover:bg-red-600 dark:hover:bg-dark-secondary transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-red-300 dark:focus:ring-dark-shadow"
             >
               <div className="flex items-center space-x-2">
-                <FaSignOutAlt />
-                <span>Logout</span>
+                {isLoading ? (
+                  <Loader isLoading={isLoading} size={25} />
+                ) : (
+                  <>
+                    <FaSignOutAlt />
+                    <span>Logout</span>
+                  </>
+                )}
               </div>
             </button>
           </div>
