@@ -5,6 +5,7 @@ import { Dialog } from "@headlessui/react";
 import jsPDF from "jspdf"; // Import jsPDF
 import "jspdf-autotable"; // Optional, for table formatting
 import axios from "axios";
+import logo from "../assets/logo.png";
 
 // TODO: change page name
 // TODO: make report pdf design similar to all reports
@@ -113,9 +114,13 @@ const GenerateReports = (props) => {
   const generatePDF = (logs) => {
     const doc = new jsPDF("landscape");
 
-    // Set the title of the report
+    const imageWidth = 40;
+    const imageHeight = 8;
+
+    doc.addImage(logo, "PNG", 10, 5, imageWidth, imageHeight);
+
     doc.setFontSize(18);
-    doc.text("Action Log Reports", doc.internal.pageSize.getWidth() / 2, 10, {
+    doc.text("Action Log Reports", doc.internal.pageSize.getWidth() / 2, 20, {
       align: "center",
     });
 
