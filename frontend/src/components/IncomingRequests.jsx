@@ -1,6 +1,8 @@
 import { MdMail } from "react-icons/md";
 import { useState } from "react";
 import { NoRequests } from "../components";
+import { FaTimes } from "react-icons/fa";
+import placeholder from "../assets/placeholder.png";
 
 // Modal component to display request details
 const RequestDetailsModal = ({ request, isOpen, onClose }) => {
@@ -15,60 +17,68 @@ const RequestDetailsModal = ({ request, isOpen, onClose }) => {
             onClick={onClose}
             className="text-gray-600 hover:text-gray-800"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              className="w-6 h-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
+            <FaTimes className="text-lg text-background-medium" />
           </button>
         </div>
 
         {/* Information Section */}
         <div className="space-y-6 text-gray-700">
+          <div>
+            <img
+              src={request?.incidentPicture || placeholder}
+              alt="Incident Picture"
+              className="w-full h-56 object-cover rounded-md"
+            />
+            {request.status && (
+              <div
+                className={`
+                  ${
+                    {
+                      pending: "bg-yellow-500",
+                      "in transit": "bg-blue-500",
+                      "en-route": "bg-indigo-700",
+                      rescued: "bg-green-500",
+                    }[request.status]
+                  } text-sm  w-max font-medium text-white px-2 py-1 rounded-md mt-2
+                `}
+              >
+                {request.status}
+              </div>
+            )}
+          </div>
+          <div>
+            <p className="text-xl font-semibold text-gray-800">
+              {request.location?.address || "Address not available"}
+            </p>
+          </div>
           <div className="grid grid-cols-2 gap-6">
             <div>
               <p className="text-sm font-medium text-gray-600">
                 Contact Number:
               </p>
               <p className="text-sm font-semibold text-gray-800">
-                {request.phone || "N/A"}
+                {request.phone || ""}
               </p>
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-600">Citizen Name:</p>
-              <p className="text-sm font-semibold text-gray-800">
-                {request.citizenName || "N/A"}
+              <p className="text-sm font-medium text-gray-600">
+                Citizen Information:
               </p>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-6">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Relation:</p>
               <p className="text-sm font-semibold text-gray-800">
-                {request.citizenRelation || "N/A"}
-              </p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-600">Description:</p>
-              <p className="text-sm font-semibold text-gray-800">
-                {request.incidentDescription || "N/A"}
+                {
+                  (request.citizenName + " • " || "",
+                  request.citizenRelation || "No Relation")
+                }
               </p>
             </div>
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-600">Location:</p>
-            <p className="text-sm font-semibold text-gray-800">
-              {request.location?.address || "Address not available"}
-            </p>
+            <p className="text-sm font-medium text-gray-600">Description:</p>
+            <div className="bg-white rounded-md border border-gray-300 p-2 min-h-20">
+              <p className="text-sm font-semibold text-gray-800 break-words">
+                {request.incidentDescription || ""}
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -104,7 +114,7 @@ const IncomingRequests = ({ requests }) => {
         </h4>
       </div>
       {/* List of Requests */}
-      <div className="flex-1 h-full overflow-y-auto">
+      <div className="flex-1 h-full overflow-y-auto flex flex-col gap-4">
         {pendingRequests.length > 0 ? (
           pendingRequests.map((request) => (
             <div
@@ -129,6 +139,12 @@ const IncomingRequests = ({ requests }) => {
                 className={`text-white text-xs font-semibold mt-1 px-2 py-1 rounded ${
                   request.status === "pending"
                     ? "bg-yellow-500"
+                    : request.status === "en-route"
+                    ? "bg-blue-500"
+                    : request.status === "in transit"
+                    ? "bg-blue-700"
+                    : request.status === "rescued"
+                    ? "bg-green-600"
                     : "bg-green-600"
                 }`}
               >

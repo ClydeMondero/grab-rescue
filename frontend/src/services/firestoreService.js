@@ -412,3 +412,22 @@ export const getLocationFromFirestore = async (id) => {
     return null;
   }
 };
+
+// get location from firestore in real-time
+export const getLocationFromFirestoreInRealTime = async (id, callback) => {
+  try {
+    const docRef = doc(store, "locations", id);
+    const unsubscribe = onSnapshot(docRef, (doc) => {
+      if (doc.exists()) {
+        callback(doc.data());
+      } else {
+        callback(null);
+      }
+    });
+
+    return unsubscribe; // To stop listening when needed
+  } catch (error) {
+    console.error("Error getting document: ", error);
+    return null;
+  }
+};
