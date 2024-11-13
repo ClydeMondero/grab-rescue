@@ -44,7 +44,6 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
   const [eta, setEta] = useState();
   const [isOnRoute, setIsOnRoute] = useState(false);
   const location = useLocation();
-  const [geolocated, setGeolocated] = useState(false);
 
   const handleGeolocation = async (coords) => {
     setCoords(coords);
@@ -62,8 +61,6 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
     const existingLocation = locations.find(
       (location) => location.userId === id
     );
-
-    console.log("existingLocation", existingLocation);
 
     if (existingLocation) {
       console.log("updating location");
@@ -97,41 +94,10 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
   };
 
   useEffect(() => {
-    if (!geolocated) return;
-
-    const timeoutID = setTimeout(() => {
-      // Start watching the user's location in a loop
-      let watchID = navigator.geolocation.watchPosition(
-        ({ coords }) => {
-          // Trigger handleGeolocation each time there's a position update
-          handleGeolocation(coords);
-          // Clear the watch, and start a new one
-          navigator.geolocation.clearWatch(watchID);
-          watchID = navigator.geolocation.watchPosition(
-            ({ coords }) => handleGeolocation(coords),
-            (error) => console.log("Error watching position:", error),
-            {
-              enableHighAccuracy: true,
-              maximumAge: 0,
-              timeout: 5000,
-            }
-          );
-        },
-        (error) => console.log("Error watching position:", error),
-        {
-          enableHighAccuracy: true,
-          maximumAge: 0,
-          timeout: 5000,
-        }
-      );
-
-      // Clear the watch on component unmount
-      return () => navigator.geolocation.clearWatch(watchID);
-    }, 3000);
-
-    // Clear the timeout on component unmount
-    return () => clearTimeout(timeoutID);
-  }, [geolocated]);
+    if (coords) {
+      handleGeolocation(coords);
+    }
+  }, [coords]);
 
   const checkIfOnRoute = (currentLocation, route) => {
     const currentPoint = turf.point([
@@ -243,12 +209,6 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
   }, [navigating]);
 
   useEffect(() => {
-    if (mapRef.current && geoControlRef.current) {
-      setTimeout(() => {
-        geoControlRef.current.trigger(); // Trigger after map is fully loaded
-      }, 1000);
-    }
-
     const unsubscribe = getLocationsFromFirestore("rescuer", setLocations);
 
     return () => {
@@ -279,13 +239,10 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
         showAccuracyCircle={false}
         style={{ display: "none" }}
         onGeolocate={({ coords }) => {
-          setGeolocated(true);
           handleGeolocation(coords);
         }}
       />
-
       {locating && <LocatingIndicator locating={locating} type="rescuer" />}
-
       {navigating && (
         <TurnIndicator
           routeData={routeData}

@@ -108,11 +108,24 @@ export const updateUserLocation = async (
   longitude,
   latitude
 ) => {
+  console.log("updateUserLocation", {
+    locationId,
+    prevLon,
+    prevLat,
+    longitude,
+    latitude,
+  });
+
   const moved = hasUserMoved(prevLon, prevLat, longitude, latitude);
 
   const address = await getAddress(longitude, latitude);
 
+  console.log("moved", moved);
+
   if (moved) {
+    console.log("updating location in firestore");
     updateLocationInFirestore(locationId, longitude, latitude, address);
+  } else {
+    console.log("not updating location in firestore");
   }
 };
