@@ -723,8 +723,8 @@ const OngoingRescues = ({ requests, user }) => {
                     </div>
                   </Marker>
                   <Marker
-                    latitude={citizen?.latitude}
-                    longitude={citizen?.longitude}
+                    latitude={rescuer?.latitude}
+                    longitude={rescuer?.longitude}
                   >
                     <div className="relative flex flex-col items-center justify-center">
                       <BiSolidAmbulance className="text-3xl text-primary green-pulse" />
