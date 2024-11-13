@@ -22,6 +22,7 @@ import { FaLocationPin } from "react-icons/fa6";
 import { useLocation } from "react-router-dom";
 import { setGeolocateIcon } from "../utils/GeolocateUtility";
 import * as turf from "@turf/turf";
+import { set } from "lodash";
 
 const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
   const { rescuer, setRescuer } = useContext(RescuerContext);
@@ -43,11 +44,12 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
   const [eta, setEta] = useState();
   const [isOnRoute, setIsOnRoute] = useState(false);
   const location = useLocation();
+  const [geolocated, setGeolocated] = useState(false);
 
   const handleGeolocation = async (coords) => {
     setCoords(coords);
 
-    if (mapRef.current.resize()) {
+    if (mapRef.current && mapRef.current.resize()) {
       mapRef.current.resize();
     }
 
@@ -61,7 +63,10 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
       (location) => location.userId === id
     );
 
+    console.log("existingLocation", existingLocation);
+
     if (existingLocation) {
+      console.log("updating location");
       updateUserLocation(
         existingLocation.id,
         rescuer.longitude,
@@ -70,6 +75,7 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
         coords.latitude
       );
     } else {
+      console.log("adding location");
       addUserLocation(coords.longitude, coords.latitude, "rescuer", id);
     }
 
@@ -89,6 +95,43 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
       setIsOnRoute(onRoute);
     }
   };
+
+  useEffect(() => {
+    if (!geolocated) return;
+
+    const timeoutID = setTimeout(() => {
+      // Start watching the user's location in a loop
+      let watchID = navigator.geolocation.watchPosition(
+        ({ coords }) => {
+          // Trigger handleGeolocation each time there's a position update
+          handleGeolocation(coords);
+          // Clear the watch, and start a new one
+          navigator.geolocation.clearWatch(watchID);
+          watchID = navigator.geolocation.watchPosition(
+            ({ coords }) => handleGeolocation(coords),
+            (error) => console.log("Error watching position:", error),
+            {
+              enableHighAccuracy: true,
+              maximumAge: 0,
+              timeout: 5000,
+            }
+          );
+        },
+        (error) => console.log("Error watching position:", error),
+        {
+          enableHighAccuracy: true,
+          maximumAge: 0,
+          timeout: 5000,
+        }
+      );
+
+      // Clear the watch on component unmount
+      return () => navigator.geolocation.clearWatch(watchID);
+    }, 3000);
+
+    // Clear the timeout on component unmount
+    return () => clearTimeout(timeoutID);
+  }, [geolocated]);
 
   const checkIfOnRoute = (currentLocation, route) => {
     const currentPoint = turf.point([
@@ -236,6 +279,7 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
         showAccuracyCircle={false}
         style={{ display: "none" }}
         onGeolocate={({ coords }) => {
+          setGeolocated(true);
           handleGeolocation(coords);
         }}
       />
