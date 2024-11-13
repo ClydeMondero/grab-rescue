@@ -21,6 +21,7 @@ import {
   getRequestFromFirestore,
   getLocationsFromFirestore,
   clearLocationsCollection,
+  getLocationFromFirestoreInRealTime,
 } from "../services/firestoreService";
 import {
   getCitizenCookie,
@@ -34,7 +35,7 @@ import MobileDetect from "mobile-detect";
 import { toast } from "react-toastify";
 import { hotlines } from "../constants/Hotlines";
 import { HotlineModal } from "../pages";
-import { map } from "zod";
+
 const Home = () => {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -191,10 +192,12 @@ const Home = () => {
 
   useEffect(() => {
     if (!request) return;
+
     const assigned = allRescuers.filter(
       (rescuer) => rescuer.userId === request.rescuerId
     );
-    setAssignedRescuer(assigned[0]);
+
+    getLocationFromFirestoreInRealTime(assigned[0].id, setAssignedRescuer);
   }, [request]);
 
   useEffect(() => {
