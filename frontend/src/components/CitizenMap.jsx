@@ -159,6 +159,7 @@ const CitizenMap = forwardRef((props, ref) => {
       setRouteData(null);
       setDistance(null);
       setEta(null);
+      return;
     }
 
     if (rescuers.length == 0) {

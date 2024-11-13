@@ -44,8 +44,6 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
   const [isOnRoute, setIsOnRoute] = useState(false);
   const location = useLocation();
 
-  const [geoLocated, setGeoLocated] = useState(false);
-
   const handleGeolocation = async (coords) => {
     setCoords(coords);
 
@@ -95,7 +93,7 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
   };
 
   useEffect(() => {
-    if (coords && geoLocated) {
+    if (coords) {
       handleGeolocation(coords);
     }
   }, [coords]);
@@ -240,7 +238,6 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
         showAccuracyCircle={false}
         style={{ display: "none" }}
         onGeolocate={({ coords }) => {
-          setGeoLocated(true);
           handleGeolocation(coords);
         }}
       />
