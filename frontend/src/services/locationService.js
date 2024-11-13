@@ -7,7 +7,7 @@ import {
 import { setCitizenCookie } from "../services/cookieService";
 import axios from "axios";
 
-const MIN_DISTANCE_THRESHOLD = 10; //in meters
+const MIN_DISTANCE_THRESHOLD = 1; //in meters
 
 //TODO: check if user moved by 50 meters
 export const hasUserMoved = (currentLat, currentLon, lastLat, lastLon) => {
@@ -108,11 +108,24 @@ export const updateUserLocation = async (
   longitude,
   latitude
 ) => {
+  console.log("updateUserLocation", {
+    locationId,
+    prevLon,
+    prevLat,
+    longitude,
+    latitude,
+  });
+
   const moved = hasUserMoved(prevLon, prevLat, longitude, latitude);
 
   const address = await getAddress(longitude, latitude);
 
+  console.log("moved", moved);
+
   if (moved) {
+    console.log("updating location in firestore");
     updateLocationInFirestore(locationId, longitude, latitude, address);
+  } else {
+    console.log("not updating location in firestore");
   }
 };

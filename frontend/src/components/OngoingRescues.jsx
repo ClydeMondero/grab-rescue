@@ -1,5 +1,13 @@
 import { useState, useEffect } from "react";
-import { FaAmbulance, FaMapMarkerAlt, FaTimes } from "react-icons/fa";
+import {
+  FaAmbulance,
+  FaMapMarkerAlt,
+  FaTimes,
+  FaFileAlt,
+  FaCalendarAlt,
+  FaCalendarDay,
+  FaCalendarWeek,
+} from "react-icons/fa";
 import { AiFillPrinter } from "react-icons/ai";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
@@ -9,6 +17,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import placeholder from "../assets/placeholder.png";
+import logo from "../assets/logo.png";
 
 const OngoingRescues = ({ requests, user }) => {
   const [showMap, setShowMap] = useState(false);
@@ -170,16 +179,18 @@ const OngoingRescues = ({ requests, user }) => {
     return `${year}-${month}-${day}`;
   };
 
+  // Updated handleReportSelection to pass the correct report type
   const handleReportSelection = (reportName) => {
     const today = new Date();
     let selectedStartDate, selectedEndDate;
 
+    // Set start and end dates based on report type
     if (reportName === "Daily Report") {
       selectedStartDate = formatDate(today);
       selectedEndDate = formatDate(today);
     } else if (reportName === "Weekly Report") {
       const sunday = new Date(today);
-      sunday.setDate(today.getDate() - today.getDay());
+      sunday.setDate(today.getDate() - today.getDay()); // Start of the week (Sunday)
       selectedStartDate = formatDate(sunday);
       selectedEndDate = formatDate(today);
     } else if (reportName === "Monthly Report") {
@@ -187,15 +198,22 @@ const OngoingRescues = ({ requests, user }) => {
       const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
       selectedStartDate = formatDate(startOfMonth);
       selectedEndDate = formatDate(endOfMonth);
-    } else {
+    } else if (
+      reportName === "Custom Report" &&
+      customStartDate &&
+      customEndDate
+    ) {
       selectedStartDate = formatDate(customStartDate);
       selectedEndDate = formatDate(customEndDate);
+    } else {
+      console.error("Invalid report type or missing custom dates");
+      return;
     }
 
+    // Pass the correct report type to handleGeneratePDF
     setStartDate(selectedStartDate);
     setEndDate(selectedEndDate);
-
-    handleGeneratePDF(selectedStartDate, selectedEndDate);
+    handleGeneratePDF(selectedStartDate, selectedEndDate, reportName); // Explicitly pass reportName as reportType
     setShowPrintModal(false);
   };
 
@@ -204,27 +222,72 @@ const OngoingRescues = ({ requests, user }) => {
     setRescuerName(null);
   };
 
-  const handleGeneratePDF = (startDate, endDate) => {
+  const handleGeneratePDF = (startDate, endDate, reportType) => {
     const doc = new jsPDF("landscape");
 
+    // Parse start and end dates as Date objects, including time boundaries for filtering
     const start = new Date(startDate);
-    start.setUTCHours(0, 0, 0, 0);
+    start.setHours(0, 0, 0, 0);
     const end = new Date(endDate);
-    end.setUTCHours(23, 59, 59, 999);
+    end.setHours(23, 59, 59, 999);
 
+    const imageWidth = 40;
+    const imageHeight = 8;
+
+    doc.addImage(logo, "PNG", 10, 10, imageWidth, imageHeight);
+
+    // Define titles and descriptions based on report type
+    let reportTitle;
+    let reportDescription;
+
+    switch (reportType) {
+      case "Daily Report":
+        reportTitle = "Daily Rescue Operations Report";
+        reportDescription =
+          "A summary of rescue operations conducted throughout the day.";
+        break;
+      case "Weekly Report":
+        reportTitle = "Weekly Rescue Operations Report";
+        reportDescription =
+          "A report summarizing the rescue operations conducted over the past week.";
+        break;
+      case "Monthly Report":
+        reportTitle = "Monthly Rescue Operations Report";
+        reportDescription =
+          "A comprehensive report of all rescue operations conducted during the month.";
+        break;
+      case "Custom Report":
+        reportTitle = "Custom Date Range Report";
+        reportDescription = `Report for rescue operations conducted between ${startDate} and ${endDate}.`;
+        break;
+      default:
+        console.error("Invalid report type");
+        return;
+    }
+
+    // Filter rescues that fall within the date range
     const filteredRescues = ongoingRescues.filter((rescue) => {
-      const requestTimestamp = new Date(rescue.originalRequest.timestamp);
+      const requestTimestamp = new Date(
+        rescue.originalRequest.acceptedTimestamp
+      );
       return requestTimestamp >= start && requestTimestamp <= end;
     });
 
-    doc.setFontSize(18);
-    doc.text(
-      "Ongoing Rescues Report",
-      doc.internal.pageSize.getWidth() / 2,
-      10,
-      { align: "center" }
-    );
+    doc.setFontSize(22);
+    doc.setTextColor("#333333");
+    doc.setFont("helvetica", "bold");
+    doc.text(reportTitle, doc.internal.pageSize.getWidth() / 2, 20, {
+      align: "center",
+    });
 
+    doc.setFontSize(12);
+    doc.setTextColor("#666666");
+    doc.setFont("helvetica", "italic");
+    doc.text(reportDescription, doc.internal.pageSize.getWidth() / 2, 30, {
+      align: "center",
+    });
+
+    // Table columns
     const tableColumn = [
       { title: "#", dataKey: "id" },
       { title: "Rescuer ID", dataKey: "rescuer" },
@@ -237,6 +300,7 @@ const OngoingRescues = ({ requests, user }) => {
       { title: "Status", dataKey: "status" },
     ];
 
+    // Rows data
     const tableRows = filteredRescues.map((rescue, index) => ({
       id: index + 1,
       rescuer: rescue.rescuer,
@@ -249,43 +313,70 @@ const OngoingRescues = ({ requests, user }) => {
       status: rescue.status.charAt(0).toUpperCase() + rescue.status.slice(1),
     }));
 
+    // Customized table style
     doc.autoTable({
       head: [tableColumn.map((col) => col.title)],
       body: tableRows.map((row) => Object.values(row)),
-      startY: 40,
-      theme: "grid",
+      startY: 50,
+      theme: "striped",
       styles: {
-        fontSize: 10,
+        fontSize: 8,
         cellPadding: 2,
         halign: "center",
         valign: "middle",
-        lineColor: "#557C55",
-        lineWidth: 0.5,
+        lineColor: "#CCCCCC",
+        lineWidth: 0.25,
       },
       headStyles: {
         fillColor: "#557C55",
         textColor: "#FFFFFF",
-        fontSize: 10,
+        fontSize: 9,
+        fontStyle: "bold",
       },
+      alternateRowStyles: {
+        fillColor: "#F8F8F8",
+        textColor: "#333333",
+        fontStyle: "semibold",
+      },
+      columnStyles: {
+        0: { cellWidth: 10 }, // Column width for #
+        1: { cellWidth: 20 }, // Rescuer ID
+        2: { cellWidth: 35 }, // Rescuer Name
+        3: { cellWidth: 35 }, // Citizen Name
+        4: { cellWidth: 50 }, // Location
+        5: { cellWidth: 35 }, // Request Date & Time
+        6: { cellWidth: 35 }, // Accepted Date & Time
+        7: { cellWidth: 35 }, // Rescued Date & Time
+        8: { cellWidth: 25 }, // Status
+      },
+      tableWidth: "auto",
+      margin: { left: (doc.internal.pageSize.getWidth() - 280) / 2 },
     });
 
     const pageHeight = doc.internal.pageSize.getHeight();
+    const footerY = pageHeight - 15;
     const pageWidth = doc.internal.pageSize.getWidth();
-    const footerY = pageHeight - 10;
 
     doc.setFontSize(10);
+    doc.setTextColor("#333333");
     doc.text(
       `Generated by: ${user?.first_name} ${user?.last_name}`,
       10,
       footerY
     );
     doc.text(
-      `Generated date: ${new Date().toLocaleString()}`,
+      `Generated on: ${new Date().toLocaleString()}`,
       pageWidth - 70,
       footerY
     );
 
-    doc.save(`ongoing_rescue_operations_${startDate}_to_${endDate}.pdf`);
+    const formattedStartDate = startDate.replace(/-/g, "");
+    const formattedEndDate = endDate.replace(/-/g, "");
+    doc.save(
+      `${reportType
+        .toLowerCase()
+        .replace(/\s/g, "_")}_${formattedStartDate}_to_${formattedEndDate}.pdf`
+    );
   };
 
   const formatDateTime = (dateString) => {
@@ -307,57 +398,81 @@ const OngoingRescues = ({ requests, user }) => {
     <div className="flex flex-col p-4 lg:p-6 h-full">
       {showPrintModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-4 rounded-lg max-w-md w-full">
-            <h4 className="text-xl font-bold mb-4">Select Report Time frame</h4>
+          <div className="bg-white shadow-lg rounded-lg p-6 max-w-md w-full">
+            <div className="flex items-center justify-between mb-6">
+              <h4 className="text-2xl font-bold text-gray-800 flex items-center">
+                <AiFillPrinter className="mr-2 text-primary-dark" />
+                Choose Report Period
+              </h4>
+              <button
+                onClick={() => setShowPrintModal(false)}
+                className="text-gray-500 hover:text-gray-700 transition"
+              >
+                <FaTimes className="text-xl" />
+              </button>
+            </div>
+
             <button
               onClick={() => handleReportSelection("Daily Report")}
-              className="w-full bg-primary-medium text-white p-2 rounded-lg mb-2"
+              className="flex items-center w-full bg-primary-medium text-white py-3 rounded-lg mb-3 shadow-md hover:bg-primary-dark transition"
             >
-              Daily
+              <FaCalendarDay className="mr-3 ml-2 text-lg" />
+              <span className="text-lg font-semibold">Daily Report</span>
             </button>
+
             <button
               onClick={() => handleReportSelection("Weekly Report")}
-              className="w-full bg-primary-medium text-white p-2 rounded-lg mb-2"
+              className="flex items-center w-full bg-primary-medium text-white py-3 rounded-lg mb-3 shadow-md hover:bg-primary-dark transition"
             >
-              Weekly
+              <FaCalendarWeek className="mr-3 ml-2 text-lg" />
+              <span className="text-lg font-semibold">Weekly Report</span>
             </button>
+
             <button
               onClick={() => handleReportSelection("Monthly Report")}
-              className="w-full bg-primary-medium text-white p-2 rounded-lg mb-2"
+              className="flex items-center w-full bg-primary-medium text-white py-3 rounded-lg mb-3 shadow-md hover:bg-primary-dark transition"
             >
-              Monthly
+              <FaCalendarAlt className="mr-3 ml-2 text-lg" />
+              <span className="text-lg font-semibold">Monthly Report</span>
             </button>
-            <div className="mb-2">
-              <label className="block text-sm font-semibold mb-1">
-                Custom Date Range
+
+            <div className="mb-4 mt-16">
+              <label className="block text-md font-semibold text-gray-700 mb-2">
+                Custom Date Range:
               </label>
-              <div className="flex space-x-2">
+              <div className="flex space-x-3">
                 <DatePicker
                   selected={customStartDate}
                   onChange={(date) => setCustomStartDate(date)}
                   placeholderText="Start Date"
-                  className="border border-gray-300 p-2 rounded-lg w-full"
+                  className="border border-gray-300 py-2 px-3 rounded-lg w-full text-gray-700"
                 />
                 <DatePicker
                   selected={customEndDate}
                   onChange={(date) => setCustomEndDate(date)}
                   placeholderText="End Date"
-                  className="border border-gray-300 p-2 rounded-lg w-full"
+                  className="border border-gray-300 py-2 px-3 rounded-lg w-full text-gray-700"
                 />
               </div>
             </div>
+
             <button
               onClick={() => handleReportSelection("Custom Report")}
-              className="w-full bg-primary-medium text-white p-2 rounded-lg mb-2"
+              className="w-full flex items-center justify-center bg-primary-medium text-white py-3 rounded-lg shadow-md hover:bg-primary-dark transition"
               disabled={!customStartDate || !customEndDate}
             >
-              Generate Custom Report
+              <FaFileAlt className="mr-3 text-lg" />
+              <span className="text-lg font-semibold">
+                Generate Custom Report
+              </span>
             </button>
+
             <button
               onClick={() => setShowPrintModal(false)}
-              className="w-full bg-gray-200 text-black p-2 rounded-lg hover:opacity-80 transition"
+              className="w-full mt-4 flex items-center justify-center bg-gray-200 text-gray-800 py-3 rounded-lg hover:bg-gray-300 transition"
             >
-              Cancel
+              <FaTimes className="mr-3 text-lg" />
+              <span className="text-lg font-semibold">Cancel</span>
             </button>
           </div>
         </div>
@@ -366,7 +481,7 @@ const OngoingRescues = ({ requests, user }) => {
       <div className="flex items-center mb-2 sm:mb-4 border-b border-gray-200 pb-3">
         <FaAmbulance className="text-3xl sm:text-2xl lg:text-3xl text-primary-dark mr-2 fill-current" />
         <h4 className="text-xl sm:text-md lg:text-3xl text-primary-dark font-bold">
-          Ongoing Rescue Operations
+          Rescue Operations
         </h4>
       </div>
 

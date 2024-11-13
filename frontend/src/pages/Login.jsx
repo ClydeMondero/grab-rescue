@@ -2,7 +2,7 @@ import logo from "../assets/logo.png";
 import { useSearchParams, useNavigate, Link } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { userLoginSchema } from "../models/Users"; // Ensure this handles email/username properly
+import { userLoginSchema } from "../models/Users"; 
 import { useContext, useState } from "react";
 import {
   FaEnvelope,

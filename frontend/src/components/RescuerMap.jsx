@@ -22,6 +22,7 @@ import { FaLocationPin } from "react-icons/fa6";
 import { useLocation } from "react-router-dom";
 import { setGeolocateIcon } from "../utils/GeolocateUtility";
 import * as turf from "@turf/turf";
+import { set } from "lodash";
 
 const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
   const { rescuer, setRescuer } = useContext(RescuerContext);
@@ -47,7 +48,7 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
   const handleGeolocation = async (coords) => {
     setCoords(coords);
 
-    if (mapRef.current.resize()) {
+    if (mapRef.current && mapRef.current.resize()) {
       mapRef.current.resize();
     }
 
@@ -62,6 +63,7 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
     );
 
     if (existingLocation) {
+      console.log("updating location");
       updateUserLocation(
         existingLocation.id,
         rescuer.longitude,
@@ -70,6 +72,7 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
         coords.latitude
       );
     } else {
+      console.log("adding location");
       addUserLocation(coords.longitude, coords.latitude, "rescuer", id);
     }
 
@@ -89,6 +92,12 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
       setIsOnRoute(onRoute);
     }
   };
+
+  useEffect(() => {
+    if (coords) {
+      handleGeolocation(coords);
+    }
+  }, [coords]);
 
   const checkIfOnRoute = (currentLocation, route) => {
     const currentPoint = turf.point([
@@ -200,12 +209,6 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
   }, [navigating]);
 
   useEffect(() => {
-    if (mapRef.current && geoControlRef.current) {
-      setTimeout(() => {
-        geoControlRef.current.trigger(); // Trigger after map is fully loaded
-      }, 1000);
-    }
-
     const unsubscribe = getLocationsFromFirestore("rescuer", setLocations);
 
     return () => {
@@ -239,9 +242,7 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
           handleGeolocation(coords);
         }}
       />
-
       {locating && <LocatingIndicator locating={locating} type="rescuer" />}
-
       {navigating && (
         <TurnIndicator
           routeData={routeData}
