@@ -168,6 +168,12 @@ const CitizenMap = forwardRef((props, ref) => {
       setEta(null);
     }
 
+    if (!nearestRescuer && !assignedRescuer) {
+      setRouteData(null);
+      setDistance(null);
+      setEta(null);
+    }
+
     if (nearestRescuer || assignedRescuer) {
       getRoute();
     }
