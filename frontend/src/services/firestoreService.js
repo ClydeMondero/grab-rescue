@@ -77,18 +77,20 @@ export const updateLocationStatus = async (id, status) => {
 
   const querySnapshot = await getDocs(q);
 
-  const location = querySnapshot.docs.map((doc) => ({
+  const locations = querySnapshot.docs.map((doc) => ({
     ...doc.data(),
     id: doc.id,
-  }))[0];
+  }));
 
-  if (location) {
+  const updatePromises = locations.map((location) => {
     const locationRef = doc(store, "locations", location.id);
-    try {
-      await updateDoc(locationRef, { status });
-    } catch (error) {
-      console.error(`Error updating location status to ${status}: `, error);
-    }
+    return updateDoc(locationRef, { status });
+  });
+
+  try {
+    await Promise.all(updatePromises);
+  } catch (error) {
+    console.error(`Error updating location status to ${status}: `, error);
   }
 };
 
