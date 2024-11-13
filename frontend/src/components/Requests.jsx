@@ -13,7 +13,12 @@ import { formatDistance, formatDuration } from "../utils/DistanceUtility";
 import { setSelectedRequestCookie } from "../services/cookieService";
 import { acceptRescueRequestInFirestore } from "../services/firestoreService";
 import { getLocationsFromFirestore } from "../services/firestoreService";
-import { NoRequests, NotNearestRescuerPrompt } from "../components";
+import {
+  NoNumberPrompt,
+  NoRequests,
+  NotNearestRescuerPrompt,
+} from "../components";
+import { set } from "lodash";
 
 const Requests = ({
   userId,
@@ -31,6 +36,7 @@ const Requests = ({
   const [filteredRescuers, setFilteredRescuers] = useState([]);
   const [nearestRescuer, setNearestRescuer] = useState(null);
   const [showNotNearestModal, setShowNotNearestModal] = useState(false);
+  const [showNoNumberModal, setShowNoNumberModal] = useState(false);
   const [hasConfirmedRequest, setHasConfirmedRequest] = useState(false);
   const [citizen, setCitizen] = useState({
     longitude: 120.926105,
@@ -44,6 +50,12 @@ const Requests = ({
   useEffect(() => {
     if (selectedRequest && !hasConfirmedRequest) {
       console.log("Selected request:", selectedRequest);
+
+      if (!selectedRequest.phone) {
+        setShowNoNumberModal(true);
+        return;
+      }
+
       const nearest = getNearestRescuer(citizen, filteredRescuers);
       setNearestRescuer(nearest);
 
@@ -87,6 +99,7 @@ const Requests = ({
 
   const handleContinue = async () => {
     setShowNotNearestModal(false);
+    setShowNoNumberModal(false);
     console.log("Continue with the request.");
     handleAssign();
   };
@@ -94,6 +107,7 @@ const Requests = ({
   const handleCancel = () => {
     setSelectedRequest(null);
     setShowNotNearestModal(false);
+    setShowNoNumberModal(false);
   };
 
   const fetchRoutes = async () => {
@@ -304,6 +318,10 @@ const Requests = ({
           onContinue={handleContinue}
           onCancel={handleCancel}
         />
+      )}
+
+      {showNoNumberModal && (
+        <NoNumberPrompt onContinue={handleContinue} onCancel={handleCancel} />
       )}
 
       {isModalOpen && (
