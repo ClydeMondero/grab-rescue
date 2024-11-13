@@ -4,6 +4,7 @@ import { useRef } from "react"; // Import useRef
 import { FaLocationPin } from "react-icons/fa6";
 import { BiSolidAmbulance } from "react-icons/bi";
 import { RiGovernmentFill } from "react-icons/ri";
+import { FaChevronLeft } from "react-icons/fa";
 
 const About = () => {
   const navigate = useNavigate();
@@ -20,6 +21,15 @@ const About = () => {
       <div className="flex flex-col gap-y-16 w-full">
         {/* Hero Section with Parallax Effect */}
         <div className="relative h-screen w-full bg-cover bg-center text-center text-black parallax-hero">
+          <div className="absolute top-10 left-0 p-4 cursor-pointer md:hidden z-[200]">
+            <button
+              onClick={() => navigate("/")}
+              className="flex items-center justify-center"
+            >
+              <FaChevronLeft className="text-white text-3xl" />
+            </button>
+          </div>
+
           <div className="absolute inset-0 bg-black bg-opacity-50 md:bg-opacity-50 flex items-center justify-center">
             <div>
               <h2 className="text-7xl md:text-8xl font-bold tracking-wider leading-tight text-white">
