@@ -9,15 +9,21 @@ import {
   FaCalendarWeek,
 } from "react-icons/fa";
 import { AiFillPrinter } from "react-icons/ai";
+import { FaLocationPin } from "react-icons/fa6";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import axios from "axios";
-import { Map } from "react-map-gl";
+import { Map, Marker } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import placeholder from "../assets/placeholder.png";
 import logo from "../assets/logo.png";
+import {
+  getLocationFromFirestoreInRealTime,
+  getLocationIDFromFirestore,
+} from "../services/firestoreService";
+import { BiSolidAmbulance } from "react-icons/bi";
 
 const OngoingRescues = ({ requests, user }) => {
   const [showMap, setShowMap] = useState(false);
@@ -33,6 +39,18 @@ const OngoingRescues = ({ requests, user }) => {
   const [customStartDate, setCustomStartDate] = useState(null);
   const [customEndDate, setCustomEndDate] = useState(null);
   const [rescuerArea, setRescuerArea] = useState(null);
+  const [citizen, setCitizen] = useState({
+    longitude: 120.9107,
+    latitude: 14.9536,
+    zoom: 15,
+  });
+  const [rescuer, setRescuer] = useState({
+    longitude: 120.9107,
+    latitude: 14.9536,
+    zoom: 15,
+  });
+
+  const [bounds, setBounds] = useState([]);
 
   const ongoingRescues = requests
     .filter((request) => {
@@ -88,12 +106,44 @@ const OngoingRescues = ({ requests, user }) => {
   };
 
   const handleShowMap = (request) => {
+    console.log("request", request);
+
+    const citizenId = request.originalRequest.citizenId;
+    getLocationFromFirestoreInRealTime(citizenId, setCitizen);
+
+    const rescuerId = request.originalRequest.rescuerId;
+
+    const rescuerLocation = getLocationIDFromFirestore(rescuerId);
+
+    getLocationFromFirestoreInRealTime(rescuerLocation, setRescuer);
+    const rescuerLongitude = rescuer.longitude;
+    const rescuerLatitude = rescuer.latitude;
+    const citizenLongitude = citizen.longitude;
+    const citizenLatitude = citizen.latitude;
+
+    const minLongitude = Math.min(rescuerLongitude, citizenLongitude);
+    const maxLongitude = Math.max(rescuerLongitude, citizenLongitude);
+    const minLatitude = Math.min(rescuerLatitude, citizenLatitude);
+    const maxLatitude = Math.max(rescuerLatitude, citizenLatitude);
+
+    const newBounds = [
+      [minLongitude, minLatitude],
+      [maxLongitude, maxLatitude],
+    ];
+
+    setBounds(newBounds);
+
     setSelectedLocation({
-      latitude: request.originalRequest.location.latitude,
-      longitude: request.originalRequest.location.longitude,
+      latitude: citizen.latitude,
+      longitude: citizen.longitude,
     });
+
     setShowMap(true);
   };
+
+  useEffect(() => {
+    console.log("citizen", citizen);
+  }, [citizen]);
 
   const handleCloseMap = () => {
     setShowMap(false);
@@ -304,8 +354,8 @@ const OngoingRescues = ({ requests, user }) => {
     const tableRows = filteredRescues.map((rescue, index) => ({
       id: index + 1,
       rescuer: rescue.rescuer,
-      rescuerName: rescue.rescuerName || "Unknown",
-      citizenName: rescue.originalRequest.citizenName || "N/A",
+      rescuerName: rescue.rescuerName || "",
+      citizenName: rescue.originalRequest.citizenName || "",
       location: rescue.location,
       requestTimestamp: formatDateTime(rescue.originalRequest.timestamp),
       acceptedTimestamp: formatDateTime(rescue.acceptedTimestamp),
@@ -640,25 +690,52 @@ const OngoingRescues = ({ requests, user }) => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-4 rounded-lg max-w-lg w-full">
             <div className="flex items-center justify-between mb-4">
-              <h4 className="text-xl font-bold">Rescue Location Details</h4>
+              <h4 className="text-xl font-bold">Rescue Location</h4>
               <FaTimes
                 onClick={handleCloseMap}
                 className="text-xl text-background-medium cursor-pointer"
               />
             </div>
 
-            <Map
-              initialViewState={{
-                latitude: selectedLocation.latitude,
-                longitude: selectedLocation.longitude,
-                zoom: 15,
-              }}
-              mapStyle={"mapbox://styles/mapbox/streets-v12"}
-              mapboxAccessToken={import.meta.env.VITE_MAPBOX_TOKEN}
-              maxzoom={15}
-            ></Map>
-
-            <div style={{ height: "400px", width: "100%" }}></div>
+            <div style={{ height: "400px", width: "100%" }}>
+              {citizen && rescuer && (
+                <Map
+                  initialViewState={{
+                    latitude: selectedLocation.latitude,
+                    longitude: selectedLocation.longitude,
+                    zoom: 15,
+                  }}
+                  mapStyle={"mapbox://styles/mapbox/streets-v12"}
+                  mapboxAccessToken={import.meta.env.VITE_MAPBOX_TOKEN}
+                  maxzoom={15}
+                  dragRotate={false}
+                  pitchWithRotate={false}
+                >
+                  <Marker
+                    latitude={citizen?.latitude}
+                    longitude={citizen?.longitude}
+                  >
+                    <div className="relative flex flex-col items-center justify-center">
+                      <FaLocationPin className="text-3xl text-secondary red-pulse" />
+                      <p className="bg-background px-2 py-1 rounded-full text-text-primary text-md font-semibold">
+                        Citizen
+                      </p>
+                    </div>
+                  </Marker>
+                  <Marker
+                    latitude={citizen?.latitude}
+                    longitude={citizen?.longitude}
+                  >
+                    <div className="relative flex flex-col items-center justify-center">
+                      <BiSolidAmbulance className="text-3xl text-primary green-pulse" />
+                      <p className="bg-background px-2 py-1 rounded-full text-text-primary text-md font-semibold">
+                        Rescuer
+                      </p>
+                    </div>
+                  </Marker>
+                </Map>
+              )}
+            </div>
           </div>
         </div>
       )}

@@ -168,6 +168,10 @@ const Home = () => {
     setRequest(null);
     setRequesting(false);
     setAssignedRescuer(null);
+
+    setTimeout(() => {
+      window.location.reload();
+    }, 3000);
   };
 
   const handleModalCancel = () => {

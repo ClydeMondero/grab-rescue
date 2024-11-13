@@ -1,9 +1,20 @@
-import React from "react";
+import { useState, useEffect } from "react";
 import { hotlines } from "../constants/Hotlines";
 import { FaPhone, FaClipboard, FaTimes } from "react-icons/fa";
 import { toast } from "react-toastify";
+import MobileDetect from "mobile-detect";
 
-const HotlineModal = ({ onClose, onMobile }) => {
+const HotlineModal = ({ onClose }) => {
+  const [onMobile, setOnMobile] = useState(false);
+
+  useEffect(() => {
+    const md = new MobileDetect(window.navigator.userAgent);
+    const isSmallScreen = window.innerWidth <= 768;
+    const isMobile = !!md.mobile() && isSmallScreen;
+
+    setOnMobile(isMobile);
+  }, []);
+
   // Handle call or copy phone number based on platform
   const handlePhoneAction = (phoneNumber) => {
     if (onMobile) {
