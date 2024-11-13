@@ -18,7 +18,6 @@ const StatusProvider = ({ children }) => {
   const [id, setId] = useState(null);
 
   const getId = async () => {
-    // Prefer user cookie if available
     const userId = await getIDFromCookie();
 
     if (userId) {
@@ -59,7 +58,6 @@ const StatusProvider = ({ children }) => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     }
 
-    // Listen for user activity events
     document.addEventListener("mousemove", handleActivity);
     document.addEventListener("keydown", handleActivity);
     document.addEventListener("touchstart", handleActivity);
@@ -71,7 +69,7 @@ const StatusProvider = ({ children }) => {
       document.removeEventListener("keydown", handleActivity);
       document.removeEventListener("touchstart", handleActivity);
     };
-  }, [id]); // Only depend on id for event listeners
+  }, [id]);
 
   useEffect(() => {
     const statusCookie = getStatusCookie();
@@ -91,10 +89,10 @@ const StatusProvider = ({ children }) => {
         }
       }
     }
-  }, [isOnline, id]); // Include isOnline and id as dependencies
+  }, [isOnline, id]);
 
   return (
-    <StatusContext.Provider value={{ isOnline, getId, id }}>
+    <StatusContext.Provider value={{ isOnline, getId, id: id || undefined }}>
       {children}
     </StatusContext.Provider>
   );

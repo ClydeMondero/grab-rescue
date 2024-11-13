@@ -32,8 +32,10 @@ import NoRequests from "./NoRequests";
 import NotNearestRescuerPrompt from "./NotNearestRescuerPrompt";
 import ThemeToggle from "./ThemeToggle";
 import FontSelector from "./FontSelector";
+import NoNumberPrompt from "./NoNumberPrompt";
 
 export {
+  NoNumberPrompt,
   FontSelector,
   ThemeToggle,
   NotNearestRescuerPrompt,

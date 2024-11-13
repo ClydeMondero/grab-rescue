@@ -35,6 +35,16 @@ export const addLocationToFirestore = async (
   };
 
   try {
+    // Delete existing locations with the same userId
+    const q = query(
+      collection(store, "locations"),
+      where("userId", "==", userId)
+    );
+    const querySnapshot = await getDocs(q);
+    const deletePromises = querySnapshot.docs.map((doc) => deleteDoc(doc.ref));
+    await Promise.all(deletePromises);
+
+    // Add new location
     const docRef = await addDoc(collection(store, "locations"), location);
     return { id: docRef.id };
   } catch (error) {
