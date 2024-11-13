@@ -93,15 +93,11 @@ const Home = () => {
 
     const unsubscribe = getRequestFromFirestore(requestId, (onGoingRequest) => {
       setRequest(onGoingRequest);
-    });
 
-    // Check if the request status is 'rescued'
-    if (onGoingRequest && onGoingRequest.status === "rescued") {
-      setRequest(null);
-      setRequesting(false); // Clear requesting state
-      deleteCookie("request_token"); // Delete the request_token cookie
-      setAssignedRescuer(null);
-    }
+      if (onGoingRequest.status === "rescued") {
+        handleCompleteRequest();
+      }
+    });
 
     return () => {
       unsubscribe();
@@ -167,11 +163,10 @@ const Home = () => {
   };
 
   const handleCompleteRequest = () => {
+    deleteCookie("request_token");
     setRequest(null);
     setRequesting(false);
-    deleteCookie("request_token");
     setAssignedRescuer(null);
-    setShowConfirmationModal(false);
   };
 
   const handleModalCancel = () => {
