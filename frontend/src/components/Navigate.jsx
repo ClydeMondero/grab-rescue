@@ -13,6 +13,7 @@ import {
   updateRequestStatusInFirestore,
   getLocationFromFirestore,
   getLocationIDFromFirestore,
+  getLocationFromFirestoreInRealTime,
 } from "../services/firestoreService";
 import { Loader } from "../components";
 import MobileDetect from "mobile-detect";
@@ -37,6 +38,7 @@ const Navigate = ({ requestID, setSelectedRequest }) => {
   const { id, getId } = useContext(StatusContext);
   const { navigating, setNavigating } = useContext(RescuerContext);
   const mapRef = useRef();
+  const [requestLocation, setRequestLocation] = useState(null);
 
   const handleLocatingChange = (newLocatingState) => {
     setLocating(newLocatingState);
@@ -55,6 +57,20 @@ const Navigate = ({ requestID, setSelectedRequest }) => {
       unsubscribe();
     };
   }, [requestID]);
+
+  useEffect(() => {
+    if (requestData) {
+      const citizen = requestData.citizenId;
+
+      if (citizen) {
+        getLocationFromFirestoreInRealTime(citizen, setRequestLocation);
+      }
+    }
+  }, [requestData]);
+
+  useEffect(() => {
+    console.log("requestLocation", requestLocation);
+  }, [requestLocation]);
 
   const handlePhone = () => {
     if (onMobile) {
@@ -138,7 +154,7 @@ const Navigate = ({ requestID, setSelectedRequest }) => {
           requestData ? (
             <Map
               mapRef={mapRef}
-              citizen={requestData.location}
+              citizen={requestLocation || requestData?.location}
               onLocatingChange={handleLocatingChange}
               navigating={navigating}
             />
@@ -203,11 +219,21 @@ const Navigate = ({ requestID, setSelectedRequest }) => {
               <div className="flex gap-6">
                 <div className="flex flex-col gap-1">
                   <div className="text-primary-dark font-semibold text-2xl">
-                    <p>{requestData.location.address.split(",")[0]}</p>
+                    <p>
+                      {
+                        (
+                          requestLocation?.address ||
+                          requestData.location?.address
+                        ).split(",")[0]
+                      }
+                    </p>
                   </div>
                   <div className="text-primary-medium text-lg">
                     <p>
-                      {requestData.location.address
+                      {(
+                        requestLocation?.address ||
+                        requestData.location?.address
+                      )
                         .split(",")
                         .slice(1, 5)
                         .join(", ")}

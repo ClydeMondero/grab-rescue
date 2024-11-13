@@ -193,11 +193,15 @@ const Home = () => {
   useEffect(() => {
     if (!request) return;
 
+    if (!request.rescuerId) return;
+
     const assigned = allRescuers.filter(
       (rescuer) => rescuer.userId === request.rescuerId
     );
 
-    getLocationFromFirestoreInRealTime(assigned[0].id, setAssignedRescuer);
+    if (assigned) {
+      getLocationFromFirestoreInRealTime(assigned[0].id, setAssignedRescuer);
+    }
   }, [request]);
 
   useEffect(() => {
