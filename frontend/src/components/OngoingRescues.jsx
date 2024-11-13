@@ -105,7 +105,7 @@ const OngoingRescues = ({ requests, user }) => {
     }
   };
 
-  const handleShowMap = (request) => {
+  const handleShowMap = async (request) => {
     console.log("request", request);
 
     const citizenId = request.originalRequest.citizenId;
@@ -113,29 +113,23 @@ const OngoingRescues = ({ requests, user }) => {
 
     const rescuerId = request.originalRequest.rescuerId;
 
-    const rescuerLocation = getLocationIDFromFirestore(rescuerId);
+    const rescuerLocation = await getLocationIDFromFirestore(rescuerId);
 
     getLocationFromFirestoreInRealTime(rescuerLocation, setRescuer);
+
     const rescuerLongitude = rescuer.longitude;
     const rescuerLatitude = rescuer.latitude;
     const citizenLongitude = citizen.longitude;
     const citizenLatitude = citizen.latitude;
 
-    const minLongitude = Math.min(rescuerLongitude, citizenLongitude);
-    const maxLongitude = Math.max(rescuerLongitude, citizenLongitude);
-    const minLatitude = Math.min(rescuerLatitude, citizenLatitude);
-    const maxLatitude = Math.max(rescuerLatitude, citizenLatitude);
-
-    const newBounds = [
-      [minLongitude, minLatitude],
-      [maxLongitude, maxLatitude],
-    ];
-
-    setBounds(newBounds);
+    const selectedLongitude = (rescuerLongitude + citizenLongitude) / 2;
+    const selectedLatitude = (rescuerLatitude + citizenLatitude) / 2;
 
     setSelectedLocation({
-      latitude: citizen.latitude,
-      longitude: citizen.longitude,
+      longitude: selectedLongitude,
+      latitude: selectedLatitude,
+      zoom: 12,
+      padding: 50,
     });
 
     setShowMap(true);
@@ -144,6 +138,10 @@ const OngoingRescues = ({ requests, user }) => {
   useEffect(() => {
     console.log("citizen", citizen);
   }, [citizen]);
+
+  useEffect(() => {
+    console.log("rescuer", rescuer);
+  }, [rescuer]);
 
   const handleCloseMap = () => {
     setShowMap(false);
@@ -703,7 +701,7 @@ const OngoingRescues = ({ requests, user }) => {
                   initialViewState={{
                     latitude: selectedLocation.latitude,
                     longitude: selectedLocation.longitude,
-                    zoom: 15,
+                    zoom: selectedLocation.zoom,
                   }}
                   mapStyle={"mapbox://styles/mapbox/streets-v12"}
                   mapboxAccessToken={import.meta.env.VITE_MAPBOX_TOKEN}
