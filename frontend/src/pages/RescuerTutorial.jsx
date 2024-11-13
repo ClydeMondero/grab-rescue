@@ -1,6 +1,9 @@
 import { Nav } from "../components";
 import { useNavigate } from "react-router-dom";
-
+import rescuerOne from "../assets/tutorial-citizen-OnLocation.png";
+import rescuerTwo from "../assets/tutorial-citizen-location.png";
+import rescuerThree from "../assets/tutorial-citizen-OnLocation.png";
+import rescuerFour from "../assets/tutorial-citizen-location.png";
 const RescuerTutorial = () => {
   const navigate = useNavigate();
 
@@ -32,7 +35,7 @@ const RescuerTutorial = () => {
                 </p>
                 <div className="flex items-center justify-center mt-4">
                   <img
-                    src="src/assets/tutorial-citizen-OnLocation.png"
+                    src={rescuerOne}
                     className="h-64 w-36 md:w-44 md:h-96"
                     alt="On Location"
                   />
@@ -48,7 +51,7 @@ const RescuerTutorial = () => {
                 </p>
                 <div className="flex items-center justify-center mt-4">
                   <img
-                    src="src/assets/tutorial-citizen-location.png"
+                    src={rescuerTwo}
                     className="h-64 w-36 md:w-44 md:h-96"
                     alt="Current Location"
                   />
@@ -72,7 +75,7 @@ const RescuerTutorial = () => {
                 </p>
                 <div className="flex items-center justify-center mt-4">
                   <img
-                    src="src/assets/tutorial-citizen-OnLocation.png"
+                    src={rescuerThree}
                     className="h-64 w-36 md:w-44 md:h-96"
                     alt="On Location"
                   />
@@ -89,7 +92,7 @@ const RescuerTutorial = () => {
                 </p>
                 <div className="flex items-center justify-center mt-4">
                   <img
-                    src="src/assets/tutorial-citizen-location.png"
+                    src={rescuerFour}
                     className="h-64 w-36 md:w-44 md:h-96"
                     alt="Current Location"
                   />

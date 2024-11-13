@@ -5,6 +5,7 @@ import { FaLocationPin } from "react-icons/fa6";
 import { BiSolidAmbulance } from "react-icons/bi";
 import { RiGovernmentFill } from "react-icons/ri";
 import { FaChevronLeft } from "react-icons/fa";
+import contentAbout from "../assets/content-about.jpg";
 
 const About = () => {
   const navigate = useNavigate();
@@ -83,7 +84,7 @@ const About = () => {
               </div>
               <div className="bg-gray-200 p-6 shadow-sm">
                 <img
-                  src="../src/assets/content-about.jpg"
+                  src={contentAbout}
                   alt="Image"
                   className="w-full h-full object-contain"
                 />
@@ -99,8 +100,8 @@ const About = () => {
             Click the button below to get started.
           </p>
 
-          <div className="grid gap-6 md:grid-cols-3 w-full px-4 py-6 md:px-8 md:py-8 items-center justify-center">
-            <div className="bg-gray-50 p-6 shadow-lg rounded-lg transition hover:scale-110 duration-300 hover:text-green-600 flex flex-col items-center">
+          <div className="flex items-center justify-around w-full px-4 py-6 md:px-8 md:py-8">
+            <div className="bg-gray-50 p-6  transition hover:scale-110 duration-300 hover:text-green-600 flex flex-col items-center">
               <h4 className="text-4xl font-semibold flex items-center gap-2">
                 <FaLocationPin className="h-8 w-8" />
                 Citizen
@@ -116,7 +117,7 @@ const About = () => {
               </button>
             </div>
 
-            <div className="bg-gray-50 p-6 shadow-lg rounded-lg hover:scale-110 transition duration-300 hover:text-green-600 flex flex-col items-center">
+            <div className="bg-gray-50 p-6 hover:scale-110 transition duration-300 hover:text-green-600 flex flex-col items-center">
               <h4 className="text-4xl font-semibold flex items-center gap-2">
                 <BiSolidAmbulance className="h-9 w-9" />
                 Rescuer
@@ -129,22 +130,6 @@ const About = () => {
                 className="mt-6 px-20 py-3 tracking-wider leading-tight bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-lg"
               >
                 Rescuer Tutorial
-              </button>
-            </div>
-
-            <div className="bg-gray-50 p-6 shadow-lg rounded-lg hover:scale-110 transition duration-300 hover:text-green-600 flex flex-col items-center">
-              <h4 className="text-4xl font-semibold flex items-center gap-2">
-                <RiGovernmentFill className="h-8 w-8" />
-                Admin
-              </h4>
-              <p className="mt-2 text-gray-600 text-center text-base">
-                Admin Step by Step Guide
-              </p>
-              <button
-                onClick={() => navigate("/admin-tutorial")}
-                className="mt-6 px-20 py-3 tracking-wider leading-tight bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-lg"
-              >
-                Admin Tutorial
               </button>
             </div>
           </div>

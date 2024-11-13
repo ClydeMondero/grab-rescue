@@ -1,6 +1,24 @@
 import { Nav } from "../components";
 import { useNavigate } from "react-router-dom";
-
+import citizenOne from "../assets/tutorial-citizen-OnLocation.png";
+import citizenTwo from "../assets/tutorial-citizen-location.png";
+import citizenThree from "../assets/tutorial-citizen-location.png";
+import citizenFour from "../assets/tutorial-citizen-nearestrescuer.png";
+import citizenFive from "../assets/tutorial-citizen-viewroute.png";
+import citizenSix from "../assets/tutorial-citizen-hideroute.png";
+import citizenSeven from "../assets/tutorial-citizen-location.png";
+import citizenEight from "../assets/tutorial-citizen-notesbeforesendingrequest.png";
+import citizenNine from "../assets/tutorial-citizen-waitingrescueracceptance.png";
+import citizenTen from "../assets/tutorial-citizen-waitingrescueracceptance.png";
+import citizenEleven from "../assets/tutorial-citizen-name.png";
+import citizenTwelve from "../assets/tutorial-citizen-relation.png";
+import citizenThirteen from "../assets/tutorial-citizen-proof.png";
+import citizenFourtheen from "../assets/tutorial-citizen-description.png";
+import citizenFifteen from "../assets/tutorial-citizen-waitingrescueracceptance.png";
+import citizenSixteen from "../assets/tutorial-citizen-name.png";
+import citizenSeventeen from "../assets/tutorial-citizen-relation.png";
+import eightTeen from "../assets/tutorial-citizen-proof.png";
+import nineTeen from "../assets/tutorial-citizen-description.png";
 const CitizenTutorial = () => {
   const navigate = useNavigate();
 
@@ -32,7 +50,7 @@ const CitizenTutorial = () => {
                 </p>
                 <div className="flex items-center justify-center mt-4">
                   <img
-                    src="src/assets/tutorial-citizen-OnLocation.png"
+                    src={citizenOne}
                     className="h-64 w-36 md:w-44 md:h-96"
                     alt="On Location"
                   />
@@ -49,7 +67,7 @@ const CitizenTutorial = () => {
                 </p>
                 <div className="flex items-center justify-center mt-4">
                   <img
-                    src="src/assets/tutorial-citizen-location.png"
+                    src={citizenTwo}
                     className="h-64 w-36 md:w-44 md:h-96"
                     alt="Current Location"
                   />
@@ -74,7 +92,7 @@ const CitizenTutorial = () => {
                 </p>
                 <div className="flex items-center justify-center mt-4">
                   <img
-                    src="src/assets/tutorial-citizen-location.png"
+                    src={citizenThree}
                     className="h-64 w-36 md:w-44 md:h-96"
                     alt="On Location"
                   />
@@ -91,7 +109,7 @@ const CitizenTutorial = () => {
                 </p>
                 <div className="flex items-center justify-center mt-4">
                   <img
-                    src="src/assets/tutorial-citizen-nearestrescuer.png"
+                    src={citizenFour}
                     className="h-64 w-36 md:w-44 md:h-96"
                     alt="Current Location"
                   />
@@ -109,7 +127,7 @@ const CitizenTutorial = () => {
                 </p>
                 <div className="flex items-center justify-center mt-4">
                   <img
-                    src="src/assets/tutorial-citizen-viewroute.png"
+                    src={citizenFive}
                     className="h-64 w-36 md:w-44 md:h-96"
                     alt="Current Location"
                   />
@@ -125,7 +143,7 @@ const CitizenTutorial = () => {
                 </p>
                 <div className="flex items-center justify-center mt-4">
                   <img
-                    src="src/assets/tutorial-citizen-hideroute.png"
+                    src={citizenSix}
                     className="h-64 w-36 md:w-44 md:h-96"
                     alt="Current Location"
                   />
@@ -150,7 +168,7 @@ const CitizenTutorial = () => {
                 </p>
                 <div className="flex items-center justify-center mt-4">
                   <img
-                    src="src/assets/tutorial-citizen-location.png"
+                    src={citizenSeven}
                     className="h-64 w-36 md:w-44 md:h-96"
                     alt="On Location"
                   />
@@ -169,7 +187,7 @@ const CitizenTutorial = () => {
                 </p>
                 <div className="flex items-center justify-center mt-4">
                   <img
-                    src="src/assets/tutorial-citizen-notesbeforesendingrequest.png"
+                    src={citizenEight}
                     className="h-64 w-36 md:w-44 md:h-96"
                     alt="Current Location"
                   />
@@ -189,7 +207,7 @@ const CitizenTutorial = () => {
                 </p>
                 <div className="flex items-center justify-center mt-4">
                   <img
-                    src="src/assets/tutorial-citizen-waitingrescueracceptance.png"
+                    src={citizenNine}
                     className="h-64 w-36 md:w-44 md:h-96"
                     alt="waiting for rescuer"
                   />
@@ -215,7 +233,7 @@ const CitizenTutorial = () => {
                 </p>
                 <div className="flex items-center justify-center mt-4">
                   <img
-                    src="src/assets/tutorial-citizen-waitingrescueracceptance.png"
+                    src={citizenTen}
                     className="h-64 w-36 md:w-44 md:h-96"
                     alt="On Location"
                   />
@@ -232,7 +250,7 @@ const CitizenTutorial = () => {
                 </p>
                 <div className="flex items-center justify-center mt-4">
                   <img
-                    src="src/assets/tutorial-citizen-name.png"
+                    src={citizenEleven}
                     className="h-64 w-36 md:w-44 md:h-96"
                     alt="Current Location"
                   />
@@ -253,7 +271,7 @@ const CitizenTutorial = () => {
                 </p>
                 <div className="flex items-center justify-center mt-4">
                   <img
-                    src="src/assets/tutorial-citizen-relation.png"
+                    src={citizenTwelve}
                     className="h-64 w-36 md:w-44 md:h-96"
                     alt="On Location"
                   />
@@ -272,7 +290,7 @@ const CitizenTutorial = () => {
                 </p>
                 <div className="flex items-center justify-center mt-4">
                   <img
-                    src="src/assets/tutorial-citizen-proof.png"
+                    src={citizenThirteen}
                     className="h-64 w-36 md:w-44 md:h-96"
                     alt="Current Location"
                   />
@@ -292,7 +310,7 @@ const CitizenTutorial = () => {
                 </p>
                 <div className="flex items-center justify-center mt-4">
                   <img
-                    src="src/assets/tutorial-citizen-description.png"
+                    src={citizenFourtheen}
                     className="h-64 w-36 md:w-44 md:h-96"
                     alt="On Location"
                   />
@@ -317,7 +335,7 @@ const CitizenTutorial = () => {
                 </p>
                 <div className="flex items-center justify-center mt-4">
                   <img
-                    src="src/assets/tutorial-citizen-waitingrescueracceptance.png"
+                    src={citizenFifteen}
                     className="h-64 w-36 md:w-44 md:h-96"
                     alt="On Location"
                   />
@@ -334,7 +352,7 @@ const CitizenTutorial = () => {
                 </p>
                 <div className="flex items-center justify-center mt-4">
                   <img
-                    src="src/assets/tutorial-citizen-name.png"
+                    src={citizenSixteen}
                     className="h-64 w-36 md:w-44 md:h-96"
                     alt="Current Location"
                   />
@@ -355,7 +373,7 @@ const CitizenTutorial = () => {
                 </p>
                 <div className="flex items-center justify-center mt-4">
                   <img
-                    src="src/assets/tutorial-citizen-relation.png"
+                    src={citizenSeventeen}
                     className="h-64 w-36 md:w-44 md:h-96"
                     alt="On Location"
                   />
@@ -374,7 +392,7 @@ const CitizenTutorial = () => {
                 </p>
                 <div className="flex items-center justify-center mt-4">
                   <img
-                    src="src/assets/tutorial-citizen-proof.png"
+                    src={eightTeen}
                     className="h-64 w-36 md:w-44 md:h-96"
                     alt="Current Location"
                   />
@@ -394,7 +412,7 @@ const CitizenTutorial = () => {
                 </p>
                 <div className="flex items-center justify-center mt-4">
                   <img
-                    src="src/assets/tutorial-citizen-description.png"
+                    src={nineTeen}
                     className="h-64 w-36 md:w-44 md:h-96"
                     alt="On Location"
                   />

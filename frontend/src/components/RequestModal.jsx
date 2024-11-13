@@ -1,6 +1,9 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
+import { Loader } from "../components";
 
 const RequestModal = ({ onConfirm, onCancel }) => {
+  const [isLoading, setIsLoading] = useState(false);
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-6 z-50">
       <div className="bg-white rounded-3xl p-6 relative md:w-1/2 lg:w-1/3 shadow-lg">
@@ -49,9 +52,13 @@ const RequestModal = ({ onConfirm, onCancel }) => {
         <div className="flex flex-col items-center gap-3">
           <button
             className="w-full bg-primary-medium hover:bg-primary text-white px-4 py-3 rounded-full md:text-base text-sm shadow-sm"
-            onClick={onConfirm}
+            onClick={() => {
+              setIsLoading(true);
+              onConfirm();
+            }}
+            disabled={isLoading}
           >
-            Confirm
+            {isLoading ? <Loader isLoading={true} size={20} /> : "Confirm"}
           </button>
           <button
             className="w-full border border-primary-dark text-primary-dark px-4 py-3 rounded-full hover:bg-secondary hover:text-white hover:border-none md:text-base text-sm"
