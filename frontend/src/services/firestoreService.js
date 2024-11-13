@@ -211,15 +211,16 @@ export const getOnlineLocationsFromFirestore = (role, setLocations) => {
 
   // Set up the real-time listener
   const unsubscribe = onSnapshot(q, (querySnapshot) => {
-    const locations = [];
+    const uniqueLocations = new Map();
 
     querySnapshot.forEach((doc) => {
-      if (doc.data().role === role) {
-        locations.push({ id: doc.id, ...doc.data() });
+      const data = doc.data();
+      if (data.role === role && !uniqueLocations.has(data.userId)) {
+        uniqueLocations.set(data.userId, { id: doc.id, ...data });
       }
     });
 
-    setLocations(locations); // Update the locations in real-time
+    setLocations(Array.from(uniqueLocations.values())); // Update the locations in real-time
   });
 
   return unsubscribe; // To stop listening when needed

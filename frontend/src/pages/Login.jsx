@@ -2,7 +2,7 @@ import logo from "../assets/logo.png";
 import { useSearchParams, useNavigate, Link } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { userLoginSchema } from "../models/Users"; 
+import { userLoginSchema } from "../models/Users";
 import { useContext, useState } from "react";
 import {
   FaEnvelope,
@@ -74,8 +74,7 @@ const Login = () => {
         toast.success(data.message);
         updateLocationStatus(id, "offline");
         setTimeout(() => {
-          // window.location = "/" + role.toLowerCase();
-          navigate("/" + role.toLowerCase(), { replace: true });
+          window.location = "/" + role.toLowerCase();
         }, 1500);
       } else {
         toast[data.error ? "error" : "warning"](data.message);

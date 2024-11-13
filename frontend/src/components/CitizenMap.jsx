@@ -4,7 +4,6 @@ import {
   useEffect,
   forwardRef,
   useImperativeHandle,
-  useCallback,
 } from "react";
 import { GeolocateControl, Map as MapGL } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -33,40 +32,39 @@ import { useLocation } from "react-router-dom";
 import { setGeolocateIcon } from "../utils/GeolocateUtility";
 
 const CitizenMap = forwardRef((props, ref) => {
-  const {
-    assignedRescuer,
-    requesting,
-    onLocatingChange,
-    onNearestRescuerUpdate,
-  } = props;
-
+  const { assignedRescuer, requesting } = props;
   const [citizen, setCitizen] = useState({
     longitude: 120.9107,
     latitude: 14.9536,
     zoom: 15,
   });
   const [coords, setCoords] = useState(null);
+
   const [rescuers, setRescuers] = useState(null);
   const [nearestRescuer, setNearestRescuer] = useState(null);
+
   const [routeData, setRouteData] = useState(null);
   const [routeOpacity, setRouteOpacity] = useState({
     background: 0.2,
     line: 1,
   });
-  const [distance, setDistance] = useState();
-  const [eta, setEta] = useState();
-  const [loadingRescuers, setLoadingRescuers] = useState(true);
 
   const bounds = [
     [120.8585, 14.8867],
     [121.0972, 15.0197],
   ];
 
+  const [distance, setDistance] = useState();
+  const [eta, setEta] = useState();
+
+  const { onLocatingChange, onNearestRescuerUpdate } = props;
+
   const mapRef = useRef();
   const geoControlRef = useRef();
   const buttonsRef = useRef();
 
   const locating = useLocating(geoControlRef, onLocatingChange);
+
   const location = useLocation();
 
   const handleGeolocation = async (coords) => {
@@ -148,44 +146,39 @@ const CitizenMap = forwardRef((props, ref) => {
   }, [requesting]);
 
   useEffect(() => {
-    if (mapRef.current && geoControlRef.current) {
-      setTimeout(() => {
-        geoControlRef.current.trigger(); // Trigger after map is fully loaded
-      }, 1000);
-    }
-
-    const unsubscribe = getOnlineLocationsFromFirestore(
-      "rescuer",
-      (fetchedRescuers) => {
-        setRescuers(fetchedRescuers);
-        setLoadingRescuers(false);
-      }
-    );
+    const unsubscribe = getOnlineLocationsFromFirestore("rescuer", setRescuers);
 
     return () => {
+      // Unsubscribe from the listener when the component unmounts
       unsubscribe();
     };
   }, []);
 
-  const calculateNearestRescuer = useCallback(() => {
-    if (!loadingRescuers && rescuers?.length && citizen) {
+  useEffect(() => {
+    if (rescuers == null) {
+      setRouteData(null);
+      setDistance(null);
+      setEta(null);
+    }
+
+    if (rescuers.length == 0) {
+      setRouteData(null);
+      setDistance(null);
+      setEta(null);
+    }
+
+    if (nearestRescuer || assignedRescuer) {
+      getRoute();
+    }
+  }, [nearestRescuer, assignedRescuer, citizen, rescuers]);
+
+  useEffect(() => {
+    if (rescuers && citizen) {
       const nearest = getNearestRescuer(citizen, rescuers);
       setNearestRescuer(nearest);
       onNearestRescuerUpdate(nearest);
     }
-  }, [citizen, rescuers, loadingRescuers]);
-
-  useEffect(() => {
-    calculateNearestRescuer();
-  }, [calculateNearestRescuer]);
-
-  useEffect(() => {
-    if (!loadingRescuers && rescuers?.length) {
-      if (nearestRescuer || assignedRescuer) {
-        getRoute();
-      }
-    }
-  }, [nearestRescuer, assignedRescuer, citizen, rescuers, loadingRescuers]);
+  }, [rescuers, citizen]);
 
   useImperativeHandle(ref, () => ({
     locateCitizen: () => {
@@ -217,6 +210,7 @@ const CitizenMap = forwardRef((props, ref) => {
           geoControlRef.current?.trigger();
         }}
       >
+        {/*FIXME: Geolocator Bug */}
         <GeolocateControl
           ref={geoControlRef}
           position="top-right"

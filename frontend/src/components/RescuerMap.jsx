@@ -22,7 +22,6 @@ import { FaLocationPin } from "react-icons/fa6";
 import { useLocation } from "react-router-dom";
 import { setGeolocateIcon } from "../utils/GeolocateUtility";
 import * as turf from "@turf/turf";
-import { set } from "lodash";
 
 const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
   const { rescuer, setRescuer } = useContext(RescuerContext);
@@ -44,6 +43,8 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
   const [eta, setEta] = useState();
   const [isOnRoute, setIsOnRoute] = useState(false);
   const location = useLocation();
+
+  const [geoLocated, setGeoLocated] = useState(false);
 
   const handleGeolocation = async (coords) => {
     setCoords(coords);
@@ -94,7 +95,7 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
   };
 
   useEffect(() => {
-    if (coords) {
+    if (coords && geoLocated) {
       handleGeolocation(coords);
     }
   }, [coords]);
@@ -239,6 +240,7 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
         showAccuracyCircle={false}
         style={{ display: "none" }}
         onGeolocate={({ coords }) => {
+          setGeoLocated(true);
           handleGeolocation(coords);
         }}
       />
