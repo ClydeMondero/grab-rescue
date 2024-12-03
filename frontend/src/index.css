@@ -141,22 +141,11 @@
   }
 }
 
-@media (max-width: 768px) {
-  .ctrl-group {
-    display: none;
-  }
-  .mapboxgl-ctrl-top-right {
-    display: none;
-  }
+.ctrl-group {
+  display: none;
 }
-
-@media (min-width: 768px) {
-  .ctrl-group {
-    display: flex;
-  }
-  .mapboxgl-ctrl-top-right {
-    display: block;
-  }
+.mapboxgl-ctrl-top-right {
+  display: none;
 }
 
 .parallax-hero {

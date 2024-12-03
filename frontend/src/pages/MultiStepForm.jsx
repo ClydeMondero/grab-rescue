@@ -154,6 +154,11 @@ const MultiStepForm = ({ request, setRequest }) => {
             >
               Next
             </button>
+            <p className="text-sm text-text-secondary">
+              Note: Providing a phone number may increase the chances of your
+              request being accepted by a rescuer as they may contact you if
+              they have any questions or need more information.
+            </p>
           </div>
         );
       case 2:

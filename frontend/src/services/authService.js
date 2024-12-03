@@ -1,7 +1,10 @@
 import axios from "axios";
 import { toast } from "react-toastify";
-import { getCookie } from "./cookieService";
-import { updateLocationStatus } from "../services/firestoreService";
+import { getCitizenCookie, getCookie } from "./cookieService";
+import {
+  updateLocationStatus,
+  getIDFromLocation,
+} from "../services/firestoreService";
 
 /**
  * Verifies the token
@@ -17,9 +20,9 @@ export const getIDFromCookie = async () => {
 
   if (!data.success) return null;
 
-  const userId = data.user.id;
+  const { id, account_type: role } = data.user;
 
-  return userId;
+  return { id, role };
 };
 
 /**
@@ -32,7 +35,9 @@ export const getIDFromCookie = async () => {
  * @return {void}
  */
 export const handleLogout = async (navigate) => {
-  const userId = await getIDFromCookie();
+  const { id: userId, role } = await getIDFromCookie();
+
+  console.log(userId);
 
   const { data } = await axios.post(
     "/auth/logout",
@@ -42,11 +47,27 @@ export const handleLogout = async (navigate) => {
     { withCredentials: true }
   );
 
+  console.log(data);
+
   if (data.success) {
-    await updateLocationStatus(userId, "offline");
-    window.location = "/";
-    // navigate("/");
-    return;
+    if (role === "Citizen") {
+      const citizenCookie = getCitizenCookie();
+
+      if (citizenCookie) {
+        const citizenId = await getIDFromLocation(citizenCookie);
+        if (citizenId) await updateLocationStatus(citizenId, "offline");
+      }
+
+      window.location = "/";
+      // navigate("/");
+      return;
+    } else {
+      await updateLocationStatus(userId, "offline");
+
+      window.location = "/";
+      // navigate("/");
+      return;
+    }
   }
   toast.error(data.message);
 };

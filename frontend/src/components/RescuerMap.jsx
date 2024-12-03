@@ -23,7 +23,7 @@ import { useLocation } from "react-router-dom";
 import { setGeolocateIcon } from "../utils/GeolocateUtility";
 import * as turf from "@turf/turf";
 
-const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
+const RescuerMap = ({ rescuerType, citizen, onLocatingChange, navigating }) => {
   const { rescuer, setRescuer } = useContext(RescuerContext);
   const [locations, setLocations] = useState(null);
   const [coords, setCoords] = useState(null);
@@ -55,7 +55,7 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
 
     if (locations == null) return;
 
-    const id = await getIDFromCookie();
+    const { id } = await getIDFromCookie();
 
     const existingLocation = locations.find(
       (location) => location.userId === id
@@ -72,7 +72,13 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
       );
     } else {
       console.log("adding location");
-      addUserLocation(coords.longitude, coords.latitude, "rescuer", id);
+      addUserLocation(
+        coords.longitude,
+        coords.latitude,
+        "rescuer",
+        id,
+        rescuerType
+      );
     }
 
     setRescuer({

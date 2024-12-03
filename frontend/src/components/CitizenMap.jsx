@@ -38,6 +38,7 @@ const CitizenMap = forwardRef((props, ref) => {
     latitude: 14.9536,
     zoom: 15,
   });
+
   const [coords, setCoords] = useState(null);
 
   const [nearestRescuer, setNearestRescuer] = useState(null);

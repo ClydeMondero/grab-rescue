@@ -21,6 +21,7 @@ export const addLocationToFirestore = async (
   address,
   role,
   userId,
+  rescuerType = "",
   timestamp = new Date().toISOString(),
   status = "online" //online, assigned, in-transit, offline
 ) => {
@@ -30,8 +31,9 @@ export const addLocationToFirestore = async (
     address,
     role,
     userId,
-    status,
+    rescuerType,
     timestamp,
+    status,
   };
 
   try {

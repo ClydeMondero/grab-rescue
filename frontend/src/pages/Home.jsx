@@ -1,61 +1,35 @@
-import { useState, useEffect, useRef, useContext } from "react";
-import logo from "../assets/logo.png";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import {
-  Nav,
-  CitizenMap as Map,
-  Loader,
-  Toast,
-  RequestModal,
-} from "../components";
-import { FaChevronDown, FaPhone } from "react-icons/fa";
-import { FaLocationPin } from "react-icons/fa6";
-import { BiSolidHide, BiSolidAmbulance } from "react-icons/bi";
-import { MdDragHandle } from "react-icons/md";
-import { MdRoute, MdCheck } from "react-icons/md";
-import { MultiStepForm } from "../pages";
-import {
-  addRequestToFirestore,
-  getLocationFromFirestore,
-  getRequestFromFirestore,
-  getLocationsFromFirestore,
-  clearLocationsCollection,
-  getLocationFromFirestoreInRealTime,
-  getFilteredOnlineRescuers,
-} from "../services/firestoreService";
-import {
-  getCitizenCookie,
-  getRequestCookie,
-  setRequestCookie,
-  deleteCookie, // Import deleteCookie
-} from "../services/cookieService";
-import { StatusContext } from "../contexts/StatusContext";
-import { RequestContext } from "../contexts/RequestContext";
-import MobileDetect from "mobile-detect";
-import { toast } from "react-toastify";
-import { hotlines } from "../constants/Hotlines";
-import { HotlineModal } from "../pages";
+import { Nav } from "../components";
+import background from "/assets/bg.svg";
+import bgGif from "../assets/mobile-view.gif";
+import contentAbout from "../assets/content-about.jpg";
+import { IoLogoGooglePlaystore } from "react-icons/io5";
+import { IoMdDownload } from "react-icons/io";
+import { FaAndroid, FaLocationPin } from "react-icons/fa6";
+import { BiSolidAmbulance } from "react-icons/bi";
+import { FaTimes } from "react-icons/fa";
+import logo from "../assets/logo.png";
 
 const Home = () => {
   const navigate = useNavigate();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [formVisible, setFormVisible] = useState(false);
-  const [locating, setLocating] = useState(true);
-  const { requesting, setRequesting } = useContext(RequestContext);
-  const [request, setRequest] = useState(null);
-  const [rescuer, setRescuer] = useState(null);
-  const [nearestRescuer, setNearestRescuer] = useState(null);
-  const [onMobile, setOnMobile] = useState(false);
-  const [allRescuers, setAllRescuers] = useState([]);
-  const [onlineRescuers, setOnlineRescuers] = useState([]);
-  const [assignedRescuer, setAssignedRescuer] = useState(null);
-  const [hotlineModalOpen, setHotlineModalOpen] = useState(false);
-  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const aboutSectionRef = useRef(null);
+  const getStartedSectionRef = useRef(null);
 
-  const { getId } = useContext(StatusContext);
-  const mapRef = useRef(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const toggleModal = () => {
+    setIsModalOpen((prev) => !prev);
+  };
+
+  const scrollToAbout = () => {
+    aboutSectionRef.current.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const scrollToGetStarted = () => {
+    getStartedSectionRef.current.scrollIntoView({ behavior: "smooth" });
+  };
 
   // Verify token function
   const verifyToken = async () => {
@@ -67,473 +41,317 @@ const Home = () => {
     }
   };
 
-  const getRescuer = async () => {
-    if (!request || !request.rescuerId) return null;
-
-    try {
-      const response = await axios.get(`/rescuers/get/${request.rescuerId}`);
-      if (response.data) {
-        return response.data;
-      } else {
-        console.error("Rescuer not found.");
-        return null;
-      }
-    } catch (error) {
-      console.error("Error fetching rescuer: ", error);
-      return null;
-    }
+  const handleDownloadAPK = () => {
+    const link = document.createElement("a");
+    link.href =
+      "https://github.com/ClydeMondero/grab-rescue/releases/download/latest/Grab-Rescue.apk";
+    link.setAttribute("download", "Grab-Rescue.apk");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
-  const checkRequest = () => {
-    const requestId = getRequestCookie();
-
-    if (requestId) {
-      handleRequesting();
-    } else {
-      return;
-    }
-
-    const unsubscribe = getRequestFromFirestore(requestId, (onGoingRequest) => {
-      setRequest(onGoingRequest);
-
-      if (onGoingRequest.status === "rescued") {
-        handleCompleteRequest();
-      }
-    });
-
-    return () => {
-      unsubscribe();
-    };
-  };
-
-  const handleNearestRescuerUpdate = (rescuer) => {
-    setNearestRescuer(rescuer);
-  };
-
-  const handlePhone = () => {
-    if (onMobile) {
-      window.location.href = `tel:${request.phone}`;
-    } else {
-      navigator.clipboard
-        .writeText(request.phone)
-        .then(() => {
-          toast.info("Phone copied to clipboard");
-        })
-        .catch((err) => {
-          toast.warning("Phone didn't get copied");
-        });
-    }
-  };
-
-  const handleModalConfirm = async () => {
-    if (mapRef.current) {
-      const citizenId = getCitizenCookie();
-
-      const location = await getLocationFromFirestore(citizenId);
-
-      const { id } = await addRequestToFirestore(citizenId, location);
-      setRequestCookie(id);
-      checkRequest();
-
-      // Send notification to nearest rescuer
-      if (nearestRescuer && nearestRescuer.fcmToken) {
-        const notificationPayload = {
-          token: nearestRescuer.fcmToken,
-          title: "Emergency Request!",
-          body: "You are the nearest rescuer to a citizen in need. Please respond!",
-          citizenId: citizenId,
-        };
-
-        try {
-          await axios.post("/messages/send", notificationPayload);
-
-          toast.success("Notification sent to nearest rescuer");
-        } catch (error) {
-          console.error("Failed to send notification:", error);
-          toast.error("Failed to send notification");
-        }
-      }
-    }
-
-    handleRequesting();
-  };
-
-  const handleRequesting = () => {
-    setModalOpen(false);
-    setRequesting(true);
-    setFormVisible(true);
-  };
-
-  const handleCompleteRequest = () => {
-    deleteCookie("request_token");
-    setRequest(null);
-    setRequesting(false);
-    setAssignedRescuer(null);
-
-    setTimeout(() => {
-      window.location.reload();
-    }, 3000);
-  };
-
-  const handleModalCancel = () => {
-    setModalOpen(false); // Just close the modal, don't show the form
-  };
-
-  const handleLocatingChange = (newLocatingState) => {
-    setLocating(newLocatingState); // Update only when locating changes
-  };
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    getLocationsFromFirestore("rescuer", setAllRescuers);
-  }, []);
-
-  useEffect(() => {
-    const fetchAndSubscribe = async () => {
-      const unsubscribe = await getFilteredOnlineRescuers(
-        "rescuer",
-        setOnlineRescuers
-      );
-      return unsubscribe;
-    };
-
-    const unsubscribeFunction = fetchAndSubscribe();
-
-    return () => {
-      unsubscribeFunction.then((unsubscribe) => unsubscribe && unsubscribe());
-    };
-  }, [allRescuers]);
-
-  useEffect(() => {
-    if (!request) return;
-
-    if (!request.rescuerId) return;
-
-    const assigned = allRescuers.filter(
-      (rescuer) => rescuer.userId === request.rescuerId
-    );
-
-    if (assigned) {
-      getLocationFromFirestoreInRealTime(assigned[0].id, setAssignedRescuer);
-    }
-  }, [request]);
-
-  useEffect(() => {
-    getId();
     verifyToken();
-    checkRequest();
 
-    const md = new MobileDetect(window.navigator.userAgent);
-    const isSmallScreen = window.innerWidth <= 768;
-    const isMobile = !!md.mobile() && isSmallScreen;
-
-    setOnMobile(isMobile);
-  }, []);
-
-  useEffect(() => {
-    if (mapRef.current && mapRef.current.resize) {
-      setTimeout(() => mapRef.current.resize(), 500);
-    }
-  }, [formVisible]);
-
-  useEffect(() => {
-    const getRescuerDetails = async () => {
-      if (!request) return;
-
-      const rescuer = await getRescuer();
-
-      if (rescuer) {
-        setRescuer(rescuer[0]);
-      }
+    const handleBeforeInstallPrompt = (e) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setIsVisible(true);
     };
 
-    getRescuerDetails();
-  }, [request]);
+    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+
+    return () =>
+      window.removeEventListener(
+        "beforeinstallprompt",
+        handleBeforeInstallPrompt
+      );
+  }, []);
+
+  const handleDownloadPWA = async () => {
+    if (!deferredPrompt) return;
+
+    deferredPrompt.prompt();
+
+    const { outcome } = await deferredPrompt.userChoice;
+    console.log(`User response to the install prompt: ${outcome}`);
+
+    setDeferredPrompt(null);
+    setIsVisible(false);
+  };
 
   return (
-    <div className="h-dvh w-screen overflow-hidden flex flex-col">
+    <div className="h-dvh">
       {/* Desktop Navbar */}
-      <Nav navigate={navigate} />
+      <Nav
+        navigate={navigate}
+        scrollToAbout={scrollToAbout}
+        scrollToGetStarted={scrollToGetStarted}
+      />
+      {/* Desktop View */}
+      <div className="hidden md:flex flex-col w-full">
+        {/* Hero */}
+        <div
+          id="hero"
+          className="relative flex flex-row justify-center items-center p-8 w-full h-[90vh] overflow-hidden bg-cover bg-center"
+          style={{
+            backgroundImage: `url(${background})`,
+          }}
+        >
+          {/* Content Section */}
+          <section className="flex flex-col items-start gap-6 text-left w-6/12 px-12 mt-0">
+            <p className="text-7xl font-bold text-primary-dark max-w-xl">
+              <span className="text-primary text-7xl">Grab Rescue.</span> Every{" "}
+              <span className="text-secondary">second</span> counts.
+            </p>
 
-      {/* Map and Form Section */}
-      <div
-        className={`h-full w-full relative flex flex-col md:h-[90%] bg-background-light ${
-          formVisible ? "justify-around" : ""
-        }`}
-      >
-        {/* Mobile Menu */}
-        <div className="absolute top-4 right-4 m-2 p-2 z-50 rounded-full bg-white shadow-lg md:hidden">
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="text-md cursor-pointer text-gray-700 rounded-full p-2 hover:bg-gray-200"
-          >
-            <FaChevronDown className="text-primary-medium" />
-          </button>
-          {mobileMenuOpen && (
-            <div className="absolute top-14 right-0 w-56 bg-background text-primary-medium rounded-md shadow-lg py-2 flex items-center justify-center">
-              <ul className="space-y-2 flex flex-col items-center w-full">
-                <li className="py-2 border-b w-full">
-                  <button
-                    onClick={() => !requesting && navigate("/")}
-                    className={`flex items-center justify-center w-full text-lg font-semibold ${
-                      requesting ? "cursor-not-allowed opacity-50" : ""
-                    }`}
-                  >
-                    Home
-                  </button>
-                </li>
-                <li className="py-2 border-b w-full justify-center">
-                  <button
-                    onClick={() =>
-                      !requesting && navigate("/login?role=Rescuer")
-                    }
-                    className={`flex items-center justify-center w-full text-lg font-semibold ${
-                      requesting ? "cursor-not-allowed opacity-50" : ""
-                    }`}
-                  >
-                    Login as Rescuer
-                  </button>
-                </li>
-                <li className="py-2 border-b w-full justify-center">
-                  <button
-                    onClick={() => !requesting && navigate("/login?role=Admin")}
-                    className={`flex items-center justify-center w-full text-lg font-semibold ${
-                      requesting ? "cursor-not-allowed opacity-50" : ""
-                    }`}
-                  >
-                    Login as Admin
-                  </button>
-                </li>
-                <li className="py-2 border-b w-full justify-center">
-                  <button
-                    onClick={() => !requesting && navigate("/download")}
-                    className={`flex items-center justify-center w-full text-lg font-semibold  ${
-                      requesting ? "cursor-not-allowed opacity-50" : ""
-                    }`}
-                  >
-                    Download
-                  </button>
-                </li>
-                <li className="py-2">
-                  <button
-                    onClick={() => !requesting && navigate("/about")}
-                    className={`flex items-center justify-center w-full text-lg font-semibold  ${
-                      requesting ? "cursor-not-allowed opacity-50" : ""
-                    }`}
-                  >
-                    About
-                  </button>
-                </li>
-              </ul>
-            </div>
-          )}
-        </div>
+            <div className="flex flex-col items-center md:flex-row gap-4">
+              {isVisible && (
+                <button
+                  onClick={handleDownloadPWA}
+                  className="flex items-center gap-2 px-8 py-4 bg-blue-400 text-white font-semibold rounded-full shadow-md"
+                >
+                  <IoMdDownload className="w-4 h-4" />
+                  <span>Download PWA</span>
+                </button>
+              )}
 
-        {/* Map Component */}
-        <Map
-          ref={mapRef}
-          rescuers={onlineRescuers}
-          onLocatingChange={handleLocatingChange}
-          onNearestRescuerUpdate={handleNearestRescuerUpdate}
-          assignedRescuer={assignedRescuer}
-          requesting={requesting}
-        />
-
-        {requesting && (
-          <div
-            className={`bg-white p-6 rounded-xl shadow-lg transition-all duration-300 ease-in-out`}
-          >
-            {request && request.status == "pending" ? (
-              <p className="animate-pulse">
-                {
-                  [
-                    "Please stay at your location.",
-                    "Waiting for rescuer acceptance...",
-                  ].sort(() => 0.5 - Math.random())[0]
-                }
-              </p>
-            ) : rescuer ? (
-              <div className="flex items-center w-full">
-                <div className="flex flex-col w-full">
-                  <p className="text-xs text-primary-medium">
-                    Assigned Rescuer
-                  </p>
-                  <div className="w-full flex items-center justify-between">
-                    <div className="flex flex-col">
-                      <p className="text-primary-dark font-semibold text-xl">
-                        {`${rescuer.first_name} ${rescuer.middle_name || ""} ${
-                          rescuer.last_name
-                        }`.trim()}
-                      </p>
-                      <p className="text-background-dark text-sm font-semibold">
-                        {rescuer.municipality}, {rescuer.barangay}
-                      </p>
-                      <div
-                        className={`text-xs w-max font-semibold text-highlight p-3 mt-2 rounded-full border border-highlight ${
-                          request?.status === "rescued"
-                            ? "border-green-500"
-                            : ""
-                        }`}
-                      >
-                        {request
-                          ? request.status.charAt(0).toUpperCase() +
-                            request.status.slice(1)
-                          : ""}
-                      </div>
-                    </div>
-                    <button
-                      onClick={handlePhone}
-                      className="p-4 text-lg h-max bg-primary rounded-full text-white shadow hover:bg-primary-dark transition"
-                    >
-                      <FaPhone />
-                    </button>
-                  </div>
+              <div className="flex flex-col items-center">
+                <button
+                  onClick={handleDownloadAPK}
+                  className="flex items-center gap-2 px-8 py-4 bg-green-50 text-primary font-semibold rounded-full shadow-md"
+                >
+                  <IoLogoGooglePlaystore className="w-4 h-4" />
+                  <span>Download APK</span>
+                </button>
+                <div className="flex gap-2 text-gray-500 mt-2">
+                  <FaAndroid />
                 </div>
               </div>
-            ) : (
-              <div className="flex items-center justify-center">
-                <Loader isLoading={true} color={"#557C55"} size={25} />
-              </div>
-            )}
-          </div>
-        )}
+            </div>
+          </section>
 
-        {/* Sliding Pane */}
-        {requesting && request?.status != "rescued" && (
-          <div
-            className={`border-x-background-medium border-t-2 p-2 w-full flex flex-col items-center transition-all duration-300 ease-in-out rounded-t-2xl ${
-              formVisible ? "h-[100%] bg-white" : "h-[10%] bg-primary-medium "
-            } `}
-          >
-            <MdDragHandle
-              onClick={() => {
-                setFormVisible(!formVisible);
-              }}
-              className="text-background-medium h-10 w-10"
+          <div className="flex justify-center items-center w-full md:w-5/12 md:ml-4 lg:ml-6">
+            <img
+              src={bgGif}
+              alt="Grab Rescue"
+              className="w-48 md:w-52 lg:w-64 object-contain"
             />
-            <p
-              className={`text-lg font-bold ${
-                formVisible ? "text-primary-medium" : "text-white"
-              }`}
-            >
-              Provide Information
-            </p>
-
-            {formVisible && (
-              <MultiStepForm request={request} setRequest={setRequest} />
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* Buttons */}
-      <div
-        className={`w-full ${
-          requesting ? "h-[15%]" : "h-[25%]"
-        } flex flex-col gap-2 bg-background-light p-2 justify-center md:h-[10%] ${
-          requesting ? "md:hidden" : ""
-        } relative`}
-      >
-        {/* Hotline Button */}
-        {!requesting && (locating || onlineRescuers.length === 0) && (
-          <div className="absolute -top-20 right-8 z-40">
-            <button
-              onClick={() => setHotlineModalOpen(true)}
-              className="bg-primary hover:bg-primary-medium text-white font-semibold p-4 rounded-full transition-colors duration-200 ease-in-out"
-            >
-              <FaPhone className="text-3xl" />
-            </button>
-          </div>
-        )}
-
-        {/* Request Button */}
-        {!requesting &&
-          (!locating ? (
-            <button
-              className={`w-full flex-1 font-bold p-4 rounded-lg ${
-                onlineRescuers.length === 0
-                  ? "bg-background-medium cursor-not-allowed text-text-primary" // Disabled color
-                  : "bg-secondary hover:opacity-80 text-white" // Enabled color
-              }`}
-              onClick={() => setModalOpen(true)}
-              disabled={onlineRescuers.length === 0}
-            >
-              {onlineRescuers.length === 0
-                ? "No Online Rescuers"
-                : "Request for Help"}
-            </button>
-          ) : (
-            <button
-              className="w-full flex-1 bg-background-medium text-white font-bold p-4 rounded-lg"
-              disabled={true}
-            >
-              Tracking your Location
-            </button>
-          ))}
-
-        {/* Render HotlineModal */}
-        {hotlineModalOpen && (
-          <HotlineModal onClose={() => setHotlineModalOpen(false)} />
-        )}
-
-        {/* Mobile Map Buttons (only show on mobile screens) */}
-        <div className="flex-1 bg-white flex items-center justify-around gap-4 rounded-lg px-2 py-4 font-medium text-sm text-center md:hidden">
-          <div className="flex flex-col items-center">
-            <button
-              onClick={() => {
-                mapRef.current.locateCitizen();
-              }}
-              className="bg-background-light rounded-full p-3 flex items-center justify-center"
-            >
-              <FaLocationPin className="text-2xl text-text-primary" />
-            </button>
-            <p className="text-text-primary">My Location</p>
-          </div>
-          <div className="flex flex-col items-center">
-            <button
-              onClick={() => {
-                mapRef.current.goToNearestRescuer();
-              }}
-              className="bg-background-light rounded-full p-3 flex items-center justify-center"
-            >
-              <BiSolidAmbulance className="text-text-primary text-2xl" />
-            </button>
-            <p className="text-text-primary">
-              {assignedRescuer ? "Assigned Rescuer" : "Nearest Rescuer"}
-            </p>
-          </div>
-          <div className="flex flex-col items-center">
-            <button
-              onClick={() => {
-                mapRef.current.viewRoute();
-              }}
-              className="bg-background-light rounded-full p-3 flex items-center justify-center"
-            >
-              <MdRoute className="text-2xl text-text-primary" />
-            </button>
-            <p className="text-text-primary">View Route</p>
-          </div>
-          <div className="flex flex-col items-center">
-            <button
-              onClick={() => {
-                mapRef.current.hideRoute();
-              }}
-              className="bg-background-light rounded-full p-3 flex items-center justify-center"
-            >
-              <BiSolidHide className="text-text-primary text-2xl" />
-            </button>
-            <p className="text-text-primary">Hide Route</p>
           </div>
         </div>
+
+        <section
+          ref={getStartedSectionRef}
+          className="flex flex-col items-center justify-center min-h-[100vh] py-12 text-center text-black bg-gradient-to-b from-white via-gray-100 to-background-light"
+        >
+          <div className="flex items-center gap-2 text-5xl text-primary-dark">
+            <h1 className="font-bold mb-4">Get Started with Grab Rescue</h1>
+          </div>
+          <p className="mt-4 max-w-lg mx-auto text-base md:text-lg md:mb-8 text-gray-700">
+            Whether you're a citizen or rescuer, follow the guides below to
+            learn how to use our platform effectively.
+          </p>
+
+          <div className="flex flex-col md:flex-row items-center justify-around w-full px-8 py-10 gap-8 max-w-5xl">
+            <div className="bg-white shadow-lg p-8 transition transform hover:scale-105 duration-300 hover:text-green-600 flex flex-col items-center rounded-lg w-full md:w-5/12">
+              <h4 className="text-4xl font-semibold flex items-center gap-3 text-secondary">
+                <FaLocationPin className="h-9 w-9" />
+                Citizen
+              </h4>
+              <p className="mt-3 text-gray-600 text-center text-base">
+                Step-by-step guide for citizens to ensure you're prepared for
+                any emergency.
+              </p>
+              <button
+                onClick={() => navigate("/citizen-tutorial")}
+                className="mt-6 px-24 py-3 tracking-wider leading-tight bg-highlight hover:opacity-80 text-white font-semibold rounded-full shadow-md"
+              >
+                Citizen Tutorial
+              </button>
+            </div>
+
+            <div className="bg-white shadow-lg p-8 transition transform hover:scale-105 duration-300 hover:text-green-600 flex flex-col items-center rounded-lg w-full md:w-5/12">
+              <h4 className="text-4xl font-semibold flex items-center gap-3 text-primary">
+                <BiSolidAmbulance className="h-9 w-9" />
+                Rescuer
+              </h4>
+              <p className="mt-3 text-gray-600 text-center text-base">
+                Comprehensive guide for rescuers to quickly and efficiently
+                respond to emergencies.
+              </p>
+              <button
+                onClick={() => navigate("/rescuer-tutorial")}
+                className="mt-6 px-24 py-3 tracking-wider leading-tight bg-highlight hover:opacity-80 text-white font-semibold rounded-full shadow-md"
+              >
+                Rescuer Tutorial
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section
+          ref={aboutSectionRef}
+          className="flex flex-row items-center justify-center min-h-[100vh] py-12 text-left text-black bg-white"
+        >
+          <img
+            src={contentAbout}
+            alt="Image"
+            className="w-1/2 h-auto object-contain"
+          />
+          <div className="flex flex-col pl-12">
+            <h2 className="text-5xl font-bold mb-6 text-primary-dark">
+              About Us
+            </h2>
+            <p className="mt-4 max-w-lg mx-auto text-base md:text-lg md:mb-8 text-gray-700">
+              Grab Rescue is committed to providing fast and reliable emergency
+              assistance. Our platform connects citizens and rescuers to ensure
+              help is always just a tap away.
+            </p>
+            <p className="mt-4 max-w-lg mx-auto text-base md:text-lg md:mb-8 text-gray-700">
+              As a responsible and dedicated team, we are committed to
+              delivering the highest level of service and support to our users.
+              Our platform is designed with the user in mind, and we strive to
+              provide a seamless and intuitive experience for all.
+            </p>
+          </div>
+        </section>
+
+        <footer className="w-full bg-background-light text-primary-medium py-8">
+          <div className="container mx-auto px-4">
+            <div className="flex flex-col md:flex-row justify-between items-center">
+              <div className="flex items-center mb-4 md:mb-0">
+                <div className="flex flex-col items-center">
+                  <img src={logo} alt="" />
+                  <p className="text-sm ">Every second counts</p>
+                </div>
+              </div>
+              <div className="flex-1 flex flex-wrap justify-center gap-16 text-sm">
+                <div>
+                  <h3 className="font-semibold mb-2">Explore</h3>
+                  <ul>
+                    <li>
+                      <a
+                        onClick={() => navigate("/")}
+                        className="hover:text-gray-300 cursor-pointer"
+                      >
+                        Home
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        onClick={() => scrollToGetStarted()}
+                        className="hover:text-gray-300"
+                      >
+                        Get Started
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        onClick={() => scrollToAbout()}
+                        className="hover:text-gray-300 cursor-pointer"
+                      >
+                        About
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-2">Others</h3>
+                  <ul>
+                    <li>
+                      <a
+                        onClick={() => navigate("/privacy-policy")}
+                        className="hover:text-gray-300 cursor-pointer"
+                      >
+                        Privacy Policy
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        onClick={() => navigate("/terms-of-service")}
+                        className="hover:text-gray-300 cursor-pointer"
+                      >
+                        Terms of Service
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-2">Contact Us</h3>
+                  <ul>
+                    <li className="underline cursor-pointer">
+                      grabrescue.ph@gmail.com
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div className="mt-8 text-center text-background-medium text-xs">
+              <p>Copyright © Grab Rescue 2024. All Rights Reserved.</p>
+            </div>
+          </div>
+        </footer>
       </div>
-
-      {modalOpen && (
-        <RequestModal
-          onConfirm={handleModalConfirm} // Handle modal confirmation to show the form
-          onCancel={handleModalCancel} // Handle modal cancellation to simply close the modal
-        />
+      {/* Mobile View */}
+      <div className="flex flex-col items-center justify-around h-screen bg-background-light px-8 md:hidden">
+        <div className="flex flex-col items-center">
+          <img src="/logo.png" alt="" className="w-36" />
+          <p className="text-sm text-primary-medium">Every second counts</p>
+        </div>
+        <div className="w-full flex flex-col items-center gap-4">
+          <button
+            onClick={toggleModal}
+            className="bg-primary text-white font-semibold py-4 px-6 w-full rounded-full "
+          >
+            Log in
+          </button>
+          <button
+            onClick={() => navigate("/register")}
+            className="bg-background-light text-primary border border-primary font-semibold py-4 px-6 w-full rounded-full "
+          >
+            New to Grab Rescue? Sign up!
+          </button>
+        </div>
+      </div>
+      {/* Minimal Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-highlight bg-opacity-80 flex flex-col items-center justify-center z-[100] text-white p-6">
+          <button
+            onClick={toggleModal}
+            className="absolute top-4 right-4 text-white hover:text-gray-300"
+          >
+            <FaTimes className="text-2xl" />
+          </button>
+          <h2 className="text-3xl font-bold mb-4">Choose Account Type</h2>
+          <p className="text-lg mb-6 text-center max-w-sm">
+            Select your account type to proceed with login.
+          </p>
+          <div className="flex flex-col space-y-4 w-full max-w-xs">
+            <button
+              onClick={() => {
+                navigate("/login?role=Citizen");
+                setIsModalOpen(false);
+              }}
+              className="w-full bg-white text-highlight font-bold py-3 rounded-lg hover:bg-gray-100 text-center "
+            >
+              Login as Citizen
+            </button>
+            <button
+              onClick={() => {
+                navigate("/login?role=Rescuer");
+                setIsModalOpen(false);
+              }}
+              className="w-full bg-white text-highlight font-bold py-3 rounded-lg hover:bg-gray-100 text-center"
+            >
+              Login as Rescuer
+            </button>
+          </div>
+        </div>
       )}
-
-      <Toast />
     </div>
   );
 };

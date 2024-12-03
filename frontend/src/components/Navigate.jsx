@@ -28,7 +28,7 @@ import {
 
 const statuses = ["assigned", "in transit", "en route", "rescued"];
 
-const Navigate = ({ requestID, setSelectedRequest }) => {
+const Navigate = ({ user, requestID, setSelectedRequest }) => {
   const [showDetails, setShowDetails] = useState(false);
   const [requestData, setRequestData] = useState(null);
   const [locating, setLocating] = useState(false);
@@ -153,6 +153,7 @@ const Navigate = ({ requestID, setSelectedRequest }) => {
         {requestID ? (
           requestData ? (
             <Map
+              rescuerType={user?.rescuer_type}
               mapRef={mapRef}
               citizen={requestLocation || requestData?.location}
               onLocatingChange={handleLocatingChange}
@@ -165,6 +166,7 @@ const Navigate = ({ requestID, setSelectedRequest }) => {
           )
         ) : (
           <Map
+            rescuerType={user?.rescuer_type}
             mapRef={mapRef}
             onLocatingChange={handleLocatingChange}
             navigating={navigating}

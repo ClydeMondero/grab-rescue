@@ -16,11 +16,7 @@ const Markers = ({
       {myMarker && (
         <Marker longitude={myMarker.longitude} latitude={myMarker.latitude}>
           <div className="relative flex flex-col items-center justify-center">
-            {markerType === "citizen" ? (
-              <FaLocationPin className="text-3xl text-secondary red-pulse" />
-            ) : (
-              <img src={ambulance} className="h-20" />
-            )}
+            <FaLocationPin className="text-3xl text-secondary red-pulse" />
             {markerType === "citizen" && (
               <p className="bg-background px-2 py-1 rounded-full text-text-primary text-md font-semibold">
                 You
