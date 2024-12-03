@@ -76,6 +76,16 @@
   animation: red-pulse 2s infinite;
 }
 
+.orange-pulse {
+  border-radius: 100%;
+  animation: orange-pulse 2s infinite;
+}
+
+.blue-pulse {
+  border-radius: 100%;
+  animation: blue-pulse 2s infinite;
+}
+
 .ctrl-group {
   position: absolute;
   right: 10px;
@@ -138,6 +148,30 @@
   }
   100% {
     box-shadow: 0 0 0 0 rgba(255, 0, 0, 0);
+  }
+}
+
+@keyframes orange-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 165, 0, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 20px rgba(255, 165, 0, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 165, 0, 0);
+  }
+}
+
+@keyframes blue-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 0, 255, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 20px rgba(0, 0, 255, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 0, 255, 0);
   }
 }
 

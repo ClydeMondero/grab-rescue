@@ -37,6 +37,8 @@ import { toast } from "react-toastify";
 import { hotlines } from "../constants/Hotlines";
 import { HotlineModal } from ".";
 import { IoPerson } from "react-icons/io5";
+import { PiFireTruckFill } from "react-icons/pi";
+import { RiPoliceCarFill } from "react-icons/ri";
 
 const Citizen = ({ user }) => {
   const navigate = useNavigate();
@@ -53,6 +55,7 @@ const Citizen = ({ user }) => {
   const [assignedRescuer, setAssignedRescuer] = useState(null);
   const [hotlineModalOpen, setHotlineModalOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [rescueTypes, setRescueType] = useState(["MDRRMO", "BFP", "PNP"]);
 
   const { getId } = useContext(StatusContext);
   const mapRef = useRef(null);
@@ -181,6 +184,7 @@ const Citizen = ({ user }) => {
     const fetchAndSubscribe = async () => {
       const unsubscribe = await getFilteredOnlineRescuers(
         "rescuer",
+        rescueTypes,
         setOnlineRescuers
       );
       return unsubscribe;
@@ -191,7 +195,7 @@ const Citizen = ({ user }) => {
     return () => {
       unsubscribeFunction.then((unsubscribe) => unsubscribe && unsubscribe());
     };
-  }, [allRescuers]);
+  }, [allRescuers, rescueTypes]);
 
   useEffect(() => {
     if (!request) return;
@@ -246,6 +250,69 @@ const Citizen = ({ user }) => {
           formVisible ? "justify-around" : ""
         } ${profileOpen ? "hidden" : ""}`}
       >
+        {/* Filters - only show if not requesting and locating */}
+        {!requesting && !locating && (
+          <details className="absolute top-4 left-4 m-2 p-6 z-50 rounded-lg bg-white shadow-lg outline-none w-max">
+            <summary className="flex items-center cursor-pointer text-secondary font-bold">
+              Rescue Type
+              <FaChevronDown className="ml-2" />
+            </summary>
+            <div className="flex flex-col space-y-2 mt-2">
+              <label className="text-md flex items-center cursor-pointer text-gray-700">
+                <input
+                  type="checkbox"
+                  value="MDRRMO"
+                  checked={rescueTypes.includes("MDRRMO")}
+                  onChange={(e) =>
+                    setRescueType((prev) =>
+                      e.target.checked
+                        ? [...prev, e.target.value]
+                        : prev.filter((item) => item !== e.target.value)
+                    )
+                  }
+                  className="mr-2 scale-125 rounded-md border border-gray-300 accent-background-medium"
+                />
+                <BiSolidAmbulance className="mr-1 text-xl text-primary" />
+                Accidents
+              </label>
+              <label className="text-md flex items-center cursor-pointer text-gray-700">
+                <input
+                  type="checkbox"
+                  value="BFP"
+                  checked={rescueTypes.includes("BFP")}
+                  onChange={(e) =>
+                    setRescueType((prev) =>
+                      e.target.checked
+                        ? [...prev, e.target.value]
+                        : prev.filter((item) => item !== e.target.value)
+                    )
+                  }
+                  className="mr-2 scale-125 rounded-md border border-gray-300 accent-background-medium"
+                />
+                <PiFireTruckFill className="mr-1 text-xl text-warning" />
+                Fire
+              </label>
+              <label className="text-md flex items-center cursor-pointer text-gray-700">
+                <input
+                  type="checkbox"
+                  value="PNP"
+                  checked={rescueTypes.includes("PNP")}
+                  onChange={(e) =>
+                    setRescueType((prev) =>
+                      e.target.checked
+                        ? [...prev, e.target.value]
+                        : prev.filter((item) => item !== e.target.value)
+                    )
+                  }
+                  className="mr-2 scale-125 rounded-md border border-gray-300 accent-background-medium"
+                />
+                <RiPoliceCarFill className="mr-1 text-xl text-highlight" />
+                Crime
+              </label>
+            </div>
+          </details>
+        )}
+
         {/* Mobile Menu */}
         <div className="absolute top-4 right-4 m-2 p-2 z-50 rounded-full bg-white shadow-lg hover:bg-gray-200">
           <button

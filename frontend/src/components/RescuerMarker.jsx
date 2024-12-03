@@ -5,7 +5,7 @@ import ambulanceModel from "/assets/ambulance/scene.gltf";
 import { useLoader, useFrame } from "@react-three/fiber";
 import { PerspectiveCamera } from "@react-three/drei";
 
-const Model = ({ view }) => {
+const Model = ({ view, rescuerType }) => {
   const gltf = useLoader(GLTFLoader, ambulanceModel);
   const model = gltf.scene;
 
@@ -13,10 +13,15 @@ const Model = ({ view }) => {
   useEffect(() => {
     model.traverse((child) => {
       if (child.isMesh) {
-        child.material.color.setHex(0x99ff99);
+        const colorMap = {
+          MDRRMO: 0x99ff99, // Green
+          BFP: 0xffa500, // Orange
+          PNP: 0x4682b4, // Light blue
+        };
+        child.material.color.setHex(colorMap[rescuerType] || 0x99ff99);
       }
     });
-  }, [model]);
+  }, [model, rescuerType]);
 
   // Animation logic
   useFrame(() => {
@@ -48,7 +53,7 @@ const Model = ({ view }) => {
   return <primitive object={model} />;
 };
 
-const RescuerMarker = ({ view }) => {
+const RescuerMarker = ({ view, rescuerType }) => {
   return (
     <Canvas
       style={{
@@ -68,7 +73,7 @@ const RescuerMarker = ({ view }) => {
       <directionalLight position={[0, 10, 10]} intensity={1} />
 
       {/* Displaying the model with rotation */}
-      <Model view={view} />
+      <Model view={view} rescuerType={rescuerType} />
     </Canvas>
   );
 };

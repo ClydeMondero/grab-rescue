@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Loader, RescuerMarker } from "../components";
 import { FaLocationPin } from "react-icons/fa6";
 
-const LocatingIndicator = ({ locating, type }) => {
+const LocatingIndicator = ({ locating, type, rescuerType }) => {
   const [locatingMessage, setLocatingMessage] = useState("");
 
   const messages = [
@@ -53,7 +53,7 @@ const LocatingIndicator = ({ locating, type }) => {
           {type == "citizen" ? (
             <FaLocationPin className="text-3xl text-secondary" />
           ) : (
-            <RescuerMarker view="left-right" />
+            <RescuerMarker view="left-right" rescuerType={rescuerType} />
           )}
         </div>
       </div>

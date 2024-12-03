@@ -27,7 +27,6 @@ import {
   LocatingIndicator,
 } from "../components";
 import { useLocating } from "../hooks";
-import { getFilteredOnlineRescuers } from "../services/firestoreService";
 import { useLocation } from "react-router-dom";
 import { setGeolocateIcon } from "../utils/GeolocateUtility";
 

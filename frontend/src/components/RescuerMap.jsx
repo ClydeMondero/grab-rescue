@@ -38,6 +38,10 @@ const RescuerMap = ({ rescuerType, citizen, onLocatingChange, navigating }) => {
     [121.0972, 15.0197],
   ];
 
+  useEffect(() => {
+    console.log("rescuer", rescuerType);
+  }, [rescuerType]);
+
   const [routeData, setRouteData] = useState(null);
   const [distance, setDistance] = useState();
   const [eta, setEta] = useState();
@@ -247,7 +251,13 @@ const RescuerMap = ({ rescuerType, citizen, onLocatingChange, navigating }) => {
           handleGeolocation(coords);
         }}
       />
-      {locating && <LocatingIndicator locating={locating} type="rescuer" />}
+      {locating && (
+        <LocatingIndicator
+          locating={locating}
+          type="rescuer"
+          rescuerType={rescuerType}
+        />
+      )}
       {navigating && (
         <TurnIndicator
           routeData={routeData}
@@ -260,9 +270,9 @@ const RescuerMap = ({ rescuerType, citizen, onLocatingChange, navigating }) => {
         <>
           <Marker longitude={rescuer.longitude} latitude={rescuer.latitude}>
             {!navigating ? (
-              <RescuerMarker view="top-down" />
+              <RescuerMarker view="top-down" rescuerType={rescuerType} />
             ) : (
-              <RescuerMarker view="3d" />
+              <RescuerMarker view="3d" rescuerType={rescuerType} />
             )}
           </Marker>
           {citizen && (

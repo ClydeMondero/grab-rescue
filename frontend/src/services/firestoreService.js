@@ -240,14 +240,19 @@ const getActiveRescuerIDs = async () => {
 };
 
 // Function to get filtered online rescuers from Firestore
-export const getFilteredOnlineRescuers = async (role, setRescuers) => {
+export const getFilteredOnlineRescuers = async (
+  role,
+  rescueTypes,
+  setRescuers
+) => {
   // Get the list of active rescuer IDs
   const activeRescuerIDs = await getActiveRescuerIDs();
 
   const q = query(
     collection(store, "locations"),
     where("status", "==", "online"),
-    where("role", "==", role)
+    where("role", "==", role),
+    where("rescuerType", "in", rescueTypes) // Filter by rescuerType array
   );
 
   // Set up the real-time listener
