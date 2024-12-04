@@ -24,6 +24,8 @@ import {
   getLocationIDFromFirestore,
 } from "../services/firestoreService";
 import { BiSolidAmbulance } from "react-icons/bi";
+import { PiFireTruckFill } from "react-icons/pi";
+import { RiPoliceCarFill } from "react-icons/ri";
 
 const OngoingRescues = ({ requests, user }) => {
   const [showMap, setShowMap] = useState(false);
@@ -134,14 +136,6 @@ const OngoingRescues = ({ requests, user }) => {
 
     setShowMap(true);
   };
-
-  useEffect(() => {
-    console.log("citizen", citizen);
-  }, [citizen]);
-
-  useEffect(() => {
-    console.log("rescuer", rescuer);
-  }, [rescuer]);
 
   const handleCloseMap = () => {
     setShowMap(false);
@@ -338,7 +332,6 @@ const OngoingRescues = ({ requests, user }) => {
     // Table columns
     const tableColumn = [
       { title: "#", dataKey: "id" },
-      { title: "Rescuer ID", dataKey: "rescuer" },
       { title: "Rescuer Name", dataKey: "rescuerName" },
       { title: "Citizen Name", dataKey: "citizenName" },
       { title: "Location", dataKey: "location" },
@@ -351,7 +344,6 @@ const OngoingRescues = ({ requests, user }) => {
     // Rows data
     const tableRows = filteredRescues.map((rescue, index) => ({
       id: index + 1,
-      rescuer: rescue.rescuer,
       rescuerName: rescue.rescuerName || "",
       citizenName: rescue.originalRequest.citizenName || "",
       location: rescue.location,
@@ -388,14 +380,13 @@ const OngoingRescues = ({ requests, user }) => {
       },
       columnStyles: {
         0: { cellWidth: 10 }, // Column width for #
-        1: { cellWidth: 20 }, // Rescuer ID
-        2: { cellWidth: 35 }, // Rescuer Name
-        3: { cellWidth: 35 }, // Citizen Name
-        4: { cellWidth: 50 }, // Location
-        5: { cellWidth: 35 }, // Request Date & Time
-        6: { cellWidth: 35 }, // Accepted Date & Time
-        7: { cellWidth: 35 }, // Rescued Date & Time
-        8: { cellWidth: 25 }, // Status
+        1: { cellWidth: 35 }, // Rescuer Name
+        2: { cellWidth: 35 }, // Citizen Name
+        3: { cellWidth: 50 }, // Location
+        4: { cellWidth: 35 }, // Request Date & Time
+        5: { cellWidth: 35 }, // Accepted Date & Time
+        6: { cellWidth: 35 }, // Rescued Date & Time
+        7: { cellWidth: 25 }, // Status
       },
       tableWidth: "auto",
       margin: { left: (doc.internal.pageSize.getWidth() - 280) / 2 },
@@ -536,19 +527,13 @@ const OngoingRescues = ({ requests, user }) => {
       <div className="flex flex-col flex-1 gap-2">
         <div className="flex justify-between items-center">
           <div className="flex items-center">
-            <label
-              htmlFor="status-filter"
-              className="mr-2 font-semibold text-primary-dark bg-white rounded-md"
-            >
-              Filter by Status:
-            </label>
             <select
               id="status-filter"
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
               className="bg-gray-200 text-black rounded-lg p-3 max-w-full lg:max-w-[200px]"
             >
-              <option value="all">All</option>
+              <option value="all">All Status</option>
               <option value="assigned">Assigned</option>
               <option value="rescued">Rescued</option>
             </select>
@@ -568,9 +553,6 @@ const OngoingRescues = ({ requests, user }) => {
             <thead className="bg-[#557C55] text-white">
               <tr>
                 <th className="px-4 py-2 text-center text-xs font-medium">#</th>
-                <th className="px-4 py-2 text-center text-xs font-medium">
-                  Rescuer ID
-                </th>
                 <th className="px-4 py-2 text-center text-xs font-medium">
                   Rescuer Name
                 </th>
@@ -598,9 +580,6 @@ const OngoingRescues = ({ requests, user }) => {
                   className="border-b bg-white hover:bg-background-light"
                   onClick={() => handleRowClick(requests)}
                 >
-                  <td className="px-4 py-2 text-center text-sm text-info font-semibold">
-                    {requests.id}
-                  </td>
                   <td className="px-4 py-2 text-center text-sm">
                     {requests.rescuer}
                   </td>
@@ -725,7 +704,13 @@ const OngoingRescues = ({ requests, user }) => {
                     longitude={rescuer?.longitude}
                   >
                     <div className="relative flex flex-col items-center justify-center">
-                      <BiSolidAmbulance className="text-3xl text-primary green-pulse" />
+                      {rescuer?.rescuerType === "MDRRMO" ? (
+                        <BiSolidAmbulance className="text-4xl text-primary green-pulse" />
+                      ) : rescuer?.rescuerType === "BFP" ? (
+                        <PiFireTruckFill className="text-4xl text-warning orange-pulse" />
+                      ) : (
+                        <RiPoliceCarFill className="text-3xl text-highlight blue-pulse" />
+                      )}
                       <p className="bg-background px-2 py-1 rounded-full text-text-primary text-md font-semibold">
                         Rescuer
                       </p>

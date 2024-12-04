@@ -114,7 +114,7 @@ const Requests = ({
   useEffect(() => {
     const unsubscribe = getFilteredOnlineRescuers(
       "rescuer",
-      [rescuerType],
+      rescuerType,
       setRescuers
     );
     return () => unsubscribe;
@@ -137,9 +137,9 @@ const Requests = ({
 
   useEffect(() => {
     if (requests) {
-      const pendingRequests = requests.filter(
-        (request) => request.status === "pending"
-      );
+      const pendingRequests = requests
+        .filter((request) => request.status === "pending")
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
       setPendingRequests(pendingRequests);
     }
@@ -218,31 +218,17 @@ const Requests = ({
                           Rescue Types{" "}
                         </strong>
                         {request.rescueTypes && (
-                          <>
-                            {request.rescueTypes.map((type, index) => {
-                              let typeClass = "";
-                              switch (type) {
-                                case "PNP":
-                                  typeClass = "text-highlight";
-                                  break;
-                                case "MDRRMO":
-                                  typeClass = "text-primary";
-                                  break;
-                                case "BFP":
-                                  typeClass = "text-warning";
-                                  break;
-                                default:
-                                  typeClass = "text-gray-500";
-                              }
-                              return (
-                                <span key={index} className={typeClass}>
-                                  {type}
-                                  {index < request.rescueTypes.length - 1 &&
-                                    ", "}
-                                </span>
-                              );
-                            })}
-                          </>
+                          <span
+                            className={
+                              request.rescueTypes === "MDRRMO"
+                                ? "text-primary"
+                                : request.rescueTypes === "PNP"
+                                ? "text-highlight"
+                                : "text-warning"
+                            }
+                          >
+                            {request.rescueTypes}
+                          </span>
                         )}
                       </p>
                     </div>

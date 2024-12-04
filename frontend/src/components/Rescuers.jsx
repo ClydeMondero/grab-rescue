@@ -25,11 +25,16 @@ const AssignRescuers = (props) => {
   const [selectedBarangay, setSelectedBarangay] = useState("All");
   const [selectedStatus, setSelectedStatus] = useState("All");
   const [selectedVerified, setSelectedVerified] = useState("All");
+  const [selectedRescuerType, setSelectedRescuerType] = useState("All");
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRescuerId, setSelectedRescuerId] = useState(null);
   const [currentStatus, setCurrentStatus] = useState("All");
   const rowsPerPage = 10;
+
+  useEffect(() => {
+    console.log(rescuers);
+  }, [rescuers]);
 
   useEffect(() => {
     const initializePage = async () => {
@@ -86,6 +91,9 @@ const AssignRescuers = (props) => {
         currentStatus === "All" ||
         (currentStatus === "Active" && rescue.status === "Active") ||
         (currentStatus === "Inactive" && rescue.status === "Inactive");
+      const matchesRescuerType =
+        selectedRescuerType === "All" ||
+        rescue.rescuer_type === selectedRescuerType;
 
       return (
         matchesName &&
@@ -93,7 +101,8 @@ const AssignRescuers = (props) => {
         matchesBarangay &&
         matchesStatus &&
         matchesVerified &&
-        matchesAction
+        matchesAction &&
+        matchesRescuerType
       );
     });
 
@@ -106,6 +115,7 @@ const AssignRescuers = (props) => {
     selectedStatus,
     selectedVerified,
     currentStatus,
+    selectedRescuerType,
     rescuers,
   ]);
 
@@ -180,7 +190,7 @@ const AssignRescuers = (props) => {
       { title: "Barangay", dataKey: "barangay" },
       { title: "Contact Number", dataKey: "contact_number" },
       { title: "Email", dataKey: "email" },
-      { title: "Online/Offline", dataKey: "status_mode" },
+      { title: "Rescuer Type", dataKey: "rescuer_type" },
       { title: "Verified Email", dataKey: "verified" },
       { title: "Status", dataKey: "status" },
     ];
@@ -194,7 +204,7 @@ const AssignRescuers = (props) => {
       barangay: rescue.barangay,
       contact_number: rescue.contact_number,
       email: rescue.email,
-      status_mode: rescue.is_online ? "Online" : "Offline",
+      rescuer_type: rescue.rescuer_type,
       verified: rescue.verified ? "Verified" : "Not Verified",
       status: rescue.status === "Active" ? "Active" : "Inactive",
     }));
@@ -229,7 +239,7 @@ const AssignRescuers = (props) => {
         3: { cellWidth: 30 }, // Barangay
         4: { cellWidth: 30 }, // Contact Number
         5: { cellWidth: 50 }, // Email
-        6: { cellWidth: 20 }, // Online/Offline
+        6: { cellWidth: 30 }, // Rescuer Type
         7: { cellWidth: 25 }, // Verified
         8: { cellWidth: 20 }, // Status
       },
@@ -297,6 +307,18 @@ const AssignRescuers = (props) => {
                   {barangay}
                 </option>
               ))}
+            </select>
+          </div>
+          <div className="mr-4 mb-4">
+            <select
+              value={selectedRescuerType}
+              onChange={(e) => setSelectedRescuerType(e.target.value)}
+              className="rounded-lg bg-gray-200 text-black p-3 text-sm"
+            >
+              <option value="All">All Rescuer Types</option>
+              <option value="MDRRMO">MDRRMO</option>
+              <option value="PNP">PNP</option>
+              <option value="BFP">BFP</option>
             </select>
           </div>
 
@@ -381,6 +403,9 @@ const AssignRescuers = (props) => {
                 Email
               </th>
               <th className="px-4 py-2 text-center text-xs font-medium">
+                Rescuer Type
+              </th>
+              <th className="px-4 py-2 text-center text-xs font-medium">
                 Online/Offline
               </th>
               <th className="px-4 py-2 text-center text-xs font-medium">
@@ -392,35 +417,39 @@ const AssignRescuers = (props) => {
             </tr>
           </thead>
           <tbody>
-            {paginatedRescuers.map((rescue, index) => (
+            {paginatedRescuers.map((rescuer, index) => (
               <tr
-                key={rescue.id}
+                key={rescuer.id}
                 className="border-b bg-white hover:bg-background-light"
               >
                 <td className="px-4 py-2 text-xs text-center text-secondary">
-                  {rescue.id}
+                  {rescuer.id}
                 </td>
                 <td className="px-4 py-2 text-xs text-center">{`${
-                  rescue.first_name
-                } ${rescue.middle_name || ""} ${rescue.last_name}`}</td>
+                  rescuer.first_name
+                } ${rescuer.middle_name || ""} ${rescuer.last_name}`}</td>
                 <td className="px-4 py-2 text-xs text-center">
-                  {rescue.municipality}
+                  {rescuer.municipality}
                 </td>
                 <td className="px-4 py-2 text-xs text-center">
-                  {rescue.barangay}
+                  {rescuer.barangay}
                 </td>
                 <td className="px-4 py-2 text-xs text-center">
-                  {rescue.contact_number}
+                  {rescuer.contact_number}
                 </td>
                 <td className="px-4 py-2 text-xs text-center">
-                  {rescue.email}
+                  {rescuer.email}
                 </td>
+                <td className="px-4 py-2 text-xs text-center">
+                  {rescuer.rescuer_type}
+                </td>
+
                 <td
                   className={`px-4 py-2 text-xs text-center ${
-                    rescue.is_online ? "text-primary" : "text-secondary"
+                    rescuer.is_online ? "text-primary" : "text-secondary"
                   }`}
                 >
-                  {rescue.is_online ? (
+                  {rescuer.is_online ? (
                     <span className="flex items-center justify-center rounded-full font-semibold py-2 text-[#34C759]">
                       <FaCircle className="text-[#34C759] mr-1" />
                       Online
@@ -434,10 +463,10 @@ const AssignRescuers = (props) => {
                 </td>
                 <td
                   className={`px-4 py-2 text-center ${
-                    rescue.verified ? "text-primary-medium" : "text-secondary"
+                    rescuer.verified ? "text-primary-medium" : "text-secondary"
                   } text-xs `}
                 >
-                  {rescue.verified ? (
+                  {rescuer.verified ? (
                     <span className="flex items-center justify-center rounded-full font-semibold py-2 text-blue-400">
                       <FaCheckCircle className="text-blue-400 mr-1" />
                       Verified
@@ -452,15 +481,15 @@ const AssignRescuers = (props) => {
                 <td className="px-4 py-2 text-xs text-center">
                   <button
                     onClick={() =>
-                      handleToggleModalOpen(rescue.id, rescue.status)
+                      handleToggleModalOpen(rescuer.id, rescuer.status)
                     }
                     className={`rounded-full px-4 py-2 ${
-                      rescue.status === "Active"
+                      rescuer.status === "Active"
                         ? "bg-green-500"
                         : "bg-slate-500"
                     } text-white`}
                   >
-                    {rescue.status === "Active" ? "Active" : "Inactive"}
+                    {rescuer.status === "Active" ? "Active" : "Inactive"}
                   </button>
                 </td>
               </tr>
