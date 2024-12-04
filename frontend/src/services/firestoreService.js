@@ -94,13 +94,21 @@ export const updateLocationStatus = async (id, status) => {
     id: doc.id,
   }));
 
-  const updatePromises = locations.map((location) => {
-    const locationRef = doc(store, "locations", location.id);
-    return updateDoc(locationRef, { status });
-  });
+  // Delete all locations except the first one
+  const deletePromises = locations
+    .slice(1)
+    .map((location) => deleteDoc(doc(store, "locations", location.id)));
 
   try {
-    await Promise.all(updatePromises);
+    await Promise.all(deletePromises);
+  } catch (error) {
+    console.error(`Error deleting duplicate locations: `, error);
+  }
+
+  // Update the first location with the new status
+  try {
+    const locationRef = doc(store, "locations", locations[0].id);
+    await updateDoc(locationRef, { status });
   } catch (error) {
     console.error(`Error updating location status to ${status}: `, error);
   }
@@ -245,6 +253,12 @@ export const getFilteredOnlineRescuers = async (
   rescueTypes,
   setRescuers
 ) => {
+  // If rescueTypes is empty, return no rescuer locations
+  if (rescueTypes.length === 0) {
+    setRescuers([]);
+    return;
+  }
+
   // Get the list of active rescuer IDs
   const activeRescuerIDs = await getActiveRescuerIDs();
 
@@ -376,19 +390,9 @@ export const addRequestToFirestore = async (
 // update request in firestore with follow-up details
 export const updateRequestInFirestore = async (
   requestId,
-  {
-    phone,
-    citizenName,
-    citizenRelation,
-    incidentPicture,
-    incidentDescription,
-  } = {}
+  { citizenRelation, incidentPicture, incidentDescription } = {}
 ) => {
-  const updateData = { phone };
-
-  if (citizenName) {
-    updateData.citizenName = citizenName;
-  }
+  const updateData = {};
 
   if (citizenRelation) {
     updateData.citizenRelation = citizenRelation;
@@ -404,6 +408,18 @@ export const updateRequestInFirestore = async (
       updateData.incidentPicture = pictureURL;
     }
   }
+
+  try {
+    await updateDoc(doc(store, "requests", requestId), updateData);
+  } catch (error) {
+    console.error("Error updating document: ", error);
+  }
+};
+
+export const addRescuerRemarksToFirestore = async (requestId, remarks) => {
+  const updateData = {
+    rescuerRemarks: remarks,
+  };
 
   try {
     await updateDoc(doc(store, "requests", requestId), updateData);

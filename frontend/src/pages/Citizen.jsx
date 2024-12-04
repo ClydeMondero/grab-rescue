@@ -118,6 +118,10 @@ const Citizen = ({ user }) => {
     }
   };
 
+  useEffect(() => {
+    console.log(nearestRescuer);
+  }, [nearestRescuer]);
+
   const handleModalConfirm = async () => {
     if (mapRef.current) {
       const citizenId = getCitizenCookie();
@@ -250,6 +254,10 @@ const Citizen = ({ user }) => {
 
     getRescuerDetails();
   }, [request]);
+
+  useEffect(() => {
+    console.log(rescueTypes);
+  }, [rescueTypes]);
 
   return (
     <div className="h-dvh w-screen overflow-hidden flex flex-col">

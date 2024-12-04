@@ -11,7 +11,10 @@ import { getRouteData, getNearestRescuer } from "../services/locationService";
 import placeholder from "../assets/placeholder.png";
 import { formatDistance, formatDuration } from "../utils/DistanceUtility";
 import { setSelectedRequestCookie } from "../services/cookieService";
-import { acceptRescueRequestInFirestore } from "../services/firestoreService";
+import {
+  acceptRescueRequestInFirestore,
+  getFilteredOnlineRescuers,
+} from "../services/firestoreService";
 import { getLocationsFromFirestore } from "../services/firestoreService";
 import { NoRequests, NotNearestRescuerPrompt } from "../components";
 
@@ -20,6 +23,7 @@ const Requests = ({
   requests,
   selectedRequest,
   setSelectedRequest,
+  rescuerType,
 }) => {
   const navigate = useNavigate();
   const { rescuer, setPage } = useContext(RescuerContext);
@@ -108,10 +112,12 @@ const Requests = ({
   };
 
   useEffect(() => {
-    const unsubscribe = getLocationsFromFirestore("rescuer", (data) => {
-      setRescuers(data.filter((rescuer) => rescuer.status !== "offline"));
-    });
-    return () => unsubscribe();
+    const unsubscribe = getFilteredOnlineRescuers(
+      "rescuer",
+      [rescuerType],
+      setRescuers
+    );
+    return () => unsubscribe;
   }, []);
 
   useEffect(() => {
