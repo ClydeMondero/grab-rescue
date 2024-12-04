@@ -266,7 +266,7 @@ export const getFilteredOnlineRescuers = async (
     collection(store, "locations"),
     where("status", "==", "online"),
     where("role", "==", role),
-    where("rescuerType", "in", rescueTypes) // Filter by rescuerType array
+    where("rescuerType", "==", rescueTypes) // Filter by rescuerType array
   );
 
   // Set up the real-time listener
@@ -322,7 +322,7 @@ export const getFilteredRequestsFromFirestore = (setRequests, rescuerType) => {
   try {
     const q = query(
       collection(store, "requests"),
-      where("rescueTypes", "array-contains", rescuerType) // Filter requests by rescuerType
+      where("rescueTypes", "==", rescuerType) // Filter requests by rescuerType
     );
 
     // Set up a Firestore listener

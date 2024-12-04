@@ -55,7 +55,7 @@ const Citizen = ({ user }) => {
   const [assignedRescuer, setAssignedRescuer] = useState(null);
   const [hotlineModalOpen, setHotlineModalOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  const [rescueTypes, setRescueType] = useState(["MDRRMO"]);
+  const [rescueTypes, setRescueType] = useState("MDRRMO");
 
   const { getId } = useContext(StatusContext);
   const mapRef = useRef(null);
@@ -277,51 +277,36 @@ const Citizen = ({ user }) => {
             <div className="flex flex-col space-y-2 mt-2">
               <label className="text-md flex items-center cursor-pointer text-gray-700">
                 <input
-                  type="checkbox"
+                  type="radio"
                   value="MDRRMO"
-                  checked={rescueTypes.includes("MDRRMO")}
-                  onChange={(e) =>
-                    setRescueType((prev) =>
-                      e.target.checked
-                        ? [...prev, e.target.value]
-                        : prev.filter((item) => item !== e.target.value)
-                    )
-                  }
-                  className="mr-2 scale-125 rounded-md border border-gray-300 accent-background-medium"
+                  checked={rescueTypes === "MDRRMO"}
+                  onChange={(e) => setRescueType(e.target.value)}
+                  className="mr-2 scale-125 rounded-md border border-gray-300 accent-secondary"
+                  name="rescue-type"
                 />
                 <BiSolidAmbulance className="mr-1 text-xl text-primary" />
                 Accidents
               </label>
               <label className="text-md flex items-center cursor-pointer text-gray-700">
                 <input
-                  type="checkbox"
+                  type="radio"
                   value="BFP"
-                  checked={rescueTypes.includes("BFP")}
-                  onChange={(e) =>
-                    setRescueType((prev) =>
-                      e.target.checked
-                        ? [...prev, e.target.value]
-                        : prev.filter((item) => item !== e.target.value)
-                    )
-                  }
-                  className="mr-2 scale-125 rounded-md border border-gray-300 accent-background-medium"
+                  checked={rescueTypes === "BFP"}
+                  onChange={(e) => setRescueType(e.target.value)}
+                  className="mr-2 scale-125 rounded-md border border-gray-300 accent-secondary"
+                  name="rescue-type"
                 />
                 <PiFireTruckFill className="mr-1 text-xl text-warning" />
                 Fire
               </label>
               <label className="text-md flex items-center cursor-pointer text-gray-700">
                 <input
-                  type="checkbox"
+                  type="radio"
                   value="PNP"
-                  checked={rescueTypes.includes("PNP")}
-                  onChange={(e) =>
-                    setRescueType((prev) =>
-                      e.target.checked
-                        ? [...prev, e.target.value]
-                        : prev.filter((item) => item !== e.target.value)
-                    )
-                  }
-                  className="mr-2 scale-125 rounded-md border border-gray-300 accent-background-medium"
+                  checked={rescueTypes === "PNP"}
+                  onChange={(e) => setRescueType(e.target.value)}
+                  className="mr-2 scale-125 rounded-md border border-gray-300 accent-secondary"
+                  name="rescue-type"
                 />
                 <RiPoliceCarFill className="mr-1 text-xl text-highlight" />
                 Crime
