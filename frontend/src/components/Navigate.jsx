@@ -109,6 +109,7 @@ const Navigate = ({ user, requestID, setSelectedRequest }) => {
         deleteCookie("selected_request");
         setSelectedRequest(null);
         setRequestData(null);
+        window.location.reload();
       }
     }
     setShowModal(false); // Close modal after confirmation
