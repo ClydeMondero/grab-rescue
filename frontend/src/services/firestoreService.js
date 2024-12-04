@@ -416,6 +416,18 @@ export const updateRequestInFirestore = async (
   }
 };
 
+export const addRescuerRemarksToFirestore = async (requestId, remarks) => {
+  const updateData = {
+    rescuerRemarks: remarks,
+  };
+
+  try {
+    await updateDoc(doc(store, "requests", requestId), updateData);
+  } catch (error) {
+    console.error("Error updating document: ", error);
+  }
+};
+
 //complete request in firestore
 export const completeRequestInFirestore = async (requestId, address) => {
   const updateData = {

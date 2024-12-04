@@ -14,6 +14,7 @@ import {
   getLocationFromFirestore,
   getLocationIDFromFirestore,
   getLocationFromFirestoreInRealTime,
+  addRescuerRemarksToFirestore,
 } from "../services/firestoreService";
 import { Loader } from "../components";
 import MobileDetect from "mobile-detect";
@@ -39,6 +40,7 @@ const Navigate = ({ user, requestID, setSelectedRequest }) => {
   const { navigating, setNavigating } = useContext(RescuerContext);
   const mapRef = useRef();
   const [requestLocation, setRequestLocation] = useState(null);
+  const [remarks, setRemarks] = useState("");
 
   const handleLocatingChange = (newLocatingState) => {
     setLocating(newLocatingState);
@@ -65,12 +67,12 @@ const Navigate = ({ user, requestID, setSelectedRequest }) => {
       if (citizen) {
         getLocationFromFirestoreInRealTime(citizen, setRequestLocation);
       }
+
+      if (requestData.rescuerRemarks) {
+        setRemarks(requestData.rescuerRemarks);
+      }
     }
   }, [requestData]);
-
-  useEffect(() => {
-    console.log("requestLocation", requestLocation);
-  }, [requestLocation]);
 
   const handlePhone = () => {
     if (onMobile) {
@@ -300,6 +302,42 @@ const Navigate = ({ user, requestID, setSelectedRequest }) => {
           {showDetails && (
             <div className="mt-2 transition-opacity duration-300 ease-in-out opacity-100">
               <div className="flex flex-col gap-3">
+                {/* Rescuer Remarks */}
+                <div className="flex flex-col gap-3">
+                  <div className=" rounded-lg w-full">
+                    <label className="block font-bold text-primary-dark">
+                      Rescuer Remarks
+                    </label>
+                    <textarea
+                      value={remarks}
+                      onChange={(e) => setRemarks(e.target.value)}
+                      className="w-full h-25 mt-2 border rounded-lg p-2 text-sm resize-none overflow-auto"
+                      placeholder="Add your remarks here..."
+                    />
+                  </div>
+                  <button
+                    onClick={async () => {
+                      if (requestID) {
+                        try {
+                          await addRescuerRemarksToFirestore(
+                            requestID,
+                            remarks
+                          );
+                          toast.success("Remarks updated successfully!");
+                        } catch (err) {
+                          toast.error("Failed to update remarks.");
+                        }
+                      }
+                    }}
+                    className="bg-primary font-bold text-white py-3 px-5 rounded-lg hover:bg-primary-dark transition text-sm"
+                  >
+                    Save Remarks
+                  </button>
+                </div>
+
+                {/* Incident Header */}
+                <h3 className="font-bold text-primary-dark mb-2">Incident</h3>
+
                 {/* Image */}
                 <img
                   src={
