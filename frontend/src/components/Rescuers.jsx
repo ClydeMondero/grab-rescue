@@ -33,10 +33,6 @@ const AssignRescuers = (props) => {
   const rowsPerPage = 10;
 
   useEffect(() => {
-    console.log(rescuers);
-  }, [rescuers]);
-
-  useEffect(() => {
     const initializePage = async () => {
       try {
         const result = await axios.get("/rescuers/get", createAuthHeader());

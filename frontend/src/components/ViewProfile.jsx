@@ -1,5 +1,12 @@
 import { useState, useEffect, useContext } from "react";
-import { FaChevronLeft, FaSave, FaEdit, FaTimes, FaUser } from "react-icons/fa";
+import {
+  FaChevronLeft,
+  FaSave,
+  FaEdit,
+  FaTimes,
+  FaUser,
+  FaHistory,
+} from "react-icons/fa";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { createAuthHeader } from "../services/authService";
@@ -9,6 +16,7 @@ import { Toast } from "../components";
 import { barangaysData } from "../constants/Barangays";
 import { Loader } from "../components";
 import { RescuerContext } from "../contexts/RescuerContext";
+import { getHistoryRequestsFromFirestore } from "../services/firestoreService";
 
 const ViewProfile = (props) => {
   const navigate = useNavigate();
@@ -18,6 +26,8 @@ const ViewProfile = (props) => {
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const location = useLocation();
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [requests, setRequests] = useState([]);
 
   const setPage =
     user.account_type === "Rescuer" ? useContext(RescuerContext).setPage : null;
@@ -80,6 +90,15 @@ const ViewProfile = (props) => {
     }
   };
 
+  useEffect(() => {
+    const unsubscribe = getHistoryRequestsFromFirestore(
+      user.id,
+      "rescuer",
+      setRequests
+    );
+    return unsubscribe; // Clean up the subscription when the component unmounts
+  }, []);
+
   return (
     <>
       <div className="flex-1 p-6 h-full to-background-light">
@@ -95,7 +114,7 @@ const ViewProfile = (props) => {
         </div>
 
         {/* Main Profile Container */}
-        <div className="w-full flex items-center justify-center md:flex-row gap-4">
+        <div className="w-full flex-col items-center justify-center gap-4">
           {/* Profile Information Card */}
           <div className="bg-white rounded-lg p-4 w-full md:w-1/2">
             <h2 className="text-lg font-semibold text-[#557C55] mb-2">
@@ -177,7 +196,16 @@ const ViewProfile = (props) => {
             </div>
 
             {/* Edit Profile Button */}
-            <div className="mt-4 flex justify-end">
+            <div className="mt-4 flex  items-center justify-around gap-3">
+              {user.account_type === "Rescuer" && (
+                <button
+                  className="flex items-center justify-center space-x-2 px-6 py-4 bg-background-light text-primary-dark hover:text-secondary-dark transition duration-200 rounded-md"
+                  onClick={() => setIsHistoryOpen(!isHistoryOpen)}
+                >
+                  <FaHistory className="text-xl" />
+                  <span>History</span>
+                </button>
+              )}
               <button
                 onClick={() => setIsEditing(true)}
                 className="bg-[#557C55] text-white px-6 py-4 rounded-md text-xs font-semibold hover:bg-[#6EA46E] transition"
@@ -189,6 +217,50 @@ const ViewProfile = (props) => {
               </button>
             </div>
           </div>
+          {isHistoryOpen && (
+            <div className="mt-4">
+              <h4 className="text-lg font-bold text-[#557C55]">
+                Request History
+              </h4>
+              <div className=" h-[25vh] overflow-y-auto">
+                {requests.map((request) => (
+                  <div
+                    key={request.id}
+                    className="bg-gray-100 p-4 mt-4 rounded-lg"
+                  >
+                    <p className="text-lg font-semibold text-primary-dark">
+                      {request.location.address}
+                    </p>
+                    <p className="mt-2 text-background-dark">
+                      {new Intl.DateTimeFormat("en-US", {
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                      }).format(new Date(request.rescuedTimestamp))}
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-white font-bold bg-primary py-4 px-3 rounded-lg w-max">
+                        {request.status.charAt(0).toUpperCase() +
+                          request.status.slice(1)}
+                      </p>
+                      <p
+                        className={
+                          `text-white p-4 font-bold rounded-lg w-max ` +
+                          (request.rescueTypes === "PNP"
+                            ? "bg-highlight"
+                            : request.rescueTypes === "BFP"
+                            ? "bg-warning"
+                            : "bg-primary")
+                        }
+                      >
+                        {request.rescueTypes}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Edit Profile Modal */}

@@ -5,6 +5,9 @@ import {
   FaTimes,
   FaSave,
   FaUser,
+  FaChevronDown,
+  FaChevronUp,
+  FaHistory,
 } from "react-icons/fa";
 import { handleLogout } from "../services/authService";
 import { useNavigate } from "react-router-dom";
@@ -16,6 +19,8 @@ import "react-toastify/dist/ReactToastify.css";
 import { Toast } from "../components";
 import { barangaysData } from "../constants/Barangays";
 import { Loader } from "../components";
+import { getCitizenCookie } from "../services/cookieService";
+import { getHistoryRequestsFromFirestore } from "../services/firestoreService";
 
 export default function CitizenProfile(props) {
   const navigate = useNavigate();
@@ -24,6 +29,8 @@ export default function CitizenProfile(props) {
   const [age, setAge] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [requests, setRequests] = useState([]);
 
   // Extract municipalities from barangaysData
   const municipalities = Object.keys(barangaysData);
@@ -83,6 +90,17 @@ export default function CitizenProfile(props) {
     }
   };
 
+  useEffect(() => {
+    const id = getCitizenCookie();
+
+    const unsubscribe = getHistoryRequestsFromFirestore(
+      id,
+      "citizen",
+      setRequests
+    );
+    return unsubscribe; // Clean up the subscription when the component unmounts
+  }, []);
+
   return (
     <div className="flex flex-col items-center h-full p-6">
       <div className="w-full items-center gap-4 mb-6 flex pb-2">
@@ -107,7 +125,7 @@ export default function CitizenProfile(props) {
         )}
       </div>
 
-      <div className="w-full flex items-center justify-center md:flex-row gap-4">
+      <div className="w-full flex flex-col items-center justify-center md:flex-row gap-4">
         <div className="bg-white rounded-lg p-4 w-full md:w-1/2">
           <h2 className="text-lg font-semibold text-[#557C55] mb-2">
             Profile Information
@@ -155,7 +173,14 @@ export default function CitizenProfile(props) {
             </div>
 
             {!requesting && (
-              <div className="mt-4 flex justify-end">
+              <div className="mt-4 flex items-end justify-around gap-3">
+                <button
+                  className="flex items-center justify-center space-x-2 px-6 py-4 bg-background-light text-primary-dark hover:text-secondary-dark transition duration-200 rounded-md"
+                  onClick={() => setIsHistoryOpen(!isHistoryOpen)}
+                >
+                  <FaHistory className="text-xl" />
+                  <span>Request History</span>
+                </button>
                 <button
                   className="flex items-center justify-center space-x-2 px-6 py-4 w-32 bg-secondary text-white hover:text-secondary-dark transition duration-200 rounded-md"
                   onClick={() => {
@@ -176,6 +201,50 @@ export default function CitizenProfile(props) {
             )}
           </div>
         </div>
+        {isHistoryOpen && (
+          <div className="mt-4">
+            <h4 className="text-lg font-bold text-[#557C55]">
+              Request History
+            </h4>
+            <div className=" h-[25vh] overflow-y-auto">
+              {requests.map((request) => (
+                <div
+                  key={request.id}
+                  className="bg-gray-100 p-4 mt-4 rounded-lg"
+                >
+                  <p className="text-lg font-semibold text-primary-dark">
+                    {request.location.address}
+                  </p>
+                  <p className="mt-2 text-background-dark">
+                    {new Intl.DateTimeFormat("en-US", {
+                      year: "numeric",
+                      month: "2-digit",
+                      day: "2-digit",
+                    }).format(new Date(request.rescuedTimestamp))}
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-white font-bold bg-primary py-4 px-3 rounded-lg w-max">
+                      {request.status.charAt(0).toUpperCase() +
+                        request.status.slice(1)}
+                    </p>
+                    <p
+                      className={
+                        `text-white p-4 font-bold rounded-lg w-max ` +
+                        (request.rescueTypes === "PNP"
+                          ? "bg-highlight"
+                          : request.rescueTypes === "BFP"
+                          ? "bg-warning"
+                          : "bg-primary")
+                      }
+                    >
+                      {request.rescueTypes}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
       {/* Edit Profile Modal */}
       {isEditing && (

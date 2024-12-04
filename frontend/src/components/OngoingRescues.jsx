@@ -7,6 +7,7 @@ import {
   FaCalendarAlt,
   FaCalendarDay,
   FaCalendarWeek,
+  FaSearch,
 } from "react-icons/fa";
 import { AiFillPrinter } from "react-icons/ai";
 import { FaLocationPin } from "react-icons/fa6";
@@ -32,9 +33,12 @@ const OngoingRescues = ({ requests, user }) => {
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [selectedRescue, setSelectedRescue] = useState(null);
   const [filterStatus, setFilterStatus] = useState("all");
+  const [filterRescueType, setFilterRescueType] = useState("all");
+  const [searchName, setSearchName] = useState(null);
   const [rescuerName, setRescuerName] = useState(null);
   const [rescuerNames, setRescuerNames] = useState([]);
   const [rescuerContactNumber, setRescuerContactNumber] = useState(null);
+  const [rescuerType, setRescuerType] = useState(null);
   const [showPrintModal, setShowPrintModal] = useState(false);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
@@ -56,6 +60,17 @@ const OngoingRescues = ({ requests, user }) => {
 
   const ongoingRescues = requests
     .filter((request) => {
+      const rescuerName = rescuerNames[request.rescuerId] || "Unknown";
+      const citizenName = request.citizenName;
+      if (searchName) {
+        return (
+          rescuerName.toLowerCase().includes(searchName.toLowerCase()) ||
+          citizenName.toLowerCase().includes(searchName.toLowerCase())
+        );
+      }
+      return true;
+    })
+    .filter((request) => {
       if (filterStatus === "all") {
         return (
           request.status === "assigned" ||
@@ -66,6 +81,18 @@ const OngoingRescues = ({ requests, user }) => {
       }
       return request.status === filterStatus;
     })
+
+    .filter((request) => {
+      if (filterRescueType === "all") {
+        return (
+          request.rescueTypes === "MDRRMO" ||
+          request.rescueTypes === "PNP" ||
+          request.rescueTypes === "BFP"
+        );
+      }
+      return request.rescueTypes === filterRescueType;
+    })
+
     .sort((a, b) => {
       const statusOrder = {
         assigned: 0,
@@ -81,6 +108,15 @@ const OngoingRescues = ({ requests, user }) => {
       rescuer: request.rescuerId,
       rescuerName: rescuerNames[request.rescuerId] || "Unknown",
       status: request.status,
+      rescueTypes: request.rescueTypes,
+      rescuedTimestamp: new Intl.DateTimeFormat("en-US", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      }).format(new Date(request.rescuedTimestamp)),
       acceptedTimestamp: new Intl.DateTimeFormat("en-US", {
         year: "numeric",
         month: "2-digit",
@@ -182,7 +218,8 @@ const OngoingRescues = ({ requests, user }) => {
       if (selectedRescue?.rescuerId) {
         const rescuer = await getRescuer(selectedRescue.rescuerId);
         if (rescuer) {
-          const { first_name, middle_name, last_name } = rescuer[0];
+          const { first_name, middle_name, last_name, rescuer_type } =
+            rescuer[0];
           const fullName = `${first_name} ${middle_name} ${last_name}`;
           const contactNumber = `${rescuer[0].contact_number}`;
           const { barangay, municipality } = rescuer[0];
@@ -190,6 +227,7 @@ const OngoingRescues = ({ requests, user }) => {
           setRescuerArea(barangay + ", " + municipality);
           setRescuerName(fullName);
           setRescuerContactNumber(contactNumber);
+          setRescuerType(rescuer_type);
         }
       }
     };
@@ -265,7 +303,7 @@ const OngoingRescues = ({ requests, user }) => {
   };
 
   const handleGeneratePDF = (startDate, endDate, reportType) => {
-    const doc = new jsPDF("landscape");
+    const doc = new jsPDF("l", "mm", "legal");
 
     // Parse start and end dates as Date objects, including time boundaries for filtering
     const start = new Date(startDate);
@@ -335,10 +373,12 @@ const OngoingRescues = ({ requests, user }) => {
       { title: "Rescuer Name", dataKey: "rescuerName" },
       { title: "Citizen Name", dataKey: "citizenName" },
       { title: "Location", dataKey: "location" },
+      { title: "Rescue Type", dataKey: "rescueType" },
       { title: "Request Date & Time", dataKey: "requestTimestamp" },
       { title: "Accepted Date & Time", dataKey: "acceptedTimestamp" },
       { title: "Rescued Date & Time", dataKey: "rescuedTimestamp" },
       { title: "Status", dataKey: "status" },
+      { title: "Rescuer Remarks", dataKey: "rescuerRemarks" },
     ];
 
     // Rows data
@@ -347,10 +387,12 @@ const OngoingRescues = ({ requests, user }) => {
       rescuerName: rescue.rescuerName || "",
       citizenName: rescue.originalRequest.citizenName || "",
       location: rescue.location,
+      rescueType: rescue.originalRequest.rescueTypes || "",
       requestTimestamp: formatDateTime(rescue.originalRequest.timestamp),
       acceptedTimestamp: formatDateTime(rescue.acceptedTimestamp),
       rescuedTimestamp: formatDateTime(rescue.originalRequest.rescuedTimestamp),
       status: rescue.status.charAt(0).toUpperCase() + rescue.status.slice(1),
+      rescuerRemarks: rescue.originalRequest.rescuerRemarks || "",
     }));
 
     // Customized table style
@@ -383,10 +425,12 @@ const OngoingRescues = ({ requests, user }) => {
         1: { cellWidth: 35 }, // Rescuer Name
         2: { cellWidth: 35 }, // Citizen Name
         3: { cellWidth: 50 }, // Location
-        4: { cellWidth: 35 }, // Request Date & Time
-        5: { cellWidth: 35 }, // Accepted Date & Time
-        6: { cellWidth: 35 }, // Rescued Date & Time
-        7: { cellWidth: 25 }, // Status
+        4: { cellWidth: 15 }, // Rescue Type
+        5: { cellWidth: 35 }, // Request Date & Time
+        6: { cellWidth: 35 }, // Accepted Date & Time
+        7: { cellWidth: 35 }, // Rescued Date & Time
+        8: { cellWidth: 25 }, // Status
+        9: { cellWidth: 30 }, // Remarks
       },
       tableWidth: "auto",
       margin: { left: (doc.internal.pageSize.getWidth() - 280) / 2 },
@@ -526,7 +570,7 @@ const OngoingRescues = ({ requests, user }) => {
 
       <div className="flex flex-col flex-1 gap-2">
         <div className="flex justify-between items-center">
-          <div className="flex items-center">
+          <div className="flex items-center gap-2">
             <select
               id="status-filter"
               value={filterStatus}
@@ -537,15 +581,38 @@ const OngoingRescues = ({ requests, user }) => {
               <option value="assigned">Assigned</option>
               <option value="rescued">Rescued</option>
             </select>
+            <select
+              id="rescue-type-filter"
+              value={filterRescueType}
+              onChange={(e) => setFilterRescueType(e.target.value)}
+              className="bg-gray-200 text-black rounded-lg p-3 max-w-full lg:max-w-[200px]"
+            >
+              <option value="all">All Rescue Types</option>
+              <option value="MDRRMO">MDRRMO</option>
+              <option value="BFP">BFP</option>
+              <option value="PNP">PNP</option>
+            </select>
           </div>
 
-          <button
-            onClick={() => setShowPrintModal(true)}
-            className="w-max bg-gray-200 text-black p-3 rounded-lg hover:opacity-80 transition flex items-center"
-          >
-            <AiFillPrinter className="text-base mr-1" />
-            Generate PDF
-          </button>
+          <div className="flex items-center gap-3">
+            <div className="relative w-full md:w-[18rem]">
+              <input
+                type="text"
+                placeholder="Search by Name"
+                value={searchName}
+                onChange={(e) => setSearchName(e.target.value)}
+                className="rounded-full border border-primary-medium p-3 w-full text-sm"
+              />
+              <FaSearch className="absolute right-2 top-1/2 transform -translate-y-1/2 text-background-medium" />
+            </div>
+            <button
+              onClick={() => setShowPrintModal(true)}
+              className="w-max bg-gray-200 text-black p-3 rounded-lg hover:opacity-80 transition flex items-center"
+            >
+              <AiFillPrinter className="text-base mr-1" />
+              Generate PDF
+            </button>
+          </div>
         </div>
 
         <div className="hidden lg:block overflow-x-auto cursor-pointer">
@@ -563,7 +630,10 @@ const OngoingRescues = ({ requests, user }) => {
                   Location
                 </th>
                 <th className="px-4 py-2 text-center text-xs font-medium">
-                  Accepted Timestamp
+                  Timestamp
+                </th>
+                <th className="px-4 py-2 text-center text-xs font-medium">
+                  Rescue Type
                 </th>
                 <th className="px-4 py-2 text-center text-xs font-medium">
                   Status
@@ -590,10 +660,27 @@ const OngoingRescues = ({ requests, user }) => {
                     {requests.originalRequest.citizenName || "N/A"}
                   </td>
                   <td className="px-4 py-2 text-center text-sm">
-                    {requests.location}
+                    {requests.location.length > 20
+                      ? `${requests.location.substring(0, 20)}...`
+                      : requests.location}
                   </td>
                   <td className="px-4 py-2 text-center text-sm">
-                    {requests.acceptedTimestamp}
+                    {requests.status === "rescued"
+                      ? requests.rescuedTimestamp
+                      : requests.acceptedTimestamp}
+                  </td>
+                  <td className="px-4 py-2 text-center text-sm">
+                    <button
+                      className={`text-xs p-3 rounded-lg ${
+                        requests.rescueTypes === "MDRRMO"
+                          ? "bg-primary text-white"
+                          : requests.rescueTypes === "BFP"
+                          ? "bg-warning text-white"
+                          : "bg-highlight text-white"
+                      }`}
+                    >
+                      {requests.rescueTypes}
+                    </button>
                   </td>
                   <td className="px-4 py-2 text-center">
                     <button
@@ -760,43 +847,6 @@ const OngoingRescues = ({ requests, user }) => {
                     />
                   )}
                 </div>
-              </div>
-
-              {/* Details Section */}
-              <div className="col-span-2 grid grid-cols-2 gap-6">
-                {/* Rescuer Info */}
-                <div className="space-y-2 border-b border-gray-200 pb-4">
-                  <h3 className="text-xl font-semibold text-primary-medium">
-                    Rescuer
-                  </h3>
-                  <p className="text-gray-600">
-                    <strong>Name:</strong> {rescuerName}
-                  </p>
-                  <p className="text-gray-600">
-                    <strong>Phone:</strong> {rescuerContactNumber}
-                  </p>
-                  <p className="text-gray-600">
-                    <strong>Assigned Area:</strong> {rescuerArea}
-                  </p>
-                </div>
-
-                {/* Citizen Info */}
-                <div className="space-y-2 border-b border-gray-200 pb-4">
-                  <h3 className="text-xl font-semibold text-secondary">
-                    Citizen
-                  </h3>
-                  <p className="text-gray-600">
-                    <strong>Name:</strong> {selectedRescue.citizenName}
-                  </p>
-                  <p className="text-gray-600">
-                    <strong>Phone:</strong> {selectedRescue.phone}
-                  </p>
-                  <p className="text-gray-600">
-                    <strong>Location:</strong> {selectedRescue.location.address}
-                  </p>
-                </div>
-
-                {/* Rescue Status */}
                 <div className="space-y-2">
                   <h3 className="text-lg font-semibold text-gray-700">
                     Status
@@ -850,6 +900,66 @@ const OngoingRescues = ({ requests, user }) => {
                         );
                       })()}
                     </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Details Section */}
+              <div className="col-span-2 grid grid-cols-2 gap-6">
+                {/* Rescuer Info */}
+                <div className="space-y-2 border-b border-gray-200 pb-4">
+                  <h3 className="text-xl font-semibold text-primary-medium">
+                    Rescuer
+                  </h3>
+                  <p className="text-gray-600">
+                    <strong>Name:</strong> {rescuerName}
+                  </p>
+                  <p className="text-gray-600">
+                    <strong>Phone:</strong> {rescuerContactNumber}
+                  </p>
+                  <p className="text-gray-600">
+                    <strong>Assigned Area:</strong> {rescuerArea}
+                  </p>
+                  <button
+                    type="button"
+                    className={`px-4 py-2 font-semibold rounded-md shadow-sm ${
+                      rescuerType === "MDRRMO"
+                        ? "bg-primary text-white"
+                        : rescuerType === "BFP"
+                        ? "bg-warning text-white"
+                        : "bg-highlight text-white"
+                    }`}
+                  >
+                    {rescuerType}
+                  </button>
+                </div>
+
+                {/* Citizen Info */}
+                <div className="space-y-2 border-b border-gray-200 pb-4">
+                  <h3 className="text-xl font-semibold text-secondary">
+                    Citizen
+                  </h3>
+                  <p className="text-gray-600">
+                    <strong>Name:</strong> {selectedRescue.citizenName}
+                  </p>
+                  <p className="text-gray-600">
+                    <strong>Phone:</strong> {selectedRescue.phone}
+                  </p>
+                  <p className="text-gray-600">
+                    <strong>Location:</strong> {selectedRescue.location.address}
+                  </p>
+                </div>
+
+                {/* Remarks */}
+                <div className="space-y-2">
+                  <h3 className="text-lg font-semibold text-gray-700">
+                    Rescuer Remarks
+                  </h3>
+                  <div
+                    className="w-full px-3 py-2 text-gray-600 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-200 focus:border-indigo-500"
+                    style={{ height: "100px", overflow: "auto" }}
+                  >
+                    <p>{selectedRescue.rescuerRemarks || ""}</p>
                   </div>
                 </div>
 

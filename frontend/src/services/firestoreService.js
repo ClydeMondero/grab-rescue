@@ -317,6 +317,29 @@ export const getRequestsFromFirestore = (setRequests) => {
   }
 };
 
+export const getHistoryRequestsFromFirestore = (id, role, setRequests) => {
+  try {
+    const q = query(
+      collection(store, "requests"),
+      where(role === "citizen" ? "citizenId" : "rescuerId", "==", id),
+      where("status", "==", "rescued")
+    );
+
+    // Set up a Firestore listener
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const requests = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setRequests(requests); // Update requests state in real-time
+    });
+
+    return unsubscribe; // Return unsubscribe function to stop listening if needed
+  } catch (error) {
+    console.error("Error fetching requests: ", error);
+  }
+};
+
 //get requests from firestore
 export const getFilteredRequestsFromFirestore = (setRequests, rescuerType) => {
   try {
