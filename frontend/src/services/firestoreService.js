@@ -245,6 +245,12 @@ export const getFilteredOnlineRescuers = async (
   rescueTypes,
   setRescuers
 ) => {
+  // If rescueTypes is empty, return no rescuer locations
+  if (rescueTypes.length === 0) {
+    setRescuers([]);
+    return;
+  }
+
   // Get the list of active rescuer IDs
   const activeRescuerIDs = await getActiveRescuerIDs();
 

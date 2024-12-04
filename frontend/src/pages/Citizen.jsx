@@ -251,6 +251,10 @@ const Citizen = ({ user }) => {
     getRescuerDetails();
   }, [request]);
 
+  useEffect(() => {
+    console.log(rescueTypes);
+  }, [rescueTypes]);
+
   return (
     <div className="h-dvh w-screen overflow-hidden flex flex-col">
       {/* Map and Form Section */}
