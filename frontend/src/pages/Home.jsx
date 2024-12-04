@@ -9,7 +9,7 @@ import { IoLogoGooglePlaystore } from "react-icons/io5";
 import { IoMdDownload } from "react-icons/io";
 import { FaAndroid, FaLocationPin } from "react-icons/fa6";
 import { BiSolidAmbulance } from "react-icons/bi";
-import { FaTimes } from "react-icons/fa";
+import { FaTimes, FaWindows } from "react-icons/fa";
 import logo from "../assets/logo.png";
 
 const Home = () => {
@@ -111,13 +111,19 @@ const Home = () => {
 
             <div className="flex flex-col items-center md:flex-row gap-4">
               {isVisible && (
-                <button
-                  onClick={handleDownloadPWA}
-                  className="flex items-center gap-2 px-8 py-4 bg-blue-400 text-white font-semibold rounded-full shadow-md"
-                >
-                  <IoMdDownload className="w-4 h-4" />
-                  <span>Download PWA</span>
-                </button>
+                <div className="flex flex-col items-center">
+                  <button
+                    onClick={handleDownloadPWA}
+                    className="flex items-center gap-2 px-8 py-4 bg-green-50 text-primary font-semibold rounded-full shadow-md"
+                  >
+                    <IoMdDownload className="w-4 h-4" />
+                    <span>Download PWA</span>
+                  </button>
+                  <div className="flex gap-2 text-gray-500 mt-2">
+                    <FaAndroid />
+                    <FaWindows />
+                  </div>
+                </div>
               )}
 
               <div className="flex flex-col items-center">
