@@ -18,6 +18,7 @@ const Home = () => {
   const getStartedSectionRef = useRef(null);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDownloadMenuOpen, setIsDownloadMenuOpen] = useState(false);
 
   const toggleModal = () => {
     setIsModalOpen((prev) => !prev);
@@ -321,8 +322,57 @@ const Home = () => {
           >
             New to Grab Rescue? Sign up!
           </button>
+          <p
+            className="underline cursor-pointer text-background-medium"
+            onClick={() => setIsDownloadMenuOpen(true)}
+          >
+            Download Grab Rescue
+          </p>
         </div>
       </div>
+      {isDownloadMenuOpen && (
+        <div className="fixed inset-0 bg-background-light bg-opacity-80 flex flex-col items-center justify-center z-[100] text-white p-6">
+          <button
+            onClick={() => setIsDownloadMenuOpen(false)}
+            className="absolute top-4 right-4 text-background-medium"
+          >
+            <FaTimes className="text-2xl" />
+          </button>
+          <div className="flex flex-col items-center md:flex-row gap-4">
+            <p className="text-3xl font-bold text-primary text-center">
+              Download the Grab Rescue App
+            </p>
+            {isVisible && (
+              <div className="flex flex-col items-center">
+                <button
+                  onClick={handleDownloadPWA}
+                  className="flex items-center gap-2 px-8 py-4 bg-green-50 text-primary font-semibold rounded-full shadow-md"
+                >
+                  <IoMdDownload className="w-4 h-4" />
+                  <span>Download PWA</span>
+                </button>
+                <div className="flex gap-2 text-gray-500 mt-2">
+                  <FaAndroid />
+                  <FaWindows />
+                </div>
+              </div>
+            )}
+
+            <div className="flex flex-col items-center">
+              <button
+                onClick={handleDownloadAPK}
+                className="flex items-center gap-2 px-8 py-4 bg-green-50 text-primary font-semibold rounded-full shadow-md"
+              >
+                <IoLogoGooglePlaystore className="w-4 h-4" />
+                <span>Download APK</span>
+              </button>
+              <div className="flex gap-2 text-gray-500 mt-2">
+                <FaAndroid />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Minimal Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-highlight bg-opacity-80 flex flex-col items-center justify-center z-[100] text-white p-6">
