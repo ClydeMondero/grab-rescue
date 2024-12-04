@@ -376,19 +376,9 @@ export const addRequestToFirestore = async (
 // update request in firestore with follow-up details
 export const updateRequestInFirestore = async (
   requestId,
-  {
-    phone,
-    citizenName,
-    citizenRelation,
-    incidentPicture,
-    incidentDescription,
-  } = {}
+  { citizenRelation, incidentPicture, incidentDescription } = {}
 ) => {
-  const updateData = { phone };
-
-  if (citizenName) {
-    updateData.citizenName = citizenName;
-  }
+  const updateData = {};
 
   if (citizenRelation) {
     updateData.citizenRelation = citizenRelation;
