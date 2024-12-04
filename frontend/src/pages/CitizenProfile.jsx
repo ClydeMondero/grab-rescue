@@ -19,7 +19,7 @@ import { Loader } from "../components";
 
 export default function CitizenProfile(props) {
   const navigate = useNavigate();
-  const { user, setProfileOpen } = props;
+  const { user, setProfileOpen, requesting } = props;
   const [profile, setProfile] = useState(user);
   const [age, setAge] = useState("");
   const [isEditing, setIsEditing] = useState(false);
@@ -93,16 +93,18 @@ export default function CitizenProfile(props) {
           }}
         />
         <p className="text-3xl text-primary-dark font-bold">Your Profile</p>
-        <div className="ml-auto">
-          <button
-            onClick={() => setIsEditing(true)}
-            className="text-primary-medium px-6 py-4 rounded-md text-xs font-semibold "
-          >
-            <div className="flex items-center gap-2">
-              <MdEdit className="mr-1 text-3xl" />
-            </div>
-          </button>
-        </div>
+        {!requesting && (
+          <div className="ml-auto">
+            <button
+              onClick={() => setIsEditing(true)}
+              className="text-primary-medium px-6 py-4 rounded-md text-xs font-semibold "
+            >
+              <div className="flex items-center gap-2">
+                <MdEdit className="mr-1 text-3xl" />
+              </div>
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="w-full flex items-center justify-center md:flex-row gap-4">
@@ -152,24 +154,26 @@ export default function CitizenProfile(props) {
               <p className="ml-2">{age || "N/A"}</p>
             </div>
 
-            <div className="mt-4 flex justify-end">
-              <button
-                className="flex items-center justify-center space-x-2 px-6 py-4 w-32 bg-secondary text-white hover:text-secondary-dark transition duration-200 rounded-md"
-                onClick={() => {
-                  handleLogout(navigate);
-                  setLoading(true);
-                }}
-              >
-                {loading ? (
-                  <Loader isLoading={loading} size={20} color="#fff" />
-                ) : (
-                  <>
-                    <FaSignOutAlt className="text-xl" />
-                    <span>Logout</span>
-                  </>
-                )}
-              </button>
-            </div>
+            {!requesting && (
+              <div className="mt-4 flex justify-end">
+                <button
+                  className="flex items-center justify-center space-x-2 px-6 py-4 w-32 bg-secondary text-white hover:text-secondary-dark transition duration-200 rounded-md"
+                  onClick={() => {
+                    handleLogout(navigate);
+                    setLoading(true);
+                  }}
+                >
+                  {loading ? (
+                    <Loader isLoading={loading} size={20} color="#fff" />
+                  ) : (
+                    <>
+                      <FaSignOutAlt className="text-xl" />
+                      <span>Logout</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

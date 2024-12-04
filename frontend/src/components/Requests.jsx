@@ -13,12 +13,7 @@ import { formatDistance, formatDuration } from "../utils/DistanceUtility";
 import { setSelectedRequestCookie } from "../services/cookieService";
 import { acceptRescueRequestInFirestore } from "../services/firestoreService";
 import { getLocationsFromFirestore } from "../services/firestoreService";
-import {
-  NoNumberPrompt,
-  NoRequests,
-  NotNearestRescuerPrompt,
-} from "../components";
-import { set } from "lodash";
+import { NoRequests, NotNearestRescuerPrompt } from "../components";
 
 const Requests = ({
   userId,
@@ -36,7 +31,6 @@ const Requests = ({
   const [filteredRescuers, setFilteredRescuers] = useState([]);
   const [nearestRescuer, setNearestRescuer] = useState(null);
   const [showNotNearestModal, setShowNotNearestModal] = useState(false);
-  const [showNoNumberModal, setShowNoNumberModal] = useState(false);
   const [hasConfirmedRequest, setHasConfirmedRequest] = useState(false);
   const [citizen, setCitizen] = useState({
     longitude: 120.926105,
@@ -50,11 +44,6 @@ const Requests = ({
   useEffect(() => {
     if (selectedRequest && !hasConfirmedRequest) {
       console.log("Selected request:", selectedRequest);
-
-      if (!selectedRequest.phone) {
-        setShowNoNumberModal(true);
-        return;
-      }
 
       const nearest = getNearestRescuer(citizen, filteredRescuers);
       setNearestRescuer(nearest);
@@ -99,7 +88,6 @@ const Requests = ({
 
   const handleContinue = async () => {
     setShowNotNearestModal(false);
-    setShowNoNumberModal(false);
     console.log("Continue with the request.");
     handleAssign();
   };
@@ -107,7 +95,6 @@ const Requests = ({
   const handleCancel = () => {
     setSelectedRequest(null);
     setShowNotNearestModal(false);
-    setShowNoNumberModal(false);
   };
 
   const fetchRoutes = async () => {
@@ -221,6 +208,42 @@ const Requests = ({
                     <div className="flex items-center gap-1">
                       <FaMapLocation className="text-background-medium" />
                       <p className="text-sm text-text-primary">
+                        <strong className="text-[#557C55]">
+                          Rescue Types{" "}
+                        </strong>
+                        {request.rescueTypes && (
+                          <>
+                            {request.rescueTypes.map((type, index) => {
+                              let typeClass = "";
+                              switch (type) {
+                                case "PNP":
+                                  typeClass = "text-highlight";
+                                  break;
+                                case "MDRRMO":
+                                  typeClass = "text-primary";
+                                  break;
+                                case "BFP":
+                                  typeClass = "text-warning";
+                                  break;
+                                default:
+                                  typeClass = "text-gray-500";
+                              }
+                              return (
+                                <span key={index} className={typeClass}>
+                                  {type}
+                                  {index < request.rescueTypes.length - 1 &&
+                                    ", "}
+                                </span>
+                              );
+                            })}
+                          </>
+                        )}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-1">
+                      <FaMapLocation className="text-background-medium" />
+                      <p className="text-sm text-text-primary">
                         <strong className="text-[#557C55]">Location </strong>
                         {request.location && (
                           <>
@@ -318,10 +341,6 @@ const Requests = ({
           onContinue={handleContinue}
           onCancel={handleCancel}
         />
-      )}
-
-      {showNoNumberModal && (
-        <NoNumberPrompt onContinue={handleContinue} onCancel={handleCancel} />
       )}
 
       {isModalOpen && (

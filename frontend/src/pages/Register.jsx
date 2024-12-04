@@ -1,18 +1,18 @@
 import { useState } from "react";
-import { FaSave } from "react-icons/fa";
-import { MdPersonAdd } from "react-icons/md";
-import axios from "axios";
+import { FaEye, FaEyeSlash, FaChevronLeft } from "react-icons/fa";
 import { toast } from "react-toastify";
-import { barangaysData } from "../constants/Barangays";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { Toast } from "../components";
 import zxcvbn from "zxcvbn"; // Import zxcvbn
 import "react-toastify/dist/ReactToastify.css";
 import { createAuthHeader } from "../services/authService";
 import { useNavigate } from "react-router-dom";
+import logo from "../assets/logo.png";
+import { barangaysData } from "../constants/Barangays";
+import { Toast } from "../components";
+import axios from "axios";
 
-const AddRescuer = () => {
+const Register = () => {
   const navigate = useNavigate();
+  const [currentStep, setCurrentStep] = useState(1); // Step tracker
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -29,6 +29,23 @@ const AddRescuer = () => {
 
   const toggleConfirmPasswordVisibility = () => {
     setShowConfirmPassword(!showConfirmPassword);
+  };
+
+  const getStrengthLabel = (score) => {
+    switch (score) {
+      case 0:
+        return "Very Weak";
+      case 1:
+        return "Weak";
+      case 2:
+        return "Fair";
+      case 3:
+        return "Good";
+      case 4:
+        return "Strong";
+      default:
+        return "";
+    }
   };
 
   const [formData, setFormData] = useState({
@@ -51,15 +68,10 @@ const AddRescuer = () => {
     const today = new Date();
     const age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
-
-    if (
-      monthDiff < 0 ||
+    return monthDiff < 0 ||
       (monthDiff === 0 && today.getDate() < birthDate.getDate())
-    ) {
-      return age - 1;
-    }
-
-    return age;
+      ? age - 1
+      : age;
   };
 
   const handleChange = (e) => {
@@ -73,7 +85,6 @@ const AddRescuer = () => {
         age: age,
       }));
     } else if (name === "password") {
-      // Update password strength on password input change
       const result = zxcvbn(value);
       setPasswordStrength(result);
       setFormData((prevData) => ({
@@ -88,92 +99,85 @@ const AddRescuer = () => {
     }
   };
 
-  const resetForm = () => {
-    setFormData({
-      firstName: "",
-      middleName: "",
-      lastName: "",
-      birthday: "",
-      municipality: "",
-      barangay: "",
-      contactNumber: "",
-      email: "",
-      username: "",
-      password: "",
-      confirmPassword: "",
-      age: "",
-    });
-    setPasswordStrength({ score: 0, feedback: [] });
+  const handleNext = () => {
+    // Basic validation for required fields in the current step
+    const validationRules = {
+      1: [
+        "firstName",
+        "middleName",
+        "lastName",
+        "birthday",
+        "municipality",
+        "barangay",
+      ],
+      2: ["contactNumber", "email", "username"],
+      3: ["password", "confirmPassword"],
+    };
+
+    const fieldsToValidate = validationRules[currentStep];
+    const invalidFields = fieldsToValidate.filter((field) => !formData[field]);
+
+    if (invalidFields.length > 0) {
+      toast.error("Please fill out all required fields.");
+      return;
+    }
+
+    // Move to the next step
+    setCurrentStep((prev) => prev + 1);
+  };
+
+  const handleBack = () => {
+    if (currentStep === 1) {
+      navigate("/", { replace: true });
+    } else {
+      setCurrentStep((prev) => prev - 1);
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true); // Start loading state
-
-    const requiredFields = [
-      "firstName",
-      "lastName",
-      "municipality",
-      "barangay",
-      "contactNumber",
-      "email",
-      "age",
-      "username",
-      "password",
-      "confirmPassword",
-    ];
+    setLoading(true);
 
     try {
-      const response = await (
-        await axios.post("/rescuers/create", formData, {
-          ...createAuthHeader(),
-          withCredentials: true,
-        })
-      ).data;
-      if (!response.success) throw new Error(response.message);
-      toast.success(response.message);
-      resetForm();
-      navigate("/admin/rescuers");
+      const response = await axios.post("/citizens/register", formData, {
+        ...createAuthHeader(),
+        withCredentials: true,
+      });
+
+      if (!response.data.success) throw new Error(response.data.message);
+
+      toast.success(response.data.message);
+      setFormData({
+        firstName: "",
+        middleName: "",
+        lastName: "",
+        birthday: "",
+        municipality: "",
+        barangay: "",
+        contactNumber: "",
+        email: "",
+        username: "",
+        password: "",
+        confirmPassword: "",
+        age: "",
+      });
+
+      navigate("/");
     } catch (error) {
-      console.error(error.message);
       toast.error(error.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const getStrengthLabel = (score) => {
-    switch (score) {
-      case 0:
-        return "Very Weak";
+  const renderStep = () => {
+    switch (currentStep) {
       case 1:
-        return "Weak";
-      case 2:
-        return "Fair";
-      case 3:
-        return "Good";
-      case 4:
-        return "Strong";
-      default:
-        return "";
-    }
-  };
-
-  return (
-    <>
-      <div className="flex flex-col">
-        {/* Header Section */}
-        <div className="flex items-center mb-2 sm:mb-4 border-b border-gray-200 pb-3">
-          <MdPersonAdd className="text-3xl sm:text-2xl lg:text-3xl text-primary-dark mr-2 fill-current" />
-          <h4 className="text-xl sm:text-md lg:text-3xl text-primary-dark font-bold">
-            Add Rescuer
-          </h4>
-        </div>
-        {/* Add Rescuer Form */}
-        <div className="flex-1 p-2 sm:p-6 lg:p-2 overflow-y-auto">
-          <form className="space-y-2 sm:space-y-4" onSubmit={handleSubmit}>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
-              {/* Form Fields */}
+        return (
+          <div>
+            <h2 className="text-lg font-semibold mb-4">Personal Information</h2>
+            {/* Fields for Step 1 */}
+            <div className="flex flex-col gap-2">
               <div>
                 <label
                   htmlFor="firstName"
@@ -308,6 +312,17 @@ const AddRescuer = () => {
                   ))}
                 </select>
               </div>
+            </div>
+
+            {/* Add other Step 1 fields */}
+          </div>
+        );
+      case 2:
+        return (
+          <div>
+            <h2 className="text-lg font-semibold mb-4">Contact Information</h2>
+            {/* Fields for Step 1 */}
+            <div className="flex flex-col gap-2">
               <div>
                 <label
                   htmlFor="contactNumber"
@@ -363,6 +378,17 @@ const AddRescuer = () => {
                   placeholder="Enter username"
                 />
               </div>
+            </div>
+
+            {/* Add other Step 1 fields */}
+          </div>
+        );
+      case 3:
+        return (
+          <div>
+            <h2 className="text-lg font-semibold mb-4">Passwords</h2>
+            {/* Fields for Step 1 */}
+            <div className="flex flex-col gap-2">
               <div>
                 <label
                   htmlFor="password"
@@ -456,31 +482,53 @@ const AddRescuer = () => {
                 </div>
               </div>
             </div>
-            {/* Submit Button */}
-            <div className="flex justify-end">
-              <button
-                type="submit"
-                className={`flex items-center justify-center px-3 py-1 sm:px-4 sm:py-2 text-white bg-[#557C55] rounded-md focus:outline-none focus:ring-2 focus:ring-[#2e5f2e] transition ${
-                  loading ? "opacity-50 cursor-not-allowed" : ""
-                }`}
-                disabled={loading}
-              >
-                {loading ? (
-                  <span>Loading...</span>
-                ) : (
-                  <>
-                    <FaSave className="mr-2" />
-                    Save Rescuer
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
-        </div>
+
+            {/* Add other Step 1 fields */}
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="p-6">
+      <div className="flex justify-center mb-8">
+        <img src={logo} alt="Logo" />
       </div>
+
+      <form onSubmit={handleSubmit}>
+        {renderStep()}
+        <div className="flex justify-between mt-4">
+          <button
+            type="button"
+            onClick={handleBack}
+            className="border text-primary-dark hover:bg-secondary hover:text-white font-semibold py-2 px-4 rounded-lg transition duration-300 h-12 w-1/2"
+          >
+            {currentStep === 1 ? "Back to Home" : "Back"}
+          </button>
+          {currentStep < 3 ? (
+            <button
+              type="button"
+              onClick={handleNext}
+              className="bg-primary text-white font-semibold py-2 px-4 rounded-lg transition duration-300 h-12 w-1/2"
+            >
+              Next
+            </button>
+          ) : (
+            <button
+              type="submit"
+              className="bg-primary text-white font-semibold py-2 px-4 rounded-lg transition duration-300 h-12 w-1/2"
+            >
+              {loading ? "Submitting..." : "Submit"}
+            </button>
+          )}
+        </div>
+      </form>
+
       <Toast />
-    </>
+    </div>
   );
 };
 
-export default AddRescuer;
+export default Register;

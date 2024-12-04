@@ -55,7 +55,7 @@ const Citizen = ({ user }) => {
   const [assignedRescuer, setAssignedRescuer] = useState(null);
   const [hotlineModalOpen, setHotlineModalOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  const [rescueTypes, setRescueType] = useState(["MDRRMO", "BFP", "PNP"]);
+  const [rescueTypes, setRescueType] = useState(["MDRRMO"]);
 
   const { getId } = useContext(StatusContext);
   const mapRef = useRef(null);
@@ -124,7 +124,16 @@ const Citizen = ({ user }) => {
 
       const location = await getLocationFromFirestore(citizenId);
 
-      const { id } = await addRequestToFirestore(citizenId, location);
+      const citizenName = `${user.first_name} ${user.middle_name} ${user.last_name}`;
+
+      const { id } = await addRequestToFirestore(
+        citizenId,
+        citizenName,
+        user.contact_number,
+        location,
+        rescueTypes
+      );
+
       setRequestCookie(id);
       checkRequest();
 
@@ -529,7 +538,11 @@ const Citizen = ({ user }) => {
       )}
 
       {profileOpen && (
-        <CitizenProfile user={user} setProfileOpen={setProfileOpen} />
+        <CitizenProfile
+          user={user}
+          setProfileOpen={setProfileOpen}
+          requesting={requesting}
+        />
       )}
 
       <Toast />

@@ -14,6 +14,7 @@ import {
   CitizenTutorial,
   Home,
   CitizenProfile,
+  Register,
 } from "./pages";
 import axios from "axios";
 import { PrivateRoute, GeolocateButton, LocationPrompt } from "./components";
@@ -36,6 +37,7 @@ const App = () => {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password/:token" element={<ResetPassword />} />
             <Route path="/verify/:token" element={<VerifyEmail />} />

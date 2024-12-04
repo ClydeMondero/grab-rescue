@@ -27,10 +27,8 @@ const RequestModal = ({ onConfirm, onCancel }) => {
               If not in immediate danger, please refrain from making a request.
             </li>
             <li>
-              You will be prompted to enter your{" "}
-              <span className="font-bold">name</span> and{" "}
-              <span className="font-bold">phone number</span> and other
-              information for follow-up communication regarding your request.
+              You will be prompted to enter information for follow-up
+              communication regarding your request.
             </li>
           </ul>
           <p className="text-center text-background-dark mt-4 text-xs">

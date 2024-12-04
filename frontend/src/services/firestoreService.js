@@ -303,6 +303,29 @@ export const getRequestsFromFirestore = (setRequests) => {
   }
 };
 
+//get requests from firestore
+export const getFilteredRequestsFromFirestore = (setRequests, rescuerType) => {
+  try {
+    const q = query(
+      collection(store, "requests"),
+      where("rescueTypes", "array-contains", rescuerType) // Filter requests by rescuerType
+    );
+
+    // Set up a Firestore listener
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const requests = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setRequests(requests); // Update requests state in real-time
+    });
+
+    return unsubscribe; // Return unsubscribe function to stop listening if needed
+  } catch (error) {
+    console.error("Error fetching requests: ", error);
+  }
+};
+
 //get request from firestore
 export const getRequestFromFirestore = (id, callback) => {
   try {
@@ -323,16 +346,21 @@ export const getRequestFromFirestore = (id, callback) => {
 };
 
 //add request to firestore
-//TODO: Send request to nearest rescuer
 export const addRequestToFirestore = async (
   citizenId,
+  citizenName,
+  phone,
   location,
+  rescueTypes,
   timestamp = new Date().toISOString(),
   status = "pending" //pending, assigned, in-transit, en route, rescued
 ) => {
   const request = {
     citizenId,
+    citizenName,
+    phone,
     location,
+    rescueTypes,
     timestamp,
     status,
   };

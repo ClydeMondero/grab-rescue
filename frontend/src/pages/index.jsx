@@ -15,8 +15,10 @@ import AdminTutorial from "./AdminTutorial";
 import RescuerTutorial from "./RescuerTutorial";
 import Home from "./Home";
 import CitizenProfile from "./CitizenProfile";
+import Register from "./Register";
 
 export {
+  Register,
   CitizenProfile,
   MultiStepForm,
   Login,

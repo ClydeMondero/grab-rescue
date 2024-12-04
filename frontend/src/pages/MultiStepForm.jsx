@@ -7,32 +7,18 @@ import {
 import { Loader } from "../components";
 import { getRequestCookie } from "../services/cookieService";
 import { Link } from "react-router-dom";
+
 const MultiStepForm = ({ request, setRequest }) => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
-    phone: "",
-    citizenName: "",
     citizenRelation: "",
     incidentPicture: "",
     incidentDescription: "",
-    previewImage: placeholder, // Initialize with Firebase URL or placeholder
+    previewImage: placeholder,
   });
-  const [required, setRequired] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const nextStep = () => {
-    if (step === 1) {
-      if (!formData.phone) {
-        setRequired(true);
-        return;
-      }
-
-      if (formData.phone.length != 11) {
-        setRequired(true);
-        return;
-      }
-    }
-
     setStep(step + 1);
   };
 
@@ -43,19 +29,12 @@ const MultiStepForm = ({ request, setRequest }) => {
   const handleChange = (e) => {
     const { name, value, files } = e.target;
 
-    if (name === "phone") {
-      const onlyNumbers = value.replace(/\D/g, "");
-      setFormData((prevData) => ({
-        ...prevData,
-        phone: onlyNumbers,
-      }));
-      setRequired(false);
-    } else if (name === "incidentPicture" && files && files[0]) {
+    if (name === "incidentPicture" && files && files[0]) {
       const file = files[0];
       setFormData((prevData) => ({
         ...prevData,
         incidentPicture: file,
-        previewImage: URL.createObjectURL(file), // Update preview URL with uploaded file
+        previewImage: URL.createObjectURL(file),
       }));
     } else {
       setFormData((prevData) => ({
@@ -70,17 +49,10 @@ const MultiStepForm = ({ request, setRequest }) => {
 
     try {
       const { id } = request;
-      const {
-        phone,
-        citizenName,
-        citizenRelation,
-        incidentPicture,
-        incidentDescription,
-      } = formData;
+      const { citizenRelation, incidentPicture, incidentDescription } =
+        formData;
 
       updateRequestInFirestore(id, {
-        phone,
-        citizenName,
         citizenRelation,
         incidentPicture,
         incidentDescription,
@@ -120,85 +92,6 @@ const MultiStepForm = ({ request, setRequest }) => {
         return (
           <div className="h-full flex flex-col justify-center gap-4">
             <div className="flex flex-col gap-4">
-              <label
-                className="text-md font-semibold text-text-secondary"
-                htmlFor="phone"
-              >
-                Phone Number (required)
-              </label>
-              <input
-                type="tel"
-                name="phone"
-                value={formData.phone}
-                required
-                onChange={handleChange}
-                autoComplete="tel"
-                minLength={11}
-                maxLength={11}
-                className={`w-full p-3 border  rounded-lg focus:outline-none focus:ring-2 ${
-                  required
-                    ? "border-secondary focus:ring-secondary "
-                    : "border-background-medium focus:ring-primary "
-                }`}
-                disabled={request?.phone ? true : false}
-              />
-              {required && (
-                <p className="text-secondary font-semibold">
-                  Phone Number is required
-                </p>
-              )}
-            </div>
-            <button
-              className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-300 h-12 w-full"
-              onClick={nextStep}
-            >
-              Next
-            </button>
-            <p className="text-sm text-text-secondary">
-              Note: Providing a phone number may increase the chances of your
-              request being accepted by a rescuer as they may contact you if
-              they have any questions or need more information.
-            </p>
-          </div>
-        );
-      case 2:
-        return (
-          <div className="h-full flex flex-col justify-center gap-4">
-            <div className="flex flex-col gap-4">
-              <h2 className="text-md font-semibold text-text-secondary">
-                Your Name (optional)
-              </h2>
-              <input
-                type="text"
-                name="citizenName"
-                value={formData.citizenName}
-                onChange={handleChange}
-                disabled={request?.citizenName ? true : false}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-              />
-            </div>
-            <div className="flex flex-col space-y-4">
-              <div className="flex justify-between space-x-4">
-                <button
-                  className="border text-primary-dark hover:bg-secondary hover:text-white font-semibold py-2 px-4 rounded-lg transition duration-300 h-12 w-1/2"
-                  onClick={prevStep}
-                >
-                  Back
-                </button>
-                <button
-                  className="bg-primary text-white font-semibold py-2 px-4 rounded-lg transition duration-300 h-12 w-1/2"
-                  onClick={nextStep}
-                >
-                  Next
-                </button>
-              </div>
-            </div>
-          </div>
-        );
-      case 3:
-        return (
-          <div className="h-full flex flex-col justify-center gap-4">
-            <div className="flex flex-col gap-4">
               <h2 className="text-md font-semibold text-text-secondary">
                 Relation to the Victim (optional)
               </h2>
@@ -214,13 +107,7 @@ const MultiStepForm = ({ request, setRequest }) => {
             <div className="flex flex-col space-y-4">
               <div className="flex justify-between space-x-4">
                 <button
-                  className="border text-primary-dark hover:bg-secondary hover:text-white font-semibold py-2 px-4 rounded-lg transition duration-300 h-12 w-1/2"
-                  onClick={prevStep}
-                >
-                  Back
-                </button>
-                <button
-                  className="bg-primary text-white font-semibold py-2 px-4 rounded-lg transition duration-300 h-12 w-1/2"
+                  className="bg-primary text-white font-semibold py-2 px-4 rounded-lg transition duration-300 h-12 w-full"
                   onClick={nextStep}
                 >
                   Next
@@ -229,7 +116,7 @@ const MultiStepForm = ({ request, setRequest }) => {
             </div>
           </div>
         );
-      case 4:
+      case 2:
         return (
           <div className="h-full flex flex-col justify-center gap-4">
             <div className="flex flex-col gap-4">
@@ -274,12 +161,12 @@ const MultiStepForm = ({ request, setRequest }) => {
             </div>
           </div>
         );
-      case 5:
+      case 3:
         return (
           <div className="h-full flex flex-col justify-center gap-4">
             <div className="flex flex-col gap-4">
               <h2 className="text-md font-semibold text-text-secondary">
-                Description of Incident
+                Description of Incident (optional)
               </h2>
               <textarea
                 name="incidentDescription"
@@ -338,8 +225,6 @@ const MultiStepForm = ({ request, setRequest }) => {
     if (request) {
       setFormData({
         ...formData,
-        phone: request.phone ?? "",
-        citizenName: request.citizenName ?? "",
         citizenRelation: request.citizenRelation ?? "",
         incidentPicture: request.incidentPicture ?? "",
         incidentDescription: request.incidentDescription ?? "",
