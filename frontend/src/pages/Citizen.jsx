@@ -118,10 +118,6 @@ const Citizen = ({ user }) => {
     }
   };
 
-  useEffect(() => {
-    console.log(nearestRescuer);
-  }, [nearestRescuer]);
-
   const handleModalConfirm = async () => {
     if (mapRef.current) {
       const citizenId = getCitizenCookie();
@@ -416,7 +412,11 @@ const Citizen = ({ user }) => {
             </p>
 
             {formVisible && (
-              <MultiStepForm request={request} setRequest={setRequest} />
+              <MultiStepForm
+                request={request}
+                setRequest={setRequest}
+                setFormVisible={setFormVisible}
+              />
             )}
           </div>
         )}
