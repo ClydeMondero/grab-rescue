@@ -227,20 +227,20 @@ const GenerateReports = (props) => {
   };
 
   const reports = [
-    { id: 1, name: "Daily Report", description: "Summary of daily activities" },
+    { id: 1, name: "Daily Logs", description: "Summary of daily activities" },
     {
       id: 2,
-      name: "Weekly Report",
+      name: "Weekly Logs",
       description: "Summary of weekly activities",
     },
     {
       id: 3,
-      name: "Monthly Report",
+      name: "Monthly Logs",
       description: "Summary of monthly activities",
     },
     {
       id: 4,
-      name: "Custom Report",
+      name: "Custom Logs",
       description: "Customizable report with date filters",
     },
   ];
@@ -250,7 +250,7 @@ const GenerateReports = (props) => {
       <div className="flex items-center mb-2 sm:mb-4 border-b border-gray-200 pb-3">
         <FaFileAlt className="text-3xl sm:text-md lg:text-3xl text-primary-dark mr-2 fill-current" />
         <h4 className="text-xl sm:text-md lg:text-3xl text-primary-dark font-bold dark:text-primary">
-          Generate Log Action Reports
+          Generate Logs
         </h4>
       </div>
 

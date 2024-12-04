@@ -29,9 +29,10 @@ const RequestDetailsModal = ({ request, isOpen, onClose }) => {
               alt="Incident Picture"
               className="w-full h-56 object-cover rounded-md"
             />
-            {request.status && (
-              <div
-                className={`
+            <div className="flex items-center gap-3">
+              {request.status && (
+                <div
+                  className={`
                   ${
                     {
                       pending: "bg-yellow-500",
@@ -41,11 +42,28 @@ const RequestDetailsModal = ({ request, isOpen, onClose }) => {
                     }[request.status]
                   } text-sm  w-max font-medium text-white px-2 py-1 rounded-md mt-2
                 `}
-              >
-                {request.status}
-              </div>
-            )}
+                >
+                  {request.status}
+                </div>
+              )}
+              {request.rescueTypes && (
+                <div
+                  className={`
+                  ${
+                    {
+                      MDRRMO: "bg-primary",
+                      PNP: "bg-highlight",
+                      BFP: "bg-warning",
+                    }[request.rescueTypes]
+                  } text-sm  w-max font-medium text-white px-2 py-1 rounded-md mt-2
+                `}
+                >
+                  {request.rescueTypes}
+                </div>
+              )}
+            </div>
           </div>
+
           <div>
             <p className="text-xl font-semibold text-gray-800">
               {request.location?.address || "Address not available"}
@@ -149,6 +167,17 @@ const IncomingRequests = ({ requests }) => {
                 }`}
               >
                 {request.status}
+              </button>{" "}
+              <button
+                className={`text-white text-xs font-semibold mt-1 px-2 py-1 rounded ${
+                  request.rescueTypes === "MDRRMO"
+                    ? "bg-primary"
+                    : request.rescueTypes === "PNP"
+                    ? "bg-highlight"
+                    : "bg-warning"
+                }`}
+              >
+                {request.rescueTypes}
               </button>
             </div>
           ))

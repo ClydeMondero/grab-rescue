@@ -11,7 +11,7 @@ const { CreateLog } = require("./LogController");
 module.exports.GetRescuers = async (req, res) => {
   const queryParams = [];
   let q =
-    "SELECT id, first_name, middle_name, last_name, municipality, barangay, profile_image, contact_number, email, is_online, verified, status FROM users WHERE account_type = 'Rescuer'";
+    "SELECT id, first_name, middle_name, last_name, municipality, barangay, profile_image, contact_number, email, is_online, verified, status, rescuer_type FROM users WHERE account_type = 'Rescuer'";
 
   let paramCounter = 1; // To dynamically number the query parameters
 
@@ -72,7 +72,7 @@ module.exports.GetRescuers = async (req, res) => {
 // Get Specific Rescuer
 module.exports.GetRescuer = async (req, res) => {
   const q =
-    "SELECT id, first_name, middle_name, last_name, municipality, barangay, profile_image, contact_number, email, is_online, verified, status FROM users WHERE id = $1";
+    "SELECT id, first_name, middle_name, last_name, municipality, barangay, profile_image, contact_number, email, is_online, verified, status, rescuer_type FROM users WHERE id = $1";
   try {
     const { rows } = await pool.query(q, [req.params.id]);
     res.status(200).json(rows);
