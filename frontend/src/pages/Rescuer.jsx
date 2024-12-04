@@ -150,6 +150,7 @@ const Rescuer = (props) => {
                 requests={requests}
                 selectedRequest={selectedRequest}
                 setSelectedRequest={setSelectedRequest}
+                rescuerType={user.rescuer_type}
               />
             }
           />

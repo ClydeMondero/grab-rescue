@@ -61,7 +61,7 @@ const RescuerMap = ({ rescuerType, citizen, onLocatingChange, navigating }) => {
 
     const { id } = await getIDFromCookie();
 
-    const existingLocation = locations.find(
+    const existingLocation = await locations.find(
       (location) => location.userId === id
     );
 

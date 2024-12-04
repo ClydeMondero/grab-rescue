@@ -94,13 +94,21 @@ export const updateLocationStatus = async (id, status) => {
     id: doc.id,
   }));
 
-  const updatePromises = locations.map((location) => {
-    const locationRef = doc(store, "locations", location.id);
-    return updateDoc(locationRef, { status });
-  });
+  // Delete all locations except the first one
+  const deletePromises = locations
+    .slice(1)
+    .map((location) => deleteDoc(doc(store, "locations", location.id)));
 
   try {
-    await Promise.all(updatePromises);
+    await Promise.all(deletePromises);
+  } catch (error) {
+    console.error(`Error deleting duplicate locations: `, error);
+  }
+
+  // Update the first location with the new status
+  try {
+    const locationRef = doc(store, "locations", locations[0].id);
+    await updateDoc(locationRef, { status });
   } catch (error) {
     console.error(`Error updating location status to ${status}: `, error);
   }
