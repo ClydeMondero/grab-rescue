@@ -23,7 +23,7 @@ import { useLocation } from "react-router-dom";
 import { setGeolocateIcon } from "../utils/GeolocateUtility";
 import * as turf from "@turf/turf";
 
-const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
+const RescuerMap = ({ rescuerType, citizen, onLocatingChange, navigating }) => {
   const { rescuer, setRescuer } = useContext(RescuerContext);
   const [locations, setLocations] = useState(null);
   const [coords, setCoords] = useState(null);
@@ -37,6 +37,10 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
     [120.8585, 14.8867],
     [121.0972, 15.0197],
   ];
+
+  useEffect(() => {
+    console.log("rescuer", rescuerType);
+  }, [rescuerType]);
 
   const [routeData, setRouteData] = useState(null);
   const [distance, setDistance] = useState();
@@ -55,7 +59,7 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
 
     if (locations == null) return;
 
-    const id = await getIDFromCookie();
+    const { id } = await getIDFromCookie();
 
     const existingLocation = locations.find(
       (location) => location.userId === id
@@ -72,7 +76,13 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
       );
     } else {
       console.log("adding location");
-      addUserLocation(coords.longitude, coords.latitude, "rescuer", id);
+      addUserLocation(
+        coords.longitude,
+        coords.latitude,
+        "rescuer",
+        id,
+        rescuerType
+      );
     }
 
     setRescuer({
@@ -241,7 +251,13 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
           handleGeolocation(coords);
         }}
       />
-      {locating && <LocatingIndicator locating={locating} type="rescuer" />}
+      {locating && (
+        <LocatingIndicator
+          locating={locating}
+          type="rescuer"
+          rescuerType={rescuerType}
+        />
+      )}
       {navigating && (
         <TurnIndicator
           routeData={routeData}
@@ -254,9 +270,9 @@ const RescuerMap = ({ citizen, onLocatingChange, navigating }) => {
         <>
           <Marker longitude={rescuer.longitude} latitude={rescuer.latitude}>
             {!navigating ? (
-              <RescuerMarker view="top-down" />
+              <RescuerMarker view="top-down" rescuerType={rescuerType} />
             ) : (
-              <RescuerMarker view="3d" />
+              <RescuerMarker view="3d" rescuerType={rescuerType} />
             )}
           </Marker>
           {citizen && (

@@ -1,61 +1,53 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useContext } from "react";
 import logo from "../assets/logo.png";
-import { RequestContext } from "../contexts/RequestContext";
 import { FaTimes } from "react-icons/fa";
 
-const Nav = ({ navigate }) => {
+const Nav = ({ navigate, scrollToAbout, scrollToGetStarted }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { requesting } = useContext(RequestContext);
 
   const toggleModal = () => {
     setIsModalOpen((prev) => !prev);
   };
 
-  // Helper function to disable buttons
-  const buttonStyle = requesting
-    ? "cursor-not-allowed opacity-50 text-gray-400"
-    : "cursor-pointer text-text-primary";
-
   return (
-    <div className="hidden lg:h-[10%] bg-accent text-white shadow-lg px-4 py-2 lg:flex items-center justify-between">
+    <div className="hidden lg:h-[10%] bg-accent text-white shadow-md p-4 lg:flex items-center justify-between sticky top-0 z-50 bg-white">
       <div className="flex items-center gap-4">
         <img
           src={logo}
           alt="logo"
           className="h-10 text-primary cursor-pointer"
-          onClick={() => !requesting && navigate("/")}
+          onClick={() => navigate("/")}
         />
       </div>
       <ul className="space-x-4 flex items-center justify-center">
         <li>
           <p
-            className={`text-lg font-semibold ${buttonStyle}`}
-            onClick={() => !requesting && navigate("/")}
+            className="text-lg font-semibold cursor-pointer text-text-primary"
+            onClick={() => navigate("/")}
           >
             Home
           </p>
         </li>
         <li>
           <p
-            className={`text-lg font-semibold ${buttonStyle}`}
-            onClick={() => !requesting && navigate("/download")}
-          >
-            Download
-          </p>
-        </li>
-        <li>
-          <p
-            className={`text-lg font-semibold ${buttonStyle}`}
-            onClick={() => !requesting && navigate("/about")}
+            className="text-lg font-semibold cursor-pointer text-text-primary"
+            onClick={() => scrollToAbout()}
           >
             About
           </p>
         </li>
         <li>
+          <p
+            className="text-lg font-semibold cursor-pointer text-primary"
+            onClick={() => scrollToGetStarted()}
+          >
+            Get Started
+          </p>
+        </li>
+        <li>
           <button
             onClick={toggleModal}
-            className={`px-6 py-2 rounded-md bg-primary ${buttonStyle}`}
-            disabled={requesting}
+            className="px-6 py-2 rounded-md bg-primary cursor-pointer text-text-primary"
           >
             <p className="text-white text-md font-semibold">Login</p>
           </button>
@@ -78,29 +70,19 @@ const Nav = ({ navigate }) => {
           <div className="flex flex-col space-y-4 w-full max-w-xs">
             <button
               onClick={() => {
-                if (!requesting) {
-                  navigate("/login?role=Rescuer");
-                  setIsModalOpen(false);
-                }
+                navigate("/login?role=Citizen");
+                setIsModalOpen(false);
               }}
-              className={`w-full bg-white text-highlight font-bold py-3 rounded-lg hover:bg-gray-100 text-center ${
-                requesting ? "cursor-not-allowed opacity-50" : ""
-              }`}
-              disabled={requesting}
+              className="w-full bg-white text-highlight font-bold py-3 rounded-lg hover:bg-gray-100 text-center"
             >
-              Login as Rescuer
+              Login as Citizen
             </button>
             <button
               onClick={() => {
-                if (!requesting) {
-                  navigate("/login?role=Admin");
-                  setIsModalOpen(false);
-                }
+                navigate("/login?role=Admin");
+                setIsModalOpen(false);
               }}
-              className={`w-full bg-white text-highlight font-bold py-3 rounded-lg hover:bg-gray-100 text-center ${
-                requesting ? "cursor-not-allowed opacity-50" : ""
-              }`}
-              disabled={requesting}
+              className="w-full bg-white text-highlight font-bold py-3 rounded-lg hover:bg-gray-100 text-center"
             >
               Login as Admin
             </button>

@@ -1,7 +1,7 @@
 import Login from "./Login";
 import Admin from "./Admin";
 import Rescuer from "./Rescuer";
-import Home from "./Home";
+import Citizen from "./Citizen";
 import ForgotPassword from "./ForgotPassword";
 import ResetPassword from "./ResetPasswordPage";
 import VerifyEmail from "./VerifyEmail";
@@ -9,17 +9,21 @@ import NotFound from "./NotFound";
 import MultiStepForm from "./MultiStepForm";
 import Policy from "./Policy";
 import TermsOfService from "./TermsOfService";
-import Download from "./Download";
-import About from "./About";
 import HotlineModal from "./HotlineModal";
 import CitizenTutorial from "./CitizenTutorial";
 import AdminTutorial from "./AdminTutorial";
 import RescuerTutorial from "./RescuerTutorial";
+import Home from "./Home";
+import CitizenProfile from "./CitizenProfile";
+import Register from "./Register";
+
 export {
-  About,
+  Register,
+  CitizenProfile,
   MultiStepForm,
   Login,
   Admin,
+  Citizen,
   Home,
   Rescuer,
   NotFound,
@@ -28,7 +32,6 @@ export {
   VerifyEmail,
   Policy,
   TermsOfService,
-  Download,
   HotlineModal,
   RescuerTutorial,
   AdminTutorial,

@@ -41,9 +41,6 @@ const TermsOfService = () => {
         <h1 className="text-3xl md:text-4xl font-bold mb-8 text-center text-primary">
           Terms Of Services
         </h1>
-        <p className="text-center text-background-medium text-sm mb-6">
-          Effective Date: November 2024
-        </p>
 
         <div className="space-y-6 md:space-y-8">
           {[

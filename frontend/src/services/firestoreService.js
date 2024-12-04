@@ -21,6 +21,7 @@ export const addLocationToFirestore = async (
   address,
   role,
   userId,
+  rescuerType = "",
   timestamp = new Date().toISOString(),
   status = "online" //online, assigned, in-transit, offline
 ) => {
@@ -30,8 +31,9 @@ export const addLocationToFirestore = async (
     address,
     role,
     userId,
-    status,
+    rescuerType,
     timestamp,
+    status,
   };
 
   try {
@@ -238,14 +240,19 @@ const getActiveRescuerIDs = async () => {
 };
 
 // Function to get filtered online rescuers from Firestore
-export const getFilteredOnlineRescuers = async (role, setRescuers) => {
+export const getFilteredOnlineRescuers = async (
+  role,
+  rescueTypes,
+  setRescuers
+) => {
   // Get the list of active rescuer IDs
   const activeRescuerIDs = await getActiveRescuerIDs();
 
   const q = query(
     collection(store, "locations"),
     where("status", "==", "online"),
-    where("role", "==", role)
+    where("role", "==", role),
+    where("rescuerType", "in", rescueTypes) // Filter by rescuerType array
   );
 
   // Set up the real-time listener
@@ -296,6 +303,29 @@ export const getRequestsFromFirestore = (setRequests) => {
   }
 };
 
+//get requests from firestore
+export const getFilteredRequestsFromFirestore = (setRequests, rescuerType) => {
+  try {
+    const q = query(
+      collection(store, "requests"),
+      where("rescueTypes", "array-contains", rescuerType) // Filter requests by rescuerType
+    );
+
+    // Set up a Firestore listener
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const requests = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setRequests(requests); // Update requests state in real-time
+    });
+
+    return unsubscribe; // Return unsubscribe function to stop listening if needed
+  } catch (error) {
+    console.error("Error fetching requests: ", error);
+  }
+};
+
 //get request from firestore
 export const getRequestFromFirestore = (id, callback) => {
   try {
@@ -316,16 +346,21 @@ export const getRequestFromFirestore = (id, callback) => {
 };
 
 //add request to firestore
-//TODO: Send request to nearest rescuer
 export const addRequestToFirestore = async (
   citizenId,
+  citizenName,
+  phone,
   location,
+  rescueTypes,
   timestamp = new Date().toISOString(),
   status = "pending" //pending, assigned, in-transit, en route, rescued
 ) => {
   const request = {
     citizenId,
+    citizenName,
+    phone,
     location,
+    rescueTypes,
     timestamp,
     status,
   };

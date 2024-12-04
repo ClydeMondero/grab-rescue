@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import {
-  Home,
+  Citizen,
   Login,
   Admin,
   Rescuer,
@@ -10,11 +10,11 @@ import {
   VerifyEmail,
   Policy,
   TermsOfService,
-  Download,
-  About,
   RescuerTutorial,
-  AdminTutorial,
   CitizenTutorial,
+  Home,
+  CitizenProfile,
+  Register,
 } from "./pages";
 import axios from "axios";
 import { PrivateRoute, GeolocateButton, LocationPrompt } from "./components";
@@ -37,21 +37,22 @@ const App = () => {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password/:token" element={<ResetPassword />} />
-            {/* Email Verification Route */}
             <Route path="/verify/:token" element={<VerifyEmail />} />
+            <Route path="/privacy-policy" element={<Policy />} />
+            <Route path="/terms-of-service" element={<TermsOfService />} />
+            <Route path="/citizen-tutorial" element={<CitizenTutorial />} />
+            <Route path="/rescuer-tutorial" element={<RescuerTutorial />} />
+            <Route
+              path="/citizen/*"
+              element={<PrivateRoute Component={Citizen} />}
+            />
             <Route
               path="/admin/*"
               element={<PrivateRoute Component={Admin} />}
             />
-            <Route path="/privacy-policy" element={<Policy />} />
-            <Route path="/terms-of-service" element={<TermsOfService />} />
-            <Route path="/download" element={<Download />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/citizen-tutorial" element={<CitizenTutorial />} />
-            <Route path="/rescuer-tutorial" element={<RescuerTutorial />} />
-            <Route path="/admin-tutorial" element={<AdminTutorial />} />
             <Route
               path="/rescuer/*"
               element={<PrivateRoute Component={Rescuer} />}

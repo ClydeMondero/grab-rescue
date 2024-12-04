@@ -42,7 +42,8 @@ export const addUserLocation = async (
   longitude,
   latitude,
   role,
-  userId = null
+  userId = null,
+  rescuerType = null
 ) => {
   const address = await getAddress(longitude, latitude);
 
@@ -52,7 +53,8 @@ export const addUserLocation = async (
     latitude,
     address,
     role,
-    userId
+    userId,
+    rescuerType
   );
 
   //adds citizen id to cookies
@@ -108,14 +110,6 @@ export const updateUserLocation = async (
   longitude,
   latitude
 ) => {
-  console.log("updateUserLocation", {
-    locationId,
-    prevLon,
-    prevLat,
-    longitude,
-    latitude,
-  });
-
   const moved = hasUserMoved(prevLon, prevLat, longitude, latitude);
 
   const address = await getAddress(longitude, latitude);

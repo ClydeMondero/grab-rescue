@@ -12,6 +12,7 @@ import {
 import { useState, useEffect, useContext } from "react";
 import {
   addMessagingTokenToLocation,
+  getFilteredRequestsFromFirestore,
   getLocationFromFirestore,
   getLocationIDFromFirestore,
   getRequestsFromFirestore,
@@ -84,7 +85,10 @@ const Rescuer = (props) => {
 
     getSelectedRequest();
 
-    const unsubscribe = getRequestsFromFirestore(setRequests);
+    const unsubscribe = getFilteredRequestsFromFirestore(
+      setRequests,
+      user?.rescuer_type
+    );
     return () => {
       unsubscribe();
     };

@@ -10,6 +10,7 @@ import {
   getIDFromLocation,
   updateLocationStatus,
 } from "../services/firestoreService";
+import { useLocation } from "react-router-dom";
 
 const StatusContext = createContext();
 
@@ -18,9 +19,9 @@ const StatusProvider = ({ children }) => {
   const [id, setId] = useState(null);
 
   const getId = async () => {
-    const userId = await getIDFromCookie();
+    const { id: userId, role } = await getIDFromCookie();
 
-    if (userId) {
+    if (userId && role !== "Citizen") {
       setId(userId);
     } else {
       const citizenCookie = getCitizenCookie();
