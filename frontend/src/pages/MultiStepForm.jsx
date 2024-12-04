@@ -8,8 +8,9 @@ import { Loader } from "../components";
 import { getRequestCookie } from "../services/cookieService";
 import { Link } from "react-router-dom";
 
-const MultiStepForm = ({ request, setRequest }) => {
+const MultiStepForm = ({ request, setRequest, setFormVisible }) => {
   const [step, setStep] = useState(1);
+  const [isComplete, setIsComplete] = useState(false);
   const [formData, setFormData] = useState({
     citizenRelation: "",
     incidentPicture: "",
@@ -59,6 +60,7 @@ const MultiStepForm = ({ request, setRequest }) => {
       });
 
       checkRequest();
+      setFormVisible(false);
     } catch (error) {
       console.error("Error submitting the form:", error);
     }
@@ -72,11 +74,21 @@ const MultiStepForm = ({ request, setRequest }) => {
   const checkRequest = async () => {
     const requestId = getRequestCookie();
 
-    console.log(requestId);
-
     const onGoingRequest = await getRequestFromFirestore(requestId);
     setRequest(onGoingRequest);
   };
+
+  useEffect(() => {
+    if (request) {
+      if (
+        request.incidentPicture &&
+        request.citizenRelation &&
+        request.incidentDescription
+      ) {
+        setIsComplete(true);
+      }
+    }
+  }, [request]);
 
   useEffect(() => {
     return () => {
@@ -203,8 +215,13 @@ const MultiStepForm = ({ request, setRequest }) => {
                 Back
               </button>
               <button
-                className="bg-primary text-white font-semibold py-2 px-4 rounded-lg transition duration-300 h-12 w-1/2"
+                className={`font-semibold py-2 px-4 rounded-lg transition duration-300 h-12 w-1/2 ${
+                  isComplete
+                    ? "bg-background-light text-background-medium"
+                    : "bg-primary text-white"
+                }`}
                 onClick={handleSubmit}
+                disabled={isComplete}
               >
                 {isLoading ? (
                   <Loader isLoading={isLoading} size={25} />
