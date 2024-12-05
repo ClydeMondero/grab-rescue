@@ -203,7 +203,7 @@ const Sidebar = ({ user }) => {
               className={`text-lg ${!isOpen ? "text-xl" : "text-lg"}`}
             />
             <span className={`${!isOpen && "hidden"} ml-4 duration-300`}>
-              Generate Reports
+              Logs
             </span>
           </Link>
           <Link
