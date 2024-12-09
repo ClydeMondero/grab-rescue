@@ -217,7 +217,7 @@ const ViewProfile = (props) => {
               </button>
             </div>
           </div>
-          {isHistoryOpen && (
+          {isHistoryOpen && requests.length > 0 && (
             <div className="mt-4">
               <h4 className="text-lg font-bold text-[#557C55]">
                 Request History
@@ -229,19 +229,23 @@ const ViewProfile = (props) => {
                     className="bg-gray-100 p-4 mt-4 rounded-lg"
                   >
                     <p className="text-lg font-semibold text-primary-dark">
-                      {request.location.address}
+                      {request.location?.address || "Address not available"}
                     </p>
                     <p className="mt-2 text-background-dark">
-                      {new Intl.DateTimeFormat("en-US", {
-                        year: "numeric",
-                        month: "2-digit",
-                        day: "2-digit",
-                      }).format(new Date(request.rescuedTimestamp))}
+                      {request.rescuedTimestamp
+                        ? new Intl.DateTimeFormat("en-US", {
+                            year: "numeric",
+                            month: "2-digit",
+                            day: "2-digit",
+                          }).format(new Date(request.rescuedTimestamp))
+                        : "Date not available"}
                     </p>
                     <div className="flex items-center gap-2">
                       <p className="text-white font-bold bg-primary py-4 px-3 rounded-lg w-max">
-                        {request.status.charAt(0).toUpperCase() +
-                          request.status.slice(1)}
+                        {request.status
+                          ? request.status.charAt(0).toUpperCase() +
+                            request.status.slice(1)
+                          : "Status not available"}
                       </p>
                       <p
                         className={
@@ -253,7 +257,7 @@ const ViewProfile = (props) => {
                             : "bg-primary")
                         }
                       >
-                        {request.rescueTypes}
+                        {request.rescueTypes || "Rescue type not available"}
                       </p>
                     </div>
                   </div>
